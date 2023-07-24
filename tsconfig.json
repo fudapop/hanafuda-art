@@ -1,0 +1,10 @@
+{
+  // https://nuxt.com/docs/guide/concepts/typescript
+  "compilerOptions": {
+    "types": [
+      "vitest/importMeta",
+      "vitest/globals"
+    ]
+  },
+  "extends": "./.nuxt/tsconfig.json"
+}
