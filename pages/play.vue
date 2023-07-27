@@ -9,7 +9,7 @@
           <div v-for="card in cs.hand.p2" class="relative rounded-sm card bg-slate-800">
             <img
               v-if="selected().value === card"
-              :src="`/webp/flash-black__${card}.webp`"
+              :src="useDesignPath(card)"
               :alt="card"
               class="absolute object-contain mx-auto"
             />
@@ -94,8 +94,10 @@ const gs = useGlobalStore();
 const { activePlayer } = storeToRefs(gs);
 const { useSelectedCard: selected } = useCardHandler();
 
+const { useDesignPath } = useCardDesign();
+
 const { autoPlay, opponentPlay } = useAutoplay();
-// const auto: Ref<boolean> = ref(false);
+const autoOpponent: Ref<boolean> = ref(false);
 const gameOver: Ref<boolean> = useState("gameover", () => false);
 const callDecision: Ref<boolean> = useState("decision", () => false);
 
@@ -125,13 +127,14 @@ const handleKoiKoi = () => {
 };
 
 const startAuto = () => {
-  // auto.value = true;
+  autoOpponent.value = false;
   gameOver.value = false;
   autoPlay();
 };
 
 const startRound = () => {
   gameOver.value = false;
+  autoOpponent.value = true;
   cs.dealCards();
 };
 
@@ -140,7 +143,7 @@ const nextRound = () => {
   gs.nextRound();
 };
 
-watch(activePlayer, async () => {
-  if (activePlayer.value.id === "p2") await opponentPlay();
+watchEffect(async () => {
+  if (autoOpponent.value && activePlayer.value.id === "p2") await opponentPlay();
 });
 </script>

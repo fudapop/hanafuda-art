@@ -1,9 +1,9 @@
 <template>
   <div v-show="cs.field.size > 0" class="relative">
-    <div class="absolute inset-0 my-auto bg-slate-800 border card">
+    <div class="absolute inset-0 my-auto border bg-slate-800 card">
       <img
         v-if="revealedCard"
-        :src="`webp/flash-black__${revealedCard}.webp`"
+        :src="useDesignPath(revealedCard)"
         :alt="revealedCard"
         class="object-contain mx-auto"
       />
@@ -12,7 +12,7 @@
         v-else
         v-show="!selectedCard && gs.checkCurrentPhase('draw')"
         type="button"
-        class="absolute my-auto inset-0 card bg-indigo-600 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        class="absolute inset-0 my-auto text-sm font-semibold text-white bg-indigo-600 shadow-sm card hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         @click="handleDraw"
       >
         Draw Card
@@ -35,10 +35,13 @@
 import { useGlobalStore } from "~/stores/globalStore";
 import { useCardStore } from "~/stores/cardStore";
 import { useCardHandler } from "~/composables/useCardHandler";
+import { useCardDesign } from "~/composables/useCardDesign";
 
 const cs = useCardStore();
 const gs = useGlobalStore();
 const { toggleActivePlayer } = gs;
+
+const { useDesignPath } = useCardDesign();
 
 const { useSelectedCard, useMatchedCards } = useCardHandler();
 const selectedCard = useSelectedCard();

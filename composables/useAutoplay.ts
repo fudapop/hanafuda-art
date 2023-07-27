@@ -21,7 +21,7 @@ export const useAutoplay = () => {
 
   const gameOver = useState("gameover");
 
-  let sleepTime = 100;
+  let sleepTime = 1000;
 
   const setPlaySpeed = (multiple: 1 | 2 | 3) => sleepTime = 1000/multiple;
 
@@ -113,6 +113,7 @@ export const useAutoplay = () => {
   const endPlay = () => (gameOver.value = true);
 
   const autoPlay = async () => {
+    setPlaySpeed(3);
     console.info("Running autoplay...");
     deal();
     await playRound();

@@ -5,6 +5,7 @@
       :class="{
         'border border-b-slate-600 transition-colors duration-300': true,
         'bg-green-500 border-b-green-300': activePlayer.id === 'p2',
+        'bg-slate-300': activePlayer.id === 'p1',
       }"
     ></div>
     <PlayArea>
@@ -15,6 +16,7 @@
       :class="{
         'border border-t-slate-600 transition-colors duration-300': true,
         'bg-green-500 border-t-green-300': activePlayer.id === 'p1',
+        'bg-slate-300': activePlayer.id === 'p2',
       }"
     ></div>
   </div>
