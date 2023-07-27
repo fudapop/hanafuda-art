@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    --card-h: 100px;
+    --card-ar: 2/3;
+    --table-grid-rows: calc(var(--card-h)/1.5) 1fr calc(var(--card-h)*2) 1fr var(--card-h);
+    min-width: 320px;
+    max-height: 100vh;
+  }
+}
+
+@layer components {
+    .card {
+      height: var(--card-h);
+      aspect-ratio: var(--card-ar);
+      border-radius: 3px;
+      padding: 1px;
+    }
+    .collection-area {
+        --card-h: 50px;
+        height: calc(var(--card-h)/2);
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: repeat(2, minmax(var(--card-h), 1fr));
+    }
+}

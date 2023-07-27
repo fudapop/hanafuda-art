@@ -1,3 +1,4 @@
+import { it, describe, expect } from "vitest";
 import { CardName } from "../cards";
 import { YAKU, checkAll } from "../yaku";
 

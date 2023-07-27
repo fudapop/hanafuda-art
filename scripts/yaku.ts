@@ -15,7 +15,6 @@ const YAKU_NAMES = [
   "kasu",
 ] as const;
 
-
 type YakuName = (typeof YAKU_NAMES)[number];
 
 type Yaku = {
@@ -24,6 +23,7 @@ type Yaku = {
   points: number;
   cards: CardName[];
   numRequired: number;
+  find: (params: Set<CardName>) => CardName[];
   check: (params: Set<CardName>) => number;
 };
 
@@ -40,12 +40,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
       "yanagi-ni-ono-no-toufuu",
     ],
     numRequired: 5,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
-      if (progress.length !== this.numRequired) return 0;
-      
+      const progress = this.find(collection);
+      if (progress.length < this.numRequired) return 0;
+
       return this.points;
     },
   },
@@ -60,13 +63,16 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
       "kiri-ni-ho-oh",
     ],
     numRequired: 4,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
       if (collection.has("yanagi-ni-ono-no-toufuu")) return 0;
 
-      const progress = getIntersection(collection, this.cards);
+      const progress = this.find(collection);
       if (progress.length !== this.numRequired) return 0;
-      
+
       return this.points;
     },
   },
@@ -82,13 +88,16 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
       "yanagi-ni-ono-no-toufuu",
     ],
     numRequired: 4,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
       if (!collection.has("yanagi-ni-ono-no-toufuu")) return 0;
 
-      const progress = getIntersection(collection, this.cards);
+      const progress = this.find(collection);
       if (progress.length !== this.numRequired) return 0;
-      
+
       return this.points;
     },
   },
@@ -103,13 +112,16 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
       "kiri-ni-ho-oh",
     ],
     numRequired: 3,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
       if (collection.has("yanagi-ni-ono-no-toufuu")) return 0;
 
-      const progress = getIntersection(collection, this.cards);
+      const progress = this.find(collection);
       if (progress.length !== this.numRequired) return 0;
-      
+
       return this.points;
     },
   },
@@ -119,12 +131,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
     description: ["Boar, Deer & Butterfly"],
     cards: ["hagi-ni-inoshishi", "momiji-ni-shika", "botan-ni-chou"],
     numRequired: 3,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
-      if (progress.length !== this.numRequired) return 0;
-      
+      const progress = this.find(collection);
+      if (progress.length < this.numRequired) return 0;
+
       return this.points;
     },
   },
@@ -134,12 +149,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
     description: ["Flower Viewing"],
     cards: ["sakura-ni-maku", "kiku-ni-sakazuki"],
     numRequired: 2,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
-      if (progress.length !== this.numRequired) return 0;
-      
+      const progress = this.find(collection);
+      if (progress.length < this.numRequired) return 0;
+
       return this.points;
     },
   },
@@ -149,12 +167,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
     description: ["Moon Viewing"],
     cards: ["susuki-ni-tsuki", "kiku-ni-sakazuki"],
     numRequired: 2,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
-      if (progress.length !== this.numRequired) return 0;
-      
+      const progress = this.find(collection);
+      if (progress.length < this.numRequired) return 0;
+
       return this.points;
     },
   },
@@ -164,12 +185,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
     description: ["Red Poetry Ribbons"],
     cards: ["matsu-no-tan", "ume-no-tan", "sakura-no-tan"],
     numRequired: 3,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
-      if (progress.length !== this.numRequired) return 0;
-      
+      const progress = this.find(collection);
+      if (progress.length < this.numRequired) return 0;
+
       return this.points;
     },
   },
@@ -179,12 +203,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
     description: ["Blue Ribbons"],
     cards: ["botan-no-tan", "kiku-no-tan", "momiji-no-tan"],
     numRequired: 3,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
-      if (progress.length !== this.numRequired) return 0;
-      
+      const progress = this.find(collection);
+      if (progress.length < this.numRequired) return 0;
+
       return this.points;
     },
   },
@@ -205,12 +232,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
       "yanagi-no-tan",
     ],
     numRequired: 5,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
+      const progress = this.find(collection);
       if (progress.length < this.numRequired) return 0;
-      
+
       return this.points + getExtraPoints(this.numRequired, progress.length);
     },
   },
@@ -230,12 +260,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
       "yanagi-ni-tsubame",
     ],
     numRequired: 5,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
+      const progress = this.find(collection);
       if (progress.length < this.numRequired) return 0;
-      
+
       return this.points + getExtraPoints(this.numRequired, progress.length);
     },
   },
@@ -270,12 +303,15 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
       "kiri-no-kasu-3",
     ],
     numRequired: 10,
-    check: function(collection) {
+    find: function (collection) {
+      return getIntersection(collection, this.cards);
+    },
+    check: function (collection) {
       if (collection.size < this.numRequired) return 0;
 
-      const progress = getIntersection(collection, this.cards);
+      const progress = this.find(collection);
       if (progress.length < this.numRequired) return 0;
-      
+
       return this.points + getExtraPoints(this.numRequired, progress.length);
     },
   },
@@ -288,21 +324,32 @@ function getExtraPoints(numRequired: number, numCollected: number): number {
 
 function getIntersection(collectedCards: Set<CardName>, yakuCards: CardName[]) {
   const hand = new Set(collectedCards);
-  const collected = yakuCards.filter(card => hand.has(card));
+  const collected = yakuCards.filter((card) => hand.has(card));
   return collected;
 }
 
-function checkAll(collection: Set<CardName>): { completed: YakuName[], score: number } {
+function checkAll(collection: Set<CardName>): {
+  completed: YakuName[];
+  score: number;
+} {
   const completed: YakuName[] = [];
-  const pointsArr = [...Object.values(YAKU)].map(yaku => {
-    const points = yaku.check(collection)
+  const pointsArr = [...Object.values(YAKU)].map((yaku) => {
+    const points = yaku.check(collection);
     if (points) completed.push(yaku.name);
     return points;
-  })
+  });
   return {
     score: pointsArr.reduce((total, n) => total + n),
     completed,
-  }
+  };
 }
 
-export { YAKU, Yaku, checkAll };
+export {
+  // Constants
+  YAKU,
+  // Types
+  Yaku,
+  YakuName,
+  // Functions
+  checkAll,
+};
