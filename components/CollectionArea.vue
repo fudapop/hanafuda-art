@@ -77,7 +77,6 @@ watchPostEffect(() => {
   }
 
   const { score, completed } = checkAll(cs.collection[player]);
-  console.log(player, { completed, previous: lastCompleted });
 
   const newCompleted = completed.map((yaku) => {
     // Allow upgrading yaku to trigger emit.

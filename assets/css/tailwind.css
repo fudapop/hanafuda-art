@@ -4,26 +4,52 @@
 
 @layer base {
   body {
-    --card-h: 100px;
-    --card-ar: 2/3;
-    --table-grid-rows: calc(var(--card-h)/1.5) 1fr calc(var(--card-h)*2) 1fr var(--card-h);
+    --card-height: 100px;
+    --card-aspect: 2/3;
+    --table-grid-rows: calc(var(--card-height) / 1.5) 1fr
+      calc(var(--card-height) * 2) 1fr var(--card-height);
     min-width: 320px;
     max-height: 100vh;
   }
 }
 
 @layer components {
-    .card {
-      height: var(--card-h);
-      aspect-ratio: var(--card-ar);
-      border-radius: 3px;
-      padding: 1px;
-    }
-    .collection-area {
-        --card-h: 50px;
-        height: calc(var(--card-h)/2);
-        display: grid;
-        grid-template-columns: 50% 50%;
-        grid-template-rows: repeat(2, minmax(var(--card-h), 1fr));
-    }
+  .card {
+    border-radius: var(--card-radius);
+    border: var(--card-border-w) solid var(--card-border-color);
+    height: var(--card-height);
+    aspect-ratio: var(--card-aspect);
+  }
+  
+  .card:is(img, .down) {
+    box-shadow: 1px 1px 2px 0 #888;
+  }
+  
+  .card.down {
+    background: var(--card-bg-color);
+    background-size: cover;
+  }
+  
+  .collection-area {
+    --card-height: 50px;
+    height: calc(var(--card-height) / 2);
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: repeat(2, minmax(var(--card-h), 1fr));
+  }
+}
+
+@layer utilities {
+
+  .staged {
+    animation: fadeRight 300ms ease-in-out 100ms forwards;
+  }
+  
+}
+  
+@keyframes fadeRight {
+  to {
+    translate: 8px 0;
+    opacity: 0;
+  }
 }

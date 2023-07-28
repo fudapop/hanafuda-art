@@ -2,33 +2,36 @@ import { useCardStore } from "~/stores/cardStore";
 import { useGlobalStore } from "~/stores/globalStore";
 import { useCardHandler } from "~/composables/useCardHandler";
 import { storeToRefs } from "pinia";
+import { shuffle } from "~/scripts/cards";
+
+const PLAY_SPEED = [0.75, 1, 1.25, 1.5, 2, 3] as const;
+
+type speedMultiple = (typeof PLAY_SPEED)[number];
 
 export const useAutoplay = () => {
   const cs = useCardStore();
   const gs = useGlobalStore();
 
-  const { useSelectedCard, useMatchedCards } = useCardHandler();
+  const { useSelectedCard, useMatchedCards, handleCardSelect, matchExists } =
+    useCardHandler();
   const selectedCard = useSelectedCard();
   const matchedCards = useMatchedCards();
 
   const { activePlayer } = storeToRefs(gs);
-  function getRandom<T>(arr: Array<T>): T {
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
-  function sleep(ms = 1000) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
 
-  const gameOver = useState("gameover");
+  const useOpponent = () => useState("opponent", () => false);
+
+  const autoOpponent = useOpponent();
+  let abort: Ref<boolean> = useState("gameover");
+  const decidingCall = useState("decision");
 
   let sleepTime = 1000;
 
-  const setPlaySpeed = (multiple: 1 | 2 | 3) => sleepTime = 1000/multiple;
+  const setPlaySpeed = (multiple: speedMultiple) =>
+    (sleepTime = 1000 / multiple);
 
-  const deal = () => cs.dealCards();
-
-  const select = () => {
-    selectedCard.value = getRandom([...cs.hand[activePlayer.value.id]]);
+  const deal = () => {
+    cs.dealCards();
   };
 
   const match = () => {
@@ -44,10 +47,6 @@ export const useAutoplay = () => {
     gs.nextPhase();
   };
 
-  const collect = () => {
-    if (cs.staged.size) cs.collectCards(activePlayer.value.id);
-  };
-
   const discard = () => {
     if (!selectedCard.value) return;
     if (!matchedCards.value?.length) {
@@ -57,28 +56,49 @@ export const useAutoplay = () => {
     }
   };
 
-  const draw = () => (selectedCard.value = cs.revealCard());
+  const ACTIONS = {
+    select() {
+      const cardsInHand = shuffle([...cs.hand[activePlayer.value.id]]);
+      for (const card of cardsInHand) {
+        if (matchExists(card)) {
+          selectedCard.value = card;
+          break;
+        }
+      }
+    },
 
-  const swap = () => {
-    gs.toggleActivePlayer();
-    if (cs.hand[activePlayer.value.id].size === 0) endPlay();
-  };
+    matchOrDiscard() {
+      switch (matchedCards.value?.length) {
+        case 0:
+          discard();
+          break;
+        default:
+          match();
+      }
+    },
 
-  const STEPS: Function[] = [
-    select,
-    match,
-    discard,
-    draw,
-    match,
-    discard,
-    collect,
-  ];
+    draw() {
+      selectedCard.value = cs.revealCard();
+    },
 
-  const playSteps = async (steps: Function[]) => {
-    for (const func of steps) {
+    collect() {
+      if (cs.staged.size) cs.collectCards(activePlayer.value.id);
+    },
+  } as const;
+
+  const TURN = {
+    select: ACTIONS.select,
+    firstMatch: ACTIONS.matchOrDiscard,
+    draw: ACTIONS.draw,
+    secondMatch: ACTIONS.matchOrDiscard,
+    collect: ACTIONS.collect,
+  } as const;
+
+  const playTurn = async () => {
+    for (const func of Object.values(TURN)) {
       try {
         func();
-        await sleep(sleepTime);
+        await sleep(sleepTime*1.5);
       } catch (err) {
         console.error(err);
         endPlay();
@@ -87,13 +107,20 @@ export const useAutoplay = () => {
     }
   };
 
-  const playRound = async () => {
-    while (gameOver.value === false) {
+  const swap = () => {
+    if (cs.handsEmpty) endPlay();
+    gs.toggleActivePlayer();
+  };
+
+  const playRound = async (turns?: number) => {
+    const maxTurns = turns ?? Infinity;
+    while (abort.value === false) {
+      if (gs.turn > maxTurns) break;
       try {
-        await playSteps(STEPS);
-        await decision();
-        if (gameOver.value) break;
+        await playTurn();
+        await autoDecision();
         await sleep(sleepTime);
+        if (abort.value) break;
         swap();
       } catch (err) {
         console.error(err);
@@ -104,36 +131,79 @@ export const useAutoplay = () => {
   };
 
   const decision = async () => {
-    while (useState("decision").value) {
+    while (decidingCall.value) {
+      if (autoOpponent.value && gs.activePlayer.id === "p1") {
+        console.log("Deciding...");
+        await autoDecision();
+        break;
+      }
       console.log("Awaiting decision...");
       await sleep(1000);
     }
   };
 
-  const endPlay = () => (gameOver.value = true);
+  const autoDecision = async () => {
+    const callChance = 25 + 10 * cs.hand.p2.size; // Max 95% for 7 cards in hand
+    const koikoiCalled =
+      cs.handNotEmpty("p2") && Math.floor(Math.random() * 100) < callChance;
+    while (decidingCall.value) {
+      // await sleep(2000);
+      // TODO: Centralize handler functions
+      if (koikoiCalled) {
+        // handleKoiKoi
+        gs.incrementBonus();
+        decidingCall.value = false;
+      } else {
+        // handleStop
+        abort.value = true;
+        decidingCall.value = false;
+        const result = gs.lastRoundResult;
+        gs.endRound();
+        console.log(
+          ...Object.entries(result as Object).map(
+            (arr) => arr.join(": ").toUpperCase() + "\n"
+          )
+        );
+      }
+    }
+  };
 
-  const autoPlay = async () => {
-    setPlaySpeed(3);
+  const endPlay = () => (abort.value = true);
+
+  type AutoplayOptions = {
+    speed?: speedMultiple;
+    turns?: number;
+    abortRef?: Ref<boolean>;
+  };
+
+  const autoPlay = async ({
+    speed = 2,
+    turns = Infinity,
+    abortRef = useState("gameover"),
+  }: AutoplayOptions) => {
+    abort = abortRef;
+    setPlaySpeed(speed);
     console.info("Running autoplay...");
     deal();
-    await playRound();
+    await playRound(turns);
     console.info("Autoplay complete.");
   };
 
-  const opponentPlay = async () => {
+  const opponentPlay = async ({speed=1}: {speed: speedMultiple}) => {
     // Wait if player is still handling decision modal
     await decision();
     // End play if player calls STOP
-    if (gameOver.value) return;
+    if (abort.value || cs.handsEmpty) return;
     if (gs.activePlayer.id === "p2") {
-      setPlaySpeed(2);
-      await playSteps(STEPS);
-      await decision();  // TODO: Automate opponent koikoi decision
+      setPlaySpeed(speed);
+      await sleep(sleepTime);
+      await playTurn();
+      await autoDecision();
       swap();
     } else {
       console.warn("Function 'opponentPlay' called while Player 1 is active.");
     }
   };
 
-  return { autoPlay, opponentPlay };
+  return { autoPlay, opponentPlay, useOpponent, TURN };
 };

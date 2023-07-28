@@ -5,9 +5,8 @@
  */
 
 import { defineStore } from "pinia";
-import { CardName, DECK, shuffle, sortByType } from "~/scripts/cards";
+import { CardName, DECK, shuffle } from "~/scripts/cards";
 import { PlayerKey } from "./globalStore";
-import { consoleLogColor } from "~/utils/logging";
 
 type PlayerCardSet = Record<PlayerKey, Set<CardName>>;
 
@@ -45,6 +44,9 @@ export const useCardStore = defineStore("cards", {
       ...state.deck,
     ],
     cardsCollected: (state) => [...state.collection.p1, ...state.collection.p2],
+    handsEmpty: (state) => [state.hand.p1, state.hand.p2].every(hand => hand.size === 0),
+    // Getter returns a function
+    handNotEmpty: (state) => (player: PlayerKey) => state.hand[player].size > 0,
     // Non-arrow function to allow use of 'this'
     integrityCheck(): boolean {
       const total = this.cardsInPlay.length + this.cardsCollected.length;
@@ -91,7 +93,7 @@ export const useCardStore = defineStore("cards", {
       this.staged.clear();
       
       consoleLogColor(`${ player.toUpperCase() } +++ Collected ${arr.map(s => s.toUpperCase()).join(" + ")}`, "palegreen");
-      console.debug("\t*Integrity Check.*", this.deck.size, "cards remaining.");
+      // console.debug("\t*Integrity Check.*", this.deck.size, "cards remaining.");
     },
     // Utility methods
     addCards(arr: CardName[], toSet: Set<CardName>) {

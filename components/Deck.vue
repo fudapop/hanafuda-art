@@ -1,30 +1,18 @@
 <template>
-  <div v-show="cs.field.size > 0" class="relative">
-    <div class="absolute inset-0 my-auto border bg-slate-800 card">
-      <img
-        v-if="revealedCard"
-        :src="useDesignPath(revealedCard)"
-        :alt="revealedCard"
-        class="object-contain mx-auto"
-      />
+  <div class="relative">
+    <div class="absolute inset-0 my-auto overflow-visible bg-slate-800 card">
+      <img :key="revealedCard" v-if="revealedCard" :src="useDesignPath(revealedCard)" :alt="revealedCard"
+        class="object-cover mx-auto transition-transform -translate-x-2 -translate-y-[53%] card" />
 
-      <button
-        v-else
-        v-show="!selectedCard && gs.checkCurrentPhase('draw')"
-        type="button"
-        class="absolute inset-0 my-auto text-sm font-semibold text-white bg-indigo-600 shadow-sm card hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        @click="handleDraw"
-      >
+      <button :key="gs.phase" v-else v-show="!selectedCard && gs.checkCurrentPhase('draw')" type="button"
+        class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-indigo-600 shadow-sm card hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        @click="handleDraw">
         Draw Card
       </button>
 
-      <button
-        v-if="selectedCard && !matchedCards?.length"
-        type="button"
-        class="absolute inset-0 my-auto text-sm font-semibold text-white bg-red-600 rounded-sm shadow-sm card hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-        :style="revealedCard ? { translate: '0 100%' } : {}"
-        @click="handleDiscard"
-      >
+      <button :key="gs.phase" v-if="selectedCard && !matchedCards?.length" type="button"
+        class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-red-600 shadow-sm card hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+        @click="handleDiscard">
         Discard
       </button>
     </div>
@@ -43,23 +31,23 @@ const { toggleActivePlayer } = gs;
 
 const { useDesignPath } = useCardDesign();
 
-const { useSelectedCard, useMatchedCards } = useCardHandler();
+const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler();
 const selectedCard = useSelectedCard();
 const matchedCards = useMatchedCards();
 const revealedCard = computed(() => gs.checkCurrentPhase("draw") && selectedCard.value);
 
-const handleDraw = () => {
-  selectedCard.value = cs.revealCard();
-  handleReveal();
-};
-
-const handleReveal = async () => {
+const handleDraw = async () => {
+  handleCardSelect(cs.revealCard());
   // Wait for player match selection or discard
   while (selectedCard.value) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await sleep(500);
     console.info("Awaiting selection...");
   }
-  toggleActivePlayer();
+  while (useState("decision").value) {
+    await sleep(500);
+    console.info("Awaiting decision...");
+  }
+  if (!cs.handsEmpty) toggleActivePlayer();
 };
 
 const handleDiscard = () => {

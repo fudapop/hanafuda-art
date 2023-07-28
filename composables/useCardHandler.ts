@@ -11,15 +11,22 @@ export const useCardHandler = () => {
   const useSelectedCard = (): Ref<CardName | null> =>
     useState("selected", () => null);
   const useMatchedCards = () =>
-    computed(() =>
-      selectedCard.value
-        ? matchByMonth(
-            // Exclude cards already staged for collection
-            [...field.value].filter((card) => !staged.value.has(card)),
-            selectedCard.value
-          )
-        : null
+    computed(() => {
+      if (!selectedCard.value) return [];
+      return matchByMonth(
+        // Exclude cards already staged for collection
+        [...field.value].filter((card) => !staged.value.has(card)),
+        selectedCard.value
+      );
+    });
+
+  const matchExists = (card?: CardName) => {
+    if (!card) return !!matchingCards.value?.length;
+    return matchByMonth(
+      [...field.value].filter((card) => !staged.value.has(card)),
+      card
     );
+  };
 
   const selectedCard = useSelectedCard();
   const matchingCards = useMatchedCards();
@@ -29,21 +36,28 @@ export const useCardHandler = () => {
       resetSelection();
       return;
     }
-    if (selectedCard.value && matchingCards.value?.length) {
+
+    if (selectedCard.value && matchExists()) {
       // Check if matches selectedCard
       matchSelection(card, selectedCard.value);
     } else {
       // Only select card from hand
       if (cs.field.has(card)) return;
       selectedCard.value = card;
-      console.log(card, "selected");
-      console.log("matches", matchingCards.value);
+      console.debug(
+        gs.activePlayer.id.toUpperCase(),
+        ">>> Selected",
+        card.toUpperCase()
+      );
+      console.debug(
+        "\tMatching:",
+        matchExists() ? matchingCards.value?.join(", ").toUpperCase() : "NONE"
+      );
     }
   };
 
   const matchSelection = (card: CardName, selected: CardName) => {
     if (matchingCards.value?.includes(card)) {
-      console.log(card, "matched");
       matchingCards.value.length === 3
         ? // Collect the entire suit
           handleMatched([...matchingCards.value, selected])
@@ -51,23 +65,24 @@ export const useCardHandler = () => {
           handleMatched([card, selected]);
     }
   };
-
+  
   const handleMatched = (matches: CardName[]) => {
     cs.stageForCollection(matches);
-    if (gs.phase === "draw") cs.collectCards(gs.activePlayer.id);
+    if (gs.checkCurrentPhase("draw")) cs.collectCards(gs.activePlayer.id);
     resetSelection();
     gs.nextPhase();
   };
 
   const resetSelection = () => {
     selectedCard.value = null;
-    console.log("Selection reset");
+    console.debug("\tSelection was reset");
   };
 
   return readonly({
     useSelectedCard,
     useMatchedCards,
     handleCardSelect,
+    matchExists,
   });
 };
 
@@ -88,8 +103,8 @@ if (import.meta.vitest) {
     expect(matches.value).toEqual(["matsu-no-kasu-1", "matsu-no-tan"]);
   });
 
-  it("returns null of no card is selected", () => {
+  it("returns an empty array if no card is selected", () => {
     useSelectedCard().value = null;
-    expect(matches.value).toBeNull();
+    expect(matches.value).toHaveLength(0);
   });
 }

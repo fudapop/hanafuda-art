@@ -1,5 +1,5 @@
 <template>
-  <div class="w-max h-max p-0" @click.capture="handleClick">
+  <div class="relative p-0 w-max h-max" @click.capture="handleClick">
     <slot />
   </div>
 </template>
@@ -13,8 +13,10 @@ const getPosition = (element: Element) => {
 };
 
 const handleClick = (ev: Event) => {
-  const position = getPosition(ev.target as Element);
+  // console.log(ev.target);
+  const position = getPosition((ev.target as Element));
   emits("locate", position);
+
 };
 </script>
 

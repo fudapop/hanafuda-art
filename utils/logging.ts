@@ -1,1 +1,0 @@
-export const consoleLogColor = (msg: string, color: string) => console.log(`%c${msg}`, `color: ${color};`);

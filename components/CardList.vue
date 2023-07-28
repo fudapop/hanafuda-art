@@ -1,18 +1,18 @@
 <template>
   <li v-for="card in cardImages" :key="card.name"
-    :class="`${stack ? '[&:not(:first-child)]:-ml-2' : ''} p-[1px] group origin-center`">
-    <ClickTarget @locate="console.log">
-      <div :class="{
-        'max-h-[--card-h] aspect-[--card-ar] cursor-pointer transition-transform': true,
-        'outline outline-green-400 scale-110 group-odd:-translate-y-2 group-even:translate-y-2 translate-x-2 z-20': matchingCards?.includes(
-          card.name
-        ),
-        '-translate-y-2': selectedCard === card.name,
-        'opacity-50 grayscale pointer-events-none': cs.staged.has(card.name),
-      }" @click="() => handleClick(card.name)">
-        <img :src="card.source" :alt="card.name" class="object-contain mx-auto" />
-      </div>
-    </ClickTarget>
+    :class="`${stack ? '[&:not(:first-child)]:-ml-2' : ''} group origin-center`">
+    <!-- <ClickTarget @locate="console.log"> -->
+      <CardTransition>
+          <div :class="{
+            'max-h-[--card-height] aspect-[--card-aspect] overflow-hidden cursor-pointer transition-transform': true,
+            'scale-105 shadow-md -translate-y-2 z-20': matchingCards?.includes(card.name),
+            '-translate-y-2 shadow-md': selectedCard === card.name,
+            'pointer-events-none staged': cs.staged.has(card.name),
+          }" @click="() => handleClick(card.name)">
+            <img :src="card.source" :alt="card.name" class="z-30 object-cover mx-auto" />
+          </div>
+      </CardTransition>
+    <!-- </ClickTarget> -->
   </li>
 </template>
 

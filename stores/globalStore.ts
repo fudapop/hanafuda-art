@@ -2,7 +2,6 @@
  * Manages global props and state variables for a running game
  */
 
-import { CompletionEvent } from "components/CollectionArea.vue";
 import { defineStore } from "pinia";
 import { YakuName } from "~/scripts/yaku";
 
@@ -98,10 +97,13 @@ export const useGlobalStore = defineStore("global", {
       consoleLogColor(`TURN ${this.turn}`, "gray");
     },
     updateScore(player: PlayerKey, amount: number) {
-      // this doesn't work
       this.players[player].score = amount;
     },
-    recordRound(data: CompletionEvent): RoundResult {
+    recordRound(data: {
+      player: PlayerKey;
+      score: number;
+      completed: YakuName[];
+    }): RoundResult {
       const result = {
         round: this.round,
         winner: data.player,
@@ -114,7 +116,7 @@ export const useGlobalStore = defineStore("global", {
     endRound() {
       this.bonusMultiplier = 1;
       this.phase = "select";
-      console.log("\t", { record: this.record });
+      // console.debug("\tRecord", this.record);
     },
     nextRound() {
       // TODO: if (!this.round === MAX_ROUNDS)
@@ -130,7 +132,7 @@ export const useGlobalStore = defineStore("global", {
     nextPhase() {
       this.phase =
         this.phase === "draw" ? (this.phase = "select") : (this.phase = "draw");
-      console.debug("\tPHASE:", this.phase.toUpperCase());
+        // console.debug("SWITCHED PHASE >>>", this.phase);
       return this.phase;
     },
   },
