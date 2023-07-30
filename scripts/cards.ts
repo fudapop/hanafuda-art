@@ -49,7 +49,7 @@ const DECK = [
   "kiri-no-kasu-3",
 ] as const;
 
-type CardName = (typeof DECK)[number];
+type CardName = (typeof DECK)[number] | "card-back";
 type CardType = "bright" | "animal" | "ribbon" | "plain";
 
 interface FlowerCard {

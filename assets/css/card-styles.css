@@ -11,9 +11,10 @@
 .cherry-version {
   --card-radius: 0.1rem;
   --card-aspect: 3/5;
-  --card-border-color: darkslategray;
-
+  --card-border-color: transparent;
+  
   & .down {
+    --card-border-color: darkslategray;
     --card-bg-color: url("/cards/cherry-version/webp/card-back.webp");
     background-size: contain !important;
     background-repeat: no-repeat !important;

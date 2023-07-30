@@ -1,8 +1,10 @@
 <template>
-  <HeroSection />
-  <Features />
-  <CallToAction />
-  <Footer />
+  <PageLayout>
+    <HeroSection />
+    <Features />
+    <CallToAction />
+    <Footer />
+  </PageLayout>
 </template>
 
 <script setup></script>

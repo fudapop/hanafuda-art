@@ -116,7 +116,7 @@ export const useGlobalStore = defineStore("global", {
     endRound() {
       this.bonusMultiplier = 1;
       this.phase = "select";
-      // console.debug("\tRecord", this.record);
+      console.debug("\tRecord", this.record);
     },
     nextRound() {
       // TODO: if (!this.round === MAX_ROUNDS)

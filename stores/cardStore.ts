@@ -60,11 +60,13 @@ export const useCardStore = defineStore("cards", {
   actions: {
     // Deal the initial hands and field
     dealCards() {
-      const cards = [...this.deck].slice(0, 24);
-      this.addCards(cards.slice(0, 8), this.hand.p1);
-      this.addCards(cards.slice(8, 16), this.hand.p2);
-      this.addCards(cards.slice(16), this.field);
-      this.removeCards(cards, this.deck);
+      this.$patch((state) => {
+        const cards = [...state.deck].slice(0, 24);
+        this.addCards(cards.slice(0, 8), state.hand.p1);
+        this.addCards(cards.slice(8, 16), state.hand.p2);
+        this.addCards(cards.slice(16), state.field);
+        this.removeCards(cards, state.deck);
+      })
     },
     // Show top card from the deck
     revealCard() {
@@ -73,9 +75,11 @@ export const useCardStore = defineStore("cards", {
     },
     // Move card from hand/deck to the field
     discard(card: CardName, player: PlayerKey) {
-      this.hand[player].delete(card);
-      this.deck.delete(card);
-      this.field.add(card);
+      this.$patch((state) => {
+        state.hand[player].delete(card);
+        state.deck.delete(card);
+        state.field.add(card);
+      })
       consoleLogColor(`${ player?.toUpperCase() ?? "  " } --- Discarded ${card.toUpperCase()}`, "palegoldenrod");
       if (this.staged.size) this.collectCards(player);
     },
@@ -86,14 +90,15 @@ export const useCardStore = defineStore("cards", {
     // Move cards from hand and field to a player's collection
     collectCards(player: PlayerKey) {
       const arr = [...this.staged];
-      this.addCards(arr, this.collection[player]);
-      this.removeCards(arr, this.hand[player]);
-      this.removeCards(arr, this.field);
-      this.removeCards(arr, this.deck);
-      this.staged.clear();
+      this.$patch((state) => {
+        this.addCards(arr, state.collection[player]);
+        this.removeCards(arr, state.hand[player]);
+        this.removeCards(arr, state.field);
+        this.removeCards(arr, state.deck);
+        state.staged.clear();
+      })
       
       consoleLogColor(`${ player.toUpperCase() } +++ Collected ${arr.map(s => s.toUpperCase()).join(" + ")}`, "palegreen");
-      // console.debug("\t*Integrity Check.*", this.deck.size, "cards remaining.");
     },
     // Utility methods
     addCards(arr: CardName[], toSet: Set<CardName>) {
@@ -107,11 +112,13 @@ export const useCardStore = defineStore("cards", {
       }
     },
     reset() {
-      for (const p in this.collection) this.collection[p as PlayerKey].clear();
-      for (const p in this.hand) this.hand[p as PlayerKey].clear();
-      this.staged.clear();
-      this.field.clear();
-      this.deck = new Set(shuffle([...DECK]));
+      this.$patch((state) => {
+        for (const p in state.collection) state.collection[p as PlayerKey].clear();
+        for (const p in state.hand) state.hand[p as PlayerKey].clear();
+        state.staged.clear();
+        state.field.clear();
+        state.deck = new Set(shuffle([...DECK]));
+      })
     }
   },
 });

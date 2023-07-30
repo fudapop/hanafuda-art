@@ -1,3 +1,5 @@
+import { CardName } from "~/scripts/cards";
+
 const DESIGNS = [
     "cherry-version",
     "koinobori",
@@ -6,9 +8,13 @@ const DESIGNS = [
 
 type CardDesign = typeof DESIGNS[number];
 
+// const IMAGE_URL_MAP: Record<CardDesign,Map<CardName,string>> = {
+
+// }
+
 export const useCardDesign = () => {
     const useDesign = (): Ref<CardDesign> => useState("design", () => "cherry-version");
-    const useDesignPath = (cardName: string) => `${useDesign().value}/webp/${cardName}.webp`;
+    const useDesignPath = (cardName: CardName) => `${useDesign().value}/webp/${cardName}.webp`;
     
     const currentDesign = useDesign();
 

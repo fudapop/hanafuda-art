@@ -1,6 +1,6 @@
 <template>
   <li v-for="card in cardImages" :key="card.name"
-    :class="`${stack ? '[&:not(:first-child)]:-ml-2' : ''} group origin-center`">
+    :class="`${stack ? '[&:not(:first-child)]:-ml-2' : ''} origin-center`">
     <!-- <ClickTarget @locate="console.log"> -->
       <CardTransition>
           <div :class="{
@@ -9,7 +9,7 @@
             '-translate-y-2 shadow-md': selectedCard === card.name,
             'pointer-events-none staged': cs.staged.has(card.name),
           }" @click="() => handleClick(card.name)">
-            <img :src="card.source" :alt="card.name" class="z-30 object-cover mx-auto" />
+            <img :src="card.source" :alt="card.name" class="object-cover mx-auto card" />
           </div>
       </CardTransition>
     <!-- </ClickTarget> -->
