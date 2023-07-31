@@ -23,7 +23,9 @@ export const useAutoplay = () => {
 
   const autoOpponent = useOpponent();
   let abort: Ref<boolean> = useState("gameover");
-  const decidingCall = useState("decision");
+
+  const { koikoiIsCalled, callKoikoi, callStop, decisionIsPending } =
+    useDecisionHandler();
 
   let sleepTime = 1000;
 
@@ -98,7 +100,7 @@ export const useAutoplay = () => {
     for (const func of Object.values(TURN)) {
       try {
         func();
-        await sleep(sleepTime*1.5);
+        await sleep(sleepTime * 1.5);
       } catch (err) {
         console.error(err);
         endPlay();
@@ -131,41 +133,48 @@ export const useAutoplay = () => {
   };
 
   const decision = async () => {
-    while (decidingCall.value) {
+    while (decisionIsPending.value) {
       if (autoOpponent.value && gs.activePlayer.id === "p1") {
         console.log("Deciding...");
         await autoDecision();
         break;
       }
       console.log("Awaiting decision...");
-      await sleep(1000);
+      await sleep();
     }
   };
 
   const autoDecision = async () => {
-    const callChance = 25 + 10 * cs.hand.p2.size; // Max 95% for 7 cards in hand
+    if (!decisionIsPending.value) return;
+    const callChance = calcKoikoiChance();
     const koikoiCalled =
       cs.handNotEmpty("p2") && Math.floor(Math.random() * 100) < callChance;
-    while (decidingCall.value) {
-      // await sleep(2000);
-      // TODO: Centralize handler functions
+    while (decisionIsPending.value) {
+      await sleep(2000);
       if (koikoiCalled) {
-        // handleKoiKoi
-        gs.incrementBonus();
-        decidingCall.value = false;
+        callKoikoi();
       } else {
-        // handleStop
-        abort.value = true;
-        decidingCall.value = false;
-        const result = gs.lastRoundResult;
-        gs.endRound();
-        console.log(
-          ...Object.entries(result as Object).map(
-            (arr) => arr.join(": ").toUpperCase() + "\n"
-          )
-        );
+        callStop();
       }
     }
+  };
+
+  const calcKoikoiChance = () => {
+    const [player, opponent] = [gs.activePlayer.id, gs.inactivePlayer.id];
+    let percentChance = 25;
+    // Higher chance if player closer to yaku
+    percentChance += 5 * cs.collection[player].size;
+    // Lower chance if opponent closer to yaku
+    percentChance += -5 * cs.collection[opponent].size;
+    // Lower chance if koi-koi already called
+    percentChance += koikoiIsCalled.value ? -25 : 0;
+    // Drastically lower chance if hand almost empty
+    percentChance += cs.hand[player].size < 2 ? -75 : 5 * cs.hand[player].size;
+
+    console.debug(player.toUpperCase(), "is calculating...", {
+      result: percentChance,
+    });
+    return percentChance;
   };
 
   const endPlay = () => (abort.value = true);
@@ -173,23 +182,39 @@ export const useAutoplay = () => {
   type AutoplayOptions = {
     speed?: speedMultiple;
     turns?: number;
+    rounds?: number;
     abortRef?: Ref<boolean>;
   };
 
   const autoPlay = async ({
     speed = 2,
     turns = Infinity,
+    rounds = 1,
     abortRef = useState("gameover"),
   }: AutoplayOptions) => {
     abort = abortRef;
     setPlaySpeed(speed);
     console.info("Running autoplay...");
-    deal();
-    await playRound(turns);
+    let r = 0;
+    while (r < rounds) {
+      try {
+        deal();
+        await playRound(turns);
+        console.info("Ending round...");
+        r++;
+        cs.reset();
+        gs.nextRound();
+        await sleep(2000);
+        abort.value = false;
+      } catch (err) {
+        console.error(err);
+        break;
+      }
+    }
     console.info("Autoplay complete.");
   };
 
-  const opponentPlay = async ({speed=1}: {speed: speedMultiple}) => {
+  const opponentPlay = async ({ speed = 1 }: { speed: speedMultiple }) => {
     // Wait if player is still handling decision modal
     await decision();
     // End play if player calls STOP

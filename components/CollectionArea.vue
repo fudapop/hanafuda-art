@@ -33,6 +33,8 @@ const emits = defineEmits<{
   (event: "completed", data: CompletionEvent): void;
 }>();
 
+const gameOver = useState("gameover");
+
 const cs = useCardStore();
 const brights: Ref<Set<CardName>> = ref(new Set([]));
 const animals: Ref<Set<CardName>> = ref(new Set([]));
@@ -67,34 +69,40 @@ const resetCollection = () => {
 
 let lastCompleted: Set<YakuName> = new Set([]);
 
-watchPostEffect(() => {
-  updateCollection();
-
-  if (useState("gameover").value) {
+watch(gameOver, () => {
+  if (gameOver.value) {
     lastCompleted.clear();
     resetCollection();
-    return;
-  }
-
-  const { score, completed } = checkAll(cs.collection[player]);
-
-  const newCompleted = completed.map((yaku) => {
-    // Allow upgrading yaku to trigger emit.
-    if (["kasu", "tan-zaku", "tane-zaku"].includes(yaku)) {
-      const extra =
-        YAKU[yaku].find(cs.collection[player]).length - YAKU[yaku].numRequired;
-      return `${yaku}+${extra}`;
-    } else {
-      return yaku;
-    }
-  }) as YakuName[];
-
-  if (newCompleted.every((yaku) => lastCompleted.has(yaku))) return;
-
-  if (completed.length) {
-    // Emits only if new yaku completed.
-    lastCompleted = new Set(newCompleted);
-    emits("completed", { player, completed, score });
   }
 });
+
+watch(
+  collection,
+  () => {
+    if (gameOver.value) return;
+    updateCollection();
+
+    const { score, completed } = checkAll(cs.collection[player]);
+
+    const newCompleted = completed.map((yaku) => {
+      // Allow upgrading yaku to trigger emit.
+      if (["kasu", "tan-zaku", "tane-zaku"].includes(yaku)) {
+        const extra =
+          YAKU[yaku].find(cs.collection[player]).length - YAKU[yaku].numRequired;
+        return `${yaku}+${extra}`;
+      } else {
+        return yaku;
+      }
+    }) as YakuName[];
+
+    if (newCompleted.every((yaku) => lastCompleted.has(yaku))) return;
+
+    if (completed.length) {
+      // Emits only if new yaku completed.
+      lastCompleted = new Set(newCompleted);
+      emits("completed", { player, completed, score });
+    }
+  },
+  { flush: "post" }
+);
 </script>

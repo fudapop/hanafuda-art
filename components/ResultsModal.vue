@@ -1,5 +1,5 @@
 <template>
-  <HeadlessTransitionRoot appear :show="roundIsEnding">
+  <HeadlessTransitionRoot appear :show="show">
     <HeadlessDialog as="div" class="relative z-10">
       <!-- BACKDROP -->
       <HeadlessTransitionChild
@@ -39,44 +39,30 @@
                     class="text-lg font-semibold leading-6 text-gray-900"
                   >
                     {{ recordedWinner?.toUpperCase() }}
-                    <span v-if="callDecision"> is deciding... </span>
-                    <span v-else> wins </span>
+                    <span v-if="decisionIsPending"> is deciding... </span>
                   </HeadlessDialogTitle>
 
                   <!-- BUTTONS -->
                   <!-- Warning is logged if no focusable elements rendered -->
                   <!-- Hidden during opponent decision -->
-                  <div class="flex flex-shrink-0 gap-2 mt-2 ml-4">
-                    <div
-                      v-if="callDecision"
-                      :class="{
-                        'opacity-0 pointer-events-none': gs.players.p2.isActive,
-                      }"
+                  <div
+                    v-if="decisionIsPending"
+                    :class="{
+                      'flex flex-shrink-0 gap-2 ml-4': true,
+                      'opacity-0 pointer-events-none': players.p2.isActive,
+                    }"
+                  >
+                    <Button button-class="secondary" :action="callStop"> Stop </Button>
+                    <Button
+                      v-show="handNotEmpty(activePlayer.id)"
+                      button-class="primary"
+                      :action="callKoikoi"
                     >
-                      <button
-                        type="button"
-                        class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-                        @click="$emit('stop')"
-                      >
-                        Stop
-                      </button>
-                      <button
-                        v-show="handNotEmpty(gs.activePlayer.id)"
-                        type="button"
-                        class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                        @click="$emit('koikoi')"
-                      >
-                        Koi-Koi
-                      </button>
-                    </div>
-                    <button
-                      v-else
-                      type="button"
-                      class="relative inline-flex items-center px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      @click="$emit('next')"
-                    >
-                      Next Round
-                    </button>
+                      Koi-Koi
+                    </Button>
+                  </div>
+                  <div v-else v-show="stopIsCalled">
+                    <Button :action="() => $emit('next')"> Next Round </Button>
                   </div>
                 </div>
               </div>
@@ -110,8 +96,7 @@
                   </p>
                   <!-- YAKU POINTS -->
                   <p class="block text-sm font-medium text-gray-500 pointer-events-none">
-                    {{ YAKU[yaku as
-                      YakuName].points }}
+                    {{ YAKU[yaku as YakuName].points }}
                     points
                   </p>
                 </li>
@@ -127,26 +112,24 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useCardStore } from "~/stores/cardStore";
-import { YAKU, YakuName } from "~/scripts/yaku";
 import { useGlobalStore } from "~/stores/globalStore";
+import { YAKU, YakuName } from "~/scripts/yaku";
 
-defineEmits(["stop", "koikoi", "next"]);
+const { show } = defineProps<{ show: boolean }>();
 
-const callDecision: Ref<boolean> = useState("decision");
-const gameOver: Ref<boolean> = useState("gameover");
+defineEmits(["next"]);
+
+const { decisionIsPending, callKoikoi, callStop, stopIsCalled } = useDecisionHandler();
 
 const { collection, handNotEmpty } = storeToRefs(useCardStore());
 
-const gs = useGlobalStore();
-const { lastRoundResult } = storeToRefs(gs);
+const { lastRoundResult, players, activePlayer } = storeToRefs(useGlobalStore());
 
 const completed = computed(() => lastRoundResult.value?.yaku);
 
 const recordedWinner = computed(() => lastRoundResult.value?.winner);
 
 const roundNotADraw = computed(() => completed.value?.length && recordedWinner);
-
-const roundIsEnding = computed(() => callDecision.value || gameOver.value);
 </script>
 
 <style scoped></style>
