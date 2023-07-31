@@ -1,6 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const NODE_ENV = process.env.NUXT_NODE_ENV ?? 'development';
-console.log(NODE_ENV);
 export default defineNuxtConfig({
   css: [
     "@/assets/css/card-styles.css",
@@ -27,7 +25,7 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    nodeEnv: NODE_ENV,
+    nodeEnv: process.env.NODE_ENV,
   },
   ssr: false,
   tailwindcss: {
@@ -36,7 +34,7 @@ export default defineNuxtConfig({
   vuefire: {
     auth: true,
     config: {
-      apiKey: 'AIzaSyBd-cAa_MlXodRUxNXJJsPc0uLz6FjdK18',
+      apiKey: process.env.API_KEY,
       authDomain: 'new-hanafuda.firebaseapp.com',
       projectId: 'new-hanafuda',
       storageBucket: "new-hanafuda.appspot.com",

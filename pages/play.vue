@@ -172,7 +172,7 @@ const handleNext = async () => {
   startRound();
 };
 
-const startAuto = () => {
+const startAuto = async () => {
   autoOpponent.value = false;
   gameOver.value = false;
   autoPlay({ speed: 3, rounds: 3 });
@@ -200,7 +200,7 @@ watch(gameOver, () => {
   if (gameOver.value === false) showModal.value = false;
 });
 
-watchEffect(() => {
+watch(activePlayer, () => {
   if (autoOpponent.value && gs.players.p2.isActive) opponentPlay({ speed: 2 });
 });
 </script>

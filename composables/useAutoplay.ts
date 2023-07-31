@@ -199,6 +199,7 @@ export const useAutoplay = () => {
     while (r < rounds) {
       try {
         deal();
+        await sleep();
         await playRound(turns);
         console.info("Ending round...");
         r++;

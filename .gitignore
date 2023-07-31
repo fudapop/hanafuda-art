@@ -18,6 +18,7 @@ logs
 .idea
 .vscode
 public/*
+wip
 
 # Local env files
 .env
