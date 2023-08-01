@@ -1,11 +1,11 @@
 <template>
-  <div class="flex min-h-screen flex-1">
-    <CircularLoader v-if="loginPending" />
-    <div class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
-      <div class="mx-auto w-full max-w-sm lg:w-96">
+  <div class="flex flex-1 min-h-screen">
+    <CircularLoader :show="loginPending" />
+    <div class="flex flex-col justify-center flex-1 px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
+      <div class="w-full max-w-sm mx-auto lg:w-96">
         <div>
           <img
-            class="h-10 w-auto"
+            class="w-auto h-10"
             src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
             alt="Your Company"
           />
@@ -66,11 +66,11 @@
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                    class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-600"
                   />
                   <label
                     for="remember-me"
-                    class="ml-3 block text-sm leading-6 text-gray-700"
+                    class="block ml-3 text-sm leading-6 text-gray-700"
                     >Remember me</label
                   >
                 </div>
@@ -92,6 +92,12 @@
               </div>
             </form>
           </div> -->
+          <Button
+            :action="login"
+            custom-class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Sign in as guest
+          </Button>
 
           <div class="mt-10">
             <div class="relative">
@@ -99,17 +105,17 @@
                 <div class="w-full border-t border-gray-200" />
               </div>
               <div class="relative flex justify-center text-sm font-medium leading-6">
-                <span class="bg-white px-6 text-gray-900">Or continue with</span>
+                <span class="px-6 text-gray-900 bg-white">Or continue with</span>
               </div>
             </div>
 
-            <div class="mt-6 grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4 mt-6">
               <Button
-                :action="login"
+                :action="() => loginWithOAuth('google')"
                 custom-class="flex w-full items-center justify-center gap-3 rounded-md bg-[#3367D6] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
               >
                 <svg
-                  class="h-5 w-5"
+                  class="w-5 h-5"
                   xmlns="http://www.w3.org/2000/svg"
                   width="31.27"
                   height="32"
@@ -135,12 +141,12 @@
                 <span class="text-sm font-semibold leading-6">Google</span>
               </Button>
 
-              <a
-                href="#"
-                class="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
+              <Button
+                :action="() => loginWithOAuth('github')"
+                custom-class="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
               >
                 <svg
-                  class="h-5 w-5"
+                  class="w-5 h-5"
                   aria-hidden="true"
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -152,7 +158,7 @@
                   />
                 </svg>
                 <span class="text-sm font-semibold leading-6">GitHub</span>
-              </a>
+              </Button>
             </div>
           </div>
         </div>
@@ -161,12 +167,20 @@
   </div>
 </template>
 <script setup lang="ts">
-const { login } = useAuth();
-const { redirect } = useRoute().query;
+const { loginWithOAuth, loginAsGuest, useGuest } = useAuth();
+const redirectUrl = (useRoute().query.redirect || "/") as string;
 const loginPending = computed(() => user.value === undefined);
 const user = useCurrentUser();
 
+const login = () => {
+  if (useGuest().value) {
+    navigateTo(redirectUrl);
+  } else {
+    loginAsGuest();
+  }
+};
+
 watch(user, () => {
-  if (user.value) navigateTo((redirect as string) || "/");
+  if (user.value) navigateTo(redirectUrl);
 });
 </script>

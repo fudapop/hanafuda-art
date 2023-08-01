@@ -1,21 +1,54 @@
 import {
+  signInAnonymously,
+  signInWithCredential,
   signInWithRedirect,
   GoogleAuthProvider,
-  getAuth,
+  GithubAuthProvider,
   signOut,
   getRedirectResult,
+  UserCredential,
 } from "firebase/auth";
-import { useCurrentUser, getCurrentUser } from "vuefire";
 import { useStorage } from "@vueuse/core";
 
+const PROVIDERS = {
+  google: () => new GoogleAuthProvider(),
+  github: () => new GithubAuthProvider(),
+} as const;
+
+type OAuthProviders = keyof typeof PROVIDERS;
+
+const useGuest = () =>
+  useStorage(
+    "hanafuda-guest",
+    (): string | undefined => undefined,
+    localStorage
+  );
+
+const useToken = () =>
+  useStorage(
+    "hanafuda-token",
+    (): string | undefined => undefined,
+    localStorage
+  );
+
 export const useAuth = () => {
-  const auth = getAuth();
-  const provider = new GoogleAuthProvider();
-  const token = ref();
+  const auth = useFirebaseAuth()!;
   const error = ref();
 
-  const login = () => {
+  const loginWithOAuth = (providerName: OAuthProviders) => {
+    const provider = PROVIDERS[providerName]();
     signInWithRedirect(auth, provider);
+  };
+
+  const loginAsGuest = async () => {
+    const { user } = await signInAnonymously(auth);
+    const idToken = await user.getIdToken();
+    const guest = {
+      uid: user.uid,
+      idToken,
+    };
+    useGuest().value = JSON.stringify(guest);
+    useToken().value = JSON.stringify(guest);
   };
 
   const logout = () => {
@@ -24,28 +57,29 @@ export const useAuth = () => {
 
   onMounted(async () => {
     try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          // This is the signed-in user
-        //   const user = result.user;
-          // This gives you a Facebook Access Token.
-          const credential = GoogleAuthProvider.credentialFromResult(result);
-          token.value = useStorage(
-            "hanafuda-auth",
-            { token: credential?.accessToken },
-            localStorage
-          );
-        }
+      const result = await getRedirectResult(auth);
+      if (result) {
+        // This is the signed-in user
+        const user = result.user;
+        // This gives you a Facebook Access Token.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        useToken().value = JSON.stringify({
+          uid: user.uid,
+          accessToken: credential?.accessToken,
+        });
+      }
     } catch (err) {
-        console.error(err);
-        error.value = err;
+      console.error(err);
+      error.value = err;
     }
   });
 
   return {
-    login,
+    loginWithOAuth,
+    loginAsGuest,
     logout,
     error,
-    token,
+    useGuest,
+    useToken,
   };
 };

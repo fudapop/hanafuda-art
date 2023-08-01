@@ -15,7 +15,7 @@
   
   & .down {
     --card-border-color: darkslategray;
-    --card-bg-color: url("/cards/cherry-version/webp/card-back.webp");
+    /* --card-bg-color: url("/cards/cherry-version/webp/card-back.webp"); */
     background-size: contain !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -35,7 +35,7 @@
   --card-aspect: 11/16;
 
   & .down {
-    background-image: url("/cards/hanami/webp/card-back.webp") !important;
+    /* background-image: url("/cards/hanami/webp/card-back.webp") !important; */
     background-color: lightgoldenrodyellow !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -49,7 +49,7 @@
   --card-radius: 0.5rem;
 
   & .down {
-    background-image: url("/cards/koinobori/webp/card-back.webp") !important;
+    /* background-image: url("/cards/koinobori/webp/card-back.webp") !important; */
     background-color: lightskyblue !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -68,7 +68,7 @@
   }
 
   & .down {
-    --card-bg-color: url("/cards/modern/webp/card-back.webp");
+    /* --card-bg-color: url("/cards/modern/webp/card-back.webp"); */
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -81,7 +81,7 @@
 
   & .down {
     --card-border-w: 2px;
-    background-image: url("/cards/moon-rabbit/webp/card-back.webp") !important;
+    /* background-image: url("/cards/moon-rabbit/webp/card-back.webp") !important; */
     background-color: lightgray !important;
     background-size: 40% !important;
     background-repeat: no-repeat !important;
@@ -94,8 +94,8 @@
   --card-border-color: #555;
 
   & .down {
-    --card-bg-color: url("/cards/nishiki-fuda/webp/card-back.webp"),
-      linear-gradient(45deg, gray, #111);
+    /* --card-bg-color: url("/cards/nishiki-fuda/webp/card-back.webp"),
+      linear-gradient(45deg, gray, #111); */
     background-blend-mode: screen;
     background-size: contain !important;
     background-repeat: no-repeat !important;
@@ -111,7 +111,7 @@
   --card-glow-color: red;
 
   & .down {
-    --card-bg-color: url("/cards/sabling-art/webp/card-back.webp");
+    /* --card-bg-color: url("/cards/sabling-art/webp/card-back.webp"); */
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;

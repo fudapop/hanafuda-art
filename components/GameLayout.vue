@@ -16,15 +16,22 @@
       </svg>
       <rect width="100%" height="100%" stroke-width="0" fill="url(#1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84)" />
     </svg>
+
     <!-- Opponent Status Bar -->
     <div :class="{
       'z-[-1] border border-b-gray-600 transition-colors duration-500 opacity-75': true,
       'bg-slate-400 border-b-slate-300 opacity-50': players.p1.isActive,
       'bg-slate-100': players.p2.isActive,
-    }"></div>
+    }">
+      <div class="p-2">
+        <StatusBar :user="null" playerNum="2" />
+      </div>
+    </div>
+
     <PlayArea>
       <slot />
     </PlayArea>
+
     <!-- Player Status Bar -->
     <div :class="{
       'z-[-1] border border-t-gray-600 transition-colors duration-500 opacity-75': true,
@@ -32,8 +39,11 @@
       'bg-slate-100': players.p1.isActive,
     }">
       <div class="p-2">
-        <StatusBar :user="user" player="p1" />
+        <StatusBar :user="user" playerNum="1" />
       </div>
+    </div>
+    <div class="absolute bottom-4 right-4">
+      <LoginButton />
     </div>
   </div>
 </template>
@@ -44,7 +54,6 @@ import { useGlobalStore } from "~/stores/globalStore";
 
 const { players } = storeToRefs(useGlobalStore());
 const user = await getCurrentUser();
-
 </script>
 
 <style scoped></style>

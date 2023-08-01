@@ -1,6 +1,6 @@
 <template>
-  <HeadlessTransitionRoot appear :show="show">
-    <HeadlessDialog as="div" class="relative z-10">
+  <HeadlessTransitionRoot appear :show="show" unmount>
+    <HeadlessDialog class="relative z-10">
       <!-- BACKDROP -->
       <HeadlessTransitionChild
         as="template"

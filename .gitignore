@@ -24,3 +24,6 @@ wip
 .env
 .env.*
 !.env.example
+
+# Sensitive
+*service_account.json

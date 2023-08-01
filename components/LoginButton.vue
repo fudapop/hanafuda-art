@@ -12,11 +12,23 @@
 </template>
 
 <script setup lang="ts">
-const { login, logout, error } = useAuth();
+const { logout, error, useGuest } = useAuth();
 const user = useCurrentUser();
 
+const login = () => {
+  if (useGuest().value) {
+    navigateTo("/");
+  } else {
+    navigateTo("/login");
+  }
+};
+
 watch(user, () => {
-  if (user.value) navigateTo("/");
+  if (user.value) {
+    navigateTo("/");
+  } else {
+    if (useRoute().meta.requiresAuth) navigateTo("/login");
+  }
 });
 </script>
 

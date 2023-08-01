@@ -1,37 +1,23 @@
 <template>
   <GameLayout>
-    <div
-      class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto"
-    >
+    <CircularLoader :show="showLoader" >
+      Starting the next round...
+    </CircularLoader>
+    <div class="absolute top-4 right-4">
+      <DesignSelector />
+    </div>
+    <div class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto">
       <!-- OPPONENT HAND -->
-      <div class="[--card-height:45px] -translate-y-4">
+      <div class="[--card-height:45px] -translate-y-4 w-max mx-auto ">
         <ListGrid :cols="8" :rows="'auto'" flow="row" gap="2px">
           <div v-for="card in hand.p2" class="relative overflow-hidden card bg-slate-800">
-            <img
-              v-if="selected().value !== card"
-              :src="useDesignPath('card-back' as CardName)"
-              alt="card-back image"
-              class="absolute object-cover mx-auto"
-            />
-            <HeadlessTransitionRoot
-              v-else
-              appear
-              :show="selected().value === card"
-              as="template"
-            >
-              <HeadlessTransitionChild
-                enter="duration-200 ease-out"
-                enter-from="opacity-0 motion-safe:-scale-x-50"
-                enter-to="opacity-100"
-                leave="duration-100 ease-in"
-                leave-from="opacity-100"
-                leave-to="opacity-0 motion-safe:translate-y-1"
-              >
-                <img
-                  :src="useDesignPath(card)"
-                  :alt="card"
-                  class="absolute z-20 object-cover mx-auto"
-                />
+            <img v-if="selected().value !== card" :src="useDesignPath('card-back' as CardName)" alt="card-back image"
+              class="absolute object-cover mx-auto" />
+            <HeadlessTransitionRoot v-else appear :show="selected().value === card" as="template">
+              <HeadlessTransitionChild enter="duration-200 ease-out" enter-from="opacity-0 motion-safe:-scale-x-50"
+                enter-to="opacity-100" leave="duration-100 ease-in" leave-from="opacity-100"
+                leave-to="opacity-0 motion-safe:translate-y-1">
+                <img :src="useDesignPath(card)" :alt="card" class="absolute z-20 object-cover mx-auto" />
               </HeadlessTransitionChild>
             </HeadlessTransitionRoot>
           </div>
@@ -44,9 +30,7 @@
       </div>
 
       <!-- FIELD -->
-      <div
-        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr]"
-      >
+      <div class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr]">
         <Deck />
         <ClickDisabled :enable-condition="players.p1.isActive && !!selected().value">
           <ListGrid :cols="6" :rows="2" flow="column" gap="4px">
@@ -61,40 +45,28 @@
       </div>
 
       <!-- PLAYER HAND -->
-      <div class="max-md:[--card-height:90px] grid place-content-center translate-y-8">
-        <ClickDisabled
-          :enable-condition="players.p1.isActive && gs.checkCurrentPhase('select')"
-        >
+      <div class="max-sm:[--card-height:85px] max-md:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-8">
+        <ClickDisabled :enable-condition="players.p1.isActive && gs.checkCurrentPhase('select')">
           <ListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
-            <CardList :cards="hand.p1" />
+            <CardList :cards="hand.p1" :stack="true" />
           </ListGrid>
         </ClickDisabled>
       </div>
     </div>
 
-    <ClientOnly>
-      <ResultsModal :show="showModal" @next="handleNext" />
-    </ClientOnly>
+    <ResultsModal :show="showModal" @next="handleNext" />
 
     <!-- DEV BUTTONS -->
-    <div
-      v-if="deck.size === 48 || gameOver"
-      class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
-    >
-      <button
-        v-if="deck.size === 48"
-        type="button"
+    <div v-if="deck.size === 48 || (gameOver && !showLoader)"
+      class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max">
+      <button v-if="deck.size === 48" type="button"
         class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        @click="startRound"
-      >
+        @click="startRound">
         Deal Cards
       </button>
-      <button
-        v-show="deck.size === 48"
-        type="button"
+      <button v-show="deck.size === 48" type="button"
         class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
-        @click="startAuto"
-      >
+        @click="startAuto">
         Autoplay
       </button>
     </div>
@@ -109,13 +81,14 @@ import { CompletionEvent } from "~/components/CollectionArea.vue";
 import { CardName } from "~/scripts/cards";
 
 definePageMeta({
+  requiresAuth: true,
   middleware: ["auth"],
 });
 
 const cs = useCardStore();
 const gs = useGlobalStore();
 const { players, activePlayer } = storeToRefs(gs);
-const { hand, field, deck, handsEmpty } = storeToRefs(cs);
+const { hand, field, deck } = storeToRefs(cs);
 const { useSelectedCard: selected } = useCardHandler();
 
 const { useDesignPath, useDesign } = useCardDesign();
@@ -123,8 +96,11 @@ useDesign().value = "cherry-version";
 
 const { autoPlay, opponentPlay, useOpponent } = useAutoplay();
 const autoOpponent: Ref<boolean> = useOpponent();
+
 const gameOver: Ref<boolean> = useState("gameover", () => false);
 const showModal = ref(false);
+const showLoader = ref(false);
+
 const {
   decisionIsPending,
   makeDecision,
@@ -164,6 +140,7 @@ const handleKoikoi = () => {
 };
 
 const handleNext = async () => {
+  showLoader.value = true;
   cs.reset();
   gs.nextRound();
   showModal.value = false;
@@ -175,11 +152,12 @@ const handleNext = async () => {
 const startAuto = async () => {
   autoOpponent.value = false;
   gameOver.value = false;
-  autoPlay({ speed: 3, rounds: 3 });
+  autoPlay({ speed: 3 });
 };
 
 const startRound = () => {
   // FIX: Opponent played twice on starting new round
+  showLoader.value = false;
   autoOpponent.value = true;
   cs.dealCards();
   if (gs.players.p2.isActive) opponentPlay({ speed: 2 });
@@ -191,9 +169,10 @@ watch(decisionIsPending, () => {
   if (stopIsCalled.value) handleStop();
 });
 
-watch(handsEmpty, () => {
-  if (handsEmpty.value === true && !decisionIsPending.value) showModal.value = true;
-});
+// This breaks, but we still need a way to handle an exhaustive draw.
+// watch(handsEmpty, () => {
+//   if (handsEmpty.value === true && !decisionIsPending.value) showModal.value = true;
+// });
 
 watch(gameOver, () => {
   // Ensure modal is closed when starting a new round during autoplay

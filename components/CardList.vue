@@ -1,17 +1,26 @@
 <template>
-  <li v-for="card in cardImages" :key="card.name"
-    :class="`${stack ? '[&:not(:first-child)]:-ml-2' : ''} origin-center`">
+  <li
+    v-for="card in cardImages"
+    :key="card.name"
+    :class="{
+      '[&:not(:first-child)]:max-sm:-ml-3 sm:[&:not(:first-child)]:-ml-2' : stack,
+       'origin-center': true,
+       }"
+  >
     <!-- <ClickTarget @locate="console.log"> -->
-      <CardTransition>
-          <div :class="{
-            'max-h-[--card-height] aspect-[--card-aspect] overflow-hidden cursor-pointer transition-transform': true,
-            'scale-105 shadow-md -translate-y-2 z-20': matchingCards?.includes(card.name),
-            '-translate-y-2 shadow-md': selectedCard === card.name,
-            'pointer-events-none staged': cs.staged.has(card.name),
-          }" @click="() => handleClick(card.name)">
-            <img :src="card.source" :alt="card.name" class="object-cover mx-auto card" />
-          </div>
-      </CardTransition>
+    <CardTransition>
+      <div
+        :class="{
+          'max-h-[--card-height] aspect-[--card-aspect] overflow-hidden cursor-pointer transition-transform': true,
+          'scale-105 shadow-md -translate-y-2 z-20': matchingCards?.includes(card.name),
+          '-translate-y-2 shadow-md': selectedCard === card.name,
+          'pointer-events-none staged': cs.staged.has(card.name),
+        }"
+        @click="() => handleClick(card.name)"
+      >
+        <img :src="card.source" :alt="card.name" class="object-cover mx-auto card" />
+      </div>
+    </CardTransition>
     <!-- </ClickTarget> -->
   </li>
 </template>

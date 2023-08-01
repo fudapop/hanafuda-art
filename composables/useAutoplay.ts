@@ -24,7 +24,7 @@ export const useAutoplay = () => {
   const autoOpponent = useOpponent();
   let abort: Ref<boolean> = useState("gameover");
 
-  const { koikoiIsCalled, callKoikoi, callStop, decisionIsPending } =
+  const { koikoiIsCalled, callKoikoi, stopIsCalled, callStop, decisionIsPending } =
     useDecisionHandler();
 
   let sleepTime = 1000;
@@ -110,7 +110,7 @@ export const useAutoplay = () => {
   };
 
   const swap = () => {
-    if (cs.handsEmpty) endPlay();
+    if (cs.handsEmpty) return endPlay();
     gs.toggleActivePlayer();
   };
 
@@ -202,9 +202,11 @@ export const useAutoplay = () => {
         await sleep();
         await playRound(turns);
         console.info("Ending round...");
-        r++;
-        cs.reset();
-        gs.nextRound();
+        if (r < rounds) {
+          r++;
+          cs.reset();
+          gs.nextRound();
+        }
         await sleep(2000);
         abort.value = false;
       } catch (err) {
