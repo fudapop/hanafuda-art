@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute inset-0 mx-auto mt-[100px]">
+  <div class="absolute inset-0 mx-auto mt-[100px] pointer-events-none">
     <HeadlessTransitionRoot appear :show="show">
       <HeadlessTransitionChild
         enter="duration-200 ease-out"
