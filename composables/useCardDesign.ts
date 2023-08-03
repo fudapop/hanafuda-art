@@ -1,4 +1,4 @@
-import { CardName } from "~/scripts/cards";
+import { CardName } from "~/utils/cards";
 
 const DESIGNS = [
     "cherry-version",

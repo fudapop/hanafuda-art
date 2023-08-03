@@ -1,6 +1,6 @@
 <template>
   <GameLayout>
-    <CircularLoader :show="showLoader" >
+    <CircularLoader :show="showLoader">
       Starting the next round...
     </CircularLoader>
     <div class="absolute top-4 right-4">
@@ -46,7 +46,7 @@
 
       <!-- PLAYER HAND -->
       <div class="max-sm:[--card-height:85px] max-md:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-8">
-        <ClickDisabled :enable-condition="players.p1.isActive && gs.checkCurrentPhase('select')">
+        <ClickDisabled :enable-condition="players.p1.isActive && ds.checkCurrentPhase('select')">
           <ListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
             <CardList :cards="hand.p1" :stack="true" />
           </ListGrid>
@@ -57,7 +57,7 @@
     <ResultsModal :show="showModal" @next="handleNext" />
 
     <!-- DEV BUTTONS -->
-    <div v-if="deck.size === 48 || (gameOver && !showLoader)"
+    <div v-if="deck.size === 48 || (roundOver && !showLoader)"
       class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max">
       <button v-if="deck.size === 48" type="button"
         class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
@@ -75,10 +75,11 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useGlobalStore } from "~/stores/globalStore";
+import { useGameDataStore } from "~/stores/gameDataStore";
+import { usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { CompletionEvent } from "~/components/CollectionArea.vue";
-import { CardName } from "~/scripts/cards";
+import { CardName } from "~/utils/cards";
 
 definePageMeta({
   requiresAuth: true,
@@ -86,9 +87,12 @@ definePageMeta({
 });
 
 const cs = useCardStore();
-const gs = useGlobalStore();
-const { players, activePlayer } = storeToRefs(gs);
+const ps = usePlayerStore();
+const ds = useGameDataStore();
 const { hand, field, deck } = storeToRefs(cs);
+const { players, activePlayer } = storeToRefs(ps);
+const { roundOver, gameOver } = storeToRefs(ds);
+
 const { useSelectedCard: selected } = useCardHandler();
 
 const { useDesignPath, useDesign } = useCardDesign();
@@ -97,7 +101,6 @@ useDesign().value = "cherry-version";
 const { autoPlay, opponentPlay, useOpponent } = useAutoplay();
 const autoOpponent: Ref<boolean> = useOpponent();
 
-const gameOver: Ref<boolean> = useState("gameover", () => false);
 const showModal = ref(false);
 const showLoader = ref(false);
 
@@ -109,14 +112,18 @@ const {
 } = useDecisionHandler();
 
 const handleCompletion = (data: CompletionEvent) => {
-  const { player, score, completed } = data;
-  gs.updateScore(player, score);
-  const message = `${player.toUpperCase()} *** Completed ${completed
+  const { player, score, completedYaku } = data;
+  ps.updateScore(player, score);
+  const message = `${player.toUpperCase()} *** Completed ${completedYaku
     .map((s) => s.toUpperCase())
     .join(" + ")}!`;
   consoleLogColor(message, "skyblue");
   consoleLogColor("\tScore: " + score, "lightblue");
-  gs.recordRound(data);
+  console.log(ds.saveResult({
+    winner: player,
+    score,
+    completedYaku,
+  }));
   handleDecision();
 };
 
@@ -124,10 +131,8 @@ const handleDecision = async () => await makeDecision();
 
 const handleStop = () => {
   console.debug(activePlayer.value.id.toUpperCase(), ">>> Called STOP");
-  gameOver.value = true;
-
-  const result = gs.lastRoundResult;
-  gs.endRound();
+  ds.endRound();
+  const result = ds.getCurrent.result;
   console.log(
     ...Object.entries(result as Object).map((arr) => arr.join(": ").toUpperCase() + "\n")
   );
@@ -135,23 +140,21 @@ const handleStop = () => {
 
 const handleKoikoi = () => {
   console.debug(activePlayer.value.id.toUpperCase(), ">>> Called KOI-KOI");
-  gs.incrementBonus();
+  ps.incrementBonus();
   showModal.value = false;
 };
 
 const handleNext = async () => {
   showLoader.value = true;
-  cs.reset();
-  gs.nextRound();
+  ds.nextRound();
   showModal.value = false;
-  gameOver.value = false;
   await sleep(2000);
   startRound();
 };
 
 const startAuto = async () => {
   autoOpponent.value = false;
-  gameOver.value = false;
+  roundOver.value = false;
   autoPlay({ speed: 3 });
 };
 
@@ -159,8 +162,8 @@ const startRound = () => {
   // FIX: Opponent played twice on starting new round
   showLoader.value = false;
   autoOpponent.value = true;
-  cs.dealCards();
-  if (gs.players.p2.isActive) opponentPlay({ speed: 2 });
+  ds.startRound();
+  if (ps.players.p2.isActive) opponentPlay({ speed: 2 });
 };
 
 watch(decisionIsPending, () => {
@@ -173,13 +176,21 @@ watch(decisionIsPending, () => {
 // watch(handsEmpty, () => {
 //   if (handsEmpty.value === true && !decisionIsPending.value) showModal.value = true;
 // });
+watch(gameOver, async () => {
+  if (gameOver.value === true) {
+    cs.reset();
+    ps.reset();
+    await sleep(2000);
+    ds.reset();
+  };
+})
 
-watch(gameOver, () => {
+watch(roundOver, () => {
   // Ensure modal is closed when starting a new round during autoplay
-  if (gameOver.value === false) showModal.value = false;
+  if (roundOver.value === false) showModal.value = false;
 });
 
 watch(activePlayer, () => {
-  if (autoOpponent.value && gs.players.p2.isActive) opponentPlay({ speed: 2 });
+  if (autoOpponent.value && ps.players.p2.isActive) opponentPlay({ speed: 2 });
 });
 </script>

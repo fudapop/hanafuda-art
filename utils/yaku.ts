@@ -345,11 +345,8 @@ function checkAll(collection: Set<CardName>): {
 }
 
 export {
-  // Constants
   YAKU,
-  // Types
   Yaku,
   YakuName,
-  // Functions
   checkAll,
 };

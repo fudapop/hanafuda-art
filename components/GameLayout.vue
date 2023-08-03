@@ -50,9 +50,9 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useGlobalStore } from "~/stores/globalStore";
+import { usePlayerStore } from "~/stores/playerStore";
 
-const { players } = storeToRefs(useGlobalStore());
+const { players } = storeToRefs(usePlayerStore());
 const user = await getCurrentUser();
 </script>
 

@@ -3,55 +3,35 @@
     <div class="absolute inset-0 my-auto overflow-visible">
       <!-- Show card-back image for face-down deck -->
       <div class="absolute inset-0 my-auto overflow-hidden card down">
-        <img
-          :src="useDesignPath('card-back')"
-          alt="card-back image"
-          class="absolute object-cover mx-auto shadow-none h-[--card-height]"
-        />
+        <img :src="useDesignPath('card-back')" alt="card-back image"
+          class="absolute object-cover mx-auto shadow-none h-[--card-height]" />
       </div>
 
       <!-- Show revealed card when drawing from deck         -->
       <div v-if="revealedCard">
         <HeadlessTransitionRoot appear :show="true" as="template">
-          <HeadlessTransitionChild
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 motion-safe:-scale-x-50"
-            enter-to="opacity-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100"
-            leave-to="opacity-0 motion-safe:translate-x-1"
-          >
-            <img
-              :key="revealedCard"
-              :src="useDesignPath(revealedCard)"
-              :alt="revealedCard"
-              class="object-cover mx-auto transition-transform -translate-x-4 card"
-            />
+          <HeadlessTransitionChild enter="duration-300 ease-out" enter-from="opacity-0 motion-safe:-scale-x-50"
+            enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100"
+            leave-to="opacity-0 motion-safe:translate-x-1">
+            <img :key="revealedCard" :src="useDesignPath(revealedCard)" :alt="revealedCard"
+              class="object-cover mx-auto transition-transform -translate-x-4 card" />
           </HeadlessTransitionChild>
         </HeadlessTransitionRoot>
       </div>
 
       <!-- Show 'Draw Card' button after the first match/discard -->
-      <button
-        :key="gs.phase"
-        v-else
-        v-show="!selectedCard && gs.checkCurrentPhase('draw')"
-        type="button"
+      <!-- <button v-else v-show="!selectedCard && ds.checkCurrentPhase('draw')" type="button"
         class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-indigo-600 shadow-sm card hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        @click="handleDraw"
-      >
+        @click="handleDraw">
         Draw Card
-      </button>
+      </button> -->
+
 
       <!-- Show the 'Discard' button if there are no matches 
         on the field for the selected card -->
-      <button
-        :key="gs.phase"
-        v-if="selectedCard && !matchedCards?.length"
-        type="button"
-        class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-red-600 shadow-sm card hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-        @click="handleDiscard"
-      >
+      <button v-if="selectedCard && !matchedCards?.length" v-hide:from="'p2'" v-hide:during="'draw'" type="button"
+        class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-red-600 shadow-xl border border-red-800 card hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+        @click="matchOrDiscard">
         Discard
       </button>
     </div>
@@ -59,42 +39,59 @@
 </template>
 
 <script setup lang="ts">
-import { useGlobalStore } from "~/stores/globalStore";
-import { useCardStore } from "~/stores/cardStore";
+import { useGameDataStore } from "~/stores/gameDataStore";
+import { usePlayerStore } from "~/stores/playerStore";
 import { useCardHandler } from "~/composables/useCardHandler";
 import { useCardDesign } from "~/composables/useCardDesign";
 
-const cs = useCardStore();
-const gs = useGlobalStore();
-const { toggleActivePlayer } = gs;
+const ps = usePlayerStore();
+const ds = useGameDataStore();
 
 const { useDesignPath } = useCardDesign();
 
-const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler();
+const { useSelectedCard, useMatchedCards, useActions } = useCardHandler();
+const { draw, matchOrDiscard, collect } = useActions();
+
+const { errorOnTimeout } = useTimeout();
+
 const selectedCard = useSelectedCard();
 const matchedCards = useMatchedCards();
-const revealedCard = computed(() => gs.checkCurrentPhase("draw") && selectedCard.value);
+const revealedCard = computed(() => ds.checkCurrentPhase("draw") && selectedCard.value);
 
-const { stopIsCalled, decisionIsPending } = useDecisionHandler();
+const isDrawPhase = computed(() => ds.checkCurrentPhase("draw") && ps.players.p1.isActive);
+const autoOpponent = useState("opponent");
 
-const handleDraw = async () => {
-  handleCardSelect(cs.revealCard());
-  // Wait for player match selection or discard
-  console.info("Awaiting selection...");
-  while (selectedCard.value) {
-    await sleep(500);
+const playDrawPhase = async () => {
+  draw();
+  await sleep();
+  // Allow player to select match
+  if (matchedCards.value.length === 2) {
+    errorOnTimeout(selectMatchFromField, 10000, "match-on-draw", {
+      startMsg: "Awaiting match selection..."
+    }).start();
+  } else {
+    matchOrDiscard();
   }
-  console.info("Awaiting decision...");
-  while (decisionIsPending.value) {
+  await sleep();
+  collect();
+  await sleep();
+}
+
+const selectMatchFromField = async () => {
+  while (selectedCard.value) {
+    if (ds.roundOver || ds.gameOver) break;
+    console.log("Awaiting match selection...")
     await sleep();
   }
-  if (!cs.handsEmpty && !stopIsCalled.value) toggleActivePlayer();
-};
+}
 
-const handleDiscard = () => {
-  if (selectedCard.value === null) return;
-  cs.discard(selectedCard.value, gs.activePlayer.id);
-  selectedCard.value = null;
-  gs.nextPhase();
-};
+watch(isDrawPhase, () => {
+  if (isDrawPhase.value) {
+    // If P2 is active, the turn is controlled by useAutoplay
+    if (autoOpponent.value && ps.players.p1.isActive) {
+      // Autoplay the draw phase for P1
+      playDrawPhase();
+    }
+  }
+})
 </script>

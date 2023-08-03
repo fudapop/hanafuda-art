@@ -17,15 +17,15 @@
 </template>
 
 <script setup lang="ts">
-import { PlayerKey } from "~/stores/globalStore";
+import { PlayerKey } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
-import { CardName, sortByType } from "~/scripts/cards";
-import { checkAll, YAKU, YakuName } from "~/scripts/yaku";
+import { CardName, sortByType } from "~/utils/cards";
+import { checkAll, YAKU, YakuName } from "~/utils/yaku";
 
 export type CompletionEvent = {
   player: PlayerKey;
-  completed: YakuName[];
   score: number;
+  completedYaku: YakuName[];
 };
 
 const { player } = defineProps<{ player: PlayerKey }>();
@@ -82,9 +82,9 @@ watch(
     if (gameOver.value) return;
     updateCollection();
 
-    const { score, completed } = checkAll(cs.collection[player]);
+    const { score, completed: completedYaku } = checkAll(cs.collection[player]);
 
-    const newCompleted = completed.map((yaku) => {
+    const newCompleted = completedYaku.map((yaku) => {
       // Allow upgrading yaku to trigger emit.
       if (["kasu", "tan-zaku", "tane-zaku"].includes(yaku)) {
         const extra =
@@ -97,12 +97,13 @@ watch(
 
     if (newCompleted.every((yaku) => lastCompleted.has(yaku))) return;
 
-    if (completed.length) {
+    if (completedYaku.length) {
       // Emits only if new yaku completed.
       lastCompleted = new Set(newCompleted);
-      emits("completed", { player, completed, score });
+      emits("completed", { player, score, completedYaku });
     }
   },
   { flush: "post" }
 );
 </script>
+lib/cardslib/yaku

@@ -1,3 +1,6 @@
+import { storeToRefs } from "pinia";
+import { useGameDataStore } from "~/stores/gameDataStore";
+
 export const useDecisionHandler = () => {
   type KoikoiDecision = "stop" | "koikoi" | "pending" | null;
 
@@ -27,9 +30,9 @@ export const useDecisionHandler = () => {
     return decision.value;
   };
 
-  const gameOver = useState("gameover");
-  watch(gameOver, () => {
-    if (gameOver.value === false) decision.value = null;
+  const {roundOver} = storeToRefs(useGameDataStore());
+  watch(roundOver, () => {
+    if (roundOver.value === false) decision.value = null;
   })
 
   return {

@@ -338,13 +338,10 @@ function matchByMonth(cards: CardName[], matching: CardName): CardName[] {
 }
 
 export {
-  // constants
   DECK,
   CARDS,
-  // types
   CardName,
   FlowerCard,
-  // functions
   shuffle,
   sortByType,
   matchByMonth,

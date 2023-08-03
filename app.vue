@@ -7,7 +7,11 @@
 <script setup lang="ts">
 import "vant/lib/index.css";
 import { Loading } from "vant";
+import { vHide } from "~/utils/directives/vHide";
 
-useNuxtApp().vueApp.use(Loading);
+const app = useNuxtApp().vueApp;
 
+app.use(Loading);
+
+app.directive("hide", vHide);
 </script>

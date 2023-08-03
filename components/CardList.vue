@@ -12,7 +12,7 @@
       <div
         :class="{
           'max-h-[--card-height] aspect-[--card-aspect] overflow-hidden cursor-pointer transition-transform': true,
-          'scale-105 shadow-md -translate-y-2 z-20': matchingCards?.includes(card.name),
+          'scale-105 shadow-md -translate-y-2 z-20': matchedCards?.includes(card.name),
           '-translate-y-2 shadow-md': selectedCard === card.name,
           'pointer-events-none staged': cs.staged.has(card.name),
         }"
@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { useCardDesign } from "~/composables/useCardDesign";
-import { CardName } from "~/scripts/cards";
+import { CardName } from "~/utils/cards";
 import { useCardStore } from "~/stores/cardStore";
 
 const { cards, stack = false } = defineProps<{
@@ -48,9 +48,10 @@ const cs = useCardStore();
 const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler();
 
 const selectedCard = useSelectedCard();
-const matchingCards = useMatchedCards();
+const matchedCards = useMatchedCards();
 
 const handleClick = (card: CardName) => {
   handleCardSelect(card);
 };
 </script>
+lib/cards
