@@ -1,5 +1,5 @@
 import { storeToRefs } from "pinia";
-import { CardName } from "~/utils/cards";
+import { CardName, matchByMonth, shuffle } from "~/utils/cards";
 import { useCardStore } from "~/stores/cardStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
 
