@@ -121,7 +121,7 @@ export const useAutoplay = () => {
 			if (abort.value) break;
 			try {
 				func();
-				await sleep(sleepTime * 1.5);
+				await sleep(sleepTime * 2);
 			} catch (err) {
 				console.error(err);
 				endPlay();

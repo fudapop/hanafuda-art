@@ -10,7 +10,7 @@
       <!-- OPPONENT HAND -->
       <div class="[--card-height:45px] -translate-y-4 w-max mx-auto ">
         <ListGrid :cols="8" :rows="'auto'" flow="row" gap="2px">
-          <div v-for="card in hand.p2" class="relative overflow-hidden card bg-slate-800">
+          <div v-for="card in hand.p2" class="relative overflow-hidden card down bg-slate-800">
             <img v-if="selected().value !== card" :src="useDesignPath('card-back' as CardName)" alt="card-back image"
               class="absolute object-cover mx-auto" />
             <HeadlessTransitionRoot v-else appear :show="selected().value === card" as="template">
@@ -30,13 +30,12 @@
       </div>
 
       <!-- FIELD -->
-      <div class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr]">
+      <div v-click-disabled:unless="players.p1.isActive && !!selected().value"
+        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr]">
         <Deck />
-        <ClickDisabled :enable-condition="players.p1.isActive && !!selected().value">
-          <ListGrid :cols="6" :rows="2" flow="column" gap="4px">
-            <CardList :cards="field" />
-          </ListGrid>
-        </ClickDisabled>
+        <ListGrid :cols="6" :rows="2" flow="column" gap="4px">
+          <CardList :cards="field" />
+        </ListGrid>
       </div>
 
       <!-- PLAYER COLLECTION -->
@@ -45,16 +44,15 @@
       </div>
 
       <!-- PLAYER HAND -->
-      <div class="max-sm:[--card-height:85px] max-md:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-8">
-        <ClickDisabled :enable-condition="players.p1.isActive && ds.checkCurrentPhase('select')">
-          <ListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
-            <CardList :cards="hand.p1" :stack="true" />
-          </ListGrid>
-        </ClickDisabled>
+      <div v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
+        class="max-sm:[--card-height:85px] max-md:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-8">
+        <ListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
+          <CardList :cards="hand.p1" :stack="true" />
+        </ListGrid>
       </div>
     </div>
 
-    <ResultsModal :show="showModal" @next="handleNext" />
+    <LazyResultsModal :show="showModal" @next="handleNext" />
 
     <!-- DEV BUTTONS -->
     <div v-if="deck.size === 48 || (roundOver && !showLoader)"
@@ -155,7 +153,7 @@ const handleNext = async () => {
 const startAuto = async () => {
   autoOpponent.value = false;
   roundOver.value = false;
-  autoPlay({ speed: 3 });
+  autoPlay({ speed: 3, rounds: 3 });
 };
 
 const startRound = () => {

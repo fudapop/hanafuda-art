@@ -99,8 +99,8 @@ export const useGameDataStore = defineStore("gameData", () => {
 				error: "forfeit",
 			});
 		roundOver.value = true;
-		if (roundCounter.value >= useConfig().maxRounds) gameOver.value = true;
 		console.debug("\tRecord", roundHistory.value);
+		// if (roundCounter.value >= useConfig().maxRounds) gameOver.value = true;
 	}
 
 	function nextRound() {

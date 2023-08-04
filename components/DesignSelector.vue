@@ -76,6 +76,7 @@ const designList: Array<typeof selectedDesign.value> = [
     "cherry-version",
     "sabling-art",
     "koinobori",
+    "flash-black",
 ];
 
 onMounted(() => {

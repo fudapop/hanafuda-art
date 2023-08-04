@@ -8,10 +8,12 @@
 import "vant/lib/index.css";
 import { Loading } from "vant";
 import { vHide } from "~/utils/directives/vHide";
+import { vClickDisabled } from "~/utils/directives/vClickDisabled";
 
 const app = useNuxtApp().vueApp;
 
 app.use(Loading);
 
 app.directive("hide", vHide);
+app.directive("click-disabled", vClickDisabled);
 </script>

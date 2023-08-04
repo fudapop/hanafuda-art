@@ -21,6 +21,8 @@ import { PlayerKey } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { CardName, sortByType } from "~/utils/cards";
 import { checkAll, YAKU, YakuName } from "~/utils/yaku";
+import { useGameDataStore } from "~/stores/gameDataStore";
+import { storeToRefs } from "pinia";
 
 export type CompletionEvent = {
   player: PlayerKey;
@@ -33,9 +35,9 @@ const emits = defineEmits<{
   (event: "completed", data: CompletionEvent): void;
 }>();
 
-const gameOver = useState("gameover");
-
+const { roundOver } = storeToRefs(useGameDataStore());
 const cs = useCardStore();
+
 const brights: Ref<Set<CardName>> = ref(new Set([]));
 const animals: Ref<Set<CardName>> = ref(new Set([]));
 const ribbons: Ref<Set<CardName>> = ref(new Set([]));
@@ -69,8 +71,8 @@ const resetCollection = () => {
 
 let lastCompleted: Set<YakuName> = new Set([]);
 
-watch(gameOver, () => {
-  if (gameOver.value) {
+watch(roundOver, () => {
+  if (roundOver.value) {
     lastCompleted.clear();
     resetCollection();
   }
@@ -79,7 +81,7 @@ watch(gameOver, () => {
 watch(
   collection,
   () => {
-    if (gameOver.value) return;
+    if (roundOver.value) return;
     updateCollection();
 
     const { score, completed: completedYaku } = checkAll(cs.collection[player]);

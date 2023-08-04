@@ -31,8 +31,11 @@ export const useDecisionHandler = () => {
   };
 
   const {roundOver} = storeToRefs(useGameDataStore());
-  watch(roundOver, () => {
-    if (roundOver.value === false) decision.value = null;
+  const unwatch = watch(roundOver, () => {
+    if (roundOver.value === false) {
+      decision.value = null;
+      unwatch()
+    }
   })
 
   return {

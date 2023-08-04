@@ -13,6 +13,9 @@
           <HeadlessTransitionChild enter="duration-300 ease-out" enter-from="opacity-0 motion-safe:-scale-x-50"
             enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100"
             leave-to="opacity-0 motion-safe:translate-x-1">
+            <!-- TODO: Fetch card images
+            <CardImage :key="revealedCard" :card="revealedCard" :img-url="useDesignPath(revealedCard)"
+              class="object-cover mx-auto transition-transform -translate-x-4 card" /> -->
             <img :key="revealedCard" :src="useDesignPath(revealedCard)" :alt="revealedCard"
               class="object-cover mx-auto transition-transform -translate-x-4 card" />
           </HeadlessTransitionChild>
