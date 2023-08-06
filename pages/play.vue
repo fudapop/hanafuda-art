@@ -149,7 +149,7 @@ const {
 
 const handleCompletion = (data: CompletionEvent) => {
   const { player, score, completedYaku } = data;
-  ps.updateScore(player, score);
+  ps.updateScore(player, score * ps.bonusMultiplier);
   const message = `${player.toUpperCase()} *** Completed ${completedYaku
     .map((s) => s.toUpperCase())
     .join(" + ")}!`;
@@ -158,7 +158,7 @@ const handleCompletion = (data: CompletionEvent) => {
   console.log(
     ds.saveResult({
       winner: player,
-      score,
+      score: score * ps.bonusMultiplier,
       completedYaku,
     })
   );
