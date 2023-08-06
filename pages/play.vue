@@ -8,47 +8,7 @@
       class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto"
     >
       <!-- OPPONENT HAND -->
-      <div class="relative [--card-height:45px] -translate-y-4 w-max mx-auto">
-        <ListGrid :cols="8" :rows="'auto'" flow="row" gap="2px">
-          <!-- FACE-DOWN CARDS -->
-          <div
-            v-for="card in hand.p2"
-            :class="{
-              'relative card down bg-slate-800': true,
-              'opacity-0 transition-opacity':
-                card === selectedCard || cs.staged.has(card),
-            }"
-          ></div>
-
-          <!-- OPPONENT-SELECTED CARD -->
-          <div
-            :class="{
-              'transition-transform absolute top-1/2 inset-x-0 mx-auto': true,
-              'scale-y-[2] scale-x-[2] translate-y-2': selectedCard,
-            }"
-          >
-            <Transition
-              appear
-              mode="out-in"
-              enter-active-class="duration-200 ease-out"
-              enter-from-class="opacity-0 motion-safe:-scale-x-50"
-              enter-to-class="opacity-100"
-              leave-active-class="duration-200 ease-in"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0 motion-safe:translate-y-2"
-            >
-              <CardImage
-                class="card"
-                v-if="
-                  selectedCard && players.p2.isActive && ds.checkCurrentPhase('select')
-                "
-                :src="getCardUrl(selectedCard)!"
-                :card="selectedCard"
-              />
-            </Transition>
-          </div>
-        </ListGrid>
-      </div>
+      <OpponentArea />
 
       <!-- OPPONENT COLLECTION -->
       <div class="-translate-y-8 pointer-events-none -z-10">
@@ -82,7 +42,10 @@
       </div>
     </div>
 
-    <LazyResultsModal :show="showModal" @next="handleNext" />
+    <LazyResultsModal :show="showModal">
+      <LazyRoundResults @next="handleNext" />
+      <!-- TODO: if last round <FinalResults /> -->
+    </LazyResultsModal>
 
     <!-- DEV BUTTONS -->
     <div
@@ -115,7 +78,6 @@ import { useGameDataStore } from "~/stores/gameDataStore";
 import { usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { CompletionEvent } from "~/components/CollectionArea.vue";
-import { CardName } from "~/utils/cards";
 
 definePageMeta({
   requiresAuth: true,
@@ -131,8 +93,6 @@ const { roundOver, gameOver } = storeToRefs(ds);
 
 const { useSelectedCard } = useCardHandler();
 const selectedCard = useSelectedCard();
-
-const { getCardUrl } = useCardDesign();
 
 const { autoPlay, opponentPlay, useOpponent } = useAutoplay();
 const autoOpponent: Ref<boolean> = useOpponent();
