@@ -9,9 +9,9 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <van-loading :size="size || '64px'" :color="color || '#3367D6'" vertical>
-          <slot />
-        </van-loading>
+        <!-- <van-loading :size="size || '64px'" :color="color || '#3367D6'" vertical> -->
+        <slot />
+        <!-- </van-loading> -->
       </HeadlessTransitionChild>
     </HeadlessTransitionRoot>
   </div>

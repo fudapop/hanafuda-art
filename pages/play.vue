@@ -1,25 +1,51 @@
 <template>
   <GameLayout>
-    <CircularLoader :show="showLoader">
-      Starting the next round...
-    </CircularLoader>
+    <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader>
     <div class="absolute top-4 right-4">
       <DesignSelector />
     </div>
-    <div class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto">
+    <div
+      class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto"
+    >
       <!-- OPPONENT HAND -->
-      <div class="[--card-height:45px] -translate-y-4 w-max mx-auto ">
+      <div class="relative [--card-height:45px] -translate-y-4 w-max mx-auto">
         <ListGrid :cols="8" :rows="'auto'" flow="row" gap="2px">
-          <div v-for="card in hand.p2" class="relative overflow-hidden card down bg-slate-800">
-            <img v-if="selected().value !== card" :src="useDesignPath('card-back' as CardName)" alt="card-back image"
-              class="absolute object-cover mx-auto" />
-            <HeadlessTransitionRoot v-else appear :show="selected().value === card" as="template">
-              <HeadlessTransitionChild enter="duration-200 ease-out" enter-from="opacity-0 motion-safe:-scale-x-50"
-                enter-to="opacity-100" leave="duration-100 ease-in" leave-from="opacity-100"
-                leave-to="opacity-0 motion-safe:translate-y-1">
-                <img :src="useDesignPath(card)" :alt="card" class="absolute z-20 object-cover mx-auto" />
-              </HeadlessTransitionChild>
-            </HeadlessTransitionRoot>
+          <!-- FACE-DOWN CARDS -->
+          <div
+            v-for="card in hand.p2"
+            :class="{
+              'relative card down bg-slate-800': true,
+              'opacity-0 transition-opacity':
+                card === selectedCard || cs.staged.has(card),
+            }"
+          ></div>
+
+          <!-- OPPONENT-SELECTED CARD -->
+          <div
+            :class="{
+              'transition-transform absolute top-1/2 inset-x-0 mx-auto': true,
+              'scale-y-[2] scale-x-[2] translate-y-2': selectedCard,
+            }"
+          >
+            <Transition
+              appear
+              mode="out-in"
+              enter-active-class="duration-200 ease-out"
+              enter-from-class="opacity-0 motion-safe:-scale-x-50"
+              enter-to-class="opacity-100"
+              leave-active-class="duration-200 ease-in"
+              leave-from-class="opacity-100"
+              leave-to-class="opacity-0 motion-safe:translate-y-2"
+            >
+              <CardImage
+                class="card"
+                v-if="
+                  selectedCard && players.p2.isActive && ds.checkCurrentPhase('select')
+                "
+                :src="getCardUrl(selectedCard)!"
+                :card="selectedCard"
+              />
+            </Transition>
           </div>
         </ListGrid>
       </div>
@@ -30,8 +56,10 @@
       </div>
 
       <!-- FIELD -->
-      <div v-click-disabled:unless="players.p1.isActive && !!selected().value"
-        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr]">
+      <div
+        v-click-disabled:unless="players.p1.isActive && !!selectedCard"
+        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr]"
+      >
         <Deck />
         <ListGrid :cols="6" :rows="2" flow="column" gap="4px">
           <CardList :cards="field" />
@@ -39,13 +67,15 @@
       </div>
 
       <!-- PLAYER COLLECTION -->
-      <div class="pointer-events-none -z-10">
+      <div class="h-full pointer-events-none -z-10">
         <CollectionArea player="p1" @completed="(data) => handleCompletion(data)" />
       </div>
 
       <!-- PLAYER HAND -->
-      <div v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
-        class="max-sm:[--card-height:85px] max-md:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-8">
+      <div
+        v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
+        class="max-sm:[--card-height:85px] max-md:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-8"
+      >
         <ListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
           <CardList :cards="hand.p1" :stack="true" />
         </ListGrid>
@@ -55,16 +85,24 @@
     <LazyResultsModal :show="showModal" @next="handleNext" />
 
     <!-- DEV BUTTONS -->
-    <div v-if="deck.size === 48 || (roundOver && !showLoader)"
-      class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max">
-      <button v-if="deck.size === 48" type="button"
+    <div
+      v-if="deck.size === 48 || (roundOver && !showLoader)"
+      class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
+    >
+      <button
+        v-if="deck.size === 48"
+        type="button"
         class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        @click="startRound">
+        @click="startRound"
+      >
         Deal Cards
       </button>
-      <button v-show="deck.size === 48" type="button"
+      <button
+        v-show="deck.size === 48"
+        type="button"
         class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
-        @click="startAuto">
+        @click="startAuto"
+      >
         Autoplay
       </button>
     </div>
@@ -91,10 +129,10 @@ const { hand, field, deck } = storeToRefs(cs);
 const { players, activePlayer } = storeToRefs(ps);
 const { roundOver, gameOver } = storeToRefs(ds);
 
-const { useSelectedCard: selected } = useCardHandler();
+const { useSelectedCard } = useCardHandler();
+const selectedCard = useSelectedCard();
 
-const { useDesignPath, useDesign } = useCardDesign();
-useDesign().value = "cherry-version";
+const { getCardUrl } = useCardDesign();
 
 const { autoPlay, opponentPlay, useOpponent } = useAutoplay();
 const autoOpponent: Ref<boolean> = useOpponent();
@@ -117,11 +155,13 @@ const handleCompletion = (data: CompletionEvent) => {
     .join(" + ")}!`;
   consoleLogColor(message, "skyblue");
   consoleLogColor("\tScore: " + score, "lightblue");
-  console.log(ds.saveResult({
-    winner: player,
-    score,
-    completedYaku,
-  }));
+  console.log(
+    ds.saveResult({
+      winner: player,
+      score,
+      completedYaku,
+    })
+  );
   handleDecision();
 };
 
@@ -180,8 +220,8 @@ watch(gameOver, async () => {
     ps.reset();
     await sleep(2000);
     ds.reset();
-  };
-})
+  }
+});
 
 watch(roundOver, () => {
   // Ensure modal is closed when starting a new round during autoplay
@@ -189,6 +229,9 @@ watch(roundOver, () => {
 });
 
 watch(activePlayer, () => {
-  if (autoOpponent.value && ps.players.p2.isActive) opponentPlay({ speed: 2 });
+  if (autoOpponent.value && ps.players.p2.isActive) {
+    // while (decisionIsPending.value) await sleep();
+    opponentPlay({ speed: 2 });
+  }
 });
 </script>

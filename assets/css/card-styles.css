@@ -9,14 +9,14 @@
 }
 
 .cherry-version {
-  --card-radius: 0.1rem;
+  --card-radius: 2px;
   --card-aspect: 3/5;
   --card-border-color: transparent;
   
   & .down {
     --card-border-color: darkslategray;
-    /* --card-bg-color: url("/cards/cherry-version/webp/card-back.webp"); */
-    background-size: contain !important;
+    --card-bg-color: url("/cards/cherry-version/card-back.webp");
+    background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
   }
@@ -35,7 +35,7 @@
   --card-aspect: 11/16;
 
   & .down {
-    /* background-image: url("/cards/hanami/webp/card-back.webp") !important; */
+    background-image: url("/cards/hanami/card-back.webp") !important;
     background-color: lightgoldenrodyellow !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -48,8 +48,12 @@
   --card-border-color: #333;
   --card-radius: 0.5rem;
 
+  & .card img {
+    scale: 1.01;
+  }
+
   & .down {
-    /* background-image: url("/cards/koinobori/webp/card-back.webp") !important; */
+    background-image: url("/cards/koinobori/card-back.webp") !important;
     background-color: lightskyblue !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -68,7 +72,7 @@
   }
 
   & .down {
-    /* --card-bg-color: url("/cards/modern/webp/card-back.webp"); */
+    --card-bg-color: url("/cards/modern/card-back.webp");
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -81,7 +85,7 @@
 
   & .down {
     --card-border-w: 2px;
-    /* background-image: url("/cards/moon-rabbit/webp/card-back.webp") !important; */
+    background-image: url("/cards/moon-rabbit/card-back.webp") !important;
     background-color: lightgray !important;
     background-size: 40% !important;
     background-repeat: no-repeat !important;
@@ -94,8 +98,8 @@
   --card-border-color: #555;
 
   & .down {
-    /* --card-bg-color: url("/cards/nishiki-fuda/webp/card-back.webp"),
-      linear-gradient(45deg, gray, #111); */
+    --card-bg-color: url("/cards/nishiki-fuda/card-back.webp"),
+      linear-gradient(45deg, gray, #111);
     background-blend-mode: screen;
     background-size: contain !important;
     background-repeat: no-repeat !important;
@@ -107,11 +111,17 @@
 }
 
 .sabling-art {
-  --card-radius: calc(0.2 * var(--card-width));
+  --card-radius: 8px;
+  --card-border-w: 1px;
+  --card-border-color: midnightblue;
   --card-glow-color: red;
 
+  & .card img {
+    scale: 1.05;
+  }
+
   & .down {
-    /* --card-bg-color: url("/cards/sabling-art/webp/card-back.webp"); */
+    --card-bg-color: url("/cards/sabling-art/card-back.webp");
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;

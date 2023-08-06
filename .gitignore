@@ -17,7 +17,6 @@ logs
 .fleet
 .idea
 .vscode
-public/*
 wip
 
 # Local env files

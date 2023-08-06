@@ -63,7 +63,7 @@ export const usePlayerStore = defineStore("players", () => {
 	}
 
 	function updateScore(player: PlayerKey, amount: number) {
-		players[player].score = amount;
+		players[player].score = amount * bonusMultiplier.value;
 	}
 
   function reset(newDealer?: PlayerKey | null) {

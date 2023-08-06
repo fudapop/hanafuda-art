@@ -1,23 +1,18 @@
 <template>
   <div class="relative">
     <div class="absolute inset-0 my-auto overflow-visible">
-      <!-- Show card-back image for face-down deck -->
-      <div class="absolute inset-0 my-auto overflow-hidden card down">
-        <img :src="useDesignPath('card-back')" alt="card-back image"
-          class="absolute object-cover mx-auto shadow-none h-[--card-height]" />
-      </div>
+
+      <!-- DECK PILE -->
+      <div class="absolute inset-0 my-auto overflow-hidden shadow-sm card down"></div>
 
       <!-- Show revealed card when drawing from deck         -->
       <div v-if="revealedCard">
-        <HeadlessTransitionRoot appear :show="true" as="template">
+        <HeadlessTransitionRoot appear :show="!!revealedCardImg" as="template">
           <HeadlessTransitionChild enter="duration-300 ease-out" enter-from="opacity-0 motion-safe:-scale-x-50"
             enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100"
             leave-to="opacity-0 motion-safe:translate-x-1">
-            <!-- TODO: Fetch card images
-            <CardImage :key="revealedCard" :card="revealedCard" :img-url="useDesignPath(revealedCard)"
-              class="object-cover mx-auto transition-transform -translate-x-4 card" /> -->
-            <img :key="revealedCard" :src="useDesignPath(revealedCard)" :alt="revealedCard"
-              class="object-cover mx-auto transition-transform -translate-x-4 card" />
+            <CardImage v-if="revealedCardImg" :key="revealedCard" :card="revealedCard" :src="revealedCardImg"
+              class="object-cover mx-auto transition-transform -translate-x-4 card drop-shadow-lg" />
           </HeadlessTransitionChild>
         </HeadlessTransitionRoot>
       </div>
@@ -32,7 +27,7 @@
 
       <!-- Show the 'Discard' button if there are no matches 
         on the field for the selected card -->
-      <button v-if="selectedCard && !matchedCards?.length" v-hide:from="'p2'" v-hide:during="'draw'" type="button"
+      <button v-if="selectedCard && !matchedCards.length" v-hide:during.display="'draw'" type="button"
         class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-red-600 shadow-xl border border-red-800 card hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
         @click="matchOrDiscard">
         Discard
@@ -50,9 +45,10 @@ import { useCardDesign } from "~/composables/useCardDesign";
 const ps = usePlayerStore();
 const ds = useGameDataStore();
 
-const { useDesignPath } = useCardDesign();
+const { getCardUrl } = useCardDesign();
 
 const { useSelectedCard, useMatchedCards, useActions } = useCardHandler();
+const { decisionIsPending } = useDecisionHandler();
 const { draw, matchOrDiscard, collect } = useActions();
 
 const { errorOnTimeout } = useTimeout();
@@ -60,6 +56,7 @@ const { errorOnTimeout } = useTimeout();
 const selectedCard = useSelectedCard();
 const matchedCards = useMatchedCards();
 const revealedCard = computed(() => ds.checkCurrentPhase("draw") && selectedCard.value);
+const revealedCardImg = computed(() => revealedCard.value ? getCardUrl(revealedCard.value) : null)
 
 const isDrawPhase = computed(() => ds.checkCurrentPhase("draw") && ps.players.p1.isActive);
 const autoOpponent = useState("opponent");
@@ -69,15 +66,21 @@ const playDrawPhase = async () => {
   await sleep();
   // Allow player to select match
   if (matchedCards.value.length === 2) {
-    errorOnTimeout(selectMatchFromField, 10000, "match-on-draw", {
-      startMsg: "Awaiting match selection..."
-    }).start();
+    await errorOnTimeout(selectMatchFromField, 10000, "match-on-draw", {
+      startMsg: "Awaiting match selection...",
+      callback: ds.endRound,
+      endMsg: "Resetting..."
+    })();
   } else {
     matchOrDiscard();
   }
   await sleep();
   collect();
   await sleep();
+  while (decisionIsPending.value) {
+    await sleep();
+  }
+  ds.nextPhase();
 }
 
 const selectMatchFromField = async () => {

@@ -69,21 +69,32 @@ import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 import { RadioGroup, RadioGroupDescription, RadioGroupLabel, RadioGroupOption } from '@headlessui/vue'
 import { CheckCircleIcon } from '@heroicons/vue/20/solid'
 
-const { useDesign } = useCardDesign();
+const { useDesign, fetchCardUrls, DESIGNS } = useCardDesign();
 const selectedDesign = useDesign();
 
-const designList: Array<typeof selectedDesign.value> = [
-    "cherry-version",
-    "sabling-art",
-    "koinobori",
-    "flash-black",
-];
+const designList: Array<typeof selectedDesign.value> = [...DESIGNS];
+
+const preloadTags = ref();
 
 onMounted(() => {
-    watch(selectedDesign, (current, previous) => {
-        document.body.classList.remove(previous);
-        document.body.classList.add(current);
+    useHead({
+        link: [
+            { rel: "preconnect", href: "https://firebasestorage.googleapis.com" },
+        ]
+    }, { tagPriority: "high" });
+    const preloadHead = useHead({});
+    watchEffect(() => {
+        fetchCardUrls().then(urlMap => {
+            preloadTags.value = [...urlMap.values()].map((url) => (
+                { rel: "preload", href: url, as: "image" }
+            ));
+            preloadHead?.patch({
+                bodyAttrs: { class: selectedDesign },
+                link: preloadTags.value,
+            });
+        });
     })
 })
+
 
 </script>

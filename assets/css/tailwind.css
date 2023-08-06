@@ -15,14 +15,11 @@
 
 @layer components {
   .card {
+    padding: 0;
     border-radius: var(--card-radius);
     border: var(--card-border-w) solid var(--card-border-color);
     height: var(--card-height);
     aspect-ratio: var(--card-aspect);
-  }
-  
-  .card:is(img, .down) {
-    box-shadow: 1px 1px 2px 0 #888;
   }
   
   .card.down {

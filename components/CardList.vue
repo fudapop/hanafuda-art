@@ -3,25 +3,26 @@
     v-for="card in cardImages"
     :key="card.name"
     :class="{
-      '[&:not(:first-child)]:max-sm:-ml-3 sm:[&:not(:first-child)]:-ml-2' : stack,
-       'origin-center': true,
-       }"
+      '[&:not(:first-child)]:max-sm:-ml-3 sm:[&:not(:first-child)]:-ml-2': stack,
+      'origin-center': true,
+    }"
   >
-    <!-- <ClickTarget @locate="console.log"> -->
     <CardTransition>
       <div
         :class="{
-          'max-h-[--card-height] aspect-[--card-aspect] overflow-hidden cursor-pointer transition-transform': true,
-          'scale-105 shadow-md -translate-y-2 z-20': matchedCards?.includes(card.name),
-          '-translate-y-2 shadow-md': selectedCard === card.name,
+          'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
+          'scale-105 drop-shadow-lg -translate-y-2 z-20': matchedCards?.includes(
+            card.name
+          ),
+          '-translate-y-2 drop-shadow-lg': selectedCard === card.name,
           'pointer-events-none staged': cs.staged.has(card.name),
         }"
         @click="() => handleClick(card.name)"
       >
-        <img :src="card.source" :alt="card.name" class="object-cover mx-auto card" />
+        <CardImage v-if="card.source" :src="card.source" :card="card.name" />
+        <!-- TODO: Add loading placeholder -->
       </div>
     </CardTransition>
-    <!-- </ClickTarget> -->
   </li>
 </template>
 
@@ -35,12 +36,12 @@ const { cards, stack = false } = defineProps<{
   stack?: boolean;
 }>();
 
-const { useDesignPath } = useCardDesign();
+const { getCardUrl } = useCardDesign();
 
 const cardImages = computed(() =>
   [...cards].map((cardName) => ({
     name: cardName,
-    source: useDesignPath(cardName),
+    source: getCardUrl(cardName),
   }))
 );
 
@@ -54,4 +55,3 @@ const handleClick = (card: CardName) => {
   handleCardSelect(card);
 };
 </script>
-lib/cards

@@ -95,7 +95,7 @@ export const useAutoplay = () => {
 				startMsg: "Opponent playing...",
 				endMsg: "Opponent turn finished.",
 			}
-		).start();
+		)();
 	};
 
 	const playRound = async (turns?: number) => {
@@ -151,7 +151,10 @@ export const useAutoplay = () => {
 	};
 
 	const autoDecision = async () => {
-		if (!decisionIsPending.value) return;
+		if (!decisionIsPending.value) {
+			ds.nextPhase();
+			return;
+		};
 		const callChance = calcKoikoiChance();
 		const koikoiCalled =
 			cs.handNotEmpty("p2") &&
@@ -164,6 +167,7 @@ export const useAutoplay = () => {
 				callStop();
 			}
 		}
+		ds.nextPhase();
 	};
 
 	const calcKoikoiChance = () => {

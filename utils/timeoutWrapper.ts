@@ -40,7 +40,7 @@ class TimeoutWrapper {
 		return this.#id;
 	}
 
-	async #run() {
+	async #runFn() {
 		await this.#fn();
 		this.clear();
 	}
@@ -52,7 +52,6 @@ class TimeoutWrapper {
 	 * Stores the instance in the class property activeTimeouts
 	 * using the instance key
 	 *
-	 * @returns the TimeoutWrapper instance
 	 */
 	start() {
 		this.#id = setTimeout(() => {
@@ -60,8 +59,7 @@ class TimeoutWrapper {
 			this.callback?.();
 		}, this.duration);
 		console.debug(`[${this.key}]`, this.startMsg || "timeout started");
-		this.#run();
-		return this;
+		return this.#runFn();
 	}
 
 	/**

@@ -1,24 +1,17 @@
 <template>
-  <div>
-    <nuxt-img v-if="url" :src="url" :alt="card"> </nuxt-img>
-  </div>
+  <template v-if="src" v-show="loaded">
+    <NuxtImg :src="src" :alt="card" @load="handleLoad" loading="eager" />
+  </template>
 </template>
 
 <script setup lang="ts">
-import { ref as storageRef } from "firebase/storage";
-import { useFirebaseStorage, useStorageFileUrl } from "vuefire";
 import { CardName } from "~/utils/cards";
 
-// useDesignPath()
-const { card, imgUrl } = defineProps<{ card: CardName; imgUrl: string }>();
+const { card, src } = defineProps<{ card: CardName; src: string }>();
 
-const storage = useFirebaseStorage();
-const imageFileRef = storageRef(storage, imgUrl);
-const {
-  url,
-  // refresh the url if the file changes
-  refresh,
-} = useStorageFileUrl(imageFileRef);
+const loaded = ref(false);
+
+const handleLoad = () => {
+  loaded.value = true;
+};
 </script>
-
-<style scoped></style>

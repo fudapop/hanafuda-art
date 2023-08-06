@@ -147,7 +147,6 @@ export const useCardHandler = () => {
 				"Phase check failed. Check autoplay script or datastore."
 			);
 			if (cs.staged.size) cs.collectCards(ds.getCurrent.player);
-			ds.nextPhase();
 		},
 	});
 

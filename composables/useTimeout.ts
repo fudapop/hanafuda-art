@@ -5,7 +5,7 @@ type CreateTimeoutFn = (
 	duration: number,
 	key: string,
 	options: TimeoutOptions
-) => InstanceType<typeof TimeoutWrapper>;
+) => () => Promise<void>;
 
 interface TimeoutOptions {
 	callback?: Function;
@@ -30,10 +30,10 @@ export const useTimeout = () => {
 		const fnWithTimeout = new TimeoutWrapper(fn, duration, key, ...args);
 		activeTimeouts.set(key, fnWithTimeout);
 		console.log(getActiveTimeouts.value);
-		return fnWithTimeout;
+		return () => fnWithTimeout.start();
 	};
 
-	const errorOnTimeout: Awaitable<CreateTimeoutFn> = (
+	const errorOnTimeout: CreateTimeoutFn = (
 		fn,
 		duration,
 		key,
@@ -53,7 +53,7 @@ export const useTimeout = () => {
 		);
 		activeTimeouts.set(key, errTimeout);
 		console.log(getActiveTimeouts.value);
-		return errTimeout;
+		return () => errTimeout.start();
 	};
 
 	return {

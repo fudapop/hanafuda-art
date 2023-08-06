@@ -1,16 +1,16 @@
 <template>
   <div class="gap-1 collection-area">
     <!-- PLAYER 1 COLLECTION -->
-    <ul class="flex py-2">
+    <ul class="flex h-full py-2">
       <CardList :cards="brights" :stack="true" />
     </ul>
-    <ul class="flex py-2">
+    <ul class="flex h-full py-2">
       <CardList :cards="animals" :stack="true" />
     </ul>
-    <ul class="flex py-2">
+    <ul class="flex h-full py-2">
       <CardList :cards="ribbons" :stack="true" />
     </ul>
-    <ul class="flex py-2">
+    <ul class="flex h-full py-2">
       <CardList :cards="plains" :stack="true" />
     </ul>
   </div>

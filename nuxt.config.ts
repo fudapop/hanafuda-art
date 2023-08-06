@@ -18,10 +18,11 @@ export default defineNuxtConfig({
 	],
 	postcss: {
 		plugins: {
-			tailwindcss: {},
-			autoprefixer: {},
+		  "tailwindcss/nesting": {},
+		  tailwindcss: {},
+		  autoprefixer: {},
 		},
-	},
+	  },
 	runtimeConfig: {
 		nodeEnv: process.env.NODE_ENV,
 	},
