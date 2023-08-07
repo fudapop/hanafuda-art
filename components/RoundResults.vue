@@ -31,8 +31,11 @@
     </div>
   </div>
   <!-- END HEADER -->
-  <h4 class="font-semibold my-1 underline underline-offset-1">
-    Total: {{ lastRoundResult.score }} points
+  <h4 class="my-4">
+    Total: <span class="font-semibold text-lg">{{ lastRoundResult.score }} points</span>
+    <span v-if="bonusMultiplier > 1" class="ml-8">
+      Koi-Koi Bonus: <span class="font-semibold text-lg">x{{ bonusMultiplier }}</span>
+    </span>
   </h4>
   <YakuGrid
     v-if="recordedWinner"
@@ -55,7 +58,7 @@ const { decisionIsPending, callKoikoi, callStop, stopIsCalled } = useDecisionHan
 
 const { handNotEmpty } = storeToRefs(useCardStore());
 
-const { activePlayer } = storeToRefs(usePlayerStore());
+const { activePlayer, bonusMultiplier } = storeToRefs(usePlayerStore());
 
 const lastRoundResult = computed(() => useGameDataStore().getCurrent.result);
 
