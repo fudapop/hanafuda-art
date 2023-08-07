@@ -6,7 +6,7 @@
 
 import { defineStore } from "pinia";
 import { PlayerKey } from "~/stores/playerStore";
-import { CardName, matchByMonth, shuffle } from "~/utils/cards";
+import { CardName, TEST_DECKS, matchByMonth, shuffle } from "~/utils/cards";
 
 type PlayerCardSet = Record<PlayerKey, Set<CardName>>;
 
@@ -35,6 +35,7 @@ export const useCardStore = defineStore("cards", {
 		// Cards not held by a player
 		field: new Set([]),
 		deck: new Set(shuffle([...DECK])),
+		// deck: new Set([...TEST_DECKS.teshi]),
 	}),
 	getters: {
 		cardsInPlay: (state) => [

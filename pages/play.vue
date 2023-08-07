@@ -62,11 +62,11 @@
 
     <!-- DEV BUTTONS -->
     <div
-      v-if="deck.size === 48 || (roundOver && !showLoader)"
+      v-if="true || (roundOver && !showLoader)"
       class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
     >
       <button
-        v-if="deck.size === 48"
+        v-if="true"
         type="button"
         class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         @click="startRound"
@@ -74,7 +74,7 @@
         Deal Cards
       </button>
       <button
-        v-show="deck.size === 48"
+        v-show="true"
         type="button"
         class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
         @click="startAuto"
@@ -88,9 +88,10 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useGameDataStore } from "~/stores/gameDataStore";
-import { usePlayerStore } from "~/stores/playerStore";
+import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { CompletionEvent } from "~/components/CollectionArea.vue";
+import { checkForWin, CompletedYaku } from "~/utils/yaku";
 
 definePageMeta({
   requiresAuth: true,
@@ -116,6 +117,7 @@ const showLoader = ref(false);
 const {
   decisionIsPending,
   makeDecision,
+  callStop,
   koikoiIsCalled,
   stopIsCalled,
 } = useDecisionHandler();
@@ -167,26 +169,76 @@ const handleNext = async () => {
   startRound();
 };
 
-const handleClose = async () => {
+const handleClose = () => {
   showModal.value = false;
   cs.reset();
   ps.reset();
-  await sleep(2000);
   ds.reset();
 };
 
 const startAuto = async () => {
   autoOpponent.value = false;
   roundOver.value = false;
+  // Instant win conditions are not checked during autoplay
   autoPlay({ speed: 3, rounds: 3 });
 };
 
-const startRound = () => {
+const startRound = async () => {
   // FIX: Opponent played twice on starting new round
   showLoader.value = false;
   autoOpponent.value = true;
   ds.startRound();
+  const result = checkDeal();
+
+  // Round is reset
+  if (result === undefined) return;
+  // Round is over
+  if (result) {
+    handleInstantWin(result as CompletionEvent);
+    return;
+  }
   if (ps.players.p2.isActive) opponentPlay({ speed: 2 });
+};
+
+const handleInstantWin = (result: CompletionEvent) => {
+  handleCompletion(result);
+  showModal.value = true;
+  callStop();
+};
+
+const checkDeal = () => {
+  // Check the field and each hand for a win condition
+  const hands = [
+    { name: "field", cards: cs.field },
+    { name: ps.activePlayer.id, cards: cs.hand[ps.activePlayer.id] },
+    { name: ps.inactivePlayer.id, cards: cs.hand[ps.inactivePlayer.id] },
+  ];
+  // If no condition exists, null will be returned
+  var result = null;
+  for (const hand of hands) {
+    const completedYaku = checkForWin(hand.cards);
+    if (completedYaku) {
+      result = {
+        player: hand.name,
+        score: completedYaku.points,
+        completedYaku: [completedYaku],
+      };
+      // Game round is reset if win condition exists on the field
+      if (result?.player === "field") {
+        console.log(
+          `Revealed ${result.completedYaku[0].name.toUpperCase()}. Resetting...`
+        );
+        cs.reset();
+        startRound();
+        return;
+      }
+      // Add cards from the winner's hand to their collection for display in the results modal
+      cs.stageForCollection(result.completedYaku[0].cards);
+      cs.collectCards(hand.name as PlayerKey);
+      break;
+    }
+  }
+  return result;
 };
 
 watch(decisionIsPending, () => {

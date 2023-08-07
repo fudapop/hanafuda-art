@@ -13,6 +13,8 @@ const YAKU_NAMES = [
 	"tan-zaku",
 	"tane-zaku",
 	"kasu",
+	"kuttsuki",
+	"teshi",
 ] as const;
 
 type YakuName = (typeof YAKU_NAMES)[number];
@@ -321,6 +323,44 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 			);
 		},
 	},
+	kuttsuki: {
+		name: "kuttsuki",
+		points: 6,
+		description: ["4 pairs in hand"],
+		cards: [],
+		numRequired: 8,
+		find: function (hand) {
+			return [];
+		},
+		check: function (hand) {
+			if (hand.size < this.numRequired) return 0;
+			const [yaku, cards] = checkForKuttsukiOrTeshi([...hand]);
+			if (yaku === this.name) {
+				this.cards = cards;
+				return this.points;
+			}
+			return 0;
+		},
+	},
+	teshi: {
+		name: "teshi",
+		points: 6,
+		description: ["4 of a kind in hand"],
+		cards: [],
+		numRequired: 8,
+		find: function (hand) {
+			return [];
+		},
+		check: function (hand) {
+			if (hand.size < this.numRequired) return 0;
+			const [yaku, cards] = checkForKuttsukiOrTeshi([...hand]);
+			if (yaku === this.name) {
+				this.cards = cards;
+				return this.points;
+			}
+			return 0;
+		},
+	},
 };
 
 function getExtraPoints(numRequired: number, numCollected: number): number {
@@ -339,11 +379,14 @@ function checkAll(collection: Set<CardName>): {
 	score: number;
 } {
 	const completed: YakuName[] = [];
-	const pointsArr = [...Object.values(YAKU)].map((yaku) => {
-		const points = yaku.check(collection);
-		if (points) completed.push(yaku.name);
-		return points;
-	});
+	const excluded = ["kuttsuki", "teshi"];
+	const pointsArr = [...Object.values(YAKU)]
+		.filter((yaku) => !excluded.includes(yaku.name))
+		.map((yaku) => {
+			const points = yaku.check(collection);
+			if (points) completed.push(yaku.name);
+			return points;
+		});
 	return {
 		score: pointsArr.reduce((total, n) => total + n),
 		completed,
@@ -372,4 +415,53 @@ function getCompleted(
 	return report;
 }
 
-export { YAKU, Yaku, YakuName, CompletedYaku, checkAll, getCompleted };
+function checkForWin(cards: Set<CardName>): CompletedYaku | null {
+	const yaku = ["kuttsuki", "teshi"] as YakuName[];
+	let completed = null;
+	yaku.forEach((name) => {
+		const points = YAKU[name].check(cards);
+		if (points) {
+			completed = {
+				name,
+				cards: YAKU[name].cards,
+				points,
+			};
+		}
+	});
+	return completed;
+}
+
+function checkForKuttsukiOrTeshi(
+	cardArr: CardName[]
+): [YakuName | null, CardName[]] {
+	// Check array for 4 of same suit/flower or 4 pairs
+	// Returns name of found winning/voiding condition
+	// Returns null if neither found
+	let suitArr = cardArr.map((card) => CARDS[card].month);
+	let suitCount = new Map();
+	for (let suit of suitArr) {
+		if (suitCount.has(suit)) {
+			suitCount.set(suit, suitCount.get(suit) + 1);
+		} else {
+			suitCount.set(suit, 1);
+		}
+	}
+	if ([...suitCount.values()].every((count) => count === 2))
+		return ["kuttsuki", cardArr];
+	if ([...suitCount.values()].some((count) => count === 4))
+		return [
+			"teshi",
+			cardArr.filter((card) => suitCount.get(CARDS[card].month) === 4),
+		];
+	return [null, [] as CardName[]];
+}
+
+export {
+	YAKU,
+	Yaku,
+	YakuName,
+	CompletedYaku,
+	checkAll,
+	getCompleted,
+	checkForWin,
+};

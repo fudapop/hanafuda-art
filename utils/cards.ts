@@ -49,6 +49,65 @@ const DECK = [
   "kiri-no-kasu-3",
 ] as const;
 
+const TEST_DECKS = {
+  kuttsuki: [
+    "matsu-no-kasu-1",
+    "matsu-no-kasu-2",
+    "ume-no-kasu-1",
+    "ume-no-kasu-2",
+    "botan-ni-chou",
+    "sakura-no-kasu-1",
+    "ayame-no-kasu-1",
+    "hagi-ni-inoshishi",
+    
+    "ayame-no-kasu-2",
+    "hagi-no-tan",
+    "hagi-no-kasu-1",
+    "hagi-no-kasu-2",
+    "sakura-no-kasu-2",
+    "botan-no-tan",
+    "botan-no-kasu-1",
+    "botan-no-kasu-2",
+    
+    "matsu-ni-tsuru",
+    "matsu-no-tan",
+    "ume-ni-uguisu",
+    "ume-no-tan",
+    "sakura-ni-maku",
+    "sakura-no-tan",
+    "ayame-ni-yatsuhashi",
+    "ayame-no-tan",
+] as CardName[],
+  teshi: [
+    "matsu-ni-tsuru",
+    "matsu-no-tan",
+    "matsu-no-kasu-1",
+    "matsu-no-kasu-2",
+    "ume-ni-uguisu",
+    "ume-no-tan",
+    "ume-no-kasu-1",
+    "ayame-no-kasu-2",
+    
+    "ume-no-kasu-2",
+    "hagi-no-tan",
+    "hagi-no-kasu-1",
+    "hagi-no-kasu-2",
+    "sakura-no-kasu-2",
+    "botan-no-tan",
+    "botan-no-kasu-1",
+    "botan-no-kasu-2",
+    
+    "hagi-ni-inoshishi",
+    "botan-ni-chou",
+    "sakura-ni-maku",
+    "sakura-no-tan",
+    "sakura-no-kasu-1",
+    "ayame-ni-yatsuhashi",
+    "ayame-no-tan",
+    "ayame-no-kasu-1",
+] as CardName[],
+}
+
 type CardName = (typeof DECK)[number] | "card-back";
 type CardType = "bright" | "animal" | "ribbon" | "plain";
 
@@ -339,6 +398,7 @@ function matchByMonth(cards: CardName[], matching: CardName): CardName[] {
 
 export {
   DECK,
+  TEST_DECKS,
   CARDS,
   CardName,
   FlowerCard,
