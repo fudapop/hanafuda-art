@@ -14,7 +14,7 @@
       <!-- OPPONENT-SELECTED CARD -->
       <div
         :class="{
-          'transition-transform absolute top-1/2 inset-x-0 mx-auto': true,
+          'transition-transform duration-200 absolute top-1/2 inset-x-0 mx-auto': true,
           'scale-[1.5] translate-y-1': selectedCard,
         }"
       >
@@ -26,7 +26,7 @@
           enter-to-class="opacity-100"
           leave-active-class="duration-200 ease-in"
           leave-from-class="opacity-100"
-          leave-to-class="opacity-0 motion-safe:translate-y-2"
+          leave-to-class="opacity-0"
         >
           <CardImage
             class="card"

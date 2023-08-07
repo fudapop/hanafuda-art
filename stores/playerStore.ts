@@ -48,6 +48,13 @@ export const usePlayerStore = defineStore("players", () => {
 		return player;
 	});
 
+	const scoreboard = computed(() => {
+		return {
+			p1: players.p1.score,
+			p2: players.p2.score,
+		}
+	})
+
 	// Actions
 	function toggleActivePlayer() {
 		playerList.value.forEach((p) => (p.isActive = !p.isActive));
@@ -63,12 +70,12 @@ export const usePlayerStore = defineStore("players", () => {
 	}
 
 	function updateScore(player: PlayerKey, amount: number) {
-		players[player].score = amount * bonusMultiplier.value;
+		players[player].score += amount * bonusMultiplier.value;
 	}
 
   function reset(newDealer?: PlayerKey | null) {
-    players.p1.score = 0;
-    players.p2.score = 0;
+    // players.p1.score = 0;
+    // players.p2.score = 0;
     bonusMultiplier.value = 1;
 	if (newDealer) {
 		playerList.value.forEach(p => {
@@ -87,6 +94,7 @@ export const usePlayerStore = defineStore("players", () => {
 		activePlayer,
 		inactivePlayer,
 		dealer,
+		scoreboard,
 		// Actions
 		toggleActivePlayer,
 		toggleDealer,

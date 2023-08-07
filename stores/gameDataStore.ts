@@ -3,7 +3,7 @@ import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { useStorage } from "@vueuse/core";
 
-type RoundResult = {
+export type RoundResult = {
 	[x: string]: unknown;
 	round?: number;
 	winner: PlayerKey | null;
@@ -29,14 +29,15 @@ export const useConfig = () =>
  */
 export const useGameDataStore = defineStore("gameData", () => {
 	// State
-	const roundCounter = ref(1);
-	const turnCounter = ref(1);
-	const turnPhase = ref("select" as TurnPhase);
 	const roundHistory = useStorage(
 		"hanafuda-data",
 		[] as RoundResult[],
-		localStorage
+		localStorage,
+		{ mergeDefaults: true }
 	);
+	const roundCounter = ref(roundHistory.value.length + 1);
+	const turnCounter = ref(1);
+	const turnPhase = ref("select" as TurnPhase);
 	const roundOver = ref(false);
 	// TODO: Create shared gameOver observer plugin
 	const gameOver = ref(false);
@@ -49,7 +50,19 @@ export const useGameDataStore = defineStore("gameData", () => {
 		player: usePlayerStore().activePlayer.id,
 		result: roundHistory.value[roundCounter.value - 1],
 	}));
+
 	const getPreviousResult = computed(() => roundHistory.value.at(-1));
+
+	const scoreboard = computed(() => {
+		const calcScore = (player: PlayerKey) =>
+			roundHistory.value
+				.filter((result) => result.winner === player)
+				.reduce((total, result) => total + result.score, 0);
+		return {
+			p1: calcScore("p1"),
+			p2: calcScore("p2"),
+		};
+	});
 
 	// Actions
 	function nextPhase() {
@@ -80,6 +93,11 @@ export const useGameDataStore = defineStore("gameData", () => {
 			return;
 		}
 		turnPhase.value = PHASES[0];
+		// if (localStorage?.getItem("hanafuda-data")) {
+		// 	roundHistory.value = JSON.parse(localStorage.getItem("hanafuda-data")!)
+		// }
+		roundCounter.value = roundHistory.value.length + 1;
+		console.debug("\tRecord", roundHistory.value);
 		useCardStore().dealCards();
 	}
 
@@ -99,8 +117,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 				error: "forfeit",
 			});
 		roundOver.value = true;
-		console.debug("\tRecord", roundHistory.value);
-		// if (roundCounter.value >= useConfig().maxRounds) gameOver.value = true;
+		if (roundCounter.value >= useConfig().maxRounds) gameOver.value = true;
 	}
 
 	function nextRound() {
@@ -151,6 +168,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 		// Getters
 		getCurrent,
 		getPreviousResult,
+		scoreboard,
 		// Actions
 		nextPhase,
 		checkCurrentPhase,

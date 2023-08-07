@@ -5,6 +5,7 @@
       <HeadlessDialogTitle as="h3" class="text-lg font-semibold leading-6 text-gray-900">
         {{ recordedWinner?.toUpperCase() }}
         <span v-if="decisionIsPending"> is deciding... </span>
+        <span v-else-if="stopIsCalled"> called stop. </span>
       </HeadlessDialogTitle>
 
       <!-- BUTTONS -->
@@ -24,14 +25,21 @@
           Koi-Koi
         </Button>
       </div>
-      <div v-else v-show="stopIsCalled">
+      <div v-show="stopIsCalled">
         <Button :action="() => $emit('next')"> Next Round </Button>
       </div>
     </div>
   </div>
   <!-- END HEADER -->
-
-  <YakuGrid v-if="recordedWinner" :winner="recordedWinner" :completed="completed" />
+  <h4 class="font-semibold my-1 underline underline-offset-1">
+    Total: {{ lastRoundResult.score }} points
+  </h4>
+  <YakuGrid
+    v-if="recordedWinner"
+    :winner="recordedWinner"
+    :completed="completed"
+    :show-cards="true"
+  />
 </template>
 
 <script setup lang="ts">
@@ -39,7 +47,7 @@ import { storeToRefs } from "pinia";
 import { useCardStore } from "~/stores/cardStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { usePlayerStore } from "~/stores/playerStore";
-import { YakuName } from "~/utils/yaku";
+import { CompletedYaku } from "~/utils/yaku";
 
 defineEmits(["next"]);
 
@@ -51,7 +59,7 @@ const { activePlayer } = storeToRefs(usePlayerStore());
 
 const lastRoundResult = computed(() => useGameDataStore().getCurrent.result);
 
-const completed = computed(() => lastRoundResult.value?.completedYaku as YakuName[]);
+const completed = computed(() => lastRoundResult.value?.completedYaku as CompletedYaku[]);
 
 const recordedWinner = computed(() => lastRoundResult.value?.winner);
 </script>

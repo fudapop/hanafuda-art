@@ -1,6 +1,6 @@
 import { it, describe, expect } from "vitest";
 import { CardName } from "../cards";
-import { YAKU, checkAll } from "../yaku";
+import { YAKU, YakuName, checkAll, getCompleted } from "../yaku";
 
 describe("YAKU", () => {
   const kasu: Set<CardName> = new Set([
@@ -100,4 +100,40 @@ describe("checkAll", () => {
     collection.delete("momiji-no-tan");
     expect(checkAll(collection).score).toBe(12);
   });
+
+  it("returns info for completed yaku", () => {
+    const collected: Set<CardName> = new Set([
+      "matsu-no-kasu-1",
+      "matsu-no-kasu-2",
+      "ume-no-kasu-1",
+      "ume-no-kasu-2",
+      "sakura-no-kasu-1",
+      "sakura-no-kasu-2",
+      "ayame-no-kasu-1",
+      "ayame-no-kasu-2",
+      "hagi-no-kasu-1",
+      "hagi-no-kasu-2",
+      "botan-no-kasu-1",
+    ]);
+    const completed: YakuName[] = ["kasu"];
+    const report = getCompleted(collected, completed);
+    expect(report).toHaveLength(1);
+    expect(report[0]).toHaveProperty("name", "kasu");
+    expect(report[0]).toHaveProperty("points", 2);
+    expect(report[0]).toHaveProperty("cards", [...collected]);
+
+    [
+      "matsu-ni-tsuru",
+      "sakura-ni-maku",
+      "susuki-ni-tsuki",
+    ].forEach(card => collected.add(card as CardName))
+    completed.push("sankou");
+    const newReport = getCompleted(collected, completed);
+    expect(newReport).toHaveLength(2);
+    expect(newReport[1].cards).toEqual([
+      "matsu-ni-tsuru",
+      "sakura-ni-maku",
+      "susuki-ni-tsuki",
+    ]);
+  })
 });

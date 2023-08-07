@@ -36,16 +36,29 @@
         v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
         class="max-sm:[--card-height:85px] max-md:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-8"
       >
-        <ListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
-          <CardList :cards="hand.p1" :stack="true" />
-        </ListGrid>
+        <div
+          :class="{
+            'transition-opacity duration-200': true,
+            'opacity-50': players.p2.isActive,
+          }"
+        >
+          <ListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
+            <CardList :cards="hand.p1" :stack="true" />
+          </ListGrid>
+        </div>
       </div>
     </div>
 
     <LazyResultsModal :show="showModal">
-      <LazyRoundResults @next="handleNext" />
-      <!-- TODO: if last round <FinalResults /> -->
+      <LazyFinalResults v-if="gameOver" :results="ds.roundHistory" @close="handleClose" />
+      <LazyRoundResults v-else @next="handleNext" />
     </LazyResultsModal>
+    <!-- <Results
+      v-if="ds.roundHistory.length"
+      :results="ds.roundHistory"
+      :show-modal="showModal"
+      :scoreboard="ps.scoreboard"
+    /> -->
 
     <!-- DEV BUTTONS -->
     <div
@@ -109,9 +122,8 @@ const {
 
 const handleCompletion = (data: CompletionEvent) => {
   const { player, score, completedYaku } = data;
-  ps.updateScore(player, score * ps.bonusMultiplier);
   const message = `${player.toUpperCase()} *** Completed ${completedYaku
-    .map((s) => s.toUpperCase())
+    .map((s) => s.name.toUpperCase())
     .join(" + ")}!`;
   consoleLogColor(message, "skyblue");
   consoleLogColor("\tScore: " + score, "lightblue");
@@ -128,12 +140,17 @@ const handleCompletion = (data: CompletionEvent) => {
 const handleDecision = async () => await makeDecision();
 
 const handleStop = () => {
-  console.debug(activePlayer.value.id.toUpperCase(), ">>> Called STOP");
+  const player = activePlayer.value.id;
+  console.debug(player.toUpperCase(), ">>> Called STOP");
   ds.endRound();
   const result = ds.getCurrent.result;
-  console.log(
-    ...Object.entries(result as Object).map((arr) => arr.join(": ").toUpperCase() + "\n")
-  );
+  ps.updateScore(player, result.score);
+  console.log({
+    WINNER: result.winner?.toUpperCase(),
+    SCORE: result.score,
+    // @ts-expect-error
+    COMPLETED: result.completedYaku.map((yaku) => yaku.name).join(", "),
+  });
 };
 
 const handleKoikoi = () => {
@@ -148,6 +165,14 @@ const handleNext = async () => {
   showModal.value = false;
   await sleep(2000);
   startRound();
+};
+
+const handleClose = async () => {
+  showModal.value = false;
+  cs.reset();
+  ps.reset();
+  await sleep(2000);
+  ds.reset();
 };
 
 const startAuto = async () => {
@@ -174,17 +199,18 @@ watch(decisionIsPending, () => {
 // watch(handsEmpty, () => {
 //   if (handsEmpty.value === true && !decisionIsPending.value) showModal.value = true;
 // });
-watch(gameOver, async () => {
-  if (gameOver.value === true) {
-    cs.reset();
-    ps.reset();
-    await sleep(2000);
-    ds.reset();
-  }
-});
+// watch(gameOver, async () => {
+//   if (gameOver.value === true) {
+//     cs.reset();
+//     ps.reset();
+//     await sleep(2000);
+//     ds.reset();
+//   }
+// });
 
 watch(roundOver, () => {
   // Ensure modal is closed when starting a new round during autoplay
+  if (gameOver.value === true) return;
   if (roundOver.value === false) showModal.value = false;
 });
 

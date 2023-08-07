@@ -1,6 +1,6 @@
 <template>
-  <HeadlessTransitionRoot appear :show="show" unmount>
-    <HeadlessDialog class="relative z-10">
+  <HeadlessDialog :open="show" class="relative z-10">
+    <HeadlessTransitionRoot appear :show="show" unmount>
       <!-- BACKDROP -->
       <HeadlessTransitionChild
         as="template"
@@ -27,15 +27,15 @@
           >
             <!-- RESPONSIVE CONTAINER -->
             <div
-              class="p-6 overflow-hidden text-left align-middle transition-all transform bg-white rounded-md shadow-xl w-full max-w-[800px]"
+              class="p-6 overflow-hidden text-left align-middle transition-all transform bg-white rounded-md shadow-xl w-[clamp(320px,calc(100vw-2rem),800px)]"
             >
               <slot />
             </div>
           </HeadlessTransitionChild>
         </div>
       </div>
-    </HeadlessDialog>
-  </HeadlessTransitionRoot>
+    </HeadlessTransitionRoot>
+  </HeadlessDialog>
 </template>
 
 <script setup lang="ts">

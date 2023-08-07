@@ -20,14 +20,14 @@
 import { PlayerKey } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { CardName, sortByType } from "~/utils/cards";
-import { checkAll, YAKU, YakuName } from "~/utils/yaku";
+import { checkAll, YAKU, YakuName, CompletedYaku } from "~/utils/yaku";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { storeToRefs } from "pinia";
 
 export type CompletionEvent = {
   player: PlayerKey;
   score: number;
-  completedYaku: YakuName[];
+  completedYaku: CompletedYaku[];
 };
 
 const { player } = defineProps<{ player: PlayerKey }>();
@@ -102,7 +102,11 @@ watch(
     if (completedYaku.length) {
       // Emits only if new yaku completed.
       lastCompleted = new Set(newCompleted);
-      emits("completed", { player, score, completedYaku });
+      emits("completed", {
+        player,
+        score,
+        completedYaku: getCompleted(cs.collection[player], completedYaku),
+      });
     }
   },
   { flush: "post" }

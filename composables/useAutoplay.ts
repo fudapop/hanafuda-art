@@ -63,6 +63,7 @@ export const useAutoplay = () => {
 			}
 		}
 		console.info("Autoplay complete.");
+		ds.gameOver = true;
 	};
 
 	const opponentPlay = async ({ speed = 1 }: { speed: speedMultiple }) => {
