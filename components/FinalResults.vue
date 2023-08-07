@@ -12,7 +12,7 @@
       <!-- BUTTONS -->
       <!-- Warning is logged if no focusable elements rendered -->
       <!-- Hidden during opponent decision -->
-      <div v-show="stopIsCalled">
+      <div v-show="ds.gameOver">
         <Button :action="() => $emit('close')"> Close </Button>
       </div>
     </div>
@@ -48,9 +48,7 @@
 
 <script setup lang="ts">
 import { ChevronUpIcon } from "@heroicons/vue/20/solid";
-import { storeToRefs } from "pinia";
-import { RoundResult } from "~/stores/gameDataStore";
-import { usePlayerStore } from "~/stores/playerStore";
+import { RoundResult, useGameDataStore } from "~/stores/gameDataStore";
 import { CompletedYaku } from "~/utils/yaku";
 
 const { results } = defineProps<{
@@ -59,13 +57,21 @@ const { results } = defineProps<{
 
 defineEmits(["close"]);
 
-const { stopIsCalled } = useDecisionHandler();
-
-const { playerList } = storeToRefs(usePlayerStore());
+const ds = useGameDataStore();
 
 const finalResult = computed(() => {
-  const score = Math.max(...playerList.value.map((p) => p.score));
-  const winner = score ? playerList.value.find((p) => p.score === score)?.id : null;
+  let score, winner;
+  const [p1Score, p2Score] = [ds.scoreboard.p1, ds.scoreboard.p2];
+  if (p1Score === p2Score) {
+    score = 0;
+    winner = null;
+  } else if (p1Score > p2Score) {
+    score = p1Score;
+    winner = "p1";
+  } else {
+    score = p2Score;
+    winner = "p2";
+  }
   return {
     winner,
     score,
