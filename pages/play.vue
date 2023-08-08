@@ -146,7 +146,6 @@ const handleStop = () => {
   console.debug(player.toUpperCase(), ">>> Called STOP");
   ds.endRound();
   const result = ds.getCurrent.result;
-  ps.updateScore(player, result.score);
   console.log({
     WINNER: result.winner?.toUpperCase(),
     SCORE: result.score,
@@ -180,7 +179,7 @@ const startAuto = async () => {
   autoOpponent.value = false;
   roundOver.value = false;
   // Instant win conditions are not checked during autoplay
-  autoPlay({ speed: 3, rounds: 3 });
+  autoPlay({ speed: 3, rounds: Infinity });
 };
 
 const startRound = async () => {

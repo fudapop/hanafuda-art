@@ -19,7 +19,7 @@ type TurnPhase = (typeof PHASES)[number];
  */
 export const useConfig = () =>
 	reactive({
-		maxRounds: 3,
+		maxRounds: 12,
 		autoplay: false,
 		autoOpponent: true,
 	});
@@ -58,11 +58,20 @@ export const useGameDataStore = defineStore("gameData", () => {
 			roundHistory.value
 				.filter((result) => result.winner === player)
 				.reduce((total, result) => total + result.score, 0);
+
+		let p1Score = 30 + calcScore("p1") - calcScore("p2");
+		if (p1Score < 0) p1Score = 0;
+		let p2Score = 30 + calcScore("p2") - calcScore("p1");
+		if (p2Score < 0) p2Score = 0;
 		return {
-			p1: calcScore("p1"),
-			p2: calcScore("p2"),
+			p1: p1Score,
+			p2: p2Score,
 		};
 	});
+
+	const pointsExhausted = computed(() =>
+		[...Object.values(scoreboard.value)].some((score) => score === 0)
+	);
 
 	// Actions
 	function nextPhase() {
@@ -93,9 +102,6 @@ export const useGameDataStore = defineStore("gameData", () => {
 			return;
 		}
 		turnPhase.value = PHASES[0];
-		// if (localStorage?.getItem("hanafuda-data")) {
-		// 	roundHistory.value = JSON.parse(localStorage.getItem("hanafuda-data")!)
-		// }
 		roundCounter.value = roundHistory.value.length + 1;
 		console.debug("\tRecord", roundHistory.value);
 		useCardStore().dealCards();
@@ -114,10 +120,16 @@ export const useGameDataStore = defineStore("gameData", () => {
 				round: roundCounter.value,
 				winner: null,
 				score: 0,
-				error: "forfeit",
 			});
+		const { winner, score } = getCurrent.value.result;
+		if (winner) usePlayerStore().updateScore(winner, score);
 		roundOver.value = true;
-		if (roundCounter.value >= useConfig().maxRounds) gameOver.value = true;
+		if (
+			roundCounter.value >= useConfig().maxRounds ||
+			pointsExhausted.value
+		) {
+			gameOver.value = true;
+		}
 	}
 
 	function nextRound() {
@@ -169,6 +181,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 		getCurrent,
 		getPreviousResult,
 		scoreboard,
+		pointsExhausted,
 		// Actions
 		nextPhase,
 		checkCurrentPhase,

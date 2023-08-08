@@ -9,6 +9,8 @@ export type Player = {
 	score: number;
 };
 
+const INITIAL_SCORE = 30;
+
 export const usePlayerStore = defineStore("players", () => {
 	// State
 	const players: Record<PlayerKey, Player> = reactive({
@@ -16,13 +18,13 @@ export const usePlayerStore = defineStore("players", () => {
 			id: "p1",
 			isActive: true,
 			isDealer: true,
-			score: 0,
+			score: INITIAL_SCORE,
 		},
 		p2: {
 			id: "p2",
 			isActive: false,
 			isDealer: false,
-			score: 0,
+			score: INITIAL_SCORE,
 		},
 	});
 	const bonusMultiplier = ref(1);
@@ -47,13 +49,8 @@ export const usePlayerStore = defineStore("players", () => {
 		if (!player) throw Error("No dealer specified");
 		return player;
 	});
-
-	const scoreboard = computed(() => {
-		return {
-			p1: players.p1.score,
-			p2: players.p2.score,
-		}
-	})
+	
+	const activeOpponent = computed(() => (player: PlayerKey) => players[player]);
 
 	// Actions
 	function toggleActivePlayer() {
@@ -70,12 +67,14 @@ export const usePlayerStore = defineStore("players", () => {
 	}
 
 	function updateScore(player: PlayerKey, amount: number) {
-		players[player].score += amount * bonusMultiplier.value;
+		const points = amount * bonusMultiplier.value;
+		const opponent = activeOpponent.value(player);
+		players[player].score += points;
+		opponent.score -= points;
+		if (opponent.score < 0) opponent.score = 0;
 	}
 
   function reset(newDealer?: PlayerKey | null) {
-    // players.p1.score = 0;
-    // players.p2.score = 0;
     bonusMultiplier.value = 1;
 	if (newDealer) {
 		playerList.value.forEach(p => {
@@ -94,7 +93,7 @@ export const usePlayerStore = defineStore("players", () => {
 		activePlayer,
 		inactivePlayer,
 		dealer,
-		scoreboard,
+		activeOpponent,
 		// Actions
 		toggleActivePlayer,
 		toggleDealer,

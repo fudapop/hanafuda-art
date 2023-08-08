@@ -45,14 +45,15 @@ export const useAutoplay = () => {
 		setPlaySpeed(speed);
 		console.info("Running autoplay...");
 		let r = 0;
-		while (r < rounds) {
+		while (r < rounds && !ds.gameOver) {
 			try {
 				ds.startRound();
 				await sleep();
 				await playRound(turns);
 				console.info("Ending round...");
+				ds.endRound();
 				r++;
-				if (r < rounds) {
+				if (r < rounds && !ds.pointsExhausted) {
 					ds.nextRound();
 				}
 				await sleep(2000);
