@@ -1,6 +1,12 @@
 <template>
   <GameLayout>
-    <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader>
+    <div
+      v-show="showLoader"
+      class="fixed top-1/2 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]"
+    >
+      <AnimatedCards />
+    </div>
+    <!-- <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader> -->
     <div
       class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto"
     >
