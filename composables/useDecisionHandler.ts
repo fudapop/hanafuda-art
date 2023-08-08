@@ -20,6 +20,8 @@ export const useDecisionHandler = () => {
     decision.value = "stop";
   };
 
+  const noCalls = computed(() => decision.value === null);
+
   const makeDecision = async (): Promise<KoikoiDecision> => {
     decision.value = "pending";
     while (decisionIsPending.value) {
@@ -43,6 +45,7 @@ export const useDecisionHandler = () => {
     callKoikoi,
     callStop,
     // Getters (reactive)
+    noCalls,
     koikoiIsCalled,
     stopIsCalled,
     decisionIsPending,

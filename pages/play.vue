@@ -88,7 +88,7 @@ import { useGameDataStore } from "~/stores/gameDataStore";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { CompletionEvent } from "~/components/CollectionArea.vue";
-import { checkForWin, CompletedYaku } from "~/utils/yaku";
+import { checkForWin } from "~/utils/yaku";
 
 definePageMeta({
   requiresAuth: true,
@@ -117,6 +117,7 @@ const {
   callStop,
   koikoiIsCalled,
   stopIsCalled,
+  noCalls,
 } = useDecisionHandler();
 
 const handleCompletion = (data: CompletionEvent) => {
@@ -250,7 +251,7 @@ watch(decisionIsPending, () => {
 
 watch([handsEmpty, turnCounter], () => {
   // Handle an exhaustive draw condition
-  if (handsEmpty.value === true && !stopIsCalled.value) {
+  if (handsEmpty.value === true && noCalls.value) {
     if (turnCounter.value < 9) return;
     showModal.value = true;
     // @ts-expect-error: CompletionEvent 'player' should not be null

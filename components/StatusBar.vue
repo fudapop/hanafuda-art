@@ -35,13 +35,90 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { useGameDataStore } from "~/stores/gameDataStore";
-import { PlayerKey } from "~/stores/playerStore";
+import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
+import { useFirestore } from "vuefire";
+import { doc, setDoc } from "firebase/firestore";
+import { convertObjArrToRecord } from "~/utils/myUtils";
 
 const { user, playerNum } = defineProps(["user", "playerNum"]);
 const ds = useGameDataStore();
+const ps = usePlayerStore();
+const { gameOver } = storeToRefs(ds);
 const player = `p${playerNum}` as PlayerKey;
+const opponent: PlayerKey = player === "p1" ? "p2" : "p1";
 const score = computed(() => ds.scoreboard[player]);
-</script>
 
-<style scoped></style>
+const convertHistory = () => {
+  const newRecord = convertObjArrToRecord(
+    ds.roundHistory,
+    "round",
+    (keyProp: string) => `Round ${keyProp}`
+  );
+  for (const round in newRecord) {
+    const roundRecord = newRecord[round];
+    if (roundRecord.completedYaku) {
+      roundRecord.completedYaku = convertObjArrToRecord(
+        roundRecord.completedYaku,
+        "name"
+      );
+    }
+  }
+  return newRecord;
+};
+
+const getDocRefs = () => {
+  const db = useFirestore();
+  const usersRef = doc(db, "users", `u_${user.uid}`);
+  const gamesRef = doc(db, "recent-games", `g_${ds.gameId}`);
+  return {
+    db,
+    usersRef,
+    gamesRef,
+  };
+};
+
+const getResult = () => {
+  const result =
+    ds.scoreboard[player] > ds.scoreboard[opponent]
+      ? "WIN"
+      : ds.scoreboard[player] === ds.scoreboard[opponent]
+      ? "DRAW"
+      : "LOSS";
+  if (result === "WIN") ps.reset(player);
+  return result;
+};
+
+if (user) {
+  watch(gameOver, async () => {
+    if (!gameOver.value) return;
+    const result = getResult();
+    const { usersRef, gamesRef } = getDocRefs();
+    const record = convertHistory();
+    const gameData = {
+      datePlayed: new Date(),
+      players: {
+        p1: usersRef,
+      },
+      finalScores: ds.scoreboard,
+      record,
+    };
+    await setDoc(gamesRef, {
+      ...gameData,
+    });
+    await setDoc(
+      usersRef,
+      {
+        lastPlayed: {
+          date: gameData.datePlayed,
+          result,
+          gameData: gamesRef,
+        },
+      },
+      { merge: true }
+    );
+    ds.generateGameId();
+  });
+}
+</script>

@@ -52,6 +52,13 @@ export const usePlayerStore = defineStore("players", () => {
 	
 	const activeOpponent = computed(() => (player: PlayerKey) => players[player]);
 
+	const winningPlayer = computed(() => {
+		const { p1, p2 } = players;
+		if (p1.score > p2.score) return p1.id;
+		if (p1.score < p2.score) return p2.id;
+		return null;
+	})
+
 	// Actions
 	function toggleActivePlayer() {
 		playerList.value.forEach((p) => (p.isActive = !p.isActive));
@@ -76,12 +83,14 @@ export const usePlayerStore = defineStore("players", () => {
 
   function reset(newDealer?: PlayerKey | null) {
     bonusMultiplier.value = 1;
+	newDealer = newDealer ?? winningPlayer.value;
 	if (newDealer) {
 		playerList.value.forEach(p => {
 			p.isDealer = p.id === newDealer
 			p.isActive = p.id === newDealer
 		})
 	}
+	console.debug("Set new dealer:", { newDealer, active: activePlayer.value })
   }
 
 	return {

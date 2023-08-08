@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { useStorage } from "@vueuse/core";
+import { getRandomString } from "~/utils/myUtils";
 
 export type RoundResult = {
 	[x: string]: unknown;
@@ -19,7 +20,7 @@ type TurnPhase = (typeof PHASES)[number];
  */
 export const useConfig = () =>
 	reactive({
-		maxRounds: 12,
+		maxRounds: 3,
 		autoplay: false,
 		autoOpponent: true,
 	});
@@ -29,6 +30,7 @@ export const useConfig = () =>
  */
 export const useGameDataStore = defineStore("gameData", () => {
 	// State
+	const gameId = ref(getRandomString(28));
 	const roundHistory = useStorage(
 		"hanafuda-data",
 		[] as RoundResult[],
@@ -99,6 +101,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 			return;
 		}
 		turnPhase.value = PHASES[0];
+		turnCounter.value = 1;
 		roundCounter.value = roundHistory.value.length + 1;
 		consoleLogColor(`ROUND ${roundCounter.value}`, "gray");
 		console.debug("\tRecord", roundHistory.value);
@@ -122,8 +125,6 @@ export const useGameDataStore = defineStore("gameData", () => {
 		const { winner, score } = getCurrent.value.result;
 		if (winner) usePlayerStore().updateScore(winner, score);
 		roundOver.value = true;
-		usePlayerStore().reset(winner);
-		useCardStore().reset();
 		if (
 			roundCounter.value >= useConfig().maxRounds ||
 			pointsExhausted.value
@@ -133,8 +134,9 @@ export const useGameDataStore = defineStore("gameData", () => {
 	}
 
 	function nextRound() {
-		// _incrementRound();
-		turnCounter.value = 1;
+		const { winner } = getCurrent.value.result;
+		usePlayerStore().reset(winner);
+		useCardStore().reset();
 		roundOver.value = false;
 	}
 
@@ -147,6 +149,11 @@ export const useGameDataStore = defineStore("gameData", () => {
 		return result;
 	}
 
+	function generateGameId() {
+		gameId.value = getRandomString(28);
+		return gameId.value;
+	}
+
 	function reset() {
 		roundCounter.value = 1;
 		roundOver.value = false;
@@ -156,11 +163,6 @@ export const useGameDataStore = defineStore("gameData", () => {
 		// TODO: Submit roundHistory to database;
 	}
 
-	// function _incrementRound() {
-	// 	roundCounter.value++;
-	// 	consoleLogColor(`ROUND ${roundCounter.value}`, "gray");
-	// }
-
 	function _incrementTurn() {
 		turnCounter.value++;
 		consoleLogColor(`TURN ${turnCounter.value}`, "gray");
@@ -168,6 +170,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 
 	return {
 		// State
+		gameId,
 		roundCounter,
 		turnCounter,
 		turnPhase,
@@ -186,6 +189,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 		saveResult,
 		endRound,
 		nextRound,
+		generateGameId,
 		reset,
 	};
 });

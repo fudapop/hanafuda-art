@@ -3,7 +3,7 @@
     <div class="absolute inset-0 my-auto overflow-visible">
       <div
         v-if="ps.bonusMultiplier > 1"
-        class="absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.5rem] after:font-semibold"
+        class="w-full absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
       >
         <TransitionGroup appear name="stamp">
           <div
@@ -11,7 +11,7 @@
             v-for="n in ps.bonusMultiplier - 1"
             :key="n"
             class="absolute w-8 h-8 mt-2 -z-10"
-            :style="{ marginLeft: `${(n - 1) * 16}px` }"
+            :style="{ marginLeft: `${(n - 1) * 10}px` }"
           >
             <img
               src="/images/coin.webp"
@@ -20,6 +20,7 @@
             />
           </div>
         </TransitionGroup>
+        <span class="text-center absolute w-full mt-3">x{{ ps.bonusMultiplier }}</span>
       </div>
 
       <!-- DECK PILE -->
