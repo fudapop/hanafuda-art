@@ -1,37 +1,9 @@
 <template>
   <div class="grid grid-rows-[80px_1fr_80px] h-[100dvh] overflow-hidden relative">
-    <svg
-      :class="{
-        'transition-transform duration-[2s] absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]': true,
-        '-translate-y-20': players.p2.isActive,
-      }"
-      aria-hidden="true"
-    >
-      <defs>
-        <pattern
-          id="1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84"
-          width="200"
-          height="200"
-          x="50%"
-          y="-1"
-          patternUnits="userSpaceOnUse"
-        >
-          <path d="M.5 200V.5H200" fill="none" />
-        </pattern>
-      </defs>
-      <svg x="50%" y="-1" class="overflow-visible fill-gray-50">
-        <path
-          d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
-          stroke-width="0"
-        />
-      </svg>
-      <rect
-        width="100%"
-        height="100%"
-        stroke-width="0"
-        fill="url(#1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84)"
-      />
-    </svg>
+    <div class="absolute inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden">
+      <MoonBackground />
+      <AnimatedBackground />
+    </div>
 
     <div class="absolute top-6 right-4">
       <DesignSelector />
@@ -40,13 +12,13 @@
     <!-- Opponent Status Bar -->
     <div
       :class="{
-        'z-[-1] border bg-slate-400 border-b-slate-500 opacity-75': true,
+        'z-[-1] transition-opacity bg-[#40495a75] border-b-slate-500': true,
+        'opacity-40': players.p1.isActive,
       }"
     >
       <div
         :class="{
-          'p-2 transition-opacity duration-300': true,
-          'opacity-50': players.p1.isActive,
+          'p-2 duration-300': true,
         }"
       >
         <StatusBar :user="null" playerNum="2" />
@@ -60,13 +32,13 @@
     <!-- Player Status Bar -->
     <div
       :class="{
-        'z-[-1] border bg-slate-400 border-t-slate-500 opacity-75': true,
+        'z-[-1] transition-opacity bg-[#40495a75] border-t-slate-500': true,
+        'opacity-40': players.p2.isActive,
       }"
     >
       <div
         :class="{
-          'p-2 transition-opacity duration-300': true,
-          'opacity-50': players.p2.isActive,
+          'p-2 duration-300': true,
         }"
       >
         <StatusBar :user="user" playerNum="1" />

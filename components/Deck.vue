@@ -3,14 +3,14 @@
     <div class="absolute inset-0 my-auto overflow-visible">
       <div
         v-if="ps.bonusMultiplier > 1"
-        class="w-full absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
+        class="w-full text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
       >
         <TransitionGroup appear name="stamp">
           <div
             :title="`Winning score x${n}!`"
             v-for="n in ps.bonusMultiplier - 1"
             :key="n"
-            class="absolute w-8 h-8 mt-2 -z-10"
+            class="absolute w-6 h-6 mt-3 -z-10"
             :style="{ marginLeft: `${(n - 1) * 10}px` }"
           >
             <img

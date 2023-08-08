@@ -2,7 +2,7 @@
   <GameLayout>
     <div
       v-show="showLoader"
-      class="fixed top-1/2 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]"
+      class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]"
     >
       <AnimatedCards />
     </div>
@@ -95,11 +95,14 @@ import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { CompletionEvent } from "~/components/CollectionArea.vue";
 import { checkForWin } from "~/utils/yaku";
+import { useScreenOrientation } from "@vueuse/core";
 
 definePageMeta({
   requiresAuth: true,
   middleware: ["auth"],
 });
+
+useScreenOrientation().lockOrientation("portrait");
 
 const cs = useCardStore();
 const ps = usePlayerStore();

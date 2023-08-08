@@ -84,7 +84,7 @@
   --card-aspect: 39/64;
 
   & .down {
-    --card-border-w: 2px;
+    --card-border-w: 1px;
     background-image: url("/cards/moon-rabbit/card-back.webp") !important;
     background-color: lightgray !important;
     background-size: 40% !important;

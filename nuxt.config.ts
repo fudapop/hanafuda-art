@@ -2,6 +2,16 @@
 export default defineNuxtConfig({
 	css: ["@/assets/css/card-styles.css"],
 	devtools: { enabled: true },
+	app: {
+		head: {
+			link: [
+				{
+					rel: "icon",
+					href: "/sakura.png",
+				},
+			],
+		},
+	},
 	image: {
 		cloudinary: {
 			baseURL: "https://res.cloudinary.com/dap2o5kiu/image/upload",
@@ -18,11 +28,11 @@ export default defineNuxtConfig({
 	],
 	postcss: {
 		plugins: {
-		  "tailwindcss/nesting": {},
-		  tailwindcss: {},
-		  autoprefixer: {},
+			"tailwindcss/nesting": {},
+			tailwindcss: {},
+			autoprefixer: {},
 		},
-	  },
+	},
 	runtimeConfig: {
 		nodeEnv: process.env.NODE_ENV,
 	},

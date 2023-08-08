@@ -1,5 +1,5 @@
 <template>
-  <div class="gap-1 collection-area">
+  <div class="gap-1 collection-area opacity-75">
     <!-- PLAYER 1 COLLECTION -->
     <ul class="flex h-full py-2">
       <CardList :cards="brights" :stack="true" />

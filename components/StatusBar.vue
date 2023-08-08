@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:flex sm:items-center sm:justify-between">
+  <div class="sm:flex sm:items-center sm:justify-between max-w-[850px] mx-auto">
     <div class="flex items-end space-x-2 sm:space-x-5">
       <div class="flex-shrink-0">
         <img
@@ -12,14 +12,23 @@
       </div>
       <div class="mt-4 sm:mt-0 sm:pt-1">
         <div class="opacity-100">
-          <p class="text-sm font-medium text-white">
+          <p class="text-sm font-medium text-white/75">
             {{ user?.displayName || `Player ${playerNum}` }}
           </p>
           <p
             v-memo="[ds.roundOver, ds.roundCounter]"
-            class="text-xl font-bold text-black sm:text-2xl"
+            class="flex items-center text-xl font-bold text-white sm:text-2xl"
           >
-            Round {{ ds.roundCounter }} | Score: {{ score }}
+            <span class="mr-2 text-[smaller] opacity-75">
+              Round {{ ds.roundCounter }}
+            </span>
+
+            <NuxtImg
+              :src="'/images/coin.webp'"
+              alt="coin"
+              class="w-5 h-5 mx-1 drop-shadow-sm"
+            />
+            {{ score }}
           </p>
         </div>
       </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="relative [--card-height:45px] -translate-y-4 w-max mx-auto">
+  <div class="relative [--card-height:45px] -translate-y-3 w-max mx-auto">
     <!-- OPPONENT HAND -->
     <ListGrid :cols="8" :rows="'auto'" flow="row" gap="2px">
       <!-- FACE-DOWN CARDS -->
