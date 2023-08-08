@@ -1,6 +1,26 @@
 <template>
   <div class="relative">
     <div class="absolute inset-0 my-auto overflow-visible">
+      <div
+        v-if="ps.bonusMultiplier > 1"
+        class="absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.5rem] after:font-semibold"
+      >
+        <TransitionGroup appear name="stamp">
+          <div
+            :title="`Winning score x${n}!`"
+            v-for="n in ps.bonusMultiplier - 1"
+            :key="n"
+            class="absolute w-8 h-8 mt-2 -z-10"
+            :style="{ marginLeft: `${(n - 1) * 16}px` }"
+          >
+            <img
+              src="/images/coin.webp"
+              alt="koi-koi bonus"
+              class="object-cover object-center drop-shadow-md"
+            />
+          </div>
+        </TransitionGroup>
+      </div>
 
       <!-- DECK PILE -->
       <div class="absolute inset-0 my-auto overflow-hidden shadow-sm card down"></div>
@@ -8,11 +28,21 @@
       <!-- Show revealed card when drawing from deck         -->
       <div v-if="revealedCard">
         <HeadlessTransitionRoot appear :show="!!revealedCardImg" as="template">
-          <HeadlessTransitionChild enter="duration-300 ease-out" enter-from="opacity-0 motion-safe:-scale-x-50"
-            enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100"
-            leave-to="opacity-0 motion-safe:translate-x-1">
-            <CardImage v-if="revealedCardImg" :key="revealedCard" :card="revealedCard" :src="revealedCardImg"
-              class="object-cover mx-auto transition-transform -translate-x-4 card drop-shadow-lg" />
+          <HeadlessTransitionChild
+            enter="duration-300 ease-out"
+            enter-from="opacity-0 motion-safe:-scale-x-50"
+            enter-to="opacity-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100"
+            leave-to="opacity-0 motion-safe:translate-x-1"
+          >
+            <CardImage
+              v-if="revealedCardImg"
+              :key="revealedCard"
+              :card="revealedCard"
+              :src="revealedCardImg"
+              class="object-cover mx-auto transition-transform -translate-x-4 card drop-shadow-lg"
+            />
           </HeadlessTransitionChild>
         </HeadlessTransitionRoot>
       </div>
@@ -24,12 +54,15 @@
         Draw Card
       </button> -->
 
-
       <!-- Show the 'Discard' button if there are no matches 
         on the field for the selected card -->
-      <button v-if="selectedCard && !matchedCards.length" v-hide:during.display="'draw'" type="button"
+      <button
+        v-if="selectedCard && !matchedCards.length"
+        v-hide:during.display="'draw'"
+        type="button"
         class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-red-600 shadow-xl border border-red-800 card hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-        @click="matchOrDiscard">
+        @click="matchOrDiscard"
+      >
         Discard
       </button>
     </div>
@@ -56,9 +89,13 @@ const { errorOnTimeout } = useTimeout();
 const selectedCard = useSelectedCard();
 const matchedCards = useMatchedCards();
 const revealedCard = computed(() => ds.checkCurrentPhase("draw") && selectedCard.value);
-const revealedCardImg = computed(() => revealedCard.value ? getCardUrl(revealedCard.value) : null)
+const revealedCardImg = computed(() =>
+  revealedCard.value ? getCardUrl(revealedCard.value) : null
+);
 
-const isDrawPhase = computed(() => ds.checkCurrentPhase("draw") && ps.players.p1.isActive);
+const isDrawPhase = computed(
+  () => ds.checkCurrentPhase("draw") && ps.players.p1.isActive
+);
 const autoOpponent = useState("opponent");
 
 const playDrawPhase = async () => {
@@ -69,7 +106,7 @@ const playDrawPhase = async () => {
     await errorOnTimeout(selectMatchFromField, 10000, "match-on-draw", {
       startMsg: "Awaiting match selection...",
       callback: ds.endRound,
-      endMsg: "Resetting..."
+      endMsg: "Resetting...",
     })();
   } else {
     matchOrDiscard();
@@ -81,15 +118,15 @@ const playDrawPhase = async () => {
     await sleep();
   }
   ds.nextPhase();
-}
+};
 
 const selectMatchFromField = async () => {
   while (selectedCard.value) {
     if (ds.roundOver || ds.gameOver) break;
-    console.log("Awaiting match selection...")
+    console.log("Awaiting match selection...");
     await sleep();
   }
-}
+};
 
 watch(isDrawPhase, () => {
   if (isDrawPhase.value) {
@@ -99,5 +136,5 @@ watch(isDrawPhase, () => {
       playDrawPhase();
     }
   }
-})
+});
 </script>
