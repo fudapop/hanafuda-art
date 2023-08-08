@@ -54,10 +54,11 @@ export const useGameDataStore = defineStore("gameData", () => {
 	const getPreviousResult = computed(() => roundHistory.value.at(-1));
 
 	const scoreboard = computed(() => {
-		const calcScore = (player: PlayerKey) =>
-			roundHistory.value
+		const calcScore = (player: PlayerKey) => {
+			return roundHistory.value
 				.filter((result) => result.winner === player)
-				.reduce((total, result) => total + result.score, 0);
+				.reduce((total, result) => total + (result?.score ?? 0), 0);
+		};
 
 		let p1Score = 30 + calcScore("p1") - calcScore("p2");
 		if (p1Score < 0) p1Score = 0;
@@ -80,12 +81,8 @@ export const useGameDataStore = defineStore("gameData", () => {
 		turnPhase.value = PHASES[i];
 		// console.debug("SWITCHED PHASE >>>", getCurrent.value.phase);
 		if (turnPhase.value === "select") {
-			if (useCardStore().handsEmpty) {
-				endRound();
-			} else {
-				usePlayerStore().toggleActivePlayer();
-				if (usePlayerStore().activePlayer.isDealer) _incrementTurn();
-			}
+			usePlayerStore().toggleActivePlayer();
+			if (usePlayerStore().activePlayer.isDealer) _incrementTurn();
 		}
 		return PHASES[i];
 	}
@@ -103,6 +100,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 		}
 		turnPhase.value = PHASES[0];
 		roundCounter.value = roundHistory.value.length + 1;
+		consoleLogColor(`ROUND ${roundCounter.value}`, "gray");
 		console.debug("\tRecord", roundHistory.value);
 		useCardStore().dealCards();
 	}
@@ -114,7 +112,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 		return getResult(round);
 	}
 
-	function endRound() {
+	async function endRound() {
 		if (!getCurrent.value.result)
 			saveResult({
 				round: roundCounter.value,
@@ -124,6 +122,8 @@ export const useGameDataStore = defineStore("gameData", () => {
 		const { winner, score } = getCurrent.value.result;
 		if (winner) usePlayerStore().updateScore(winner, score);
 		roundOver.value = true;
+		usePlayerStore().reset(winner);
+		useCardStore().reset();
 		if (
 			roundCounter.value >= useConfig().maxRounds ||
 			pointsExhausted.value
@@ -133,10 +133,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 	}
 
 	function nextRound() {
-		const winner = getCurrent.value.result?.winner || null;
-		usePlayerStore().reset(winner);
-		useCardStore().reset();
-		_incrementRound();
+		// _incrementRound();
 		turnCounter.value = 1;
 		roundOver.value = false;
 	}
@@ -159,10 +156,10 @@ export const useGameDataStore = defineStore("gameData", () => {
 		// TODO: Submit roundHistory to database;
 	}
 
-	function _incrementRound() {
-		roundCounter.value++;
-		consoleLogColor(`ROUND ${roundCounter.value}`, "gray");
-	}
+	// function _incrementRound() {
+	// 	roundCounter.value++;
+	// 	consoleLogColor(`ROUND ${roundCounter.value}`, "gray");
+	// }
 
 	function _incrementTurn() {
 		turnCounter.value++;

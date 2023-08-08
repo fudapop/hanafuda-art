@@ -1,9 +1,6 @@
 <template>
   <GameLayout>
     <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader>
-    <div class="absolute top-4 right-4">
-      <DesignSelector />
-    </div>
     <div
       class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto"
     >
@@ -62,11 +59,11 @@
 
     <!-- DEV BUTTONS -->
     <div
-      v-if="true || (roundOver && !showLoader)"
+      v-if="deck.size === 48 || (roundOver && !showLoader)"
       class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
     >
       <button
-        v-if="true"
+        v-if="deck.size === 48"
         type="button"
         class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         @click="startRound"
@@ -74,7 +71,7 @@
         Deal Cards
       </button>
       <button
-        v-show="true"
+        v-show="deck.size === 48"
         type="button"
         class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
         @click="startAuto"
@@ -101,9 +98,9 @@ definePageMeta({
 const cs = useCardStore();
 const ps = usePlayerStore();
 const ds = useGameDataStore();
-const { hand, field, deck } = storeToRefs(cs);
+const { hand, field, deck, handsEmpty } = storeToRefs(cs);
 const { players, activePlayer } = storeToRefs(ps);
-const { roundOver, gameOver } = storeToRefs(ds);
+const { roundOver, gameOver, turnCounter } = storeToRefs(ds);
 
 const { useSelectedCard } = useCardHandler();
 const selectedCard = useSelectedCard();
@@ -124,10 +121,13 @@ const {
 
 const handleCompletion = (data: CompletionEvent) => {
   const { player, score, completedYaku } = data;
-  const message = `${player.toUpperCase()} *** Completed ${completedYaku
-    .map((s) => s.name.toUpperCase())
-    .join(" + ")}!`;
-  consoleLogColor(message, "skyblue");
+  if (player) {
+    // The round did NOT end in a draw
+    const message = `${player.toUpperCase()} *** Completed ${completedYaku
+      .map((s) => s.name.toUpperCase())
+      .join(" + ")}!`;
+    consoleLogColor(message, "skyblue");
+  }
   consoleLogColor("\tScore: " + score, "lightblue");
   console.log(
     ds.saveResult({
@@ -160,6 +160,7 @@ const handleKoikoi = () => {
   showModal.value = false;
 };
 
+// Closing the round results modal
 const handleNext = async () => {
   showLoader.value = true;
   ds.nextRound();
@@ -168,6 +169,7 @@ const handleNext = async () => {
   startRound();
 };
 
+// Closing the final results modal
 const handleClose = () => {
   showModal.value = false;
   cs.reset();
@@ -246,18 +248,17 @@ watch(decisionIsPending, () => {
   if (stopIsCalled.value) handleStop();
 });
 
-// This breaks, but we still need a way to handle an exhaustive draw.
-// watch(handsEmpty, () => {
-//   if (handsEmpty.value === true && !decisionIsPending.value) showModal.value = true;
-// });
-// watch(gameOver, async () => {
-//   if (gameOver.value === true) {
-//     cs.reset();
-//     ps.reset();
-//     await sleep(2000);
-//     ds.reset();
-//   }
-// });
+watch([handsEmpty, turnCounter], () => {
+  // Handle an exhaustive draw condition
+  if (handsEmpty.value === true && !stopIsCalled.value) {
+    if (turnCounter.value < 9) return;
+    showModal.value = true;
+    // @ts-expect-error: CompletionEvent 'player' should not be null
+    handleCompletion({ player: null, score: 0 });
+    callStop();
+    ds.endRound();
+  }
+});
 
 watch(roundOver, () => {
   // Ensure modal is closed when starting a new round during autoplay
@@ -267,7 +268,6 @@ watch(roundOver, () => {
 
 watch(activePlayer, () => {
   if (autoOpponent.value && ps.players.p2.isActive) {
-    // while (decisionIsPending.value) await sleep();
     opponentPlay({ speed: 2 });
   }
 });

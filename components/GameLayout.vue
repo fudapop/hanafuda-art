@@ -33,6 +33,10 @@
       />
     </svg>
 
+    <div class="absolute top-6 right-4">
+      <DesignSelector />
+    </div>
+
     <!-- Opponent Status Bar -->
     <div
       :class="{

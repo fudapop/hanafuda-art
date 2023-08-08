@@ -53,9 +53,10 @@ export const useAutoplay = () => {
 				console.info("Ending round...");
 				ds.endRound();
 				r++;
-				if (r < rounds && !ds.pointsExhausted) {
-					ds.nextRound();
+				if (r > rounds || ds.pointsExhausted) {
+					break;
 				}
+				ds.nextRound();
 				await sleep(2000);
 				abort.value = false;
 			} catch (err) {

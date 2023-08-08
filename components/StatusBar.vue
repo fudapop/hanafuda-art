@@ -15,7 +15,10 @@
           <p class="text-sm font-medium text-white">
             {{ user?.displayName || `Player ${playerNum}` }}
           </p>
-          <p class="text-xl font-bold text-black sm:text-2xl">
+          <p
+            v-memo="[ds.roundOver, ds.roundCounter]"
+            class="text-xl font-bold text-black sm:text-2xl"
+          >
             Round {{ ds.roundCounter }} | Score: {{ score }}
           </p>
         </div>
