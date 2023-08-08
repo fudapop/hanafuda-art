@@ -1,6 +1,12 @@
 <template>
   <template v-if="src" v-show="loaded">
-    <NuxtImg :src="src" :alt="card" @load="handleLoad" loading="eager" />
+    <NuxtImg
+      :src="src"
+      :alt="card"
+      @load="handleLoad"
+      loading="eager"
+      class="object-fill aspect-[--card-aspect] scale-[1.01]"
+    />
   </template>
 </template>
 
