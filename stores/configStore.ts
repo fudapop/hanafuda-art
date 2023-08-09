@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { YakuName } from "~/utils/yaku";
 
 const OPTIONS = {
 	GAME_LENGTH: [3, 6, 12] as const,
@@ -15,22 +16,46 @@ type DifficultyOptions = (typeof OPTIONS.DIFFICULTY)[number];
 
 const useConfigStore = defineStore("config", () => {
 	const maxRounds = ref(3) as Ref<GameLengthOptions>;
-    
+
 	const difficulty = ref("normal") as Ref<DifficultyOptions>;
 
 	const allowViewingsYaku = ref("allow") as Ref<ViewingsOptions>;
-    
+
 	const doubleScoreOverSeven = ref(false);
-    
+
 	const sakeIsWildCard = ref(false);
 
-    const getCurrentSettings = computed(() => ({
-        rounds: maxRounds.value,
-        difficulty: difficulty.value,
-        viewings: allowViewingsYaku.value,
-        double: doubleScoreOverSeven.value,
-        wild: sakeIsWildCard.value,
-    }))
+	const getCurrentSettings = computed(() => ({
+		rounds: maxRounds.value,
+		difficulty: difficulty.value,
+		viewings: allowViewingsYaku.value,
+		double: doubleScoreOverSeven.value,
+		wild: sakeIsWildCard.value,
+	}));
+
+	/**
+	 * Filter an array/set of yaku based on set rule
+	 */
+	function applyViewingsOption(yakuList: YakuName[]) {
+		const limitedYaku = ["hanami-zake", "tsukimi-zake"];
+		const filteredList = yakuList.filter((yaku) => !limitedYaku.includes(yaku));
+
+		switch (allowViewingsYaku.value) {
+			case "none":
+				return filteredList;
+
+			case "limited":
+				if (filteredList.length) {
+					return yakuList;
+				} else {
+					return filteredList;
+				}
+
+			case "allow":
+			default:
+				return yakuList;
+		}
+	}
 
 	return {
 		doubleScoreOverSeven,
@@ -38,7 +63,8 @@ const useConfigStore = defineStore("config", () => {
 		maxRounds,
 		sakeIsWildCard,
 		difficulty,
-        getCurrentSettings,
+		getCurrentSettings,
+		applyViewingsOption,
 		OPTIONS,
 	};
 });

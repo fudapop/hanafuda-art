@@ -23,6 +23,7 @@ import { CardName, sortByType } from "~/utils/cards";
 import { checkAll, YAKU, YakuName, CompletedYaku } from "~/utils/yaku";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { storeToRefs } from "pinia";
+import { useConfigStore } from "~/stores/configStore";
 
 export type CompletionEvent = {
   player: PlayerKey;
@@ -37,6 +38,7 @@ const emits = defineEmits<{
 
 const { roundOver } = storeToRefs(useGameDataStore());
 const cs = useCardStore();
+const config = useConfigStore();
 
 const brights: Ref<Set<CardName>> = ref(new Set([]));
 const animals: Ref<Set<CardName>> = ref(new Set([]));
@@ -69,6 +71,20 @@ const resetCollection = () => {
   plains.value.clear();
 };
 
+const applyExtraTags = (yakuList: YakuName[]) => {
+  const taggedList = yakuList.map((yaku) => {
+    // Allow upgrading yaku to trigger emit.
+    if (["kasu", "tan-zaku", "tane-zaku"].includes(yaku)) {
+      const extra =
+        YAKU[yaku].find(cs.collection[player]).length - YAKU[yaku].numRequired;
+      return `${yaku}+${extra}`;
+    } else {
+      return yaku;
+    }
+  }) as YakuName[];
+  return taggedList;
+};
+
 let lastCompleted: Set<YakuName> = new Set([]);
 
 watch(roundOver, () => {
@@ -86,18 +102,11 @@ watch(
 
     const { score, completed: completedYaku } = checkAll(cs.collection[player]);
 
-    const newCompleted = completedYaku.map((yaku) => {
-      // Allow upgrading yaku to trigger emit.
-      if (["kasu", "tan-zaku", "tane-zaku"].includes(yaku)) {
-        const extra =
-          YAKU[yaku].find(cs.collection[player]).length - YAKU[yaku].numRequired;
-        return `${yaku}+${extra}`;
-      } else {
-        return yaku;
-      }
-    }) as YakuName[];
+    // Filter list based on viewings allowance setting
+    const newCompleted = config.applyViewingsOption(completedYaku);
 
-    if (newCompleted.every((yaku) => lastCompleted.has(yaku))) return;
+    // No yaku completed or upgraded since the last update
+    if (applyExtraTags(newCompleted).every((yaku) => lastCompleted.has(yaku))) return;
 
     if (completedYaku.length) {
       // Emits only if new yaku completed.

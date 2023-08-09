@@ -214,7 +214,7 @@ const optionDescription = (option: ViewingsOptions) => {
     case "allow":
       return "Completion is scored normally.";
     case "limited":
-      return "Requires another complete yaku to score points.";
+      return "Requires another completed yaku to score points.";
     case "none":
       return "No points are scored for completion.";
   }
