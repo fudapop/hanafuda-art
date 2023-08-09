@@ -5,7 +5,7 @@
       :alt="card"
       @load="handleLoad"
       loading="eager"
-      class="object-fill aspect-[--card-aspect] scale-[1.01]"
+      class="object-cover aspect-[--card-aspect] scale-[1.01]"
     />
   </template>
 </template>

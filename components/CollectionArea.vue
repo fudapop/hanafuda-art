@@ -100,6 +100,7 @@ watch(
     if (roundOver.value) return;
     updateCollection();
 
+    config.applyWildCardOption();
     const { score, completed: completedYaku } = checkAll(cs.collection[player]);
 
     // Filter list based on viewings allowance setting

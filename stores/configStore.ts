@@ -57,6 +57,22 @@ const useConfigStore = defineStore("config", () => {
 		}
 	}
 
+	/**
+	 * Adds/removes the sake cup to the check for plains
+	 */
+	function applyWildCardOption() {
+		const plains = YAKU.kasu.cards;
+		const isIncluded = plains.includes("kiku-ni-sakazuki");
+
+		if (sakeIsWildCard.value) {
+			if (!isIncluded) plains.push("kiku-ni-sakazuki");
+		} else {
+			if (isIncluded) {
+				plains.splice(plains.indexOf("kiku-ni-sakazuki"), 1);
+			}
+		}
+	}
+
 	return {
 		doubleScoreOverSeven,
 		allowViewingsYaku,
@@ -65,6 +81,7 @@ const useConfigStore = defineStore("config", () => {
 		difficulty,
 		getCurrentSettings,
 		applyViewingsOption,
+		applyWildCardOption,
 		OPTIONS,
 	};
 });

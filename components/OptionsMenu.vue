@@ -1,14 +1,14 @@
 <template>
-  <HeadlessMenu as="div" class="relative inline-block text-left">
+  <HeadlessPopover class="relative inline-block text-left">
     <div>
-      <HeadlessMenuButton
+      <HeadlessPopoverButton
         class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
       >
         Options
         <ChevronDownIcon class="w-5 h-5 -mr-1 text-gray-400" aria-hidden="true" />
-      </HeadlessMenuButton>
+      </HeadlessPopoverButton>
     </div>
-
+    <HeadlessPopoverOverlay class="fixed inset-0 bg-black opacity-30" />
     <Transition
       enter-active-class="transition duration-100 ease-out"
       enter-from-class="transform scale-95 opacity-0"
@@ -17,7 +17,7 @@
       leave-from-class="transform scale-100 opacity-100"
       leave-to-class="transform scale-95 opacity-0"
     >
-      <HeadlessMenuItems
+      <HeadlessPopoverPanel
         :unmount="false"
         class="absolute right-0 z-20 w-[calc(100vw-2rem)] sm:w-[600px] mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
@@ -52,9 +52,9 @@
             </HeadlessTabPanel>
           </HeadlessTabPanels>
         </HeadlessTabGroup>
-      </HeadlessMenuItems>
+      </HeadlessPopoverPanel>
     </Transition>
-  </HeadlessMenu>
+  </HeadlessPopover>
 </template>
 
 <script setup lang="ts">
