@@ -4,7 +4,7 @@
       v-show="showLoader"
       class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]"
     >
-      <AnimatedCards />
+      <CardsLoader />
     </div>
     <!-- <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader> -->
     <div
@@ -56,16 +56,11 @@
       <LazyFinalResults v-if="gameOver" :results="ds.roundHistory" @close="handleClose" />
       <LazyRoundResults v-else @next="handleNext" />
     </LazyResultsModal>
-    <!-- <Results
-      v-if="ds.roundHistory.length"
-      :results="ds.roundHistory"
-      :show-modal="showModal"
-      :scoreboard="ps.scoreboard"
-    /> -->
 
     <!-- DEV BUTTONS -->
     <div
-      v-if="deck.size === 48 || (roundOver && !showLoader)"
+      v-if="deck.size === 48 || roundOver"
+      v-hide="showLoader"
       class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
     >
       <button
@@ -77,6 +72,7 @@
         Deal Cards
       </button>
       <button
+        v-if="nodeEnv === 'development'"
         v-show="deck.size === 48"
         type="button"
         class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
@@ -102,8 +98,12 @@ definePageMeta({
   middleware: ["auth"],
 });
 
-useScreenOrientation().lockOrientation("portrait");
+const { nodeEnv } = useRuntimeConfig().public;
 
+onMounted(() => {
+  const screen = useScreenOrientation();
+  if (screen.isSupported.value) screen.lockOrientation("portrait");
+});
 const cs = useCardStore();
 const ps = usePlayerStore();
 const ds = useGameDataStore();

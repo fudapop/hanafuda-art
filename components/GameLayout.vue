@@ -5,8 +5,15 @@
       <AnimatedBackground />
     </div>
 
-    <div class="absolute top-6 right-4">
-      <DesignSelector />
+    <div class="absolute top-6 right-4 flex gap-x-4">
+      <OptionsMenu :tabCategories="tabs">
+        <template #tab-panel-1>
+          <DesignSelector />
+        </template>
+        <template #tab-panel-2>
+          <ProfilePanel />
+        </template>
+      </OptionsMenu>
     </div>
 
     <!-- Opponent Status Bar -->
@@ -44,9 +51,6 @@
         <StatusBar :user="user" playerNum="1" />
       </div>
     </div>
-    <div class="absolute bottom-4 right-4">
-      <LoginButton />
-    </div>
   </div>
 </template>
 
@@ -56,6 +60,8 @@ import { usePlayerStore } from "~/stores/playerStore";
 
 const { players } = storeToRefs(usePlayerStore());
 const user = await getCurrentUser();
+
+const tabs = ref(["Design", "Profile"]);
 </script>
 
 <style scoped></style>

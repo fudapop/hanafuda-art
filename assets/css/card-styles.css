@@ -35,7 +35,7 @@
   --card-aspect: 11/16;
 
   & .down {
-    background-image: url("/cards/hanami/card-back.webp") !important;
+    background-image: url("/cards/koinobori/card-back.webp") !important;
     background-color: lightgoldenrodyellow !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -54,7 +54,7 @@
 
   & .down {
     background-image: url("/cards/koinobori/card-back.webp") !important;
-    background-color: lightskyblue !important;
+    background-color: powderblue !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
     background-position: bottom 5% right 5% !important;
@@ -63,7 +63,7 @@
 
 .modern {
   --card-aspect: 9/16;
-  --card-border-color: hsla(0 0% 100% / 0.3);
+  --card-border-color: hsla(0 0% 13% / 0.3);
   --card-glow-color: powderblue;
 
   & .card {

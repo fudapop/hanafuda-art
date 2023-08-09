@@ -1,6 +1,7 @@
 <template>
   <div class="fixed h-screen w-screen">
     <NuxtImg
+      src="/bg/grey-hills-1280.webp"
       srcset="/bg/grey-hills-768.webp 768w, /bg/grey-hills-1024.webp 1024w, /bg/grey-hills-1280.webp 1280w, /bg/grey-hills-1920.webp 1920w"
       alt="Moon over grassy fields"
       sizes="100vw"

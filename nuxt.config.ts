@@ -34,7 +34,9 @@ export default defineNuxtConfig({
 		},
 	},
 	runtimeConfig: {
-		nodeEnv: process.env.NODE_ENV,
+		public: {
+			nodeEnv: process.env.NODE_ENV,
+		}
 	},
 	ssr: false,
 	tailwindcss: {
