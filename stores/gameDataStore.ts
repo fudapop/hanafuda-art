@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
+import { useConfigStore } from "~/stores/configStore";
 import { useStorage } from "@vueuse/core";
 import { getRandomString } from "~/utils/myUtils";
 
@@ -14,16 +15,6 @@ export type RoundResult = {
 const PHASES = ["select", "draw", "collect"] as const;
 
 type TurnPhase = (typeof PHASES)[number];
-
-/**
- * @todo Create a configStore for game settings
- */
-export const useConfig = () =>
-	reactive({
-		maxRounds: 3,
-		autoplay: false,
-		autoOpponent: true,
-	});
 
 /**
  * Coordinates the appropriate store actions during each phase of the game
@@ -126,7 +117,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 		if (winner) usePlayerStore().updateScore(winner, score);
 		roundOver.value = true;
 		if (
-			roundCounter.value >= useConfig().maxRounds ||
+			roundCounter.value >= useConfigStore().maxRounds ||
 			pointsExhausted.value
 		) {
 			gameOver.value = true;

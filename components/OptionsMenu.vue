@@ -19,7 +19,7 @@
     >
       <HeadlessMenuItems
         :unmount="false"
-        class="absolute right-0 z-20 w-[300px] sm:w-[600px] mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="absolute right-0 z-20 w-[calc(100vw-2rem)] sm:w-[600px] mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
         <HeadlessTabGroup>
           <HeadlessTabList class="flex space-x-1 rounded-md bg-blue-900/20 p-1">

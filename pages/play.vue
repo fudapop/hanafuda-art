@@ -91,7 +91,6 @@ import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { CompletionEvent } from "~/components/CollectionArea.vue";
 import { checkForWin } from "~/utils/yaku";
-import { useScreenOrientation } from "@vueuse/core";
 
 definePageMeta({
   requiresAuth: true,
@@ -100,10 +99,6 @@ definePageMeta({
 
 const { nodeEnv } = useRuntimeConfig().public;
 
-onMounted(() => {
-  const screen = useScreenOrientation();
-  if (screen.isSupported.value) screen.lockOrientation("portrait");
-});
 const cs = useCardStore();
 const ps = usePlayerStore();
 const ds = useGameDataStore();

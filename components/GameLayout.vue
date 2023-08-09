@@ -11,6 +11,9 @@
           <DesignSelector />
         </template>
         <template #tab-panel-2>
+          <GameplaySettings />
+        </template>
+        <template #tab-panel-3>
           <ProfilePanel />
         </template>
       </OptionsMenu>
@@ -61,7 +64,7 @@ import { usePlayerStore } from "~/stores/playerStore";
 const { players } = storeToRefs(usePlayerStore());
 const user = await getCurrentUser();
 
-const tabs = ref(["Design", "Profile"]);
+const tabs = ref(["Design", "Gameplay", "Profile"]);
 </script>
 
 <style scoped></style>

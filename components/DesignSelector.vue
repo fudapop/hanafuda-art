@@ -1,6 +1,63 @@
 <template>
   <div class="p-3 grid sm:grid-cols-2">
-    <div>
+    <div class="relative isolate">
+      <svg
+        class="absolute inset-x-0 top-0 -z-10 h-[16rem] w-full stroke-gray-200 [mask-image:radial-gradient(8rem_8rem_at_center,white,transparent)]"
+        aria-hidden="true"
+      >
+        <defs>
+          <pattern
+            id="1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84"
+            width="200"
+            height="200"
+            x="50%"
+            y="-1"
+            patternUnits="userSpaceOnUse"
+          >
+            <path d="M.5 200V.5H200" fill="none" />
+          </pattern>
+        </defs>
+        <svg x="50%" y="-1" class="overflow-visible fill-gray-50">
+          <path
+            d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
+            stroke-width="0"
+          />
+        </svg>
+        <rect
+          width="100%"
+          height="100%"
+          stroke-width="0"
+          fill="url(#1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84)"
+        />
+      </svg>
+      <div
+        class="absolute top-0 right-0 -ml-6 overflow-hidden left-1/3 -z-10 transform-gpu blur-2xl lg:ml-6 xl:ml-12"
+        aria-hidden="true"
+      >
+        <div
+          class="aspect-[4/5] w-[200px] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
+          style="
+            clip-path: polygon(
+              63.1% 29.5%,
+              100% 17.1%,
+              76.6% 3%,
+              48.4% 0%,
+              44.6% 4.7%,
+              54.5% 25.3%,
+              59.8% 49%,
+              55.2% 57.8%,
+              44.4% 57.2%,
+              27.8% 47.9%,
+              35.1% 81.5%,
+              0% 97.7%,
+              39.2% 100%,
+              35.2% 81.4%,
+              97.2% 52.8%,
+              63.1% 29.5%
+            );
+          "
+        />
+      </div>
       <AnimatedCards />
     </div>
     <div>
@@ -46,29 +103,29 @@ const selectedDesign = ref(currentDesign.value);
 
 const designInfo = computed(() => getDesignInfo(currentDesign.value));
 
-const preloadTags = ref();
+const prefetchTags = ref();
 
 onMounted(() => {
   // @ts-ignore
-  //   currentDesign.value = localStorage.getItem("hanafuda-design-pref") || "cherry-version";
+  currentDesign.value = localStorage.getItem("hanafuda-design-pref") || "cherry-version";
   useHead(
     {
       link: [{ rel: "preconnect", href: "https://firebasestorage.googleapis.com" }],
     },
     { tagPriority: "high" }
   );
-  const preloadHead = useHead({});
+  const prefetchHead = useHead({});
   watchEffect(() => {
     localStorage.setItem("hanafuda-design-pref", currentDesign.value);
     fetchCardUrls().then((urlMap) => {
-      preloadTags.value = [...urlMap.values()].map((url) => ({
-        rel: "preload",
+      prefetchTags.value = [...urlMap.values()].map((url) => ({
+        rel: "prefetch",
         href: url,
         as: "image",
       }));
-      preloadHead?.patch({
+      prefetchHead?.patch({
         bodyAttrs: { class: currentDesign },
-        link: preloadTags.value,
+        link: prefetchTags.value,
       });
     });
   });

@@ -23,11 +23,7 @@
               Round {{ ds.roundCounter }}
             </span>
 
-            <NuxtImg
-              src="/images/coin.webp"
-              alt="coin"
-              class="w-5 h-5 mx-1 drop-shadow-sm"
-            />
+            <img src="/images/coin.webp" alt="coin" class="w-5 h-5 mx-1 drop-shadow-sm" />
             {{ score }}
           </p>
         </div>
