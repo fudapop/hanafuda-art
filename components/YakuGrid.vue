@@ -16,12 +16,14 @@
       </div>
       <!-- YAKU TITLE -->
       <p
-        class="block mt-2 text-sm font-semibold tracking-wide text-gray-900 truncate pointer-events-none"
+        class="block mt-2 text-sm font-semibold tracking-wide text-gray-900 dark:text-white truncate pointer-events-none"
       >
         {{ yaku.name.toUpperCase() }}
       </p>
       <!-- YAKU POINTS -->
-      <p class="block text-sm font-medium text-gray-500 pointer-events-none">
+      <p
+        class="block text-sm font-medium text-gray-500 dark:text-gray-400 pointer-events-none"
+      >
         {{ yaku.points }}
         points
       </p>

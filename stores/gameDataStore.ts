@@ -32,7 +32,6 @@ export const useGameDataStore = defineStore("gameData", () => {
 	const turnCounter = ref(1);
 	const turnPhase = ref("select" as TurnPhase);
 	const roundOver = ref(false);
-	// TODO: Create shared gameOver observer plugin
 	const gameOver = ref(false);
 
 	// Getters
@@ -151,7 +150,6 @@ export const useGameDataStore = defineStore("gameData", () => {
 		gameOver.value = false;
 		const record = JSON.stringify(roundHistory.value.splice(0));
 		return record;
-		// TODO: Submit roundHistory to database;
 	}
 
 	function _incrementTurn() {

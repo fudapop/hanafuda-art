@@ -1,6 +1,8 @@
 <template>
   <div class="grid sm:grid-cols-2">
-    <div class="grid h-full p-4 m-3 bg-white border rounded-lg shadow-sm">
+    <div
+      class="grid h-full p-4 m-3 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-sm"
+    >
       <!-- TODO: Profile Info -->
       <div v-if="user">
         <img
@@ -15,13 +17,15 @@
           class="object-contain object-center mx-auto rounded-full"
         />
       </div>
-      <p class="px-4 overflow-hidden text-lg font-semibold text-center">
+      <p
+        class="px-4 overflow-hidden text-lg text-gray-900 dark:text-white font-semibold text-center"
+      >
         {{ user?.displayName }}
       </p>
       <div v-if="profile">
-        <p class="text-center">
+        <p class="text-center text-gray-900 dark:text-white">
           Last played on:
-          <span class="block mt-1 text-sm text-gray-500">{{
+          <span class="block mt-1 text-sm text-gray-500 dark:text-gray-300">{{
             useDateFormat(profile.lastPlayed.date.toDate(), "MMM-DD-YYYY HH:mm").value
           }}</span>
         </p>

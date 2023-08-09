@@ -1,8 +1,13 @@
 <template>
   <!-- HEADER -->
-  <div class="px-4 py-5 bg-white border-b border-gray-200 sm:px-6">
+  <div
+    class="px-4 py-5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 sm:px-6"
+  >
     <div class="flex flex-wrap items-end justify-between -mt-2 -ml-4 sm:flex-nowrap">
-      <HeadlessDialogTitle as="h3" class="text-lg font-semibold leading-6 text-gray-900">
+      <HeadlessDialogTitle
+        as="h3"
+        class="text-lg font-semibold leading-6 text-gray-900 dark:text-white"
+      >
         {{ recordedWinner?.toUpperCase() }}
         <span v-if="decisionIsPending"> is deciding... </span>
         <span v-else-if="stopIsCalled"> called stop. </span>
@@ -31,10 +36,16 @@
     </div>
   </div>
   <!-- END HEADER -->
-  <h4 class="my-4">
-    Total: <span class="font-semibold text-lg">{{ lastRoundResult.score }} points</span>
+  <h4 class="my-4 text-gray-600 dark:text-gray-400">
+    Total:
+    <span class="font-semibold text-lg text-indigo-700 dark:text-yellow-100"
+      >{{ lastRoundResult.score }} points</span
+    >
     <span v-if="bonusMultiplier > 1" class="ml-8">
-      Koi-Koi Bonus: <span class="font-semibold text-lg">x{{ bonusMultiplier }}</span>
+      Koi-Koi Bonus:
+      <span class="font-semibold text-lg text-indigo-700 dark:text-yellow-100"
+        >x{{ bonusMultiplier }}</span
+      >
     </span>
   </h4>
   <YakuGrid

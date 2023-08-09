@@ -1,5 +1,7 @@
 <template>
-  <div class="fixed h-screen w-screen">
+  <div
+    class="fixed h-screen w-screen after:content-normal after:block after:fixed after:h-full after:bg-indigo-300/30 dark:after:bg-black/20 after:inset-0"
+  >
     <NuxtImg
       src="/bg/grey-hills-1280.webp"
       srcset="/bg/grey-hills-768.webp 768w, /bg/grey-hills-1024.webp 1024w, /bg/grey-hills-1280.webp 1280w, /bg/grey-hills-1920.webp 1920w"

@@ -10,32 +10,40 @@
         />
         <!-- <div v-else class="w-16 h-16 mx-auto rounded-full"></div> -->
       </div>
-      <div class="mt-4 sm:mt-0 sm:pt-1">
+      <div class="mt-2 sm:mt-0 sm:pt-1">
         <div class="opacity-100">
-          <p class="text-sm font-medium text-white/75">
+          <p
+            v-if="playerNum == 1"
+            class="text-lg text-indigo-700 dark:text-white font-bold sm:text-xl"
+          >
             {{ user?.displayName || `Player ${playerNum}` }}
           </p>
           <p
             v-memo="[ds.roundOver, ds.roundCounter]"
-            class="flex items-center text-xl font-bold text-white sm:text-2xl"
+            class="flex items-center text-sm font-medium text-gray-900 dark:text-white"
           >
-            <span class="mr-2 text-[smaller] opacity-75">
+            <span class="mr-2 text-gray-600 dark:text-gray-300">
               Round {{ ds.roundCounter }}
             </span>
-
-            <img src="/images/coin.webp" alt="coin" class="w-5 h-5 mx-1 drop-shadow-sm" />
-            {{ score }}
+            <span class="flex items-center font-semibold text-xl">
+              <img
+                src="/images/coin.webp"
+                alt="coin"
+                class="w-5 h-5 mx-1 drop-shadow-sm"
+              />
+              {{ score }}
+            </span>
+          </p>
+          <p
+            v-if="playerNum == 2"
+            class="text-lg text-gray-900 dark:text-white font-bold sm:text-xl"
+          >
+            {{ user?.displayName || `Player ${playerNum}` }}
           </p>
         </div>
       </div>
     </div>
-    <div v-if="playerNum == 1" class="flex justify-center mt-5 sm:mt-0 z-[-1]">
-      <!-- <a
-        href="#"
-        class="flex items-center justify-center px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-        >View Progress</a
-      > -->
-    </div>
+    <div v-if="playerNum == 1" class="flex justify-center mt-5 sm:mt-0 z-[-1]"></div>
   </div>
 </template>
 

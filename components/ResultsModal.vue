@@ -27,7 +27,7 @@
           >
             <!-- RESPONSIVE CONTAINER -->
             <div
-              class="p-6 overflow-hidden text-left align-middle transition-all transform bg-white rounded-md shadow-xl w-[clamp(320px,calc(100vw-2rem),800px)]"
+              class="p-6 overflow-hidden text-left align-middle transition-all transform text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md shadow-xl w-[clamp(320px,calc(100vw-2rem),800px)]"
             >
               <slot />
             </div>

@@ -22,15 +22,11 @@
     <!-- Opponent Status Bar -->
     <div
       :class="{
-        'z-[-1] transition-opacity bg-[#40495a75] border-b-slate-500': true,
+        'z-[-1] duration-300 transition-opacity bg-gray-50 dark:bg-[#40495a75] border-b-slate-500': true,
         'opacity-40': players.p1.isActive,
       }"
     >
-      <div
-        :class="{
-          'p-2 duration-300': true,
-        }"
-      >
+      <div class="p-2">
         <StatusBar :user="null" playerNum="2" />
       </div>
     </div>
@@ -42,15 +38,11 @@
     <!-- Player Status Bar -->
     <div
       :class="{
-        'z-[-1] transition-opacity bg-[#40495a75] border-t-slate-500': true,
+        'z-[-1] duration-300 transition-opacity bg-gray-50 dark:bg-[#40495a75] border-t-slate-500': true,
         'opacity-40': players.p2.isActive,
       }"
     >
-      <div
-        :class="{
-          'p-2 duration-300': true,
-        }"
-      >
+      <div class="p-2">
         <StatusBar :user="user" playerNum="1" />
       </div>
     </div>

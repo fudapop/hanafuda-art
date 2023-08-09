@@ -65,10 +65,17 @@
   --card-aspect: 9/16;
   --card-border-color: hsla(0 0% 13% / 0.3);
   --card-glow-color: powderblue;
+  --card-radius: 3px;
 
   & .card {
-    background-color: var(--tbl-black);
-    object-fit: cover;
+    /* The moon card has a transparent bg for some reason.
+      This fixes it.
+    */
+    background-color: #333;
+
+    & img {
+      scale: 1.05;
+    }
   }
 
   & .down {

@@ -1,5 +1,8 @@
 <template>
-  <div v-show="koikoiIsCalled" class="relative h-full w-full">
+  <div
+    v-if="koikoiIsCalled"
+    class="relative h-full w-full animate-pulse [animation-duration:15s]"
+  >
     <TransitionGroup
       enter-active-class="duration-200"
       enter-to-class="opacity-90 scale-100"
@@ -21,7 +24,7 @@
       >
         <img
           src="/images/sakura.webp"
-          class="animate-spin [animation-duration:10s] drop-shadow-md"
+          class="animate-spin [animation-duration:20s] drop-shadow-md"
         />
       </div>
     </TransitionGroup>

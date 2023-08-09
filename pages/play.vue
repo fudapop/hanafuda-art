@@ -37,7 +37,7 @@
       <!-- PLAYER HAND -->
       <div
         v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
-        class="max-sm:[--card-height:85px] max-md:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-8"
+        class="max-sm:[--card-height:85px] max-lg:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-6"
       >
         <div
           :class="{
@@ -255,8 +255,9 @@ watch(decisionIsPending, () => {
 
 watch([handsEmpty, turnCounter], () => {
   // Handle an exhaustive draw condition
-  if (handsEmpty.value === true && noCalls.value) {
+  if (handsEmpty.value === true) {
     if (turnCounter.value < 9) return;
+    if (decisionIsPending.value || stopIsCalled.value) return;
     showModal.value = true;
     // @ts-expect-error: CompletionEvent 'player' should not be null
     handleCompletion({ player: null, score: 0 });

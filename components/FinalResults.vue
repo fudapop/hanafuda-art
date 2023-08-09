@@ -1,8 +1,13 @@
 <template>
   <!-- HEADER -->
-  <div class="px-4 py-5 bg-white border-b border-gray-200 sm:px-6">
+  <div
+    class="px-4 py-5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 sm:px-6"
+  >
     <div class="flex flex-wrap items-end justify-between -mt-2 -ml-4 sm:flex-nowrap">
-      <HeadlessDialogTitle as="h3" class="text-lg font-semibold leading-6 text-gray-900">
+      <HeadlessDialogTitle
+        as="h3"
+        class="text-lg font-semibold leading-6 text-gray-900 dark:text-white"
+      >
         {{}}
         <span v-if="finalResult.winner === 'p1'"> YOU WIN! </span>
         <span v-else-if="finalResult.winner === 'p2'"> YOU LOSE... </span>
@@ -23,7 +28,7 @@
     <HeadlessDisclosureButton
       :class="`flex w-full justify-between mb-1 rounded-md ${
         result.winner === 'p1' ? 'bg-green-400' : 'bg-red-400'
-      } px-4 py-2 text-left text-sm font-medium text-gray-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500 focus-visible:ring-opacity-75`"
+      } px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus-visible:ring focus-visible:ring-indigo-500 dark:focus-visible:ring-gray-100 focus-visible:ring-opacity-75`"
     >
       <span
         >Round {{ result.round }}:
@@ -35,7 +40,9 @@
         class="h-5 w-5 text-gray-500"
       />
     </HeadlessDisclosureButton>
-    <HeadlessDisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
+    <HeadlessDisclosurePanel
+      class="px-4 pt-4 pb-2 text-sm text-gray-500 dark:text-gray-300"
+    >
       <YakuGrid
         v-if="result.winner"
         :winner="result.winner"

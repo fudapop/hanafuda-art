@@ -5,7 +5,11 @@
     <div class="animated-card down card three"></div>
     <div class="animated-card down card four"></div>
     <div class="animated-card down card five"></div>
-    <p class="tracking-wide animate-pulse [animation-duration:4s]">Loading...</p>
+    <p
+      class="tracking-wide animate-pulse [animation-duration:4s] text-gray-900 dark:text-white"
+    >
+      Loading...
+    </p>
   </div>
 </template>
 

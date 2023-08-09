@@ -1,8 +1,8 @@
 <template>
   <div class="p-3 grid sm:grid-cols-2">
-    <div class="relative isolate">
+    <div class="relative isolate pointer-events-none">
       <svg
-        class="absolute inset-x-0 top-0 -z-10 h-[16rem] w-full stroke-gray-200 [mask-image:radial-gradient(8rem_8rem_at_center,white,transparent)]"
+        class="absolute inset-x-0 top-0 -z-10 h-[16rem] w-full stroke-gray-200 dark:stroke-gray-600 [mask-image:radial-gradient(8rem_8rem_at_center,white,transparent)]"
         aria-hidden="true"
       >
         <defs>
@@ -17,7 +17,7 @@
             <path d="M.5 200V.5H200" fill="none" />
           </pattern>
         </defs>
-        <svg x="50%" y="-1" class="overflow-visible fill-gray-50">
+        <svg x="50%" y="-1" class="overflow-visible fill-gray-50 dark:opacity-10">
           <path
             d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
             stroke-width="0"
@@ -31,7 +31,7 @@
         />
       </svg>
       <div
-        class="absolute top-0 right-0 -ml-6 overflow-hidden left-1/3 -z-10 transform-gpu blur-2xl lg:ml-6 xl:ml-12"
+        class="absolute top-0 right-0 -ml-6 overflow-hidden left-1/3 -z-10 transform-gpu blur-3xl lg:ml-6 xl:ml-12"
         aria-hidden="true"
       >
         <div
@@ -58,16 +58,18 @@
           "
         />
       </div>
-      <AnimatedCards />
+      <AnimatedCards class="pointer-events-auto" />
     </div>
     <div>
-      <label for="card-design" class="block text-sm font-medium leading-6 text-gray-900"
+      <label
+        for="card-design"
+        class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
         >Card Design</label
       >
       <select
         id="card-design"
         name="card-design"
-        class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 dark:bg-gray-800 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-yellow-100 sm:text-sm sm:leading-6"
         v-model="currentDesign"
       >
         <option
@@ -79,14 +81,16 @@
           {{ getDesignInfo(design).title }}
         </option>
       </select>
-      <div class="rounded-lg border bg-white p-4 shadow-sm my-3">
+      <div
+        class="rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white p-4 shadow-sm my-3"
+      >
         <p class="mb-4">
           {{ designInfo.attribution }}
         </p>
         <a
           :href="designInfo.url"
           target="_blank"
-          class="text-indigo-600 hover:text-indigo-500 hover:underline underline-offset-4"
+          class="text-indigo-600 dark:text-yellow-300 hover:text-indigo-500 dark:hover:text-yellow-100 hover:underline underline-offset-4"
         >
           {{ designInfo.urlDescription }} &rarr;
         </a>
