@@ -47,15 +47,13 @@
       <select id="card-design" name="card-design"
         class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 dark:bg-gray-800 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-yellow-100 sm:text-sm sm:leading-6"
         v-model="currentDesign">
-<template v-if="!userIsGuest">
-        <option v-for="design in designOptions" :key="design" :value="design" :selected="currentDesign === design">
-          {{ getDesignInfo(design).title }}
-        </option>
-</template>
-        <template v-else>
+          <option v-for="design in designOptions" :key="design" :value="design" :selected="currentDesign === design">
+            {{ getDesignInfo(design).title }}
+          </option>
+        <template v-if="userIsGuest">
           <option value="" disabled>...</option>
           <option value="" disabled>
-              Create a free account to see more!
+            Create a free account to see more!
           </option>
         </template>
       </select>
@@ -80,7 +78,7 @@ const { useDesign, fetchCardUrls, DESIGNS, getDesignInfo } = useCardDesign();
 const userIsGuest = computed(() => useCurrentUser().value?.isAnonymous)
 
 const currentDesign = useDesign();
-const designOptions = userIsGuest ? [currentDesign.value, getRandom([...DESIGNS].filter(d => d !== currentDesign.value))] : DESIGNS;
+const designOptions = computed(() => userIsGuest.value ? DESIGNS.slice(0, 3) : DESIGNS);
 
 const designInfo = computed(() => getDesignInfo(currentDesign.value));
 

@@ -102,9 +102,11 @@
 
 .nishiki-fuda {
   --card-radius: 0.1rem;
-  --card-border-color: #555;
-
+  --card-border-color: transparent;
+  --card-aspect: 75/121;
+  
   & .down {
+    --card-border-color: #555;
     --card-bg-color: url("/cards/nishiki-fuda/card-back.webp"),
       linear-gradient(45deg, gray, #111);
     background-blend-mode: screen;

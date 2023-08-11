@@ -29,6 +29,18 @@ nuxtApp.hook("page:finish", async () => {
   await sleep();
   loading.value = false
 });
+
+useHead({
+  script: [
+    {
+      id: "cookieyes",
+      type: "text/javascript",
+      src: "https://cdn-cookieyes.com/client_data/0d8331e0442d66223912def6/script.js",
+    },
+  ],
+}, {
+  tagPriority: -10,
+})
 </script>
 
 <style>

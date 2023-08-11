@@ -4,7 +4,7 @@
     <Button v-else button-class="secondary" :action="logout"> &larr; Logout </Button>
     <div
       v-if="error"
-      class="absolute inset-0 mx-auto rounded-md px-8 py-4 text-lg border-red-500"
+      class="absolute inset-0 px-8 py-4 mx-auto text-lg border-red-500 rounded-md"
     >
       {{ error }}
     </div>
@@ -12,22 +12,16 @@
 </template>
 
 <script setup lang="ts">
-const { logout, error, useGuest } = useAuth();
+const { logout, error } = useAuth();
 const user = useCurrentUser();
 
 const login = () => {
-  if (useGuest().value) {
-    navigateTo("/");
-  } else {
     navigateTo("/login");
-  }
 };
 
 watch(user, () => {
-  if (user.value) {
-    navigateTo("/");
-  } else {
-    if (useRoute().meta.requiresAuth) navigateTo("/login");
+  if (!user.value && useRoute().meta.requiresAuth) {
+    navigateTo("/login");
   }
 });
 </script>

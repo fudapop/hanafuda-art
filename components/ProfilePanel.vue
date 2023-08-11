@@ -30,11 +30,9 @@
         </p>
       </div>
     </div>
-    <div class="flex flex-col items-center justify-center">
-      <Button v-if="isAnonymous" button-class="primary" :action="() => navigateTo('/login')">
-        Create Account
-      </Button>
-      <LoginButton v-else />
+    <SignupPanel v-if="userIsGuest" />
+    <div v-else class="flex flex-col items-center justify-center">
+      <LoginButton />
     </div>
   </div>
 </template>
@@ -49,7 +47,7 @@ const profile = useDocument(doc(useFirestore(), "users", `u_${user.value?.uid}`)
 });
 
 // TODO: Finish sign up for anonymous users
-const isAnonymous = computed(() => user.value?.isAnonymous);
+const userIsGuest = computed(() => user.value?.isAnonymous);
 </script>
 
 <style scoped></style>
