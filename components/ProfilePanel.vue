@@ -1,7 +1,7 @@
 <template>
   <div class="grid sm:grid-cols-2">
     <div
-      class="grid h-full p-4 m-3 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-sm"
+      class="grid h-full p-4 m-3 bg-white border rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-600"
     >
       <!-- TODO: Profile Info -->
       <div v-if="user">
@@ -18,7 +18,7 @@
         />
       </div>
       <p
-        class="px-4 overflow-hidden text-lg text-gray-900 dark:text-white font-semibold text-center"
+        class="px-4 overflow-hidden text-lg font-semibold text-center text-gray-900 dark:text-white"
       >
         {{ user?.displayName }}
       </p>

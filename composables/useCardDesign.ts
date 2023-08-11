@@ -15,9 +15,9 @@ const DESIGNS = [
 	"flash-black",
 ] as const;
 
-type CardDesign = (typeof DESIGNS)[number];
+export type CardDesign = (typeof DESIGNS)[number];
 
-type DesignInfo = {
+export type DesignInfo = {
 	name: string;
 	title: string;
 	attribution?: string;

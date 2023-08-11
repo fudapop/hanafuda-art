@@ -1,11 +1,11 @@
 <template>
   <div class="grid grid-rows-[80px_1fr_80px] h-[100dvh] overflow-hidden relative">
-    <div class="absolute inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden">
+    <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
       <MoonBackground />
       <AnimatedBackground />
     </div>
 
-    <div class="absolute top-6 right-4 flex gap-x-4">
+    <div class="absolute flex top-6 right-4 gap-x-4">
       <OptionsMenu :tabCategories="tabs">
         <template #tab-panel-1>
           <DesignSelector />

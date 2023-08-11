@@ -4,6 +4,12 @@ export default defineNuxtConfig({
 	devtools: { enabled: true },
 	app: {
 		head: {
+			bodyAttrs: {
+				class: "dark:bg-gray-800",
+			},
+			htmlAttrs: {
+				lang: "en",
+			},
 			link: [
 				{
 					rel: "icon",
@@ -11,6 +17,7 @@ export default defineNuxtConfig({
 				},
 			],
 		},
+		pageTransition: { name: 'page', mode: 'out-in' },
 	},
 	image: {
 		cloudinary: {

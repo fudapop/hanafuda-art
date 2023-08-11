@@ -23,7 +23,7 @@
           ]"
           aria-hidden="true"
         >
-          <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+          <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 12 12">
             <path
               d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2"
               stroke="currentColor"
@@ -43,7 +43,7 @@
           aria-hidden="true"
         >
           <svg
-            class="h-3 w-3 text-indigo-600 dark:text-yellow-600"
+            class="w-3 h-3 text-indigo-600 dark:text-yellow-600"
             fill="currentColor"
             viewBox="0 0 12 12"
           >
@@ -55,7 +55,7 @@
       </span>
     </HeadlessSwitch>
 
-    <span class="flex flex-grow flex-col ml-3">
+    <span class="flex flex-col flex-grow ml-3">
       <HeadlessSwitchLabel
         as="span"
         class="text-sm font-medium leading-6 text-gray-900 dark:text-white"
@@ -74,10 +74,11 @@
 </template>
 
 <script setup lang="ts">
-const { callback, invert } = defineProps<{
+const { callback, invert, initValue } = defineProps<{
   callback: (param: boolean) => void;
   invert?: boolean;
+  initValue: boolean;
 }>();
-const enabled = ref(false);
-watch(enabled, () => callback(invert ? !enabled.value : enabled.value));
+const enabled = ref(initValue);
+watchEffect(() => callback(invert ? !enabled.value : enabled.value));
 </script>

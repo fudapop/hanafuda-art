@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { YakuName } from "~/utils/yaku";
+import { CardDesign } from "~/composables/useCardDesign";
 
 const OPTIONS = {
 	GAME_LENGTH: [3, 6, 12] as const,
@@ -14,6 +15,15 @@ type GameLengthOptions = (typeof OPTIONS.GAME_LENGTH)[number];
 type ViewingsOptions = (typeof OPTIONS.VIEWINGS)[number];
 type DifficultyOptions = (typeof OPTIONS.DIFFICULTY)[number];
 
+interface GameSettings {
+	rounds: GameLengthOptions;
+	difficulty: DifficultyOptions;
+	viewings: ViewingsOptions;
+	double: boolean;
+	wild: boolean;
+	design?: CardDesign;
+}
+
 const useConfigStore = defineStore("config", () => {
 	const maxRounds = ref(3) as Ref<GameLengthOptions>;
 
@@ -25,13 +35,23 @@ const useConfigStore = defineStore("config", () => {
 
 	const sakeIsWildCard = ref(false);
 
-	const getCurrentSettings = computed(() => ({
-		rounds: maxRounds.value,
-		difficulty: difficulty.value,
-		viewings: allowViewingsYaku.value,
-		double: doubleScoreOverSeven.value,
-		wild: sakeIsWildCard.value,
-	}));
+	const getCurrentSettings = computed(
+		(): GameSettings => ({
+			rounds: maxRounds.value,
+			difficulty: difficulty.value,
+			viewings: allowViewingsYaku.value,
+			double: doubleScoreOverSeven.value,
+			wild: sakeIsWildCard.value,
+		})
+	);
+
+	function loadUserSettings(userSettings: GameSettings) {
+		maxRounds.value = userSettings.rounds;
+		difficulty.value = userSettings.difficulty;
+		allowViewingsYaku.value = userSettings.viewings;
+		doubleScoreOverSeven.value = userSettings.double;
+		sakeIsWildCard.value = userSettings.wild;
+	}
 
 	/**
 	 * Filter an array/set of yaku based on set rule
@@ -80,6 +100,7 @@ const useConfigStore = defineStore("config", () => {
 		sakeIsWildCard,
 		difficulty,
 		getCurrentSettings,
+		loadUserSettings,
 		applyViewingsOption,
 		applyWildCardOption,
 		OPTIONS,
