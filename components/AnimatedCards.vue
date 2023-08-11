@@ -3,28 +3,28 @@
     mode="out-in"
     enter-to-class="opacity-100"
     enter-from-class="opacity-0 -scale-x-[25%]"
-    enter-active-class="duration-500"
+    enter-active-class="duration-300"
     leave-to-class="opacity-0"
     leave-from-class="opacity-100"
-    leave-active-class="duration-500"
+    leave-active-class="duration-100"
   >
     <div v-if="loaded" class="cards" :key="selectedDesign">
-      <div class="animated-card card one">
+      <div class="drop-shadow-md animated-card card one">
         <CardImage card="matsu-ni-tsuru" :src="getCardUrl('matsu-ni-tsuru')!" />
       </div>
-      <div class="animated-card card two">
+      <div class="drop-shadow-md animated-card card two">
         <CardImage card="sakura-ni-maku" :src="getCardUrl('sakura-ni-maku')!" />
       </div>
-      <div class="animated-card card three">
+      <div class="drop-shadow-md animated-card card three">
         <CardImage card="susuki-ni-tsuki" :src="getCardUrl('susuki-ni-tsuki')!" />
       </div>
-      <div class="animated-card card four">
+      <div class="drop-shadow-md animated-card card four">
         <CardImage
           card="yanagi-ni-ono-no-toufuu"
           :src="getCardUrl('yanagi-ni-ono-no-toufuu')!"
         />
       </div>
-      <div class="animated-card card five">
+      <div class="drop-shadow-md animated-card card five">
         <CardImage card="kiri-ni-ho-oh" :src="getCardUrl('kiri-ni-ho-oh')!" />
       </div>
       <p v-if="title" class="tracking-wide">{{ title }}</p>

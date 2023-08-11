@@ -20,11 +20,11 @@
             />
           </div>
         </TransitionGroup>
-        <span class="text-center absolute w-full mt-3">x{{ ps.bonusMultiplier }}</span>
+        <span class="absolute w-full mt-3 text-center">x{{ ps.bonusMultiplier }}</span>
       </div>
 
       <!-- DECK PILE -->
-      <div class="absolute inset-0 my-auto overflow-hidden shadow-sm card down"></div>
+      <div class="absolute inset-0 my-auto overflow-hidden shadow-md card down"></div>
 
       <!-- Show revealed card when drawing from deck         -->
       <div v-if="revealedCard">

@@ -5,16 +5,16 @@
         <img
           v-if="user"
           class="w-16 h-16 mx-auto rounded-full"
-          :src="user.photoURL"
+          :src="user.photoURL || '/avatars/avatar-phoenix.webp'"
           :alt="user.displayName"
         />
-        <!-- <div v-else class="w-16 h-16 mx-auto rounded-full"></div> -->
+        <img v-else src="/avatars/avatar-deer.webp" class="w-16 h-16 mx-auto rounded-full" />
       </div>
       <div class="mt-2 sm:mt-0 sm:pt-1">
         <div class="opacity-100">
           <p
             v-if="playerNum == 1"
-            class="text-lg text-indigo-700 dark:text-white font-bold sm:text-xl"
+            class="text-lg font-bold text-indigo-700 dark:text-white sm:text-xl"
           >
             {{ user?.displayName || `Player ${playerNum}` }}
           </p>
@@ -25,7 +25,7 @@
             <span class="mr-2 text-gray-600 dark:text-gray-300">
               Round {{ ds.roundCounter }}
             </span>
-            <span class="flex items-center font-semibold text-xl">
+            <span class="flex items-center text-xl font-semibold">
               <img
                 src="/images/coin.webp"
                 alt="coin"
@@ -36,7 +36,7 @@
           </p>
           <p
             v-if="playerNum == 2"
-            class="text-lg text-gray-900 dark:text-white font-bold sm:text-xl"
+            class="text-lg font-bold text-gray-900 dark:text-white sm:text-xl"
           >
             {{ user?.displayName || `Player ${playerNum}` }}
           </p>
@@ -102,8 +102,7 @@ const getResult = () => {
   if (result === "WIN") ps.reset(player);
   return result;
 };
-
-if (user) {
+if (user && !user.isAnonymous) {
   watch(gameOver, async () => {
     if (!gameOver.value) return;
     const result = getResult();

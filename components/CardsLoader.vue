@@ -1,10 +1,10 @@
 <template>
   <div class="cards">
-    <div class="animated-card down card one"></div>
-    <div class="animated-card down card two"></div>
-    <div class="animated-card down card three"></div>
-    <div class="animated-card down card four"></div>
-    <div class="animated-card down card five"></div>
+    <div class="shadow-md animated-card down card one"></div>
+    <div class="shadow-md animated-card down card two"></div>
+    <div class="shadow-md animated-card down card three"></div>
+    <div class="shadow-md animated-card down card four"></div>
+    <div class="shadow-md animated-card down card five"></div>
     <p
       class="tracking-wide animate-pulse [animation-duration:4s] text-gray-900 dark:text-white"
     >

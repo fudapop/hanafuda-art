@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-1 min-h-screen">
-    <CircularLoader :show="loginPending" />
+    <div class="absolute inset-x-0 mx-auto pointer-events-none top-1/3">
+    <CardsLoader :show="loginPending" />
+    </div>
+
     <div class="flex flex-col justify-center flex-1 px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
       <div class="w-full max-w-sm mx-auto lg:w-96">
         <div>
@@ -169,11 +172,11 @@
 <script setup lang="ts">
 const { loginWithOAuth, loginAsGuest, useGuest } = useAuth();
 const redirectUrl = (useRoute().query.redirect || "/") as string;
-const loginPending = computed(() => user.value === undefined);
 const user = useCurrentUser();
+const loginPending = computed(() => user.value === undefined);
 
 const login = () => {
-  if (useGuest().value) {
+  if (useGuest().value !== undefined) {
     navigateTo(redirectUrl);
   } else {
     loginAsGuest();

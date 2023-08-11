@@ -16,8 +16,17 @@ export default defineNuxtConfig({
 					href: "/sakura.png",
 				},
 			],
+			script: [
+				{
+					id: "Cookiebot",
+					src: "https://consent.cookiebot.com/uc.js",
+					"data-cbid": "ac02cfdd-be85-4af4-8f58-9b6604169432",
+					type: "text/javascript",
+					async: true,
+				},
+			],
 		},
-		pageTransition: { name: 'page', mode: 'out-in' },
+		pageTransition: { name: "page", mode: "out-in" },
 	},
 	image: {
 		cloudinary: {
@@ -43,7 +52,7 @@ export default defineNuxtConfig({
 	runtimeConfig: {
 		public: {
 			nodeEnv: process.env.NODE_ENV,
-		}
+		},
 	},
 	ssr: false,
 	tailwindcss: {

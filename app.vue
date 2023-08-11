@@ -1,13 +1,12 @@
 <template>
   <div>
-    <NuxtLayout class="relative h-full">
     <div class="absolute inset-x-0 z-50 mx-auto pointer-events-none top-1/3">
-      <Transition appear enter-active-class="duration-300" enter-to-class="opacity-100" enter-from-class="opacity-0" leave-active-class="duration-300" leave-from-class="opacity-100" leave-to-class="opacity-0">
+      <Transition appear enter-active-class="duration-300" enter-to-class="opacity-100" enter-from-class="opacity-0"
+        leave-active-class="duration-300" leave-from-class="opacity-100" leave-to-class="opacity-0">
         <CardsLoader v-if="loading" />
       </Transition>
     </div>
     <NuxtPage />
-    </NuxtLayout>
   </div>
 </template>
 
@@ -26,7 +25,8 @@ nuxtApp.hook("page:start", () => {
   loading.value = true
 });
 
-nuxtApp.hook("page:transition:finish", () => {
+nuxtApp.hook("page:finish", async () => {
+  await sleep();
   loading.value = false
 });
 </script>

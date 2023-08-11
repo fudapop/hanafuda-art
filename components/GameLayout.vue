@@ -54,7 +54,7 @@ import { storeToRefs } from "pinia";
 import { usePlayerStore } from "~/stores/playerStore";
 
 const { players } = storeToRefs(usePlayerStore());
-const user = await getCurrentUser();
+const user = useCurrentUser();
 
 const tabs = ref(["Design", "Gameplay", "Profile"]);
 </script>
