@@ -15,7 +15,7 @@
 import { vHide } from "~/utils/directives/vHide";
 import { vClickDisabled } from "~/utils/directives/vClickDisabled";
 
-const loading = ref(true);
+const loading = ref(false);
 const nuxtApp = useNuxtApp();
 const vueApp = nuxtApp.vueApp;
 

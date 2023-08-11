@@ -1,6 +1,6 @@
 <template>
-  <div class="p-3 grid sm:grid-cols-2">
-    <div class="relative isolate pointer-events-none">
+  <div class="grid p-3 sm:grid-cols-2">
+    <div class="relative pointer-events-none isolate">
       <svg
         class="absolute inset-x-0 top-0 -z-10 h-[16rem] w-full stroke-gray-200 dark:stroke-gray-600 [mask-image:radial-gradient(8rem_8rem_at_center,white,transparent)]"
         aria-hidden="true"
@@ -82,7 +82,7 @@
         </option>
       </select>
       <div
-        class="rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-white p-4 shadow-sm my-3"
+        class="p-4 my-3 bg-white border rounded-lg shadow-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
       >
         <p class="mb-4">
           {{ designInfo.attribution }}
@@ -107,7 +107,7 @@ const selectedDesign = ref(currentDesign.value);
 
 const designInfo = computed(() => getDesignInfo(currentDesign.value));
 
-const prefetchTags = ref();
+const preloadTags = ref();
 
 onMounted(() => {
   // @ts-ignore
@@ -118,18 +118,18 @@ onMounted(() => {
     },
     { tagPriority: "high" }
   );
-  const prefetchHead = useHead({});
+  const preloadHead = useHead({});
   watchEffect(() => {
     localStorage.setItem("hanafuda-design-pref", currentDesign.value);
     fetchCardUrls().then((urlMap) => {
-      prefetchTags.value = [...urlMap.values()].map((url) => ({
-        rel: "prefetch",
+      preloadTags.value = [...urlMap.values()].map((url) => ({
+        rel: "preload",
         href: url,
         as: "image",
       }));
-      prefetchHead?.patch({
+      preloadHead?.patch({
         bodyAttrs: { class: currentDesign },
-        link: prefetchTags.value,
+        link: preloadTags.value,
       });
     });
   });
