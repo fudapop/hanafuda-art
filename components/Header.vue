@@ -88,7 +88,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 const navigation = [
   { name: "Play", href: "/play" },
-  { name: "Gallery", href: "/gallery" },
+  { name: "Gallery", href: "https://lets-play-koikoi.vercel.app/hanafuda-gallery" },
   { name: "Blog", href: "#" },
   { name: "About", href: "#" },
 ];

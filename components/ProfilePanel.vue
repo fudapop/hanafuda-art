@@ -1,12 +1,12 @@
 <template>
   <div class="grid gap-y-2 sm:grid-cols-2">
     <div
-      class="grid h-full p-4 m-3 bg-white border rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-600"
+      class="grid p-4 m-3 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700"
     >
       <div v-if="user">
         <img
           v-if="user.photoURL"
-          class="w-20 h-20 mx-auto my-4 rounded-full"
+          class="w-32 h-32 mx-auto my-4 rounded-full"
           :src="user.photoURL"
           :alt="user.displayName ?? ''"
         />

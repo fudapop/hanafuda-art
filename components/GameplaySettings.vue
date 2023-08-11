@@ -1,5 +1,5 @@
 <template>
-  <div ref="settingsPanel" class="grid gap-4 p-4 overflow-y-auto max-h-[75vh]">
+  <div ref="settingsPanel" class="grid max-h-[75vh] gap-4 p-4 overflow-y-auto">
     <ClientOnly>
       <div class="max-sm:grid max-sm:grid-cols-2 gap-x-2">
         <!-- Set maximum for number of rounds per game -->

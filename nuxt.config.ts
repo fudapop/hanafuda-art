@@ -15,7 +15,36 @@ export default defineNuxtConfig({
 					rel: "icon",
 					href: "/sakura.png",
 				},
+				{
+					rel: "preconnect",
+					href: "https://fonts.googleapis.com",
+				},
+				{
+					rel: "preconnect",
+					href: "https://fonts.gstatic.com",
+					crossorigin: "",
+				},
+				{
+					rel: "preload",
+					as: "style",
+					href: "https://fonts.googleapis.com/css2?family=Potta+One&display=swap",
+					onload: "this.rel = 'stylesheet'",
+				},
+				{
+					rel: "preload",
+					as: "style",
+					href: "https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;700&display=swap",
+					onload: "this.rel = 'stylesheet'",
+				},
 			],
+			script: [
+				{
+					id: "cookieyes",
+					type: "text/partytown",
+					src: "https://cdn-cookieyes.com/client_data/0d8331e0442d66223912def6/script.js",
+				},
+			],
+			title: "New Hanafuda",
 		},
 		pageTransition: { name: "page", mode: "out-in" },
 	},
@@ -32,12 +61,27 @@ export default defineNuxtConfig({
 		"@nuxt/image",
 		"nuxt-vitest",
 		"nuxt-vuefire",
+		"@nuxtjs/partytown",
 	],
 	postcss: {
 		plugins: {
 			"tailwindcss/nesting": {},
 			tailwindcss: {},
 			autoprefixer: {},
+		},
+	},
+	routeRules: {
+		// Set custom headers matching paths
+		"/_nuxt/**": {
+			headers: {
+				"Cache-Control": "public, maxage=86400, stale-while-revalidate=86400",
+			},
+		},
+		"/(_ipx|cards|images|bg|avatars)/**": {
+			headers: {
+				"Cache-Control":
+					"public, maxage=604800, stale-while-revalidate=86400, stale-if-error=86400",
+			},
 		},
 	},
 	runtimeConfig: {

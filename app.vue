@@ -28,19 +28,24 @@ nuxtApp.hook("page:start", () => {
 nuxtApp.hook("page:finish", async () => {
   await sleep();
   loading.value = false
+  window.dispatchEvent(new CustomEvent("ptupdate"));
 });
 
-useHead({
-  script: [
-    {
-      id: "cookieyes",
-      type: "text/javascript",
-      src: "https://cdn-cookieyes.com/client_data/0d8331e0442d66223912def6/script.js",
-    },
-  ],
-}, {
-  tagPriority: -10,
-})
+onMounted(() => {
+  // find google scripts
+  const googleScripts = [/.*\/www\.gstatic\.com\/.*/, /.*\/apis\.google\.com\/.*/];
+  const scripts = ref(document.head.querySelectorAll("script"));
+  // console.log([...scripts.value].map((s) => ({ type: s.type, src: s.src })));
+  scripts.value.forEach((script) => {
+    if (
+      googleScripts.some((regex) => regex.test(script.src)) &&
+      script.type !== "text/partytown-x"
+    )
+      script.type = "text/partytown";
+  });
+  console.log([...scripts.value].map((s) => ({ type: s.type, src: s.src })));
+  window.dispatchEvent(new CustomEvent("ptupdate"));
+});
 </script>
 
 <style>

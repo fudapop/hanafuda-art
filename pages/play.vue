@@ -11,11 +11,11 @@
       class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto"
     >
       <!-- OPPONENT HAND -->
-      <OpponentArea />
+      <LazyOpponentArea />
 
       <!-- OPPONENT COLLECTION -->
       <div class="-translate-y-8 pointer-events-none -z-10">
-        <CollectionArea player="p2" @completed="(data) => handleCompletion(data)" />
+        <LazyCollectionArea player="p2" @completed="(data) => handleCompletion(data)" />
       </div>
 
       <!-- FIELD -->
@@ -23,15 +23,15 @@
         v-click-disabled:unless="players.p1.isActive && !!selectedCard"
         class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr]"
       >
-        <Deck />
-        <ListGrid :cols="6" :rows="2" flow="column" gap="4px">
-          <CardList :cards="field" />
-        </ListGrid>
+        <LazyDeck />
+        <LazyListGrid :cols="6" :rows="2" flow="column" gap="4px">
+          <LazyCardList :cards="field" />
+        </LazyListGrid>
       </div>
 
       <!-- PLAYER COLLECTION -->
       <div class="h-full pointer-events-none -z-10">
-        <CollectionArea player="p1" @completed="(data) => handleCompletion(data)" />
+        <LazyCollectionArea player="p1" @completed="(data) => handleCompletion(data)" />
       </div>
 
       <!-- PLAYER HAND -->
@@ -45,9 +45,9 @@
             'opacity-50': players.p2.isActive,
           }"
         >
-          <ListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
-            <CardList :cards="hand.p1" :stack="true" />
-          </ListGrid>
+          <LazyListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
+            <LazyCardList :cards="hand.p1" :stack="true" />
+          </LazyListGrid>
         </div>
       </div>
     </div>
@@ -114,6 +114,7 @@ const autoOpponent: Ref<boolean> = useOpponent();
 
 const showModal = ref(false);
 const showLoader = ref(false);
+const gameStart = useState("start");
 
 const {
   decisionIsPending,
@@ -121,7 +122,6 @@ const {
   callStop,
   koikoiIsCalled,
   stopIsCalled,
-  noCalls,
 } = useDecisionHandler();
 
 const handleCompletion = (data: CompletionEvent) => {
@@ -277,4 +277,22 @@ watch(activePlayer, () => {
     opponentPlay({ speed: 2 });
   }
 });
+
+watch(gameStart, () => {
+  if (gameStart.value) {
+    startRound();
+  } else {
+    ds.endRound();
+    ds.nextRound();
+    handleClose();
+    console.info("Resetting game...")
+  }
+})
+
+onBeforeUnmount(() => {
+  console.debug("Unmounted play.vue")
+  ds.endRound();
+  ds.nextRound();
+  handleClose();
+})
 </script>

@@ -6,6 +6,7 @@
     <div class="shadow-md animated-card down card four"></div>
     <div class="shadow-md animated-card down card five"></div>
     <p
+      v-if="!noText"
       class="tracking-wide animate-pulse [animation-duration:4s] text-gray-900 dark:text-white"
     >
       Loading...
@@ -13,7 +14,9 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { noText } = defineProps<{ noText?: boolean }>()
+</script>
 <style scoped>
 .cards {
   /* // Outer wrapper for all cards */

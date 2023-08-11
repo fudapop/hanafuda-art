@@ -10,16 +10,17 @@
       calc(var(--card-height) * 2) 1fr var(--card-height);
     min-width: 320px;
     max-height: 100vh;
+    font-family: Rubik, sans-serif;
   }
 
   *::-webkit-scrollbar {
-    width: 0.2rem;
-    @apply bg-gray-50/20 dark:bg-gray-700/50
+    width: 0.3rem;
+    @apply bg-gray-50/20 dark:bg-gray-700/50 rounded-sm
   }
 
   *::-webkit-scrollbar-thumb {
-    width: 0.2rem;
-    @apply dark:bg-gray-300
+    width: 0.3rem;
+    @apply bg-gray-400 dark:bg-gray-300 rounded-sm
   }
 }
 

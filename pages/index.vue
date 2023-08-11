@@ -1,8 +1,7 @@
 <template>
   <PageLayout>
     <HeroSection />
-    <Features />
-    <CallToAction />
+    <!-- <Features /> -->
     <Footer />
   </PageLayout>
 </template>

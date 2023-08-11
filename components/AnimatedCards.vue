@@ -29,7 +29,7 @@
       </div>
       <p v-if="title" class="tracking-wide">{{ title }}</p>
     </div>
-    <CardsLoader v-else />
+    <CardsLoader v-else :no-text="true" />
   </Transition>
 </template>
 
