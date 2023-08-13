@@ -25,7 +25,7 @@
       >
         <LazyDeck />
         <LazyListGrid :cols="6" :rows="2" flow="column" gap="4px">
-          <LazyCardList :cards="field" />
+          <LazyFieldDisplay />
         </LazyListGrid>
       </div>
 
@@ -37,7 +37,7 @@
       <!-- PLAYER HAND -->
       <div
         v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
-        class="max-sm:[--card-height:85px] max-lg:[--card-height:90px] min-[400px]:mx-auto w-max grid translate-y-6"
+        class="max-sm:[--card-height:85px] max-lg:[--card-height:90px] w-full grid translate-y-6"
       >
         <div
           :class="{
@@ -45,9 +45,7 @@
             'opacity-50': players.p2.isActive,
           }"
         >
-          <LazyListGrid :cols="8" :rows="'auto'" flow="row" gap="4px">
-            <LazyCardList :cards="hand.p1" :stack="true" />
-          </LazyListGrid>
+          <LazyHandDisplay id="p1" />
         </div>
       </div>
     </div>
@@ -176,10 +174,11 @@ const handleNext = async () => {
 
 // Closing the final results modal
 const handleClose = () => {
+  ds.nextRound(); // This should fix the issue of not swapping to the winner after final round
   showModal.value = false;
-  cs.reset();
-  ps.reset();
   ds.reset();
+  // Return to the start screen
+  gameStart.value = false;
 };
 
 const startAuto = async () => {
@@ -213,7 +212,7 @@ const handleInstantWin = (result: CompletionEvent) => {
 };
 
 const checkDeal = () => {
-  // Check the field and each hand for a win condition
+  // Check the field and each hand for a 4-pair or 4-of-a-kind
   const hands = [
     { name: "field", cards: cs.field },
     { name: ps.activePlayer.id, cards: cs.hand[ps.activePlayer.id] },
@@ -253,11 +252,16 @@ watch(decisionIsPending, () => {
   if (stopIsCalled.value) handleStop();
 });
 
-watch([handsEmpty, turnCounter], () => {
+watch(turnCounter, () => {
   // Handle an exhaustive draw condition
-  if (handsEmpty.value === true) {
-    if (turnCounter.value < 9) return;
-    if (decisionIsPending.value || stopIsCalled.value) return;
+  if (turnCounter.value !== 9) return;
+  const drawConditions = [
+    handsEmpty.value,
+    ds.checkCurrentPhase("select"),
+    !decisionIsPending.value,
+    !stopIsCalled.value,
+  ];
+  if (drawConditions.every((cond) => cond === true)) {
     showModal.value = true;
     // @ts-expect-error: CompletionEvent 'player' should not be null
     handleCompletion({ player: null, score: 0 });
@@ -282,17 +286,16 @@ watch(gameStart, () => {
   if (gameStart.value) {
     startRound();
   } else {
-    ds.endRound();
-    ds.nextRound();
-    handleClose();
-    console.info("Resetting game...")
+    console.info("Resetting game...");
+    if (!roundOver.value) ds.endRound();
+    if (!gameOver.value) handleClose();
   }
-})
+});
 
 onBeforeUnmount(() => {
-  console.debug("Unmounted play.vue")
+  console.debug("Unmounted play.vue");
   ds.endRound();
   ds.nextRound();
   handleClose();
-})
+});
 </script>

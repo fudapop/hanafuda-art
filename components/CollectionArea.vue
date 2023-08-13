@@ -1,5 +1,5 @@
 <template>
-  <div class="gap-1 collection-area opacity-75">
+  <div class="gap-1 opacity-75 collection-area">
     <!-- PLAYER 1 COLLECTION -->
     <ul class="flex h-full py-2">
       <CardList :cards="brights" :stack="true" />
@@ -71,6 +71,10 @@ const resetCollection = () => {
   plains.value.clear();
 };
 
+/**
+ * Appends '+{n}' to denote the number of extra cards
+ * to track if the yaku is upgraded
+ */
 const applyExtraTags = (yakuList: YakuName[]) => {
   const taggedList = yakuList.map((yaku) => {
     // Allow upgrading yaku to trigger emit.
@@ -106,12 +110,15 @@ watch(
     // Filter list based on viewings allowance setting
     const newCompleted = config.applyViewingsOption(completedYaku);
 
+    // Tag potentially upgraded yaku
+    const taggedYaku = applyExtraTags(newCompleted);
+    
     // No yaku completed or upgraded since the last update
-    if (applyExtraTags(newCompleted).every((yaku) => lastCompleted.has(yaku))) return;
+    if (taggedYaku.every((yaku) => lastCompleted.has(yaku))) return;
 
     if (completedYaku.length) {
       // Emits only if new yaku completed.
-      lastCompleted = new Set(newCompleted);
+      lastCompleted = new Set(taggedYaku);
       emits("completed", {
         player,
         score,

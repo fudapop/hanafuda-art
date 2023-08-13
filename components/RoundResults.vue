@@ -1,7 +1,7 @@
 <template>
   <!-- HEADER -->
   <div
-    class="px-4 py-5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 sm:px-6"
+    class="px-4 py-5 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-600 sm:px-6"
   >
     <div class="flex flex-wrap items-end justify-between -mt-2 -ml-4 sm:flex-nowrap">
       <HeadlessDialogTitle
@@ -16,19 +16,17 @@
       <!-- BUTTONS -->
       <!-- Warning is logged if no focusable elements rendered -->
       <!-- Hidden during opponent decision -->
-      <div
-        v-if="decisionIsPending"
-        v-hide:from="'p2'"
-        class="flex flex-shrink-0 gap-2 ml-4"
-      >
-        <Button button-class="secondary" :action="callStop"> Stop </Button>
-        <Button
-          v-show="handNotEmpty(activePlayer.id)"
-          button-class="primary"
-          :action="callKoikoi"
-        >
-          Koi-Koi
-        </Button>
+      <div v-if="decisionIsPending">
+        <div v-show="players.p1.isActive" class="flex flex-shrink-0 gap-2 ml-4">
+          <Button button-class="secondary" :action="callStop"> Stop </Button>
+          <Button
+            v-show="handNotEmpty(activePlayer.id)"
+            button-class="primary"
+            :action="callKoikoi"
+          >
+            Koi-Koi
+          </Button>
+        </div>
       </div>
       <div v-show="stopIsCalled">
         <Button :action="() => $emit('next')"> Next Round </Button>
@@ -38,12 +36,12 @@
   <!-- END HEADER -->
   <h4 class="my-4 text-gray-600 dark:text-gray-400">
     Total:
-    <span class="font-semibold text-lg text-indigo-700 dark:text-yellow-100"
+    <span class="text-lg font-semibold text-indigo-700 dark:text-yellow-100"
       >{{ lastRoundResult.score }} points</span
     >
     <span v-if="bonusMultiplier > 1" class="ml-8">
       Koi-Koi Bonus:
-      <span class="font-semibold text-lg text-indigo-700 dark:text-yellow-100"
+      <span class="text-lg font-semibold text-indigo-700 dark:text-yellow-100"
         >x{{ bonusMultiplier }}</span
       >
     </span>
@@ -69,7 +67,7 @@ const { decisionIsPending, callKoikoi, callStop, stopIsCalled } = useDecisionHan
 
 const { handNotEmpty } = storeToRefs(useCardStore());
 
-const { activePlayer, bonusMultiplier } = storeToRefs(usePlayerStore());
+const { activePlayer, bonusMultiplier, players } = storeToRefs(usePlayerStore());
 
 const lastRoundResult = computed(() => useGameDataStore().getCurrent.result);
 

@@ -77,6 +77,7 @@ export const usePlayerStore = defineStore("players", () => {
 		const points = amount * bonusMultiplier.value;
 		const opponent = activeOpponent.value(player);
 		players[player].score += points;
+		if (players[player].score > 60) opponent.score = 60;
 		opponent.score -= points;
 		if (opponent.score < 0) opponent.score = 0;
 	}

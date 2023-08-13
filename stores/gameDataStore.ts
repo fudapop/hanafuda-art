@@ -51,11 +51,14 @@ export const useGameDataStore = defineStore("gameData", () => {
 				.filter((result) => result.winner === player)
 				.reduce((total, result) => total + (result?.score ?? 0), 0);
 		};
+		const limitScore = (score: number) => {
+			if (score < 0) return 0;
+			if (score > 60) return 60;
+			return score;
+		}
 
-		let p1Score = 30 + calcScore("p1") - calcScore("p2");
-		if (p1Score < 0) p1Score = 0;
-		let p2Score = 30 + calcScore("p2") - calcScore("p1");
-		if (p2Score < 0) p2Score = 0;
+		let p1Score = limitScore(30 + calcScore("p1") - calcScore("p2"));
+		let p2Score = limitScore(30 + calcScore("p2") - calcScore("p1"));
 		return {
 			p1: p1Score,
 			p2: p2Score,
@@ -105,7 +108,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 		return getResult(round);
 	}
 
-	async function endRound() {
+	function endRound() {
 		if (!getCurrent.value.result)
 			saveResult({
 				round: roundCounter.value,

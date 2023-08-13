@@ -3,10 +3,10 @@
     mode="out-in"
     enter-to-class="opacity-100"
     enter-from-class="opacity-0 -scale-x-[25%]"
-    enter-active-class="duration-300"
+    enter-active-class="duration-500"
     leave-to-class="opacity-0"
     leave-from-class="opacity-100"
-    leave-active-class="duration-100"
+    leave-active-class="duration-400"
   >
     <div v-if="loaded" class="cards" :key="selectedDesign">
       <div class="drop-shadow-md animated-card card one">

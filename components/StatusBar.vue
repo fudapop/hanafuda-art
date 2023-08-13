@@ -23,7 +23,7 @@
             class="flex items-center text-sm font-medium text-gray-900 dark:text-white"
           >
             <span class="mr-2 text-gray-600 dark:text-gray-300">
-              Round {{ ds.roundCounter }}
+              Round {{ ds.roundCounter }} / {{ useConfigStore().maxRounds }}
             </span>
             <span class="flex items-center text-xl font-semibold">
               <img
@@ -50,6 +50,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useGameDataStore } from "~/stores/gameDataStore";
+import { useConfigStore } from "~/stores/configStore";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useFirestore } from "vuefire";
 import { doc, setDoc } from "firebase/firestore";

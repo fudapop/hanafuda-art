@@ -1,11 +1,11 @@
 <template>
   <div class="absolute inset-0 flex flex-col items-center m-auto">
     <div class="relative mt-32 drop-shadow-xl">
-      <div class="absolute right-0 bottom-[10%] rotate-12 -z-10">
+      <div class="absolute right-[2rem] bottom-[10%] rotate-12 -z-10">
         <AnimatedCards />
       </div>
       <h1 id="hero-title" class="text-4xl text-center sm:text-5xl">
-        <span class="block text-xl italic text-left text-white md:text-3xl">New Hanafuda</span>花札 KOI-KOI
+        <span class="block text-xl italic text-left text-white md:text-3xl">Hanafuda</span>花札 KOI-KOI
       </h1>
     </div>
     <div class="absolute inset-x-0 mx-auto text-2xl shadow-lg w-max top-1/2">
