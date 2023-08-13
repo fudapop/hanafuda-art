@@ -1,8 +1,15 @@
 <template>
   <div>
     <div class="absolute inset-x-0 z-50 mx-auto pointer-events-none top-1/3">
-      <Transition appear enter-active-class="duration-300" enter-to-class="opacity-100" enter-from-class="opacity-0"
-        leave-active-class="duration-300" leave-from-class="opacity-100" leave-to-class="opacity-0">
+      <Transition
+        appear
+        enter-active-class="duration-300"
+        enter-to-class="opacity-100"
+        enter-from-class="opacity-0"
+        leave-active-class="duration-300"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
         <CardsLoader v-if="loading" />
       </Transition>
     </div>
@@ -22,20 +29,18 @@ vueApp.directive("hide", vHide);
 vueApp.directive("click-disabled", vClickDisabled);
 
 nuxtApp.hook("page:start", () => {
-  loading.value = true
+  loading.value = true;
 });
 
 nuxtApp.hook("page:finish", async () => {
   await sleep();
-  loading.value = false
+  loading.value = false;
   window.dispatchEvent(new CustomEvent("ptupdate"));
 });
 
 onMounted(() => {
-  // find google scripts
   const googleScripts = [/.*\/www\.gstatic\.com\/.*/, /.*\/apis\.google\.com\/.*/];
   const scripts = ref(document.head.querySelectorAll("script"));
-  // console.log([...scripts.value].map((s) => ({ type: s.type, src: s.src })));
   scripts.value.forEach((script) => {
     if (
       googleScripts.some((regex) => regex.test(script.src)) &&
@@ -43,7 +48,6 @@ onMounted(() => {
     )
       script.type = "text/partytown";
   });
-  console.log([...scripts.value].map((s) => ({ type: s.type, src: s.src })));
   window.dispatchEvent(new CustomEvent("ptupdate"));
 });
 </script>

@@ -100,7 +100,7 @@ const { nodeEnv } = useRuntimeConfig().public;
 const cs = useCardStore();
 const ps = usePlayerStore();
 const ds = useGameDataStore();
-const { hand, field, deck, handsEmpty } = storeToRefs(cs);
+const { deck, handsEmpty } = storeToRefs(cs);
 const { players, activePlayer } = storeToRefs(ps);
 const { roundOver, gameOver, turnCounter } = storeToRefs(ds);
 
@@ -209,6 +209,7 @@ const handleInstantWin = (result: CompletionEvent) => {
   handleCompletion(result);
   showModal.value = true;
   callStop();
+  handleStop();
 };
 
 const checkDeal = () => {
@@ -284,6 +285,7 @@ watch(activePlayer, () => {
 
 watch(gameStart, () => {
   if (gameStart.value) {
+    localStorage?.removeItem("hanafuda-data");
     startRound();
   } else {
     console.info("Resetting game...");

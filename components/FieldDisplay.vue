@@ -1,20 +1,12 @@
 <template>
   <li v-for="(card, index) in displayedCards" :key="index" class="origin-center">
-    <Transition
-      appear
-      mode="out-in"
-      enter-active-class="duration-300 ease-out"
-      enter-from-class="opacity-0 motion-safe:-translate-x-1"
-      enter-to-class="opacity-100"
-      leave-active-class="duration-200 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0 motion-safe:translate-x-1"
-    >
+    <CardTransition v-if="card">
       <div
-        v-if="card"
         :class="{
           'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
-          'scale-105 drop-shadow-xl -translate-y-2 z-20': matchedCards?.includes(card),
+          'scale-105 drop-shadow-xl -translate-y-2 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-2 after:border-yellow-300 after:rounded-[inherit]': matchedCards?.includes(
+            card
+          ),
           '-translate-y-2 drop-shadow-xl': selectedCard === card,
           'pointer-events-none staged': cs.staged.has(card),
         }"
@@ -22,12 +14,11 @@
       >
         <CardImage :src="getCardUrl(card)!" :card="card" />
       </div>
-
-      <div
-        v-else
-        class="card border-none opacity-10 relative after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
-      ></div>
-    </Transition>
+    </CardTransition>
+    <div
+      v-else
+      class="card border-none opacity-10 relative after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
+    ></div>
   </li>
 </template>
 
