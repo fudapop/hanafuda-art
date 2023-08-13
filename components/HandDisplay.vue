@@ -1,5 +1,5 @@
 <template>
-  <ul class="relative h-full w-max mx-auto isolate">
+  <ul class="relative h-full w-max mx-auto isolate pr-[40px]">
     <li
       v-for="(card, index) in displayedCards.filter((card) => card)"
       :key="index"

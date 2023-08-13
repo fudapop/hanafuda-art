@@ -37,7 +37,7 @@
       <!-- PLAYER HAND -->
       <div
         v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
-        class="max-sm:[--card-height:85px] max-lg:[--card-height:90px] w-full grid translate-y-6"
+        class="max-sm:[--card-height:85px] max-lg:[--card-height:90px] w-full grid translate-y-4"
       >
         <div
           :class="{
@@ -56,7 +56,7 @@
     </LazyResultsModal>
 
     <!-- DEV BUTTONS -->
-    <div
+    <!-- <div
       v-if="deck.size === 48 || roundOver"
       v-hide="showLoader"
       class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
@@ -78,7 +78,7 @@
       >
         Autoplay
       </button>
-    </div>
+    </div> -->
   </GameLayout>
 </template>
 
