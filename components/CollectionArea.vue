@@ -1,18 +1,27 @@
 <template>
   <div class="gap-1 opacity-75 collection-area">
     <!-- PLAYER 1 COLLECTION -->
-    <ul class="flex h-full py-2">
-      <CardList :cards="brights" :stack="true" />
+    <ul v-for="type in cardTypes" :key="type" class="flex h-full py-2 relative">
+      <span
+        v-show="coll[type].size > 0"
+        class="uppercase absolute top-1 left-0 z-[1] bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
+      >
+        {{ type }}:
+        <span class="ml-1 text-xs align-middle">
+          {{ coll[type].size }}
+        </span>
+      </span>
+      <CardList :cards="coll[type]" :stack="true" />
+    </ul>
+    <!-- <ul class="flex h-full py-2">
+      <CardList :cards="coll.animals" :stack="true" />
     </ul>
     <ul class="flex h-full py-2">
-      <CardList :cards="animals" :stack="true" />
+      <CardList :cards="coll.ribbons" :stack="true" />
     </ul>
     <ul class="flex h-full py-2">
-      <CardList :cards="ribbons" :stack="true" />
-    </ul>
-    <ul class="flex h-full py-2">
-      <CardList :cards="plains" :stack="true" />
-    </ul>
+      <CardList :cards="coll.plains" :stack="true" />
+    </ul> -->
   </div>
 </template>
 
@@ -40,10 +49,17 @@ const { roundOver } = storeToRefs(useGameDataStore());
 const cs = useCardStore();
 const config = useConfigStore();
 
-const brights: Ref<Set<CardName>> = ref(new Set([]));
-const animals: Ref<Set<CardName>> = ref(new Set([]));
-const ribbons: Ref<Set<CardName>> = ref(new Set([]));
-const plains: Ref<Set<CardName>> = ref(new Set([]));
+const cardTypes = ["brights", "animals", "ribbons", "plains"] as const;
+const coll: Record<string, Set<CardName>> = reactive({
+  brights: new Set([]),
+  animals: new Set([]),
+  ribbons: new Set([]),
+  plains: new Set([]),
+});
+// const brights: Ref<Set<CardName>> = ref(new Set([]));
+// const animals: Ref<Set<CardName>> = ref(new Set([]));
+// const ribbons: Ref<Set<CardName>> = ref(new Set([]));
+// const plains: Ref<Set<CardName>> = ref(new Set([]));
 
 const collection = computed(() => sortByType([...cs.collection[player]]));
 const cBrights = computed(() => collection.value.brights);
@@ -52,10 +68,10 @@ const cRibbons = computed(() => collection.value.ribbons);
 const cPlains = computed(() => collection.value.plains);
 
 const updateCollection = () => {
-  cBrights.value.forEach((card) => brights.value.add(card));
-  cAnimals.value.forEach((card) => animals.value.add(card));
-  cRibbons.value.forEach((card) => ribbons.value.add(card));
-  cPlains.value.forEach((card) => plains.value.add(card));
+  cBrights.value.forEach((card) => coll.brights.add(card));
+  cAnimals.value.forEach((card) => coll.animals.add(card));
+  cRibbons.value.forEach((card) => coll.ribbons.add(card));
+  cPlains.value.forEach((card) => coll.plains.add(card));
   console.debug("\t", player.toUpperCase(), {
     Brights: cBrights.value.length,
     Animals: cAnimals.value.length,
@@ -65,10 +81,10 @@ const updateCollection = () => {
 };
 
 const resetCollection = () => {
-  brights.value.clear();
-  animals.value.clear();
-  ribbons.value.clear();
-  plains.value.clear();
+  coll.brights.clear();
+  coll.animals.clear();
+  coll.ribbons.clear();
+  coll.plains.clear();
 };
 
 /**
@@ -112,7 +128,7 @@ watch(
 
     // Tag potentially upgraded yaku
     const taggedYaku = applyExtraTags(newCompleted);
-    
+
     // No yaku completed or upgraded since the last update
     if (taggedYaku.every((yaku) => lastCompleted.has(yaku))) return;
 

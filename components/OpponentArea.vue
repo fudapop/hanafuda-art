@@ -1,5 +1,7 @@
 <template>
-  <div class="relative [--card-height:45px] -translate-y-3 w-max mx-auto">
+  <div
+    class="relative [--card-height:45px] sm:[@media_(max-height:500px)]:absolute sm:[@media_(max-height:500px)]:right-[15%] sm:[@media_(max-height:500px)]:top-0 -translate-y-3 w-max mx-auto"
+  >
     <!-- OPPONENT HAND -->
     <ListGrid :cols="8" :rows="'auto'" flow="row" gap="2px">
       <!-- FACE-DOWN CARDS -->

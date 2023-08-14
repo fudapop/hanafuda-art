@@ -1,11 +1,13 @@
 <template>
-  <div class="grid grid-rows-[80px_1fr_80px] h-[100dvh] overflow-hidden relative">
+  <div
+    class="sm:[@media_(max-height:500px)]:[--card-height:80px] grid grid-rows-[80px_1fr_80px] sm:grid-rows-[50px_1fr_50px] h-[100dvh] overflow-y-hidden overflow-x-hidden relative"
+  >
     <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
       <MoonBackground />
       <AnimatedBackground />
     </div>
 
-    <div class="absolute flex top-6 right-4 gap-x-4">
+    <div class="absolute flex top-4 right-4 gap-x-4">
       <OptionsMenu :tabCategories="tabs">
         <template #tab-panel-1>
           <DesignSelector />
@@ -22,7 +24,7 @@
     <!-- Opponent Status Bar -->
     <div
       :class="{
-        'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a75] border-b-slate-500': true,
+        'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a75] border-b-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
         'opacity-40': players.p1.isActive,
         '-translate-y-full': !gameStart,
       }"
@@ -53,7 +55,7 @@
     <!-- Player Status Bar -->
     <div
       :class="{
-        'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a75] border-t-slate-500': true,
+        'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a75] border-t-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
         'opacity-40': players.p2.isActive,
         'translate-y-full': !gameStart,
       }"

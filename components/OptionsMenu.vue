@@ -14,7 +14,7 @@
     <HeadlessPopoverOverlay class="fixed inset-0 z-40 bg-black opacity-50" />
     <HeadlessPopoverPanel
       :unmount="false"
-      class="absolute top-0 right-0 z-50 w-[calc(100vw-4rem)] sm:w-[600px] min-h-[60svh] mt-2 ml-8 origin-top-right bg-white dark:bg-gray-800 rounded-lg ring-1 ring-black dark:ring-gray-600 ring-opacity-5 focus:outline-none"
+      class="absolute top-0 right-0 z-50 w-[calc(100vw-4rem)] sm:w-[600px] h-max mt-2 ml-8 origin-top-right bg-white dark:bg-gray-800 rounded-lg ring-1 ring-black dark:ring-gray-600 ring-opacity-5 focus:outline-none"
     >
       <!-- Close indicator; not a button -->
       <div class="absolute right-0 pointer-events-none -left-8 top-2">
@@ -51,7 +51,7 @@
         <HeadlessTabPanels>
           <HeadlessTabPanel
             :unmount="false"
-            class="w-full min-h-[300px] relative"
+            class="w-full min-h-[75vh] relative"
             v-for="(category, index) in tabCategories"
           >
             <slot :name="`tab-panel-${index + 1}`" />

@@ -1,16 +1,21 @@
 <template>
   <div class="absolute inset-0 flex flex-col items-center m-auto">
-    <div class="relative mt-32 drop-shadow-xl">
+    <div class="relative mt-32 drop-shadow-xl sm:-translate-x-1/4">
       <div class="absolute right-[2rem] bottom-[10%] rotate-12 -z-10">
         <AnimatedCards />
       </div>
       <h1 id="hero-title" class="text-4xl text-center sm:text-5xl">
-        <span class="block text-xl italic text-left text-white md:text-3xl">Hanafuda</span>花札 KOI-KOI
+        <span class="block text-xl italic text-left text-white md:text-3xl">Hanafuda</span
+        >花札 KOI-KOI
       </h1>
     </div>
-    <div class="absolute inset-x-0 mx-auto text-2xl shadow-lg w-max top-1/2">
-      <Button button-class="primary" :style="{ fontSize: '1.5rem', padding: '1rem 1.5rem', borderRadius: '0.75rem' }" :action="() => $emit('start-game')">
-        Start Game
+    <div class="absolute shadow-lg w-max top-1/2 sm:right-4">
+      <Button
+        button-class="primary"
+        :style="{ fontSize: '1.25rem', padding: '1rem 1.5rem', borderRadius: '0.75rem' }"
+        :action="() => $emit('start-game')"
+      >
+        Start Game &rarr;
       </Button>
     </div>
     <p class="fixed bottom-0 w-screen mb-2 text-xs text-center text-white opacity-50">
@@ -20,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-defineEmits(["start-game"])
+defineEmits(["start-game"]);
 </script>
 
 <style scoped>

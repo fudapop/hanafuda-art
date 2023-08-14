@@ -39,7 +39,7 @@
     <span class="text-lg font-semibold text-indigo-700 dark:text-yellow-100"
       >{{ lastRoundResult.score }} points</span
     >
-    <span v-if="bonusMultiplier > 1" class="ml-8">
+    <span v-if="bonusMultiplier > 1" class="max-sm:block sm:ml-8">
       Koi-Koi Bonus:
       <span class="text-lg font-semibold text-indigo-700 dark:text-yellow-100"
         >x{{ bonusMultiplier }}</span

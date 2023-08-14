@@ -8,25 +8,25 @@
     </div>
     <!-- <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader> -->
     <div
-      class="z-10 grid grid-rows-[--table-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full min-h-[500px] mx-auto"
+      class="z-10 grid grid-rows-[--table-grid-rows] sm:[@media_(max-height:500px)]:grid-rows-[--landscape-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full mx-auto"
     >
       <!-- OPPONENT HAND -->
       <LazyOpponentArea />
 
       <!-- OPPONENT COLLECTION -->
-      <div class="-translate-y-8 pointer-events-none -z-10">
+      <div class="pointer-events-none -z-10">
         <LazyCollectionArea player="p2" @completed="(data) => handleCompletion(data)" />
       </div>
 
       <!-- FIELD -->
       <div
         v-click-disabled:unless="players.p1.isActive && !!selectedCard"
-        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr]"
+        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr] sm:grid-cols-[160px_1fr] sm:translate-y-4"
       >
         <LazyDeck />
-        <LazyListGrid :cols="6" :rows="2" flow="column" gap="4px">
-          <LazyFieldDisplay />
-        </LazyListGrid>
+        <!-- <LazyListGrid :cols="6" :rows="2" flow="column" gap="4px"> -->
+        <LazyFieldDisplay />
+        <!-- </LazyListGrid> -->
       </div>
 
       <!-- PLAYER COLLECTION -->
@@ -37,16 +37,12 @@
       <!-- PLAYER HAND -->
       <div
         v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
-        class="max-sm:[--card-height:85px] max-lg:[--card-height:90px] w-full grid translate-y-4"
+        :class="{
+          'transition-all duration-200 sm:absolute sm:bottom-1/4 sm:right-1/3 sm:w-max': true,
+          'opacity-50 sm:translate-y-[40px]': players.p2.isActive,
+        }"
       >
-        <div
-          :class="{
-            'transition-opacity duration-200': true,
-            'opacity-50': players.p2.isActive,
-          }"
-        >
-          <LazyHandDisplay id="p1" />
-        </div>
+        <LazyHandDisplay id="p1" />
       </div>
     </div>
 

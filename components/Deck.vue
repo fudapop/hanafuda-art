@@ -3,7 +3,7 @@
     <div class="absolute inset-0 my-auto overflow-visible">
       <div
         v-if="ps.bonusMultiplier > 1"
-        class="w-full text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
+        class="w-full sm:w-1/2 text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 sm:top-1/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
       >
         <TransitionGroup appear name="stamp">
           <div
@@ -20,33 +20,35 @@
             />
           </div>
         </TransitionGroup>
-        <span class="absolute w-full mt-3 text-center">x{{ ps.bonusMultiplier }}</span>
+        <span class="absolute w-full mt-3 text-center drop-shadow-lg"
+          >x{{ ps.bonusMultiplier }}</span
+        >
       </div>
 
       <!-- DECK PILE -->
-      <div class="absolute inset-0 my-auto overflow-hidden shadow-md card down"></div>
+      <div
+        class="absolute inset-y-0 my-auto sm:right-4 overflow-hidden shadow-md card down"
+      ></div>
 
       <!-- Show revealed card when drawing from deck         -->
-      <div v-if="revealedCard">
-        <HeadlessTransitionRoot appear :show="!!revealedCardImg" as="template">
-          <HeadlessTransitionChild
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 motion-safe:-scale-x-50"
-            enter-to="opacity-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100"
-            leave-to="opacity-0 motion-safe:translate-x-1"
-          >
-            <CardImage
-              v-if="revealedCardImg"
-              :key="revealedCard"
-              :card="revealedCard"
-              :src="revealedCardImg"
-              class="object-cover mx-auto transition-transform -translate-x-4 card drop-shadow-lg"
-            />
-          </HeadlessTransitionChild>
-        </HeadlessTransitionRoot>
-      </div>
+      <HeadlessTransitionRoot appear :show="!!revealedCard" as="template">
+        <HeadlessTransitionChild
+          enter="duration-300 ease-out"
+          enter-from="opacity-0 motion-safe:-scale-x-50"
+          enter-to="opacity-100"
+          leave="duration-200 ease-in"
+          leave-from="opacity-100"
+          leave-to="opacity-0 motion-safe:translate-x-1"
+        >
+          <CardImage
+            v-if="revealedCard && revealedCardImg"
+            :key="revealedCard"
+            :card="revealedCard"
+            :src="revealedCardImg"
+            class="object-cover mx-auto transition-transform -translate-x-4 sm:translate-x-3/4 card drop-shadow-lg"
+          />
+        </HeadlessTransitionChild>
+      </HeadlessTransitionRoot>
 
       <!-- Show 'Draw Card' button after the first match/discard -->
       <!-- <button v-else v-show="!selectedCard && ds.checkCurrentPhase('draw')" type="button"
@@ -57,15 +59,14 @@
 
       <!-- Show the 'Discard' button if there are no matches 
         on the field for the selected card -->
-      <button
-        v-if="selectedCard && !matchedCards.length"
-        v-hide:during.display="'draw'"
-        type="button"
-        class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-red-600 shadow-xl border border-red-800 card hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-        @click="matchOrDiscard"
+      <Button
+        v-if="selectedCard && !matchedCards.length && ps.players.p1.isActive"
+        v-show="ds.checkCurrentPhase('select')"
+        button-class="primary"
+        :action="matchOrDiscard"
       >
-        Discard
-      </button>
+        <span class="animate-pulse"> Discard </span>
+      </Button>
     </div>
   </div>
 </template>

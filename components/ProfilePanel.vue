@@ -1,12 +1,10 @@
 <template>
   <div class="grid gap-y-2 sm:grid-cols-2">
-    <div
-      class="grid p-4 m-3 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700"
-    >
+    <div class="grid p-4 m-3 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700">
       <div v-if="user">
         <img
           v-if="user.photoURL"
-          class="w-32 h-32 mx-auto my-4 rounded-full"
+          class="w-28 h-28 mx-auto my-4 rounded-full"
           :src="user.photoURL"
           :alt="user.displayName ?? ''"
         />
@@ -19,7 +17,7 @@
       <p
         class="px-4 overflow-hidden text-lg font-semibold text-center text-gray-900 dark:text-white"
       >
-        {{ user?.displayName || `Guest #${user?.uid.slice(-5)}` }}
+        {{ user?.displayName || `Guest #${user?.uid.slice(0, 5)}` }}
       </p>
       <div v-if="profile">
         <p class="text-center text-gray-900 dark:text-white">

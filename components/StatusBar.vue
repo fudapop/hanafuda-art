@@ -1,46 +1,43 @@
 <template>
-  <div class="sm:flex sm:items-center sm:justify-between max-w-[850px] mx-auto">
+  <div class="sm:flex sm:items-end sm:justify-between max-w-[850px] mx-auto">
     <div class="flex items-end space-x-2 sm:space-x-5">
       <div class="flex-shrink-0">
         <img
           v-if="user"
-          class="w-16 h-16 mx-auto rounded-full"
+          class="w-16 h-16 sm:w-8 sm:h-8 mx-auto rounded-full"
           :src="user.photoURL || '/avatars/avatar-phoenix.webp'"
           :alt="user.displayName"
         />
-        <img v-else src="/avatars/avatar-deer.webp" class="w-16 h-16 mx-auto rounded-full" />
+        <img
+          v-else
+          src="/avatars/avatar-deer.webp"
+          class="w-16 h-16 sm:w-8 sm:h-8 mx-auto rounded-full"
+        />
       </div>
-      <div class="mt-2 sm:mt-0 sm:pt-1">
-        <div class="opacity-100">
-          <p
-            v-if="playerNum == 1"
-            class="text-lg font-bold text-indigo-700 dark:text-white sm:text-xl"
+      <div class="mt-2 sm:mt-0 sm:pt-1 sm:flex sm:items-end sm:gap-x-4">
+        <p class="text-lg font-bold text-indigo-700 dark:text-white sm:text-xl">
+          {{ user?.displayName?.split(" ")[0] || `Player ${playerNum}` }}
+        </p>
+        <p
+          v-memo="[ds.roundOver, ds.roundCounter]"
+          class="flex items-center text-xs font-medium text-gray-900 dark:text-white"
+        >
+          <span
+            class="[@media_(max-height:500px)]:sr-only pt-1 mr-2 text-gray-600 dark:text-gray-300"
           >
-            {{ user?.displayName || `Player ${playerNum}` }}
-          </p>
-          <p
-            v-memo="[ds.roundOver, ds.roundCounter]"
-            class="flex items-center text-sm font-medium text-gray-900 dark:text-white"
-          >
-            <span class="mr-2 text-gray-600 dark:text-gray-300">
-              Round {{ ds.roundCounter }} / {{ useConfigStore().maxRounds }}
-            </span>
-            <span class="flex items-center text-xl font-semibold">
-              <img
-                src="/images/coin.webp"
-                alt="coin"
-                class="w-5 h-5 mx-1 drop-shadow-sm"
-              />
-              {{ score }}
-            </span>
-          </p>
-          <p
-            v-if="playerNum == 2"
-            class="text-lg font-bold text-gray-900 dark:text-white sm:text-xl"
-          >
-            {{ user?.displayName || `Player ${playerNum}` }}
-          </p>
-        </div>
+            Round {{ ds.roundCounter }} / {{ useConfigStore().maxRounds }}
+          </span>
+          <span class="flex items-center text-xl font-semibold">
+            <img src="/images/coin.webp" alt="coin" class="w-5 h-5 mx-1 drop-shadow-sm" />
+            {{ score }}
+          </span>
+        </p>
+        <!-- <p
+          v-if="playerNum == 2"
+          class="text-lg font-bold text-gray-900 dark:text-white sm:text-xl"
+        >
+          {{ user?.displayName || `Player ${playerNum}` }}
+        </p> -->
       </div>
     </div>
     <div v-if="playerNum == 1" class="flex justify-center mt-5 sm:mt-0 z-[-1]"></div>
