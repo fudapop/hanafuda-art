@@ -11,6 +11,7 @@
     --landscape-grid-rows: repeat(3, max-content);
     min-width: 320px;
     max-height: 100vh;
+    max-height: 100dvh;
     font-family: Rubik, sans-serif;
   }
 

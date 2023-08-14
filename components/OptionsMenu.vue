@@ -51,7 +51,7 @@
         <HeadlessTabPanels>
           <HeadlessTabPanel
             :unmount="false"
-            class="w-full min-h-[75vh] relative"
+            class="w-full min-h-[75svh] relative"
             v-for="(category, index) in tabCategories"
           >
             <slot :name="`tab-panel-${index + 1}`" />
