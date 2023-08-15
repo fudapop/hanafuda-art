@@ -18,9 +18,7 @@
         Start
       </button>
     </div>
-    <p class="fixed bottom-0 w-screen mb-2 text-xs text-center text-white opacity-50">
-      {{ new Date().getFullYear() }} | Andre L. Hammons
-    </p>
+    <StartScreenFooter />
   </div>
 </template>
 

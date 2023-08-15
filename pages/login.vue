@@ -115,9 +115,10 @@
             </div>
 
             <div class="grid grid-cols-2 gap-4 mt-6">
-              <Button
-                :action="() => loginWithOAuth('google')"
-                custom-class="flex w-full items-center justify-center gap-3 rounded-md bg-[#3367D6] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+              <button
+                type="button"
+                @click="() => loginWithOAuth('google')"
+                class="flex w-full items-center justify-center gap-3 rounded-md bg-[#3367D6] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
               >
                 <svg
                   class="w-5 h-5"
@@ -144,11 +145,12 @@
                   />
                 </svg>
                 <span class="text-sm font-semibold leading-6">Google</span>
-              </Button>
+              </button>
 
-              <Button
-                :action="() => loginWithOAuth('github')"
-                custom-class="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+              <button
+                type="button"
+                @click="() => loginWithOAuth('github')"
+                class="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
               >
                 <svg
                   class="w-5 h-5"
@@ -163,7 +165,7 @@
                   />
                 </svg>
                 <span class="text-sm font-semibold leading-6">GitHub</span>
-              </Button>
+              </button>
             </div>
           </div>
         </div>
