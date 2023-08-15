@@ -25,23 +25,33 @@
       Your feedback has been submitted. Thank you!
     </template>
     <template #actions>
-      <form v-if="!submitted" @submit="handleSubmit">
-        <fieldset class="bg-gray-50 shadow-inner rounded-lg px-4 pb-6 mt-4">
-          <div class="mt-5 flex gap-4 w-full justify-between">
+      <form
+        v-if="!submitted"
+        @submit="handleSubmit"
+        class="text-gray-900 dark:text-white"
+      >
+        <fieldset
+          class="shadow-inner rounded-lg px-4 pt-4 pb-8 sm:pb-2 mt-4 bg-gray-50 dark:bg-gray-700"
+        >
+          <div class="grid grid-rows-2 gap-y-5 min-w-[250px] sm:grid-cols-2 w-full h-8">
             <p>Animation Smoothness</p>
             <StarRating
               ratingId="animation-rating"
               v-model.number="feedback['animation-rating']"
             />
           </div>
-          <div class="mt-5 flex gap-4 w-full justify-between">
+          <div
+            class="mt-8 sm:mt-5 grid grid-rows-2 gap-y-5 min-w-[250px] sm:grid-cols-2 w-full h-8"
+          >
             <p>Ease of Controls</p>
             <StarRating
               ratingId="controls-rating"
               v-model.number="feedback['controls-rating']"
             />
           </div>
-          <div class="mt-5 flex gap-4 w-full justify-between">
+          <div
+            class="mt-8 sm:mt-5 grid grid-rows-2 gap-y-5 min-w-[250px] sm:grid-cols-2 w-full h-8"
+          >
             <p>Image Quality</p>
             <StarRating
               ratingId="image-rating"
@@ -64,23 +74,29 @@
             id="comment-box"
             rows="3"
             v-model="comments.message"
-            class="bg-gray-50 shadow-inner rounded-lg p-2"
+            class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white shadow-inner rounded-lg p-2"
             placeholder="Your feedback is greatly appreciated! 🙏🏽"
           />
         </fieldset>
         <div class="mt-4 w-max float-right flex gap-x-4">
-          <Button type="button" button-class="secondary" :action="() => $emit('close')"
-            >Close</Button
+          <button type="button" class="sec-btn" @click="() => $emit('close')">
+            Close
+          </button>
+          <button
+            type="button"
+            class="pri-btn"
+            @click="() => $emit('close')"
+            :disabled="incomplete"
+            :aria-disabled="incomplete"
           >
-          <Button type="submit" button-class="primary" :disabled="incomplete"
-            >Submit</Button
-          >
+            Submit
+          </button>
         </div>
       </form>
       <div v-else class="mt-4 w-max float-right">
-        <Button button-class="primary" :action="() => $emit('close')" autofocus
-          >Close</Button
-        >
+        <button type="button" class="pri-btn" @click="() => $emit('close')" autofocus>
+          Close
+        </button>
       </div>
     </template>
   </Modal>

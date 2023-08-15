@@ -9,14 +9,14 @@
         >花札 KOI-KOI
       </h1>
     </div>
-    <div class="absolute shadow-lg w-max top-1/2 sm:right-4">
-      <Button
-        button-class="primary"
-        :style="{ fontSize: '1.25rem', padding: '1rem 1.5rem', borderRadius: '0.75rem' }"
-        :action="() => $emit('start-game')"
+    <div class="absolute shadow-lg w-max top-1/2 sm:left-3/4">
+      <button
+        type="button"
+        class="pri-btn text-xl px-8 py-3 rounded-lg"
+        @click="() => $emit('start-game')"
       >
-        Start Game &rarr;
-      </Button>
+        Start
+      </button>
     </div>
     <p class="fixed bottom-0 w-screen mb-2 text-xs text-center text-white opacity-50">
       {{ new Date().getFullYear() }} | Andre L. Hammons

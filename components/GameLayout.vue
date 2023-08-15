@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sm:[@media_(max-height:500px)]:[--card-height:80px] grid grid-rows-[80px_1fr_80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-[100dvh] pb-4 overflow-hidden relative"
+    class="sm:[@media_(max-height:500px)]:[--card-height:80px] grid grid-rows-[80px_1fr_80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-[100dvh] overflow-hidden relative"
   >
     <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
       <MoonBackground />

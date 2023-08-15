@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-[200px]">
+  <div class="relative min-w-[150px] pt-8">
     <input
       :value="modelValue"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
@@ -12,9 +12,11 @@
     />
     <label
       :for="ratingId"
-      class="absolute flex inset-0 m-auto pl-[1.5ch] -top-2 justify-between pointer-events-none text-3xl pr-4 rounded-lg peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-600"
+      class="absolute flex inset-0 m-auto pl-[1.5ch] -top-2 justify-between pointer-events-none text-3xl rounded-lg peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-600"
     >
-      <span v-for="n in getRange(modelValue)" class="text-indigo-600">&starf;</span>
+      <span v-for="n in getRange(modelValue)" class="text-indigo-600 dark:text-yellow-300"
+        >&starf;</span
+      >
       <span v-for="n in getRange(5 - modelValue)" class="text-gray-500">&star;</span>
     </label>
   </div>

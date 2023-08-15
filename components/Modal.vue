@@ -27,7 +27,7 @@
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <HeadlessDialogPanel
-              class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+              class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
             >
               <div>
                 <slot name="image" />
@@ -35,12 +35,12 @@
                 <div class="mt-3 text-center sm:mt-5">
                   <HeadlessDialogTitle
                     as="h3"
-                    class="text-base font-semibold leading-6 text-gray-900"
+                    class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
                   >
                     <slot name="title" />
                   </HeadlessDialogTitle>
                   <div class="mt-2">
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-gray-500 dark:text-gray-300">
                       <slot name="description" />
                     </p>
                   </div>
