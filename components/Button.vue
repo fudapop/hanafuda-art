@@ -1,14 +1,19 @@
 <template>
-  <button type="button" :class="className" @click="action">
+  <button
+    :type="type || 'button'"
+    :class="`disabled:bg-gray-300 disabled:cursor-not-allowed ${className}`"
+    @click="action"
+  >
     <slot />
   </button>
 </template>
 
 <script setup lang="ts">
-const { buttonClass, action, customClass } = defineProps<{
-  action: () => void;
+const { buttonClass, action, customClass, type } = defineProps<{
+  action?: (param?: any) => void;
   buttonClass?: "primary" | "secondary" | "accent";
   customClass?: string;
+  type?: "button" | "submit" | "reset";
 }>();
 
 const primaryClass =

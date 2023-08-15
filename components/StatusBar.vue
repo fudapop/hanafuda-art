@@ -4,17 +4,19 @@
       <div class="flex-shrink-0">
         <img
           v-if="user"
-          class="w-16 h-16 sm:w-8 sm:h-8 mx-auto rounded-full"
+          class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
           :src="user.photoURL || '/avatars/avatar-phoenix.webp'"
           :alt="user.displayName"
         />
         <img
           v-else
           src="/avatars/avatar-deer.webp"
-          class="w-16 h-16 sm:w-8 sm:h-8 mx-auto rounded-full"
+          class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
         />
       </div>
-      <div class="mt-2 sm:mt-0 sm:pt-1 sm:flex sm:items-end sm:gap-x-4">
+      <div
+        class="mt-2 sm:mt-0 sm:pt-1 sm:[@media_(max-height:500px)]:flex sm:items-end sm:gap-x-4"
+      >
         <p class="text-lg font-bold text-indigo-700 dark:text-white sm:text-xl">
           {{ user?.displayName?.split(" ")[0] || `Player ${playerNum}` }}
         </p>

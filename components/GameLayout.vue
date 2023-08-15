@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sm:[@media_(max-height:500px)]:[--card-height:80px] grid grid-rows-[80px_1fr_80px] sm:grid-rows-[50px_1fr_50px] h-[100dvh] overflow-y-hidden overflow-x-hidden relative"
+    class="sm:[@media_(max-height:500px)]:[--card-height:80px] grid grid-rows-[80px_1fr_80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-[100dvh] pb-4 overflow-hidden relative"
   >
     <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
       <MoonBackground />
@@ -79,15 +79,17 @@
       </button>
     </div>
 
-    <ExitModal
+    <ExitWarning
       :open="leavingGame"
       @cancel="leavingGame = false"
-      @exit-game="handleExit"
+      @confirm="handleExit"
     />
+    <FeedbackForm :open="requestFeedback" @close="() => (requestFeedback = false)" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useStorage } from "@vueuse/core";
 import { ArrowLeftOnRectangleIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 import { usePlayerStore } from "~/stores/playerStore";
@@ -98,6 +100,11 @@ const user = useCurrentUser();
 const tabs = ref(["Design", "Gameplay", "Profile"]);
 const gameStart = useState("start", () => false);
 const leavingGame = ref(false);
+const requestFeedback = ref(false);
+
+const feedbackSubmitted = useStorage("hanafuda-feedback", false, localStorage, {
+  mergeDefaults: true,
+});
 
 const handleClick = () => {
   if (!gameStart.value) {
@@ -111,6 +118,14 @@ const handleExit = () => {
   leavingGame.value = false;
   gameStart.value = false;
 };
+
+const unwatch = watch([gameStart, leavingGame], () => {
+  if (feedbackSubmitted.value) {
+    unwatch();
+    return;
+  }
+  if (!gameStart.value && !leavingGame.value) requestFeedback.value = true;
+});
 </script>
 
 <style scoped></style>

@@ -41,7 +41,7 @@
   }
   
   .collection-area {
-    --card-height: 50px;
+    --card-height: 45px;
     height: calc(var(--card-height) / 2);
     display: grid;
     padding-left: 0.75rem;

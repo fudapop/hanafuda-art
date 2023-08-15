@@ -15,7 +15,7 @@
       <div
         v-for="(pos, index) in posArr"
         :key="index"
-        class="w-8 h-8 absolute"
+        class="w-6 h-6 absolute"
         :style="{
           left: `${pos.x}px`,
           top: `${pos.y}px`,

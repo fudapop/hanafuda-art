@@ -13,15 +13,6 @@
       </span>
       <CardList :cards="coll[type]" :stack="true" />
     </ul>
-    <!-- <ul class="flex h-full py-2">
-      <CardList :cards="coll.animals" :stack="true" />
-    </ul>
-    <ul class="flex h-full py-2">
-      <CardList :cards="coll.ribbons" :stack="true" />
-    </ul>
-    <ul class="flex h-full py-2">
-      <CardList :cards="coll.plains" :stack="true" />
-    </ul> -->
   </div>
 </template>
 
