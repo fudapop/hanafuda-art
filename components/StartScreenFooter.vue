@@ -1,7 +1,7 @@
 <template>
   <div class="fixed bottom-0 w-screen mb-2 opacity-50">
     <div class="flex gap-x-4 w-max mx-auto">
-      <a href="https://www.ahammons.dev" title="View my portfolio" target="_blank">
+      <a href="https://www.andrehammons.dev" title="View my portfolio" target="_blank">
         <svg
           version="1.1"
           id="Layer_1"
