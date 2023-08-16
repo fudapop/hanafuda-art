@@ -1,8 +1,8 @@
 <template>
-  <main>
+  <main class="overflow-x-hidden">
     <div class="relative isolate">
       <svg
-        class="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
+        class="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 dark:stroke-gray-700 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
         aria-hidden="true"
       >
         <defs>
@@ -17,7 +17,7 @@
             <path d="M.5 200V.5H200" fill="none" />
           </pattern>
         </defs>
-        <svg x="50%" y="-1" class="overflow-visible fill-gray-50">
+        <svg x="50%" y="-1" class="overflow-visible fill-gray-50 dark:fill-gray-700">
           <path
             d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
             stroke-width="0"
@@ -35,7 +35,7 @@
         aria-hidden="true"
       >
         <div
-          class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
+          class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b590] to-[#9089fc90] opacity-30"
           style="
             clip-path: polygon(
               63.1% 29.5%,
@@ -64,31 +64,26 @@
             class="max-w-2xl mx-auto gap-x-14 lg:mx-0 lg:flex lg:max-w-none lg:items-center"
           >
             <div class="w-full max-w-xl lg:shrink-0 xl:max-w-2xl">
-              <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+              <h1
+                class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-50 sm:text-6xl"
+              >
                 Bring your own deck.
               </h1>
               <p
-                class="relative mt-6 text-lg leading-8 text-gray-600 sm:max-w-md lg:max-w-none"
+                class="relative mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300 sm:max-w-md lg:max-w-none"
               >
                 Love playing Hanafuda Koi-Koi? Join us for a classic game with a fresh
                 look!
               </p>
               <div class="flex items-center mt-10 gap-x-6">
-                <NuxtLink
-                  to="/play"
-                  class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  Play the game
-                </NuxtLink>
-                <NuxtLink
-                  to="/gallery"
-                  class="z-10 text-sm font-semibold leading-6 text-gray-900"
+                <NuxtLink to="/play" class="pri-btn"> Play the game </NuxtLink>
+                <NuxtLink to="/gallery" class="sec-btn"
                   >Browse designs <span aria-hidden="true">→</span></NuxtLink
                 >
               </div>
             </div>
             <div
-              class="flex justify-end gap-8 pt-4 origin-top-left scale-50 pointer-events-none sm:scale-100 mt-14 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0"
+              class="flex justify-end gap-8 pt-4 origin-top scale-50 translate-x-[12.5%] pointer-events-none sm:scale-100 mt-14 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0"
             >
               <div
                 class="flex-none pt-32 ml-auto space-y-8 w-44 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80"

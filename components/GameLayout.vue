@@ -69,10 +69,10 @@
       <button
         type="button"
         @click="handleClick"
-        class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-gray-50/20 dark:bg-gray-700/50 px-2 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-50 shadow-sm ring-1 ring-inset ring-gray-300/10 dark:ring-gray-500/10 hover:bg-gray-50 dark:hover:bg-gray-600"
+        class="inline-flex w-full justify-center gap-x-1.5 rounded-lg bg-gray-50/20 dark:bg-gray-700/50 px-2 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-50 shadow-sm ring-1 ring-inset ring-gray-300/10 dark:ring-gray-500/10 hover:bg-gray-50 dark:hover:bg-gray-600"
       >
         <ArrowLeftOnRectangleIcon
-          class="w-8 h-8 text-gray-700 dark:text-gray-300"
+          class="w-8 h-8 text-gray-700 dark:text-gray-400"
           aria-hidden="true"
         />
         <span class="sr-only">Return to homepage</span>

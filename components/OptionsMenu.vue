@@ -11,10 +11,10 @@
         />
       </HeadlessPopoverButton>
     </div>
-    <HeadlessPopoverOverlay class="fixed inset-0 z-40 bg-black opacity-50" />
+    <HeadlessPopoverOverlay class="fixed inset-0 z-40 bg-black opacity-70" />
     <HeadlessPopoverPanel
       :unmount="false"
-      class="absolute top-0 right-0 z-50 w-[calc(100vw-4rem)] sm:w-[600px] h-max mt-2 ml-8 origin-top-right bg-white dark:bg-gray-800 rounded-lg ring-1 ring-black dark:ring-gray-600 ring-opacity-5 focus:outline-none"
+      class="absolute top-0 right-0 z-50 max-[400px]:w-screen max-[400px]:-right-4 w-[calc(100vw-4rem)] sm:w-[600px] h-max mt-2 ml-8 origin-top-right bg-white dark:bg-gray-800 rounded-lg ring-1 ring-black dark:ring-gray-600 ring-opacity-5 focus:outline-none"
     >
       <!-- Close indicator; not a button -->
       <div class="absolute right-0 pointer-events-none -left-8 top-2">

@@ -33,7 +33,7 @@ nuxtApp.hook("page:start", () => {
 });
 
 nuxtApp.hook("page:finish", async () => {
-  await sleep();
+  await sleep(500);
   loading.value = false;
   window.dispatchEvent(new CustomEvent("ptupdate"));
 });
@@ -55,12 +55,19 @@ onMounted(() => {
 <style>
 .page-enter-active,
 .page-leave-active {
-  transition: all 1s;
+  transition: all 0.8s;
 }
 
 .page-enter-from,
 .page-leave-to {
   opacity: 0;
-  filter: blur(0.5rem);
+  /* filter: blur(0.5rem); */
 }
+
+/* .page-enter-from {
+  translate: 100% 0;
+}
+.page-leave-to {
+  translate: -100% 0;
+} */
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="grid gap-8 bg-white">
+  <div class="grid gap-8 bg-white dark:bg-gray-800">
     <Header />
     <slot />
   </div>

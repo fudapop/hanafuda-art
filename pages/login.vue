@@ -6,16 +6,12 @@
 
     <div class="flex flex-col justify-center flex-1 px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
       <div class="w-full max-w-sm mx-auto lg:w-96">
-        <div>
-          <img
-            class="w-auto h-10"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-          />
+        <div class="flex items-center">
+          <img class="w-auto h-10" src="/images/sakura.webp" alt="New Hanafuda Logo" />
           <h2
-            class="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-50 dark:bg-gray-800"
+            class="ml-4 text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-50 dark:bg-gray-800"
           >
-            Sign in to your account
+            Welcome!
           </h2>
           <!-- <p class="mt-2 text-sm leading-6 text-gray-500">
             Not a member?
@@ -110,7 +106,10 @@
                 <div class="w-full border-t border-gray-200" />
               </div>
               <div class="relative flex justify-center text-sm font-medium leading-6">
-                <span class="px-6 text-gray-900 bg-white">Or continue with</span>
+                <span
+                  class="px-6 text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-800"
+                  >Or continue with</span
+                >
               </div>
             </div>
 

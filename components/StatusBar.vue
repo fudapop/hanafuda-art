@@ -5,12 +5,12 @@
         <img
           v-if="user"
           class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
-          :src="user.photoURL || '/avatars/avatar-phoenix.webp'"
+          :src="user.photoURL"
           :alt="user.displayName"
         />
         <img
           v-else
-          src="/avatars/avatar-deer.webp"
+          :src="avatar2"
           class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
         />
       </div>
@@ -62,6 +62,23 @@ const { gameOver } = storeToRefs(ds);
 const player = `p${playerNum}` as PlayerKey;
 const opponent: PlayerKey = player === "p1" ? "p2" : "p1";
 const score = computed(() => ds.scoreboard[player]);
+
+const avatars = [
+  "/avatars/origami-crane.webp",
+  "/avatars/origami-warbler.webp",
+  "/avatars/origami-curtain.webp",
+  "/avatars/origami-butterfly.webp",
+  "/avatars/origami-boar.webp",
+  "/avatars/origami-deer.webp",
+  "/avatars/origami-rainman.webp",
+  "/avatars/origami-phoenix.webp",
+];
+const avatar1 = getRandom(avatars);
+const avatar2 = getRandom(avatars.filter((a) => a !== avatar1));
+
+if (user?.isAnonymous) {
+  user.photoURL = avatar1;
+}
 
 const convertHistory = () => {
   const newRecord = convertObjArrToRecord(

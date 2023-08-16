@@ -4,12 +4,12 @@
     <ul v-for="type in cardTypes" :key="type" class="flex h-full py-2 relative">
       <span
         v-show="coll[type].size > 0"
-        class="uppercase absolute top-1 left-0 z-[1] bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
+        class="uppercase absolute top-1 left-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
       >
-        {{ type }}:
-        <span class="ml-1 text-xs align-middle">
+        <span class="mr-1 text-xs align-middle">
           {{ coll[type].size }}
         </span>
+        {{ type }}
       </span>
       <CardList :cards="coll[type]" :stack="true" />
     </ul>
@@ -47,10 +47,6 @@ const coll: Record<string, Set<CardName>> = reactive({
   ribbons: new Set([]),
   plains: new Set([]),
 });
-// const brights: Ref<Set<CardName>> = ref(new Set([]));
-// const animals: Ref<Set<CardName>> = ref(new Set([]));
-// const ribbons: Ref<Set<CardName>> = ref(new Set([]));
-// const plains: Ref<Set<CardName>> = ref(new Set([]));
 
 const collection = computed(() => sortByType([...cs.collection[player]]));
 const cBrights = computed(() => collection.value.brights);

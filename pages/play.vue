@@ -21,7 +21,7 @@
       <!-- FIELD -->
       <div
         v-click-disabled:unless="players.p1.isActive && !!selectedCard"
-        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr] sm:grid-cols-[160px_1fr] sm:translate-y-4"
+        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr] sm:grid-cols-[160px_1fr] sm:translate-y-4 max-[400px]:scale-[90%] max-[400px]:origin-left"
       >
         <LazyDeck />
         <!-- <LazyListGrid :cols="6" :rows="2" flow="column" gap="4px"> -->
@@ -38,7 +38,7 @@
       <div
         v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
         :class="{
-          'transition-all duration-200 sm:absolute sm:bottom-1/4 sm:right-1/3 sm:w-max': true,
+          'transition-all duration-200 sm:absolute sm:bottom-1/4 sm:right-1/3 sm:w-max max-[400px]:scale-[80%] max-[400px]:origin-left': true,
           'opacity-50 sm:translate-y-[40px]': players.p2.isActive,
         }"
       >
