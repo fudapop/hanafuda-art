@@ -6,8 +6,19 @@
     }"
   >
     <li v-for="(card, index) in displayedCards" :key="index" class="origin-center">
-      <CardTransition v-if="card">
+      <Transition
+        appear
+        mode="out-in"
+        enter-active-class="duration-300 ease-out"
+        enter-from-class="opacity-0 motion-safe:-translate-x-1"
+        enter-to-class="opacity-100"
+        leave-active-class="duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0 motion-safe:translate-x-1"
+      >
         <div
+          v-if="card"
+          :key="`${index}-${card}`"
           :class="{
             'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
             'scale-105 drop-shadow-xl -translate-y-2 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-2 after:border-yellow-300 after:rounded-[inherit]': matchedCards?.includes(
@@ -20,12 +31,15 @@
         >
           <CardImage :src="getCardUrl(card)!" :card="card" />
         </div>
-      </CardTransition>
-      <div
-        v-else
-        v-show="isFarRightCol(index) ? farRightColIsOccupied : true"
-        class="card border-none opacity-10 relative after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
-      ></div>
+        <template v-else>
+          <div
+            v-show="isFarRightCol(index) ? farRightColIsOccupied : true"
+            class="card border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
+          >
+            <span class="sr-only">empty field slot</span>
+          </div>
+        </template>
+      </Transition>
     </li>
   </ul>
 </template>
