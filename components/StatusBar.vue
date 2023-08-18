@@ -5,8 +5,8 @@
         <img
           v-if="user"
           class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
-          :src="user.photoURL"
-          :alt="user.displayName"
+          :src="user.avatar"
+          :alt="user.username"
         />
         <img
           v-else
@@ -18,7 +18,7 @@
         class="mt-2 sm:mt-0 sm:pt-1 sm:[@media_(max-height:500px)]:flex sm:items-end sm:gap-x-4"
       >
         <p class="text-lg font-bold text-indigo-700 dark:text-white sm:text-xl">
-          {{ user?.displayName?.split(" ")[0] || `Player ${playerNum}` }}
+          {{ user?.username || `Player ${playerNum}` }}
         </p>
         <p
           v-memo="[ds.roundOver, ds.roundCounter]"
@@ -73,12 +73,7 @@ const avatars = [
   "/avatars/origami-rainman.webp",
   "/avatars/origami-phoenix.webp",
 ];
-const avatar1 = getRandom(avatars);
-const avatar2 = getRandom(avatars.filter((a) => a !== avatar1));
-
-if (user?.isAnonymous) {
-  user.photoURL = avatar1;
-}
+const avatar2 = getRandom(avatars);
 
 const convertHistory = () => {
   const newRecord = convertObjArrToRecord(
@@ -119,7 +114,7 @@ const getResult = () => {
   if (result === "WIN") ps.reset(player);
   return result;
 };
-if (user && !user.isAnonymous) {
+if (user && !user.isGuest) {
   watch(gameOver, async () => {
     if (!gameOver.value) return;
     const result = getResult();

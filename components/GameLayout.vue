@@ -95,16 +95,18 @@ import { storeToRefs } from "pinia";
 import { usePlayerStore } from "~/stores/playerStore";
 
 const { players } = storeToRefs(usePlayerStore());
-const user = useCurrentUser();
+// const user = JSON.parse(useRoute().params.user as string);
+const user = toValue(useProfile().current);
 
 const tabs = ref(["Design", "Gameplay", "Profile"]);
 const gameStart = useState("start", () => false);
 const leavingGame = ref(false);
 const requestFeedback = ref(false);
 
-const feedbackSubmitted = useStorage("hanafuda-feedback", false, localStorage, {
-  mergeDefaults: true,
-});
+const feedbackSubmitted = computed(() => user?.flags?.hasSubmittedFeedback);
+// const feedbackSubmitted = useStorage("hanafuda-feedback", false, localStorage, {
+//   mergeDefaults: true,
+// });
 
 const handleClick = () => {
   if (!gameStart.value) {

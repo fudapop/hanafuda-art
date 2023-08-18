@@ -68,7 +68,7 @@
                   v-for="item in navigation"
                   :key="item.name"
                   :to="item.href"
-                  class="block px-3 py-2 -mx-3 text-base font-semibold leading-7 text-gray-900 dark:text-gray-200 rounded-lg hover:bg-gray-50"
+                  class="block px-3 py-2 -mx-3 text-base font-semibold leading-7 text-gray-900 dark:text-gray-200 rounded-lg hover:bg-gray-50 hover:dark:bg-gray-700"
                   >{{ item.name }}</NuxtLink
                 >
               </div>

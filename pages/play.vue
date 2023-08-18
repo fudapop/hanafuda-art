@@ -91,9 +91,6 @@ definePageMeta({
   middleware: ["auth"],
 });
 
-const { nodeEnv } = useRuntimeConfig().public;
-const openCollectionPanel = ref(false);
-
 const cs = useCardStore();
 const ps = usePlayerStore();
 const ds = useGameDataStore();

@@ -1,5 +1,5 @@
 <template>
-  <main class="overflow-x-hidden">
+  <main class="overflow-hidden">
     <div class="relative isolate">
       <svg
         class="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 dark:stroke-gray-700 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
@@ -77,18 +77,18 @@
               </p>
               <div class="flex items-center mt-10 gap-x-6">
                 <NuxtLink to="/play" class="pri-btn"> Play the game </NuxtLink>
-                <NuxtLink to="/gallery" class="sec-btn"
-                  >Browse designs <span aria-hidden="true">→</span></NuxtLink
+                <a href="#browse-designs" class="sec-btn"
+                  >Browse designs <span aria-hidden="true">→</span></a
                 >
               </div>
             </div>
             <div
-              class="flex justify-end gap-8 pt-4 origin-top scale-50 translate-x-[12.5%] pointer-events-none sm:scale-100 mt-14 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0"
+              class="flex justify-end gap-8 pt-4 pointer-events-none sm:scale-100 mt-14 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0"
             >
               <div
-                class="flex-none pt-32 ml-auto space-y-8 w-44 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80"
+                class="flex-none pt-32 space-y-8 w-max sm:w-40 md:44 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80"
               >
-                <div class="relative">
+                <div class="relative w-28 sm:w-40 md:44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
@@ -102,8 +102,10 @@
                   />
                 </div>
               </div>
-              <div class="flex-none mr-auto space-y-8 w-44 sm:mr-0 sm:pt-52 lg:pt-36">
-                <div class="relative">
+              <div
+                class="flex-none space-y-8 w-max sm:w-40 md:44 sm:mr-0 sm:pt-52 lg:pt-36"
+              >
+                <div class="relative w-28 sm:w-40 md:44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
@@ -116,7 +118,7 @@
                     class="absolute inset-0 rounded-md pointer-events-none ring-1 ring-inset ring-gray-900/10"
                   />
                 </div>
-                <div class="relative">
+                <div class="relative w-28 sm:w-40 md:44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
@@ -130,8 +132,8 @@
                   />
                 </div>
               </div>
-              <div class="flex-none pt-32 space-y-8 w-44 sm:pt-0">
-                <div class="relative">
+              <div class="flex-none pt-32 space-y-8 w-max sm:w-40 md:44 sm:pt-0">
+                <div class="relative w-28 sm:w-40 md:44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
@@ -144,7 +146,7 @@
                     class="absolute inset-0 rounded-md pointer-events-none ring-1 ring-inset ring-gray-900/10"
                   />
                 </div>
-                <div class="relative">
+                <div class="relative w-28 sm:w-40 md:44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"

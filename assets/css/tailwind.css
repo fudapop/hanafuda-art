@@ -14,7 +14,11 @@
     max-height: 100dvh;
     font-family: Rubik, sans-serif;
   }
-
+  
+  * {
+    scroll-behavior: smooth;
+  }
+  
   *::-webkit-scrollbar {
     width: 0.3rem;
     @apply bg-gray-50/20 dark:bg-gray-700/50 rounded-sm

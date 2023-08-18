@@ -15,7 +15,7 @@ type GameLengthOptions = (typeof OPTIONS.GAME_LENGTH)[number];
 type ViewingsOptions = (typeof OPTIONS.VIEWINGS)[number];
 type DifficultyOptions = (typeof OPTIONS.DIFFICULTY)[number];
 
-interface GameSettings {
+export interface GameSettings {
 	rounds: GameLengthOptions;
 	difficulty: DifficultyOptions;
 	viewings: ViewingsOptions;

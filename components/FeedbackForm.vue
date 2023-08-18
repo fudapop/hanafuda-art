@@ -26,7 +26,7 @@
     </template>
     <template #actions>
       <form
-        v-if="!submitted"
+        v-show="!submitted"
         @submit="handleSubmit"
         class="text-gray-900 dark:text-white"
       >
@@ -70,7 +70,6 @@
             <span class="sr-only">Comment Type</span>
           </OptionsRadioGroup>
           <textarea
-            autofocus
             id="comment-box"
             rows="3"
             v-model="comments.message"
@@ -83,9 +82,9 @@
             Close
           </button>
           <button
-            type="button"
+            type="submit"
             class="pri-btn"
-            @click="() => $emit('close')"
+            @click="() => handleSubmit"
             :disabled="incomplete"
             :aria-disabled="incomplete"
           >
@@ -93,10 +92,8 @@
           </button>
         </div>
       </form>
-      <div v-else class="mt-4 w-max float-right">
-        <button type="button" class="pri-btn" @click="() => $emit('close')" autofocus>
-          Close
-        </button>
+      <div v-show="submitted" class="mt-4 w-max float-right">
+        <button type="button" class="pri-btn" @click="() => $emit('close')">Close</button>
       </div>
     </template>
   </Modal>
@@ -141,9 +138,18 @@ interface Feedback {
   [x: string]: number;
 }
 
-const submitted = useStorage("hanafuda-feedback", false, localStorage, {
-  mergeDefaults: true,
+const user = toValue(useProfile().current);
+const submitted = computed({
+  get: () => user?.flags?.hasSubmittedFeedback,
+  set: (value) => {
+    if (!user) return;
+    if (!user.flags) user.flags = {};
+    user.flags.hasSubmittedFeedback = value;
+  },
 });
+// const submitted = useStorage("hanafuda-feedback", false, localStorage, {
+//   mergeDefaults: true,
+// });
 
 const feedback: Feedback = reactive({
   "animation-rating": 0,

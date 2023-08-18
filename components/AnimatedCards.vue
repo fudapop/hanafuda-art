@@ -34,22 +34,35 @@
 </template>
 
 <script setup lang="ts">
+import { useImage } from "@vueuse/core";
+import { CardName } from "~/utils/cards";
 const { getCardUrl, useDesign } = useCardDesign();
 
 const selectedDesign = useDesign();
 const loaded = ref(false);
 
-const { title } = defineProps<{ title?: string }>();
-
-const animateLoad = async () => {
+const loadImages = async () => {
   loaded.value = false;
-  await sleep(2000);
+  const images = ([
+    "matsu-ni-tsuru",
+    "sakura-ni-maku",
+    "susuki-ni-tsuki",
+    "yanagi-ni-ono-no-toufuu",
+    "kiri-ni-ho-oh",
+  ] as CardName[]).map((cardName) => useImage({ src: getCardUrl(cardName)! }));
+  while (images.every((img) => img.isLoading.value)) {
+    await sleep(500);
+  }
+  await sleep(1500);
   loaded.value = true;
 };
+
+const { title } = defineProps<{ title?: string }>();
+
 onMounted(() => {
-  animateLoad();
+  loadImages();
   watch(selectedDesign, () => {
-    animateLoad();
+    loadImages();
   });
 });
 </script>
