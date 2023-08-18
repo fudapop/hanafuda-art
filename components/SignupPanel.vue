@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 mt-10">
+  <div class="px-4">
     <div class="relative">
       <div class="absolute inset-0 flex items-center" aria-hidden="true">
         <div class="w-full border-t border-gray-200" />
@@ -10,7 +10,7 @@
         >
       </div>
     </div>
-    <div class="grid gap-4 px-4 mt-6">
+    <div class="grid grid-cols-2 gap-4 px-4 mt-6">
       <button
         type="button"
         @click="() => loginWithOAuth('google')"

@@ -52,7 +52,11 @@ export const useAuth = () => {
   };
 
   const logout = () => {
-    signOut(auth);
+    if (auth.currentUser?.isAnonymous) {
+      auth.currentUser.delete();
+    } else {
+      signOut(auth);
+    }
   };
 
   onMounted(async () => {

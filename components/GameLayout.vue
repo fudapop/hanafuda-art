@@ -30,7 +30,7 @@
       }"
     >
       <div class="p-2">
-        <StatusBar :user="null" playerNum="2" />
+        <StatusBar :user="null" :playerNum="2" />
       </div>
     </div>
 
@@ -61,7 +61,7 @@
       }"
     >
       <div class="p-2">
-        <StatusBar :user="user" playerNum="1" />
+        <StatusBar :user="user" :playerNum="1" />
       </div>
     </div>
 

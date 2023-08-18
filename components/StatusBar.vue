@@ -51,9 +51,7 @@ import { storeToRefs } from "pinia";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { useConfigStore } from "~/stores/configStore";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
-import { useFirestore } from "vuefire";
-import { doc, setDoc } from "firebase/firestore";
-import { convertObjArrToRecord } from "~/utils/myUtils";
+import { UserProfile } from "firebase/auth";
 
 const { user, playerNum } = defineProps(["user", "playerNum"]);
 const ds = useGameDataStore();
@@ -75,73 +73,31 @@ const avatars = [
 ];
 const avatar2 = getRandom(avatars);
 
-const convertHistory = () => {
-  const newRecord = convertObjArrToRecord(
-    ds.roundHistory,
-    "round",
-    (keyProp: string) => `Round ${keyProp}`
-  );
-  for (const round in newRecord) {
-    const roundRecord = newRecord[round];
-    if (roundRecord.completedYaku) {
-      roundRecord.completedYaku = convertObjArrToRecord(
-        roundRecord.completedYaku,
-        "name"
-      );
-    }
-  }
-  return newRecord;
-};
-
-const getDocRefs = () => {
-  const db = useFirestore();
-  const usersRef = doc(db, "users", `u_${user.uid}`);
-  const gamesRef = doc(db, "recent-games", `g_${ds.gameId}`);
-  return {
-    db,
-    usersRef,
-    gamesRef,
-  };
-};
-
 const getResult = () => {
   const result =
     ds.scoreboard[player] > ds.scoreboard[opponent]
-      ? "WIN"
+      ? "win"
       : ds.scoreboard[player] === ds.scoreboard[opponent]
-      ? "DRAW"
-      : "LOSS";
-  if (result === "WIN") ps.reset(player);
+      ? "draw"
+      : "loss";
+  if (result === "win") ps.reset(player);
   return result;
 };
-if (user && !user.isGuest) {
+if (user) {
   watch(gameOver, async () => {
     if (!gameOver.value) return;
+    const date = new Date();
     const result = getResult();
-    const { usersRef, gamesRef } = getDocRefs();
-    const record = convertHistory();
-    const gameData = {
-      datePlayed: new Date(),
-      players: {
-        p1: usersRef,
-      },
-      finalScores: ds.scoreboard,
-      record,
-    };
-    await setDoc(gamesRef, {
-      ...gameData,
-    });
-    await setDoc(
-      usersRef,
-      {
-        lastPlayed: {
-          date: gameData.datePlayed,
-          result,
-          gameData: gamesRef,
-        },
-      },
-      { merge: true }
-    );
+    const currentUser = toValue(useProfile().current);
+    if (currentUser) {
+      currentUser.record[result]++;
+      console.log("score:", ds.scoreboard.p1)
+      currentUser.record.coins += ds.scoreboard.p1;
+      currentUser.lastPlayed = {
+      date,
+      result,
+    }
+  }
     ds.generateGameId();
   });
 }
