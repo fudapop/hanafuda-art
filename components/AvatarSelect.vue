@@ -3,29 +3,40 @@
     <HeadlessPopoverButton>
       <slot />
     </HeadlessPopoverButton>
-
+    <!-- <HeadlessPopoverOverlay class="fixed inset-0 z-40 bg-black opacity-70" /> -->
+    
+    <Transition
+    appear
+    enter-active-class="duration-200 ease-out"
+    enter-from-class="translate-y-4 opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="duration-200 ease-in"
+    leave-from-class="opacity-100"
+    leave-to-class="translate-y-4 opacity-0"
+    >
     <HeadlessPopoverPanel
       v-slot="{ close }"
-      class="fixed z-10 bg-gray-900 shadow-xl rounded-xl inset-[20%] m-auto space-y-6"
+      class="fixed z-50 max-xs:inset-x-0 px-3 py-4 m-4 max-w-[500px] [@media(min-height:_500px)]:xs:bottom-4 [@media(min-height:_500px)]:xs:-translate-x-1/3  [@media(max-height:_500px)]:max-w-[40%] [@media(max-height:_500px)]:right-0 border border-gray-300/50 dark:border-gray-700/50 rounded-xl [@media(max-height:_500px)]:inset-y-4 my-auto space-y-5 shadow-xl bg-white dark:bg-gray-800"
     >
       <h3
-        class="text-gray-900 dark:text-white text-xl text-center font-semibold tracking-wide mt-4"
+        class="mt-4 text-xl font-semibold tracking-wide text-center text-gray-900 dark:text-white"
       >
         Choose Your Avatar
       </h3>
-      <div class="flex gap-4 flex-wrap flex-shrink-0 justify-center pb-12 px-8">
+      <div class="flex flex-wrap justify-center gap-4">
         <img
           v-for="url in avatars"
           :key="url"
           :src="url"
           alt="user avatar"
-          :class="`w-16 h-auto sm:w-24 rounded-full shadow-lg cursor-pointer ${
+          :class="`w-16 h-auto [@media(min-height:500px)]:sm:w-24 rounded-full shadow-lg cursor-pointer ${
             url === modelValue ? 'ring-2 ring-indigo-600 dark:ring-yellow-300' : ''
           }`"
           @click="() => handleClick(url, close)"
         />
       </div>
     </HeadlessPopoverPanel>
+    </Transition>
   </HeadlessPopover>
 </template>
 
@@ -40,6 +51,7 @@ const avatars = ref([
   "/avatars/origami-curtain.webp",
   "/avatars/origami-butterfly.webp",
   "/avatars/origami-boar.webp",
+  "/avatars/origami-moon.webp",
   "/avatars/origami-deer.webp",
   "/avatars/origami-rainman.webp",
   "/avatars/origami-phoenix.webp",

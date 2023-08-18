@@ -1,8 +1,16 @@
 /** @type {import('tailwindcss').Config} */
+
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 module.exports = {
   content: [],
   theme: {
-    extend: {},
+    extend: {
+    },
+    screens: {
+      "xs": "420px",
+      ...defaultTheme.screens,
+    }
   },
   plugins: [
     require('@tailwindcss/container-queries'),
