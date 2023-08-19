@@ -1,6 +1,6 @@
 <template>
   <HeadlessTransitionRoot as="template" :show="open">
-    <HeadlessDialog as="div" class="relative z-10">
+    <HeadlessDialog as="div" class="relative z-40">
       <HeadlessTransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -10,7 +10,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
+        <div class="fixed inset-0 transition-opacity bg-gray-600 opacity-50 dark:bg-black" />
       </HeadlessTransitionChild>
 
       <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -27,7 +27,7 @@
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <HeadlessDialogPanel
-              class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+              class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
             >
               <div>
                 <slot name="image" />
