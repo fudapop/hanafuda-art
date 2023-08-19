@@ -63,12 +63,14 @@
           </ToggleSwitch>
         </div>
       </div>
+
+      <!-- Hide options and show current settings while game is in progress -->
       <div v-show="gameStart" class="w-full">
         <p class="mb-4 text-gray-600 dark:text-gray-300">
         <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
           Settings are locked while a game is in progress.
         </p>
-        <ul class="grid w-full px-12 mx-auto tracking-wider gap-y-4">
+        <ul class="grid w-full px-4 mx-auto tracking-wider gap-y-4">
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <span class="text-lg font-semibold ">
               Game Length

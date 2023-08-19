@@ -27,7 +27,7 @@
 
       <!-- DECK PILE -->
       <div
-        class="absolute inset-y-0 my-auto sm:right-4 overflow-hidden shadow-md card down"
+        class="absolute inset-y-0 my-auto overflow-hidden shadow-md sm:right-4 card down"
       ></div>
 
       <!-- Show revealed card when drawing from deck         -->
@@ -56,17 +56,6 @@
         @click="handleDraw">
         Draw Card
       </button> -->
-
-      <!-- Show the 'Discard' button if there are no matches 
-        on the field for the selected card -->
-      <Button
-        v-if="selectedCard && !matchedCards.length && ps.players.p1.isActive"
-        v-show="ds.checkCurrentPhase('select')"
-        button-class="primary"
-        :action="matchOrDiscard"
-      >
-        <span class="animate-pulse"> Discard </span>
-      </Button>
     </div>
   </div>
 </template>
@@ -105,7 +94,7 @@ const playDrawPhase = async () => {
   await sleep();
   // Allow player to select match
   if (matchedCards.value.length === 2) {
-    await errorOnTimeout(selectMatchFromField, 10000, "match-on-draw", {
+    await errorOnTimeout(selectMatchFromField, 30000, "match-on-draw", {
       startMsg: "Awaiting match selection...",
       callback: ds.endRound,
       endMsg: "Resetting...",
