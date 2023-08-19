@@ -15,14 +15,15 @@
         </div>
       </div>
       <!-- YAKU TITLE -->
-      <p
-        class="block mt-2 text-sm font-semibold tracking-wide text-gray-900 dark:text-white truncate pointer-events-none"
+      <a
+        :title="YAKU[yaku.name].description.toString()"
+        class="block mt-2 text-sm font-semibold tracking-wide text-gray-900 truncate dark:text-white cursor-help"
       >
         {{ yaku.name.toUpperCase() }}
-      </p>
+      </a>
       <!-- YAKU POINTS -->
       <p
-        class="block text-sm font-medium text-gray-500 dark:text-gray-400 pointer-events-none"
+        class="block text-sm font-medium text-gray-500 pointer-events-none dark:text-gray-400"
       >
         {{ yaku.points }}
         points
@@ -32,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { CompletedYaku } from "~/utils/yaku";
+import { CompletedYaku, YAKU } from "~/utils/yaku";
 
 const { completed, showCards } = defineProps<{
   completed: CompletedYaku[];

@@ -2,10 +2,11 @@
   <li
     v-for="card in cardImages"
     :key="card.name"
-    :class="{
-      '[&:not(:first-child)]:max-sm:-ml-3 sm:[&:not(:first-child)]:-ml-2': stack,
-      'origin-center': true,
-    }"
+    :class="[
+      stack ? '[&:not(:first-child)]:max-sm:-ml-3 sm:[&:not(:first-child)]:-ml-2' : '',
+      'origin-center',
+      currentDesign,
+    ]"
   >
     <CardTransition>
       <div
@@ -36,7 +37,8 @@ const { cards, stack = false } = defineProps<{
   stack?: boolean;
 }>();
 
-const { getCardUrl } = useCardDesign();
+const { getCardUrl, useDesign } = useCardDesign();
+const currentDesign = useDesign();
 
 const cardImages = computed(() =>
   [...cards].map((cardName) => ({

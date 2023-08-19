@@ -105,7 +105,7 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 	},
 	sankou: {
 		name: "sankou",
-		description: ["Three Brights ( Any 3 )"],
+		description: ["Three Brights ( Any 3 except Rain-Man )"],
 		points: 6,
 		cards: [
 			"matsu-ni-tsuru",

@@ -1,5 +1,5 @@
 <template>
-  <ul role="list" class="" :style="ulStyle">
+  <ul role="list" :style="ulStyle">
     <slot />
   </ul>
 </template>

@@ -41,10 +41,10 @@
       </div>
     </HeadlessTransitionRoot>
     <Teleport to="body">
-      <div class="absolute inset-x-0 z-50 mx-auto w-max text-white bottom-[10%]">
+      <div class="absolute inset-x-0 z-50 mx-auto w-max text-white bottom-[5%]">
         <Button button-class="primary" :action="toggleOpacity">
-          <EyeSlashIcon class="w-8 h-8 inline pb-1" v-if="modalHidden" />
-          <EyeIcon class="w-8 h-8 inline pb-1" v-else />
+          <EyeSlashIcon class="inline w-8 h-8 pb-1" v-if="modalHidden" />
+          <EyeIcon class="inline w-8 h-8 pb-1" v-else />
           <span class="mr-1"> Show Board </span>
         </Button>
       </div>
