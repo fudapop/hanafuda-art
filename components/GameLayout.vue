@@ -44,7 +44,7 @@
       enter-to-class="opacity-100"
       enter-from-class="opacity-0"
     >
-      <PlayArea v-if="gameStart">
+      <PlayArea v-if="gameStart" :class="currentDesign">
         <slot />
       </PlayArea>
       <div v-else class="relative h-full">
@@ -89,13 +89,13 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
 import { ArrowLeftOnRectangleIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 import { usePlayerStore } from "~/stores/playerStore";
 
+const currentDesign = useCardDesign().useDesign();
+
 const { players } = storeToRefs(usePlayerStore());
-// const user = JSON.parse(useRoute().params.user as string);
 const user = toValue(useProfile().current);
 
 const tabs = ref(["Design", "Gameplay", "Profile"]);
@@ -104,9 +104,6 @@ const leavingGame = ref(false);
 const requestFeedback = ref(false);
 
 const feedbackSubmitted = computed(() => user?.flags?.hasSubmittedFeedback);
-// const feedbackSubmitted = useStorage("hanafuda-feedback", false, localStorage, {
-//   mergeDefaults: true,
-// });
 
 const handleClick = () => {
   if (!gameStart.value) {

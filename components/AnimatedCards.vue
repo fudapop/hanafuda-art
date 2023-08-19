@@ -8,7 +8,7 @@
     leave-from-class="opacity-100"
     leave-active-class="duration-400"
   >
-    <div v-if="loaded" class="cards" :key="selectedDesign">
+    <div v-if="loaded" :key="selectedDesign" :class="['cards', selectedDesign]">
       <div class="drop-shadow-md animated-card card one">
         <CardImage card="matsu-ni-tsuru" :src="getCardUrl('matsu-ni-tsuru')!" />
       </div>
@@ -29,7 +29,7 @@
       </div>
       <p v-if="title" class="tracking-wide">{{ title }}</p>
     </div>
-    <CardsLoader v-else :no-text="true" />
+    <CardsLoader v-else :no-text="true" :class="selectedDesign" />
   </Transition>
 </template>
 

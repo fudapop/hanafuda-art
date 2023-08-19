@@ -1,138 +1,150 @@
 :root {
-  --card-width: 70px;
-  --card-aspect: 2/3;
-  --card-border-color: #111;
-  --card-border-w: 0.5px;
-  --card-radius: 0.3rem;
-  --card-bg-color: rgb(185 28 28 / 1);
-  --card-glow-color: lightgoldenrodyellow;
-}
-
-.cherry-version {
-  --card-radius: 2px;
-  --card-aspect: 3/5;
-  --card-border-color: transparent;
-  
-  & .down {
-    --card-border-color: darkslategray;
-    --card-bg-color: url("/cards/cherry-version/card-back.webp");
-    background-size: cover !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-  }
-}
-
-.flash-black {
-  --card-border-color: slategray;
-  --card-radius: 0.1rem;
-  --card-bg-color: #333;
-}
-
-.hanami {
-  --card-bg-color: linear-gradient(45deg, seagreen, palegreen);
-  --card-border-color: #555;
-  --card-radius: 0.5rem;
-  --card-aspect: 11/16;
-
-  & .down {
-    background-image: url("/cards/koinobori/card-back.webp") !important;
-    background-color: lightgoldenrodyellow !important;
-    background-size: 60% !important;
-    background-repeat: no-repeat !important;
-    background-position: bottom 5% right 5% !important;
-  }
-}
-
-.koinobori {
-  --card-bg-color: linear-gradient(225deg, skyblue, lightsteelblue);
-  --card-border-color: #333;
-  --card-radius: 0.5rem;
-
-  & .card img {
-    scale: 1.01;
-  }
-
-  & .down {
-    background-image: url("/cards/koinobori/card-back.webp") !important;
-    background-color: powderblue !important;
-    background-size: 60% !important;
-    background-repeat: no-repeat !important;
-    background-position: bottom 5% right 5% !important;
-  }
-}
-
-.modern {
-  --card-aspect: 9/16;
-  --card-border-color: hsla(0 0% 13% / 0.3);
-  --card-glow-color: powderblue;
-  --card-radius: 3px;
-
-  & .card {
-    /* The moon card has a transparent bg for some reason.
-      This fixes it.
-    */
-    background-color: #333;
-
-    & img {
-      scale: 1.05;
-    }
-  }
-
-  & .down {
-    --card-bg-color: url("/cards/modern/card-back.webp");
-    background-size: cover !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-  }
-}
-
-.moon-rabbit {
-  --card-radius: 0.1rem;
-  --card-aspect: 39/64;
-
-  & .down {
-    --card-border-w: 1px;
-    background-image: url("/cards/moon-rabbit/card-back.webp") !important;
-    background-color: lightgray !important;
-    background-size: 40% !important;
-    background-repeat: no-repeat !important;
-    background-position: bottom 5% right 5% !important;
-  }
-}
-
-.nishiki-fuda {
-  --card-radius: 0.1rem;
-  --card-border-color: transparent;
-  --card-aspect: 75/121;
-  
-  & .down {
-    --card-border-color: #555;
-    --card-bg-color: url("/cards/nishiki-fuda/card-back.webp"),
-      linear-gradient(45deg, gray, #111);
-    background-blend-mode: screen;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-  }
+	--card-aspect: 2/3;
+	--card-border-color: #111;
+	--card-border-w: 0.5px;
+	--card-radius: 0.3rem;
+	--card-bg-color: rgb(185 28 28 / 1);
 }
 
 .ramen-red {
+	--card-aspect: 2/3;
+	--card-radius: 0.3rem;
+
+	& .card.down {
+		--card-bg-color: rgb(185 28 28 / 1);
+	}
+}
+
+.flash-black {
+	--card-border-color: slategray;
+	--card-radius: 0.1rem;
+	--card-aspect: 2/3;
+
+	& .card.down {
+		--card-bg-color: #333;
+	}
+}
+
+.cherry-version {
+	--card-radius: 2px;
+	--card-aspect: 3/5;
+	--card-border-color: transparent;
+
+	& .down {
+		--card-border-color: darkslategray;
+		--card-bg-color: url("/cards/cherry-version/card-back.webp");
+		background-size: cover !important;
+		background-repeat: no-repeat !important;
+		background-position: center !important;
+	}
+}
+
+.hanami {
+	--card-bg-color: linear-gradient(45deg, seagreen, palegreen);
+	--card-border-color: #555;
+	--card-radius: 0.5rem;
+	--card-aspect: 11/16;
+
+	& .down {
+		background-image: url("/cards/koinobori/card-back.webp") !important;
+		background-color: lightgoldenrodyellow !important;
+		background-size: 60% !important;
+		background-repeat: no-repeat !important;
+		background-position: bottom 5% right 5% !important;
+	}
+}
+
+.koinobori {
+	--card-bg-color: linear-gradient(225deg, skyblue, lightsteelblue);
+	--card-border-color: #333;
+	--card-radius: 0.5rem;
+	--card-aspect: 2/3;
+
+	& .card img {
+		scale: 1.01;
+	}
+
+	& .down {
+		background-image: url("/cards/koinobori/card-back.webp") !important;
+		background-color: powderblue !important;
+		background-size: 60% !important;
+		background-repeat: no-repeat !important;
+		background-position: bottom 5% right 5% !important;
+	}
+}
+
+.modern {
+	--card-aspect: 9/16;
+	--card-border-color: hsla(0 0% 13% / 0.3);
+	--card-radius: 3px;
+
+	& .card {
+		/* The moon card has a transparent bg for some reason.
+      This fixes it.
+    */
+		background-color: #333;
+
+		& img {
+			scale: 1.05;
+		}
+	}
+
+	& .down {
+		--card-bg-color: url("/cards/modern/card-back.webp");
+		background-size: cover !important;
+		background-repeat: no-repeat !important;
+		background-position: center !important;
+	}
+}
+
+.moon-rabbit {
+	--card-radius: 0.1rem;
+	--card-aspect: 58/97;
+	
+	& .card img {
+		object-fit: contain;
+	}
+	
+	& .down {
+		--card-border-w: 1px;
+		background-image: url("/cards/moon-rabbit/card-back.webp") !important;
+		background-color: lightgray !important;
+		background-size: 40% !important;
+		background-repeat: no-repeat !important;
+		background-position: bottom 5% right 5% !important;
+	}
+}
+
+.nishiki-fuda {
+	--card-radius: 0.1rem;
+	--card-border-color: transparent;
+	--card-aspect: 75/121;
+
+	& .down {
+		--card-border-color: #555;
+		--card-bg-color: url("/cards/nishiki-fuda/card-back.webp"),
+			linear-gradient(45deg, gray, #111);
+		background-blend-mode: screen;
+		background-size: contain !important;
+		background-repeat: no-repeat !important;
+		background-position: center !important;
+	}
 }
 
 .sabling-art {
-  --card-radius: 8px;
-  --card-border-w: 1px;
-  --card-border-color: midnightblue;
-  --card-glow-color: red;
+	--card-radius: 8px;
+	--card-border-w: 1px;
+	--card-border-color: midnightblue;
+	--card-aspect: 2/3;
 
-  & .card img {
-    scale: 1.05;
-  }
+	& .card img {
+		scale: 1.05;
+	}
 
-  & .down {
-    --card-bg-color: url("/cards/sabling-art/card-back.webp");
-    background-size: cover !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-  }
+	& .down {
+		--card-bg-color: url("/cards/sabling-art/card-back.webp");
+		background-size: cover !important;
+		background-repeat: no-repeat !important;
+		background-position: center !important;
+	}
 }

@@ -2,6 +2,7 @@ import { User, onAuthStateChanged, getAuth } from "firebase/auth";
 import { DocumentData, doc, getDoc, setDoc } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 import { useStorage } from "@vueuse/core";
+import { CardDesign } from "~/composables/useCardDesign";
 
 interface UserProfile {
 	uid: string;
@@ -18,6 +19,10 @@ interface UserProfile {
 		result?: string;
 	};
 	settings?: Record<string, any>;
+	designs: {
+		unlocked: CardDesign[];
+		liked: CardDesign[];
+	};
 	flags?: Record<string, any>;
 	isGuest?: boolean;
 }
@@ -32,6 +37,12 @@ const avatars = [
 	"/avatars/origami-rainman.webp",
 	"/avatars/origami-phoenix.webp",
 ];
+
+const defaultDesigns: CardDesign[] = [
+	"cherry-version",
+	"ramen-red",
+	"flash-black",
+]
 
 const useUserProfile = (): Ref<UserProfile | null> =>
 	useState("profile", () => null);
@@ -92,6 +103,7 @@ export const useProfile = () => {
 				result: userData.lastPlayed.result,
 			},
 			record: userData.record || { coins: 0, win: 0, draw: 0, loss: 0 },
+			designs: { unlocked: [...defaultDesigns], liked: [] },
 			settings: userData.settings,
 			flags: userData.flags || {
 				isNewPlayer: true,
@@ -107,6 +119,7 @@ export const useProfile = () => {
 			username:
 				user.displayName?.split(" ")[0] || `Guest_${user.uid.slice(0, 5)}`,
 			record: { coins: 0, win: 0, draw: 0, loss: 0 },
+			designs: { unlocked: [...defaultDesigns], liked: [] },
 			isGuest: true,
 		});
 		profile.value = guest.value as UserProfile;
@@ -119,6 +132,7 @@ export const useProfile = () => {
 			username:
 				user.displayName?.split(" ")[0] || `User #${user.uid.slice(0, 5)}`,
 			record: { coins: 0, win: 0, draw: 0, loss: 0 },
+			designs: { unlocked: [...defaultDesigns], liked: [] },
 			flags: {
 				isNewPlayer: true,
 				hasSubmittedFeedback: false,
@@ -144,6 +158,7 @@ export const useProfile = () => {
 			lastPlayed: profile.value.lastPlayed,
             record: profile.value.record,
 			flags: profile.value.flags,
+			designs: profile.value.designs,
 		};
 		if (!profile.value.isGuest) {
 			setDoc(doc(getFirestore(), "users", `u_${profile.value.uid}`), data, {
