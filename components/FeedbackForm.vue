@@ -2,12 +2,6 @@
   <Modal :open="open">
     <template #title> Thank you for playing! </template>
     <template #image>
-      <!-- <img
-        v-if="!submitted"
-        src="/images/sakura.webp"
-        alt="cherry blossom"
-        class="w-12 h-12 motion-safe:animate-spin motion-safe:[animation-duration:10s] mx-auto"
-      /> -->
       <div
         v-if="!submitted"
         class="flex items-center justify-center w-12 h-12 mx-auto bg-indigo-100 rounded-full"
@@ -31,7 +25,7 @@
         class="text-gray-900 dark:text-white"
       >
         <fieldset
-          class="shadow-inner rounded-lg px-4 pt-4 pb-8 sm:pb-2 mt-4 bg-gray-50 dark:bg-gray-700"
+          class="px-4 pt-4 pb-8 mt-4 rounded-lg shadow-inner sm:pb-2 bg-gray-50 dark:bg-gray-700"
         >
           <div class="grid grid-rows-2 gap-y-5 min-w-[250px] sm:grid-cols-2 w-full h-8">
             <p>Animation Smoothness</p>
@@ -59,7 +53,7 @@
             />
           </div>
         </fieldset>
-        <fieldset class="mt-5 grid gap-y-1">
+        <fieldset class="grid mt-5 gap-y-1">
           <label for="comment-box">Comments</label>
           <OptionsRadioGroup
             :model-value="comments.tag"
@@ -73,11 +67,11 @@
             id="comment-box"
             rows="3"
             v-model="comments.message"
-            class="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white shadow-inner rounded-lg p-2"
+            class="p-2 text-gray-900 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700 dark:text-white"
             placeholder="Your feedback is greatly appreciated! 🙏🏽"
           />
         </fieldset>
-        <div class="mt-4 w-max float-right flex gap-x-4">
+        <div class="flex float-right mt-4 w-max gap-x-4">
           <button type="button" class="sec-btn" @click="() => $emit('close')">
             Close
           </button>
@@ -92,7 +86,7 @@
           </button>
         </div>
       </form>
-      <div v-show="submitted" class="mt-4 w-max float-right">
+      <div v-show="submitted" class="float-right mt-4 w-max">
         <button type="button" class="pri-btn" @click="() => $emit('close')">Close</button>
       </div>
     </template>
@@ -100,10 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
 import {
-  HandThumbUpIcon,
-  HandThumbDownIcon,
   ChatBubbleLeftEllipsisIcon,
   CheckIcon,
 } from "@heroicons/vue/24/outline";
@@ -147,9 +138,6 @@ const submitted = computed({
     user.flags.hasSubmittedFeedback = value;
   },
 });
-// const submitted = useStorage("hanafuda-feedback", false, localStorage, {
-//   mergeDefaults: true,
-// });
 
 const feedback: Feedback = reactive({
   "animation-rating": 0,
@@ -224,7 +212,7 @@ async function apiCall(path: string, ...params: any[]) {
     headers: {
       "content-type": "application/json",
     },
-    body: JSON.stringify(params), // <-- parameters are sent as JSON array
+    body: JSON.stringify(params),
   });
 
   return await response.json();

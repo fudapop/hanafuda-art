@@ -34,7 +34,7 @@
         <template v-else>
           <div
             v-show="isFarRightCol(index) ? farRightColIsOccupied : true"
-            class="card border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
+            class="h-[--card-height] aspect-[--card-aspect] border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
           >
             <span class="sr-only">empty field slot</span>
           </div>
