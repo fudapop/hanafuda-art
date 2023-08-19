@@ -46,6 +46,8 @@ export const useGameDataStore = defineStore("gameData", () => {
 	const getPreviousResult = computed(() => roundHistory.value.at(-1));
 
 	const scoreboard = computed(() => {
+		const baseScore = 10 * useConfigStore().maxRounds;
+		const maxScore = baseScore * 2;
 		const calcScore = (player: PlayerKey) => {
 			return roundHistory.value
 				.filter((result) => result.winner === player)
@@ -53,12 +55,12 @@ export const useGameDataStore = defineStore("gameData", () => {
 		};
 		const limitScore = (score: number) => {
 			if (score < 0) return 0;
-			if (score > 60) return 60;
+			if (score > maxScore) return maxScore;
 			return score;
 		}
 
-		let p1Score = limitScore(30 + calcScore("p1") - calcScore("p2"));
-		let p2Score = limitScore(30 + calcScore("p2") - calcScore("p1"));
+		let p1Score = limitScore(baseScore + calcScore("p1") - calcScore("p2"));
+		let p2Score = limitScore(baseScore + calcScore("p2") - calcScore("p1"));
 		return {
 			p1: p1Score,
 			p2: p2Score,
@@ -90,9 +92,9 @@ export const useGameDataStore = defineStore("gameData", () => {
 		if (roundOver.value) {
 			console.error(
 				"Failed to start game. State variable ('roundOver') not reset."
-			);
-			return;
-		}
+				);
+				return;
+			}
 		turnPhase.value = PHASES[0];
 		turnCounter.value = 1;
 		roundCounter.value = roundHistory.value.length + 1;
@@ -116,7 +118,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 				score: 0,
 			});
 		const { winner, score } = getCurrent.value.result;
-		if (winner) usePlayerStore().updateScore(winner, score);
+		// if (winner) usePlayerStore().updateScore(winner, score);
 		roundOver.value = true;
 		if (
 			roundCounter.value >= useConfigStore().maxRounds ||

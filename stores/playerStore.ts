@@ -6,10 +6,10 @@ export type Player = {
 	readonly id: PlayerKey;
 	isActive: boolean;
 	isDealer: boolean;
-	score: number;
+	// score: number;
 };
 
-const INITIAL_SCORE = 30;
+// const INITIAL_SCORE = 30;
 
 export const usePlayerStore = defineStore("players", () => {
 	// State
@@ -18,13 +18,13 @@ export const usePlayerStore = defineStore("players", () => {
 			id: "p1",
 			isActive: true,
 			isDealer: true,
-			score: INITIAL_SCORE,
+			// score: INITIAL_SCORE,
 		},
 		p2: {
 			id: "p2",
 			isActive: false,
 			isDealer: false,
-			score: INITIAL_SCORE,
+			// score: INITIAL_SCORE,
 		},
 	});
 	const bonusMultiplier = ref(1);
@@ -52,12 +52,12 @@ export const usePlayerStore = defineStore("players", () => {
 	
 	const activeOpponent = computed(() => (player: PlayerKey) => players[player]);
 
-	const winningPlayer = computed(() => {
-		const { p1, p2 } = players;
-		if (p1.score > p2.score) return p1.id;
-		if (p1.score < p2.score) return p2.id;
-		return null;
-	})
+	// const winningPlayer = computed(() => {
+	// 	const { p1, p2 } = players;
+	// 	if (p1.score > p2.score) return p1.id;
+	// 	if (p1.score < p2.score) return p2.id;
+	// 	return null;
+	// })
 
 	// Actions
 	function toggleActivePlayer() {
@@ -73,18 +73,18 @@ export const usePlayerStore = defineStore("players", () => {
 		bonusMultiplier.value++;
 	}
 
-	function updateScore(player: PlayerKey, amount: number) {
-		const points = amount * bonusMultiplier.value;
-		const opponent = activeOpponent.value(player);
-		players[player].score += points;
-		if (players[player].score > 60) opponent.score = 60;
-		opponent.score -= points;
-		if (opponent.score < 0) opponent.score = 0;
-	}
+	// function updateScore(player: PlayerKey, amount: number) {
+	// 	const points = amount * bonusMultiplier.value;
+	// 	const opponent = activeOpponent.value(player);
+	// 	players[player].score += points;
+	// 	if (players[player].score > 60) opponent.score = 60;
+	// 	opponent.score -= points;
+	// 	if (opponent.score < 0) opponent.score = 0;
+	// }
 
   function reset(newDealer?: PlayerKey | null) {
     bonusMultiplier.value = 1;
-	newDealer = newDealer ?? winningPlayer.value;
+	// newDealer = newDealer ?? winningPlayer.value;
 	if (newDealer) {
 		playerList.value.forEach(p => {
 			p.isDealer = p.id === newDealer
@@ -108,7 +108,7 @@ export const usePlayerStore = defineStore("players", () => {
 		toggleActivePlayer,
 		toggleDealer,
 		incrementBonus,
-		updateScore,
+		// updateScore,
     reset,
 	};
 });

@@ -2,44 +2,25 @@
   <div class="sm:flex sm:items-end sm:justify-between max-w-[850px] mx-auto">
     <div class="flex items-end space-x-2 sm:space-x-5">
       <div class="flex-shrink-0">
-        <img
-          v-if="user"
+        <img v-if="user"
           class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
-          :src="user.avatar"
-          :alt="user.username"
-        />
-        <img
-          v-else
-          :src="avatar2"
-          class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
-        />
+          :src="user.avatar" :alt="user.username" />
+        <img v-else :src="avatar2"
+          class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full" />
       </div>
-      <div
-        class="mt-2 sm:mt-0 sm:pt-1 sm:[@media_(max-height:500px)]:flex sm:items-end sm:gap-x-4"
-      >
+      <div class="mt-2 sm:mt-0 sm:pt-1 sm:[@media_(max-height:500px)]:flex sm:items-end sm:gap-x-4">
         <p class="text-lg font-bold text-indigo-700 dark:text-white sm:text-xl">
           {{ user?.username || `Player ${playerNum}` }}
         </p>
-        <p
-          v-memo="[ds.roundOver, ds.roundCounter]"
-          class="flex items-center text-xs font-medium text-gray-900 dark:text-white"
-        >
-          <span
-            class="[@media_(max-height:500px)]:sr-only pt-1 mr-2 text-gray-600 dark:text-gray-300"
-          >
+        <p class="flex items-center text-xs font-medium text-gray-900 dark:text-white">
+          <span class="[@media_(max-height:500px)]:sr-only pt-1 mr-2 text-gray-600 dark:text-gray-300">
             Round {{ ds.roundCounter }} / {{ useConfigStore().maxRounds }}
           </span>
-          <span class="flex items-center text-xl font-semibold">
+          <span class="flex items-center text-xl font-semibold" v-memo="[ds.roundOver, useState('start').value]">
             <img src="/images/coin.webp" alt="coin" class="w-5 h-5 mx-1 drop-shadow-sm" />
             {{ score }}
           </span>
         </p>
-        <!-- <p
-          v-if="playerNum == 2"
-          class="text-lg font-bold text-gray-900 dark:text-white sm:text-xl"
-        >
-          {{ user?.displayName || `Player ${playerNum}` }}
-        </p> -->
       </div>
     </div>
     <div v-if="playerNum == 1" class="flex justify-center mt-5 sm:mt-0 z-[-1]"></div>
@@ -51,7 +32,6 @@ import { storeToRefs } from "pinia";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { useConfigStore } from "~/stores/configStore";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
-import { UserProfile } from "firebase/auth";
 
 const { user, playerNum } = defineProps(["user", "playerNum"]);
 const ds = useGameDataStore();
@@ -78,8 +58,8 @@ const getResult = () => {
     ds.scoreboard[player] > ds.scoreboard[opponent]
       ? "win"
       : ds.scoreboard[player] === ds.scoreboard[opponent]
-      ? "draw"
-      : "loss";
+        ? "draw"
+        : "loss";
   if (result === "win") ps.reset(player);
   return result;
 };
@@ -94,10 +74,10 @@ if (user) {
       console.log("score:", ds.scoreboard.p1)
       currentUser.record.coins += ds.scoreboard.p1;
       currentUser.lastPlayed = {
-      date,
-      result,
+        date,
+        result,
+      }
     }
-  }
     ds.generateGameId();
   });
 }

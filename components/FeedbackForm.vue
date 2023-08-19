@@ -27,27 +27,30 @@
         <fieldset
           class="px-4 pt-4 pb-8 mt-4 rounded-lg shadow-inner sm:pb-2 bg-gray-50 dark:bg-gray-700"
         >
-          <div class="grid grid-rows-2 gap-y-5 min-w-[250px] sm:grid-cols-2 w-full h-8">
+          <div class="grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>Animation Smoothness</p>
             <StarRating
+              class="max-sm:mt-4 max-sm:-translate-x-2"
               ratingId="animation-rating"
               v-model.number="feedback['animation-rating']"
             />
           </div>
           <div
-            class="mt-8 sm:mt-5 grid grid-rows-2 gap-y-5 min-w-[250px] sm:grid-cols-2 w-full h-8"
+            class="mt-8 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8"
           >
             <p>Ease of Controls</p>
             <StarRating
+              class="max-sm:mt-4 max-sm:-translate-x-2"
               ratingId="controls-rating"
               v-model.number="feedback['controls-rating']"
             />
           </div>
           <div
-            class="mt-8 sm:mt-5 grid grid-rows-2 gap-y-5 min-w-[250px] sm:grid-cols-2 w-full h-8"
+            class="mt-8 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8"
           >
             <p>Image Quality</p>
             <StarRating
+              class="max-sm:mt-4 max-sm:-translate-x-2"
               ratingId="image-rating"
               v-model.number="feedback['image-rating']"
             />
@@ -60,6 +63,7 @@
             :value-options="tags"
             :update-callback="(option) => comments.tag = (option as CommentTag)"
             :label-template="(option) => includeTagEmoji(option as CommentTag)"
+            class-name="mt-2 mb-4 grid grid-cols-3 gap-y-2 gap-x-2"
           >
             <span class="sr-only">Comment Type</span>
           </OptionsRadioGroup>
@@ -67,7 +71,7 @@
             id="comment-box"
             rows="3"
             v-model="comments.message"
-            class="p-2 text-gray-900 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700 dark:text-white"
+            class="w-full p-2 text-gray-900 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700 dark:text-white"
             placeholder="Your feedback is greatly appreciated! 🙏🏽"
           />
         </fieldset>

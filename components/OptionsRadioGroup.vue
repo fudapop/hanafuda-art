@@ -6,7 +6,7 @@
       <slot />
     </HeadlessRadioGroupLabel>
 
-    <div class="mt-2 mb-4 grid grid-cols-1 gap-y-2 sm:grid-cols-3 sm:gap-x-4">
+    <div :class="className || 'grid grid-cols-1 mt-2 mb-4 gap-y-2 sm:grid-cols-3 sm:gap-x-4'">
       <HeadlessRadioGroupOption
         as="template"
         v-for="(option, index) in valueOptions"
@@ -26,21 +26,21 @@
             <span class="flex flex-col">
               <HeadlessRadioGroupLabel
                 as="span"
-                class="block text-sm font-medium text-gray-900 dark:text-white capitalize"
+                class="block text-sm font-medium text-gray-900 capitalize dark:text-white"
               >
                 {{ labelTemplate ? labelTemplate(option) : option }}
               </HeadlessRadioGroupLabel>
               <HeadlessRadioGroupDescription
                 v-if="descriptionTemplate"
                 as="span"
-                class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-300"
+                class="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-300"
               >
                 {{ descriptionTemplate(option) }}
               </HeadlessRadioGroupDescription>
               <HeadlessRadioGroupDescription
                 v-else-if="optionDescriptions"
                 as="span"
-                class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-300"
+                class="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-300"
               >
                 {{ optionDescriptions[index] }}
               </HeadlessRadioGroupDescription>
@@ -78,11 +78,13 @@ const {
   valueOptions,
   labelTemplate,
   optionDescriptions,
+  className,
 } = defineProps<{
   modelValue: ModelVal;
   valueOptions: ModelVal[] | readonly ModelVal[];
-  optionDescriptions?: string[];
   updateCallback: (param: ModelVal) => void;
+  className?: string;
+  optionDescriptions?: string[];
   labelTemplate?: (param: ModelVal) => string;
   descriptionTemplate?: (param: ModelVal) => string;
 }>();

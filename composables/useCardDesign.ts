@@ -280,10 +280,6 @@ export const useCardDesign = () => {
 		return cardMap.value;
 	};
 
-	tryOnMounted(() => {
-		document?.body.classList.add(useDesign().value);
-	});
-
 	return {
 		fetchCardUrls,
 		useDesign,

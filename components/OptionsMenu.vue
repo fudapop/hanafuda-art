@@ -20,7 +20,7 @@
         <!-- Close indicator; not a button -->
         <HeadlessPopoverButton class="absolute z-50 -left-8 top-4 max-xs:hidden">
           <div class="relative flex text-gray-400 gap-x-2">
-            <span class="sr-only">Close panel</span>
+            <span class="sr-only">Close</span>
             <XMarkIcon class="w-6 h-6" aria-hidden="true" />
           </div>
         </HeadlessPopoverButton>
@@ -75,7 +75,7 @@
     <HeadlessPopoverButton v-if="open" class="fixed inset-x-0 bottom-0 z-30 h-10 shadow-inner xs:hidden">
       <div
         class="relative flex items-center justify-center w-full h-full text-blue-700 dark:text-gray-200 bg-blue-900/20 dark:bg-blue-300/20 gap-x-2">
-        <span>Close panel</span>
+        <span class="sr-only">Close</span>
         <XMarkIcon class="w-6 h-6" aria-hidden="true" />
       </div>
     </HeadlessPopoverButton>

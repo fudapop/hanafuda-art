@@ -102,8 +102,8 @@ export const useProfile = () => {
 				date: userData.lastPlayed.date.toDate(),
 				result: userData.lastPlayed.result,
 			},
-			record: userData.record || { coins: 0, win: 0, draw: 0, loss: 0 },
-			designs: { unlocked: [...defaultDesigns], liked: [] },
+			record: userData.record || { coins: 500, win: 0, draw: 0, loss: 0 },
+			designs: userData.designs || { unlocked: [...defaultDesigns], liked: [] },
 			settings: userData.settings,
 			flags: userData.flags || {
 				isNewPlayer: true,
@@ -131,7 +131,7 @@ export const useProfile = () => {
 			avatar: user.photoURL || getRandom(avatars),
 			username:
 				user.displayName?.split(" ")[0] || `User #${user.uid.slice(0, 5)}`,
-			record: { coins: 0, win: 0, draw: 0, loss: 0 },
+			record: { coins: 500, win: 0, draw: 0, loss: 0 },
 			designs: { unlocked: [...defaultDesigns], liked: [] },
 			flags: {
 				isNewPlayer: true,

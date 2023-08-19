@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="grid p-3 sm:grid-cols-2">
+  <div class="max-h-[calc(100dvh-84px)] [@media(max-height:500px)]:max-h-[100dvh] xs:max-h-[75vh] overflow-y-auto pb-4">
+    <div class="grid p-3 mb-2 max-sm:grid-rows-2 sm:grid-cols-2">
       <div class="relative pointer-events-none isolate">
         <svg
           class="absolute inset-x-0 top-0 -z-10 h-[16rem] w-full stroke-gray-200 dark:stroke-gray-600 [mask-image:radial-gradient(8rem_8rem_at_center,white,transparent)]"
@@ -41,12 +41,12 @@
           " />
         </div>
         <AnimatedCards />
-        <button type="button" @click="handleLike" class="pointer-events-auto">
+        <button type="button" @click="handleLike" class="absolute pointer-events-auto max-sm:bottom-5 max-sm:left-5 sm:top-5 sm:right-5 focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300">
           <HeartIcon :aria-hidden="true"
-            :class="['absolute w-8 h-auto max-sm:bottom-5 max-sm:left-5 sm:top-5 sm:right-5 stroke-gray-500', isLiked ? 'fill-red-600 stroke-red-400' : '']" />
+            :class="['w-8 h-auto stroke-gray-500 stroke-1', isLiked ? 'fill-red-600 stroke-red-400' : '']" />
         </button>
       </div>
-      <div class="p-4 my-3 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700 dark:text-white">
+      <div class="h-full p-4 my-3 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700 dark:text-white">
         <h3 class="mb-2 text-lg font-semibold tracking-wide text-gray-900 dark:text-white">{{ designInfo.title }}</h3>
         <p class="mb-4">
           {{ designInfo.attribution }}
@@ -63,7 +63,6 @@
 
 <script setup lang="ts">
 import { HeartIcon } from '@heroicons/vue/24/outline';
-import { CardDesign } from '~/composables/useCardDesign';
 
 const { useDesign, fetchCardUrls, getDesignInfo } = useCardDesign();
 
@@ -79,7 +78,7 @@ const isLiked = computed(() => userLiked?.includes(currentDesign.value));
 const handleLike = () => {
   if (!userLiked) return;
   if (isLiked.value) {
-    delete userLiked[userLiked.indexOf(currentDesign.value)]
+    userLiked.splice(userLiked.indexOf(currentDesign.value), 1);
   } else {
     userLiked.push(currentDesign.value);
   }
