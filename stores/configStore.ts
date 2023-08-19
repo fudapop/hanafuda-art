@@ -93,6 +93,15 @@ const useConfigStore = defineStore("config", () => {
 		}
 	}
 
+	/**
+	 * Double score if base score (w/o bonus from koi-koi) is 7 or greater
+	 */
+	function applyDoubleScoreOption(baseScore: number) {
+		if (!doubleScoreOverSeven.value) return baseScore;
+		if (baseScore < 7) return baseScore;
+		return baseScore * 2;
+	}
+
 	return {
 		doubleScoreOverSeven,
 		allowViewingsYaku,
@@ -103,6 +112,7 @@ const useConfigStore = defineStore("config", () => {
 		loadUserSettings,
 		applyViewingsOption,
 		applyWildCardOption,
+		applyDoubleScoreOption,
 		OPTIONS,
 	};
 });

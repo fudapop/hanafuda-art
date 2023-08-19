@@ -1,7 +1,7 @@
 <template>
   <div class="gap-1 opacity-75 collection-area">
     <!-- PLAYER 1 COLLECTION -->
-    <ul v-for="type in cardTypes" :key="type" class="flex h-full py-2 relative">
+    <ul v-for="type in cardTypes" :key="type" class="relative flex h-full py-2">
       <span
         v-show="coll[type].size > 0"
         class="uppercase absolute top-1 left-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
@@ -124,7 +124,7 @@ watch(
       lastCompleted = new Set(taggedYaku);
       emits("completed", {
         player,
-        score,
+        score: config.applyDoubleScoreOption(score),
         completedYaku: getCompleted(cs.collection[player], completedYaku),
       });
     }
