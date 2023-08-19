@@ -1,6 +1,6 @@
 <template>
   <div class="fixed bottom-0 w-screen mb-2 opacity-50">
-    <div class="flex gap-x-4 w-max mx-auto">
+    <div class="flex mx-auto gap-x-4 w-max">
       <a href="https://www.andrehammons.dev" title="View my portfolio" target="_blank">
         <svg
           version="1.1"
@@ -13,7 +13,7 @@
           viewBox="0 0 1002 1004"
           enable-background="new 0 0 1002 1004"
           xml:space="preserve"
-          class="w-5 h-5 fill-white mx-auto"
+          class="w-5 h-5 mx-auto fill-white"
         >
           <path
             class="accent-fill"
@@ -102,7 +102,7 @@ z"
       </a>
     </div>
     <p class="text-xs text-center text-white">
-      {{ new Date().getFullYear() }} | Andre L. Hammons
+      &copy; {{ new Date().getFullYear() }} Developed by Andre L. Hammons
     </p>
   </div>
 </template>

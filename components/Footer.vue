@@ -25,7 +25,7 @@
         </a>
       </div>
       <p class="mt-10 text-xs leading-5 text-center text-gray-500">
-        &copy; 2023 Andre L. Hammons
+        &copy; {{ new Date().getFullYear() }} Developed by Andre L. Hammons
       </p>
     </div>
   </footer>

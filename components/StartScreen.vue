@@ -1,18 +1,18 @@
 <template>
   <div class="absolute inset-0 flex flex-col items-center m-auto">
-    <div class="relative mt-32 drop-shadow-xl sm:-translate-x-1/4">
-      <div class="absolute right-[2rem] bottom-[10%] rotate-12 -z-10">
+    <div class="relative my-auto drop-shadow-xl sm:-translate-x-1/4">
+      <div class="absolute right-8 bottom-1/4 rotate-12 -z-10">
         <AnimatedCards />
       </div>
       <h1 id="hero-title" class="text-4xl text-center sm:text-5xl">
-        <span class="block text-xl italic text-left text-white md:text-3xl">Hanafuda</span
+        <span class="block text-xl italic text-left text-white sm:text-3xl">Hanafuda</span
         >花札 KOI-KOI
       </h1>
     </div>
-    <div class="absolute shadow-lg w-max top-1/2 sm:left-3/4">
+    <div class="absolute shadow-lg w-max top-3/4 sm:top-1/2 sm:left-3/4">
       <button
         type="button"
-        class="pri-btn text-xl px-8 py-3 rounded-lg"
+        class="px-8 py-3 text-xl rounded-lg pri-btn"
         @click="() => $emit('start-game')"
       >
         Start

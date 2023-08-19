@@ -6,7 +6,7 @@
         <!-- Avatar -->
         <div v-if="user" class="relative mx-auto w-max group">
           <PencilSquareIcon
-            class="absolute right-0 w-5 h-auto text-gray-400 opacity-0 bottom-4 group-hover:opacity-100" />
+            class="absolute right-0 w-5 h-auto text-gray-400 opacity-50 bottom-4 group-hover:opacity-100" />
           <AvatarSelect v-model="avatar">
             <img class="w-32 h-auto mx-auto my-2 rounded-full sm:my-4 sm:w-36" :src="user.avatar" :alt="user.username" />
           </AvatarSelect>
@@ -23,7 +23,7 @@
             @click="handleEdit">
             {{ user?.username }}
             <PencilSquareIcon
-              class="absolute inset-y-0 w-4 h-auto my-auto text-gray-400 opacity-0 right-4 group-hover:opacity-100" />
+              class="absolute inset-y-0 w-4 h-auto my-auto text-gray-400 opacity-50 right-4 group-hover:opacity-100" />
           </p>
 
           <!-- Player Coins -->
@@ -49,7 +49,9 @@
     <!-- Player Record -->
     <div v-if="user?.record"
       class="px-8 grid sm:grid-cols-[20%_1fr] items-center mx-3 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700">
-      <h3 class="mt-2 text-base font-semibold leading-6 text-center text-gray-500 sm:text-left sm:text-lg dark:text-gray-300">Player Record</h3>
+      <h3
+        class="mt-2 text-base font-semibold leading-6 text-center text-gray-500 sm:text-left sm:text-lg dark:text-gray-300">
+        Player Record</h3>
       <dl class="flex justify-around">
         <div v-for="val, key in record" :key="key" class="px-4 py-3 overflow-hidden sm:py-5 sm:p-6">
           <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-300">{{ key }}</dt>
@@ -59,9 +61,11 @@
     </div>
 
     <!-- Account sign-in/out -->
-    <SignupPanel v-if="user.isGuest" class="mt-2 [@media(max-height:_500px)]:hidden" />
-    <div v-else class="flex flex-col items-center justify-center">
-      <LoginButton />
+    <div class="[@media(max-height:_500px)]:hidden">
+      <SignupPanel v-if="user.isGuest" class="mt-2" />
+      <div v-else class="flex flex-col items-center justify-center">
+        <LoginButton />
+      </div>
     </div>
   </div>
 </template>

@@ -18,7 +18,7 @@
       bg-white dark:bg-gray-800 rounded-lg ring-1 ring-black dark:ring-gray-600 ring-opacity-5 focus:outline-none
       `">
         <!-- Close indicator; not a button -->
-        <HeadlessPopoverButton class="absolute z-50 -left-8 top-2 max-xs:hidden">
+        <HeadlessPopoverButton class="absolute z-50 -left-8 top-4 max-xs:hidden">
           <div class="relative flex text-gray-400 gap-x-2">
             <span class="sr-only">Close panel</span>
             <XMarkIcon class="w-6 h-6" aria-hidden="true" />
@@ -27,7 +27,7 @@
 
         <HeadlessTabGroup>
           <HeadlessTabList
-            class="flex [@media(max-height:500px)]:flex-col p-1 gap-1 rounded-[inherit] shadow-inner bg-blue-900/20 dark:bg-blue-300/20">
+            class="relative flex [@media(max-height:500px)]:flex-col [@media(max-height:500px)]:py-4 p-1 gap-1 rounded-[inherit] shadow-inner bg-blue-900/20 dark:bg-blue-300/20">
             <HeadlessTab v-for="category in tabCategories" as="template" :key="category" v-slot="{ selected }">
               <button :class="[
                 'w-full rounded-lg py-2 text-sm font-medium leading-5 text-blue-700 dark:text-gray-200',
@@ -39,9 +39,10 @@
                 {{ category }}
               </button>
             </HeadlessTab>
-            <HeadlessTab as="template" v-slot="{ selected }">
+            <!-- Move signup panel to separate tab for mobile landscape layout -->
+            <HeadlessTab v-if="isGuest" as="template" v-slot="{ selected }">
               <button :class="[
-                'w-full rounded-lg py-2 text-sm font-medium leading-5 text-blue-700 dark:text-gray-200 [@media(min-height:_500px)]:hidden',
+                'absolute bottom-4 inset-x-1 rounded-lg py-2 text-sm font-medium leading-5 text-blue-700 dark:text-gray-200 [@media(min-height:_500px)]:hidden',
                 'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 dark:ring-offset-gray-200 focus:outline-none focus:ring-2',
                 selected
                   ? 'bg-white dark:bg-gray-800 shadow'
@@ -50,13 +51,20 @@
                 Sign In
               </button>
             </HeadlessTab>
+              <button v-else :class="[
+                'absolute bottom-4 inset-x-1 rounded-lg py-2 text-sm font-medium leading-5 text-blue-700 dark:text-gray-200 [@media(min-height:_500px)]:hidden',
+                'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 dark:ring-offset-gray-200 focus:outline-none focus:ring-2',
+                'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+              ]">
+                Logout
+              </button>
           </HeadlessTabList>
           <HeadlessTabPanels>
             <HeadlessTabPanel :unmount="false" class="w-full min-h-[75svh] relative"
               v-for="(category, index) in tabCategories">
               <slot :name="`tab-panel-${index + 1}`" />
             </HeadlessTabPanel>
-            <HeadlessTabPanel :unmount="false" class="relative w-full h-full [@media(min-height:_500px)]:hidden">
+            <HeadlessTabPanel v-if="isGuest" :unmount="false" class="relative w-full h-full [@media(min-height:_500px)]:hidden">
               <div class="w-[500px] absolute inset-0 h-max m-auto">
                 <SignupPanel />
               </div>
@@ -81,4 +89,6 @@ import { XMarkIcon } from "@heroicons/vue/24/outline";
 const { tabCategories } = defineProps<{
   tabCategories: string[];
 }>();
+
+const isGuest = computed(() => useProfile().current.value?.isGuest);
 </script>

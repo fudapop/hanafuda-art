@@ -21,7 +21,7 @@
 
   <HeadlessDisclosure v-for="result in results" v-slot="{ open }">
     <HeadlessDisclosureButton
-      :class="`flex w-full justify-between mb-1 rounded-md ${result.winner === 'p1' ? 'bg-green-400' : 'bg-red-400'
+      :class="`flex w-full justify-between my-1 rounded-md ${result.winner === 'p1' ? 'bg-green-400' : 'bg-red-400'
         } px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus-visible:ring focus-visible:ring-indigo-500 dark:focus-visible:ring-gray-100 focus-visible:ring-opacity-75`">
       <span>Round {{ result.round }}:
         <span v-if="result.winner" class="font-semibold tracking-wide uppercase"> {{ result.winner === 'p1' ? 'Win' : "Lose" }} </span>

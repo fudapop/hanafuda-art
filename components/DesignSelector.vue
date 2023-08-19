@@ -51,9 +51,8 @@
             {{ getDesignInfo(design).title }}
           </option>
         <template v-if="userIsGuest">
-          <option value="" disabled>...</option>
           <option value="" disabled>
-            Create a free account to see more!
+            Sign in for more. It's free!
           </option>
         </template>
       </select>
