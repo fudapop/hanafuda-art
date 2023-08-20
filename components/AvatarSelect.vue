@@ -46,10 +46,21 @@ const emits = defineEmits(["update:modelValue"]);
 
 const photo = computed(() => useCurrentUser().value?.photoURL);
 const avatars = ref([
+  // "/avatars/flat-crane.webp",
+  // "/avatars/flat-warbler.webp",
+  // "/avatars/flat-curtain.webp",
+  // "/avatars/flat-bridge.webp",
+  // "/avatars/flat-butterflies.webp",
+  // "/avatars/flat-boar.webp",
+  // "/avatars/flat-moon.webp",
+  // "/avatars/flat-deer.webp",
+  // "/avatars/flat-phoenix.webp",
   "/avatars/origami-crane.webp",
   "/avatars/origami-warbler.webp",
   "/avatars/origami-curtain.webp",
-  "/avatars/origami-butterfly.webp",
+  "/avatars/origami-cuckoo.webp",
+  "/avatars/origami-bridge.webp",
+  "/avatars/origami-butterflies.webp",
   "/avatars/origami-boar.webp",
   "/avatars/origami-moon.webp",
   "/avatars/origami-deer.webp",

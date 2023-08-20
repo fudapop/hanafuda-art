@@ -6,7 +6,7 @@
       <slot />
     </HeadlessRadioGroupLabel>
 
-    <div :class="className || 'grid grid-cols-1 mt-2 mb-4 gap-y-2 sm:grid-cols-3 sm:gap-x-4'">
+    <div :class="className || 'grid grid-cols-1 mt-2 mb-4 gap-y-3 sm:grid-cols-3 sm:gap-x-4'">
       <HeadlessRadioGroupOption
         as="template"
         v-for="(option, index) in valueOptions"

@@ -2,8 +2,8 @@
   <div ref="settingsPanel"
     class="grid max-h-[calc(100dvh-84px)] [@media(max-height:500px)]:max-h-[100dvh] xs:max-h-[75vh] gap-4 p-4 overflow-y-auto">
     <ClientOnly>
-      <div v-show="!gameStart">
-        <div class="max-sm:grid max-sm:grid-cols-2 gap-x-2">
+      <div v-show="!gameStart" class="space-y-5">
+        <div class="gap-y-5 max-sm:grid max-sm:grid-cols-2 gap-x-5">
           <!-- Set maximum for number of rounds per game -->
           <OptionsRadioGroup :model-value="config.maxRounds"
             :update-callback="(option) => (config.maxRounds = option as GameLengthOptions)"
@@ -37,7 +37,7 @@
 
         <div class="flex">
           <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
-            Scoring Variations
+            Other Variations
           </p>
           <a href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
             title="Read about scoring on fudawiki.org" target="_blank">
@@ -46,7 +46,7 @@
             <span class="sr-only">Read about scoring on fudawiki.org</span>
           </a>
         </div>
-        <div class="mb-4 space-y-4">
+        <div class="pb-5 space-y-5">
           <!-- Set wild-card behavior for KIKU-NI-SAKAZUKI -->
           <ToggleSwitch :callback="toggleSake" :init-value="config.sakeIsWildCard">
             <template #label>Wild Card Sake Cup</template>
