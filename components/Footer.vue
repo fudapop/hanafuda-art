@@ -1,7 +1,7 @@
 <template>
   <footer>
     <div class="px-6 py-20 mx-auto overflow-hidden max-w-7xl sm:py-24 lg:px-8">
-      <nav
+      <!-- <nav
         class="-mb-6 columns-2 sm:flex sm:justify-center sm:space-x-12"
         aria-label="Footer"
       >
@@ -12,7 +12,7 @@
             >{{ item.name }}</NuxtLink
           >
         </div>
-      </nav>
+      </nav> -->
       <div class="flex justify-center mt-10 space-x-10">
         <a
           v-for="item in navigation.social"

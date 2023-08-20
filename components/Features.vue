@@ -1,40 +1,22 @@
 <template>
-  <div class="bg-white py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl lg:mx-0">
-        <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Welcome all hanafuda enthusiasts
-        </h2>
-        <p class="mt-6 text-lg leading-8 text-gray-600">
-          Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum
-          cupiditate veritatis in accusamus quisquam.
-        </p>
+  <div class="py-24 bg-white dark:bg-gray-800 sm:py-32">
+    <div class="px-6 mx-auto max-w-7xl lg:px-8">
+      <div class="max-w-2xl mx-auto lg:text-center">
+        <h2 class="text-base font-semibold leading-7 text-indigo-600 dark:text-yellow-300">Deploy faster</h2>
+        <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Everything you need to deploy your app</p>
+        <p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">Quis tellus eget adipiscing convallis sit sit eget aliquet quis. Suspendisse eget egestas a elementum pulvinar et feugiat blandit at. In mi viverra elit nunc.</p>
       </div>
-      <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-        <dl
-          class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3"
-        >
+      <div class="max-w-2xl mx-auto mt-16 sm:mt-20 lg:mt-24 lg:max-w-none">
+        <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
           <div v-for="feature in features" :key="feature.name" class="flex flex-col">
-            <dt class="text-base font-semibold leading-7 text-gray-900">
-              <div
-                class="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600"
-              >
-                <component
-                  :is="feature.icon"
-                  class="h-6 w-6 text-white"
-                  aria-hidden="true"
-                />
-              </div>
+            <dt class="flex items-center text-base font-semibold leading-7 text-gray-900 dark:text-white gap-x-3">
+              <component :is="feature.icon" class="flex-none w-5 h-5 text-indigo-600 dark:text-yellow-300" aria-hidden="true" />
               {{ feature.name }}
             </dt>
-            <dd class="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+            <dd class="flex flex-col flex-auto mt-4 text-base leading-7 text-gray-600 dark:text-gray-300">
               <p class="flex-auto">{{ feature.description }}</p>
               <p class="mt-6">
-                <a
-                  :href="feature.href"
-                  class="text-sm font-semibold leading-6 text-indigo-600"
-                  >Learn more <span aria-hidden="true">→</span></a
-                >
+                <a :href="feature.href" class="text-sm font-semibold leading-6 text-indigo-600 dark:text-yellow-300">Learn more <span aria-hidden="true">→</span></a>
               </p>
             </dd>
           </div>

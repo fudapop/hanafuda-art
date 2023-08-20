@@ -68,7 +68,7 @@
                   v-for="item in navigation"
                   :key="item.name"
                   :to="item.href"
-                  class="block px-3 py-2 -mx-3 text-base font-semibold leading-7 text-gray-900 dark:text-gray-200 rounded-lg hover:bg-gray-50 hover:dark:bg-gray-700"
+                  class="block px-3 py-2 -mx-3 text-base font-semibold leading-7 text-gray-900 rounded-lg dark:text-gray-200 hover:bg-gray-50 hover:dark:bg-gray-700"
                   >{{ item.name }}</NuxtLink
                 >
               </div>
@@ -88,9 +88,9 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 const navigation = [
   { name: "Play", href: "/play" },
-  { name: "Gallery", href: "https://lets-play-koikoi.vercel.app/hanafuda-gallery" },
-  { name: "Blog", href: "#" },
-  { name: "About", href: "#" },
+  // { name: "Gallery", href: "https://lets-play-koikoi.vercel.app/hanafuda-gallery" },
+  // { name: "Blog", href: "#" },
+  // { name: "About", href: "#" },
 ];
 
 const mobileMenuOpen = ref(false);

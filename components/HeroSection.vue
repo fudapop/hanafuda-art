@@ -59,36 +59,36 @@
         />
       </div>
       <div class="overflow-hidden">
-        <div class="px-6 pb-32 mx-auto max-w-7xl pt-36 sm:pt-60 lg:px-8 lg:pt-32">
+        <div class="px-6 pb-32 mx-auto max-w-7xl pt-36 sm:pt-60 lg:px-8 lg:pt-20">
           <div
             class="max-w-2xl mx-auto gap-x-14 lg:mx-0 lg:flex lg:max-w-none lg:items-center"
           >
             <div class="w-full max-w-xl lg:shrink-0 xl:max-w-2xl">
               <h1
-                class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-50 sm:text-6xl"
+                class="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-50 sm:text-5xl"
               >
-                Bring your own deck.
+                Classic game. Fresh look.
               </h1>
-              <p
+              <!-- <p
                 class="relative mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300 sm:max-w-md lg:max-w-none"
               >
                 Love playing Hanafuda Koi-Koi? Join us for a classic game with a fresh
                 look!
-              </p>
+              </p> -->
               <div class="flex items-center mt-10 gap-x-6">
                 <NuxtLink to="/play" class="pri-btn"> Play the game </NuxtLink>
-                <a href="#browse-designs" class="sec-btn"
+                <a href="#browse-designs" class="hidden sec-btn"
                   >Browse designs <span aria-hidden="true">→</span></a
                 >
               </div>
             </div>
             <div
-              class="flex justify-end gap-8 pt-4 pointer-events-none sm:scale-100 mt-14 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0"
+              class="flex justify-end gap-8 pt-4 mt-8 pointer-events-none sm:scale-100 sm:-mt-32 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0"
             >
               <div
-                class="flex-none pt-32 space-y-8 w-max sm:w-40 md:44 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80"
+                class="flex-none pt-32 space-y-8 w-max sm:w-40 md:w-44 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80"
               >
-                <div class="relative w-28 sm:w-40 md:44">
+                <div class="relative w-28 sm:w-40 md:w-44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
@@ -103,9 +103,9 @@
                 </div>
               </div>
               <div
-                class="flex-none space-y-8 w-max sm:w-40 md:44 sm:mr-0 sm:pt-52 lg:pt-36"
+                class="flex-none space-y-8 w-max sm:w-40 md:w-44 sm:mr-0 sm:pt-52 lg:pt-36"
               >
-                <div class="relative w-28 sm:w-40 md:44">
+                <div class="relative w-28 sm:w-40 md:w-44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
@@ -118,7 +118,7 @@
                     class="absolute inset-0 rounded-md pointer-events-none ring-1 ring-inset ring-gray-900/10"
                   />
                 </div>
-                <div class="relative w-28 sm:w-40 md:44">
+                <div class="relative w-28 sm:w-40 md:w-44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
@@ -132,8 +132,8 @@
                   />
                 </div>
               </div>
-              <div class="flex-none pt-32 space-y-8 w-max sm:w-40 md:44 sm:pt-0">
-                <div class="relative w-28 sm:w-40 md:44">
+              <div class="flex-none pt-32 space-y-8 w-max sm:w-40 md:w-44 sm:pt-14">
+                <div class="relative w-28 sm:w-40 md:w-44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
@@ -146,7 +146,7 @@
                     class="absolute inset-0 rounded-md pointer-events-none ring-1 ring-inset ring-gray-900/10"
                   />
                 </div>
-                <div class="relative w-28 sm:w-40 md:44">
+                <div class="relative w-28 sm:w-40 md:w-44">
                   <nuxt-img
                     provider="cloudinary"
                     :modifiers="{ q: 'auto' }"
