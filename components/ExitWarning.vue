@@ -13,7 +13,7 @@
       leave?
     </template>
     <template #actions>
-      <div class="mt-6 grid grid-flow-row-dense grid-cols-2 gap-3">
+      <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-2">
         <button type="button" class="sec-btn" @click="$emit('confirm')">
           Yes, leave the game
         </button>
