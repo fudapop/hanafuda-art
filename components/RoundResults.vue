@@ -2,7 +2,7 @@
   <!-- HEADER -->
   <div class="px-4 py-5 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-600 sm:px-6">
     <div class="flex flex-wrap items-end justify-between -mt-2 -ml-4 sm:flex-nowrap">
-      <HeadlessDialogTitle as="h3" class="text-lg font-semibold leading-6 text-gray-900 dark:text-white">
+      <HeadlessDialogTitle as="h3" class="mb-2 text-lg font-semibold leading-6 text-gray-900 dark:text-white">
         <span v-if="recordedWinner">
           <span v-if="decisionIsPending">
             <span v-if="recordedWinner === 'p1'">

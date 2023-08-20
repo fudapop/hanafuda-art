@@ -46,7 +46,7 @@
             :class="['w-8 h-auto stroke-gray-500 stroke-1', isLiked ? 'fill-red-600 stroke-red-400' : '']" />
         </button>
       </div>
-      <div class="h-full p-4 my-3 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700 dark:text-white">
+      <div class="h-full p-4 my-3 rounded-lg shadow-inner bg-gray-50 dark:bg-[#40495a] dark:text-white">
         <h3 class="mb-2 text-lg font-semibold tracking-wide text-gray-900 dark:text-white">{{ designInfo.title }}</h3>
         <p class="mb-4">
           {{ designInfo.attribution }}

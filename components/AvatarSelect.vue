@@ -1,5 +1,5 @@
 <template>
-  <HeadlessPopover class="">
+  <HeadlessPopover>
     <HeadlessPopoverButton>
       <slot />
     </HeadlessPopoverButton>
@@ -16,21 +16,23 @@
     >
     <HeadlessPopoverPanel
       v-slot="{ close }"
-      class="fixed z-50 max-xs:inset-x-0 px-3 py-4 m-4 max-w-[500px] [@media(min-height:_500px)]:xs:bottom-4 [@media(min-height:_500px)]:xs:-translate-x-1/3  [@media(max-height:_500px)]:max-w-[40%] [@media(max-height:_500px)]:right-0 border border-gray-300/50 dark:border-gray-700/50 rounded-xl [@media(max-height:_500px)]:inset-y-4 my-auto space-y-5 shadow-xl bg-white dark:bg-gray-800"
+      class="fixed z-50 inset-x-3 mx-auto max-w-[640px] rounded-lg [@media(max-height:_500px)]:inset-y-3 my-auto shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black dark:ring-gray-600 ring-opacity-5 focus:outline-none"
     >
+    <div class="flex items-center justify-center px-3 py-3 shadow-inner bg-blue-900/20 dark:bg-blue-300/20 rounded-[inherit]">
       <h3
-        class="mt-4 text-xl font-semibold tracking-wide text-center text-gray-900 dark:text-white"
+        class="text-lg font-semibold tracking-wide text-blue-700 dark:text-gray-200"
       >
         Choose Your Avatar
       </h3>
-      <div class="flex flex-wrap justify-center gap-4">
+    </div>
+      <div class="flex flex-wrap justify-center gap-4 px-3 py-5">
         <img
           v-for="url in avatars"
           :key="url"
           :src="url"
           alt="user avatar"
-          :class="`w-16 h-auto [@media(min-height:500px)]:sm:w-24 rounded-full shadow-lg cursor-pointer ${
-            url === modelValue ? 'ring-2 ring-indigo-600 dark:ring-yellow-300' : ''
+          :class="`w-16 h-auto [@media(min-height:500px)]:sm:w-24 rounded-full drop-shadow-sm cursor-pointer ${
+            url === modelValue ? 'ring-2 ring-offset-2 ring-indigo-600 dark:ring-yellow-300' : ''
           }`"
           @click="() => handleClick(url, close)"
         />

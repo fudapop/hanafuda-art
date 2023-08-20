@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Button v-if="!user" button-class="secondary" :action="login"> Login &rarr; </Button>
-    <Button v-else button-class="secondary" :action="logout"> &larr; Logout </Button>
+    <button type="button" v-if="!user" class="sec-btn" @click="login"> Login &rarr; </button>
+    <button type="button" v-else class="sec-btn" @click="logout"> &larr; Logout </button>
     <div
       v-if="error"
       class="absolute inset-0 px-8 py-4 mx-auto text-lg border-red-500 rounded-md"

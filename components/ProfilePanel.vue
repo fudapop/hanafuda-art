@@ -48,7 +48,7 @@
 
     <!-- Player Record -->
     <div v-if="user?.record"
-      class="px-8 grid sm:grid-cols-[20%_1fr] items-center mx-3 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700">
+      class="px-8 grid sm:grid-cols-[20%_1fr] items-center mx-3 rounded-lg shadow-inner bg-gray-50 dark:bg-[#40495a]">
       <h3
         class="mt-2 text-base font-semibold leading-6 text-center text-gray-500 sm:text-left sm:text-lg dark:text-gray-300">
         Player Record</h3>

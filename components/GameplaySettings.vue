@@ -58,8 +58,8 @@
           <!-- Set additional scoring rule -->
           <ToggleSwitch :callback="toggleDouble" :init-value="config.doubleScoreOverSeven">
             <template #label>Double Over Seven</template>
-            <template #description>Double the score if the combined yaku value is greater than 7
-              points.</template>
+            <template #description>Double the score if the combined yaku value is 7
+              points or greater.</template>
           </ToggleSwitch>
         </div>
       </div>
@@ -92,7 +92,7 @@
               <span class="text-lg font-semibold ">
                 Moon/Flower Viewings
               </span>
-              <span class="block w-3/4 text-sm text-gray-600 dark:text-gray-300">
+              <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
                 {{ getOptionDescription(config.allowViewingsYaku) }}
               </span>
             </div>
@@ -105,7 +105,7 @@
               <span class="text-lg font-semibold ">
                 Wild Card Sake Cup
               </span>
-              <span class="block w-3/4 text-sm text-gray-600 dark:text-gray-300">
+              <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
                 The sake cup counts as both animal and plain types.
               </span>
             </div>
@@ -118,8 +118,8 @@
               <span class="text-lg font-semibold">
                 Double Over Seven
               </span>
-              <span class="block w-3/4 text-sm text-gray-600 dark:text-gray-300">
-                Double the score if the combined yaku value is greater than 7 points.
+              <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
+                Double the score if the combined yaku value is 7 points or greater.
               </span>
             </div>
             <span class="self-center text-indigo-600 capitalize dark:text-yellow-300">

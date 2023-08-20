@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="absolute inset-x-0 z-50 mx-auto pointer-events-none top-1/3">
+    <div class="absolute inset-x-0 z-50 mx-auto pointer-events-none top-1/3 w-max">
       <Transition
         appear
         enter-active-class="duration-300"
@@ -10,7 +10,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <CardsLoader v-if="loading" />
+        <SakuraLoader v-if="loading" />
       </Transition>
     </div>
     <NuxtPage />
