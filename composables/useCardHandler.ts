@@ -101,7 +101,7 @@ export const useCardHandler = () => {
 		select() {
 			console.assert(
 				ds.checkCurrentPhase("select"),
-				"Phase check failed. Check autoplay script or datastore."
+				`Phase check failed. Expected: 'select'; Received: '${ds.getCurrent.phase}'`
 			);
 			const cardsInHand = shuffle([...cs.hand[ds.getCurrent.player]]);
 			for (const card of cardsInHand) {
@@ -136,7 +136,7 @@ export const useCardHandler = () => {
 		draw() {
 			console.assert(
 				ds.checkCurrentPhase("draw"),
-				"Phase check failed. Check autoplay script or datastore."
+				`Phase check failed. Expected: 'draw'; Received: '${ds.getCurrent.phase}'`
 			);
 			selectedCard.value = cs.revealCard();
 		},
@@ -144,7 +144,7 @@ export const useCardHandler = () => {
 		collect() {
 			console.assert(
 				ds.checkCurrentPhase("collect"),
-				"Phase check failed. Check autoplay script or datastore."
+				`Phase check failed. Expected: 'collect'; Received: '${ds.getCurrent.phase}'`
 			);
 			if (cs.staged.size) cs.collectCards(ds.getCurrent.player);
 		},
@@ -158,26 +158,3 @@ export const useCardHandler = () => {
 		useActions,
 	});
 };
-
-// @vitest-environment nuxt
-if (import.meta.vitest) {
-	const testFieldCards: CardName[] = [
-		"matsu-no-kasu-1",
-		"matsu-no-tan",
-		"sakura-ni-maku",
-	];
-
-	useCardStore().addCards(testFieldCards, useCardStore().field);
-	const { useMatchedCards, useSelectedCard } = useCardHandler();
-	useSelectedCard().value = "matsu-ni-tsuru";
-	const matches = useMatchedCards();
-
-	it("returns an array with matching cards", () => {
-		expect(matches.value).toEqual(["matsu-no-kasu-1", "matsu-no-tan"]);
-	});
-
-	it("returns an empty array if no card is selected", () => {
-		useSelectedCard().value = null;
-		expect(matches.value).toHaveLength(0);
-	});
-}

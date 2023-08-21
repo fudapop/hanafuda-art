@@ -10,7 +10,7 @@
         leave-to-class="opacity-0 motion-safe:translate-x-1">
         <div v-if="card" :key="`${index}-${card}`" :class="{
           'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
-          'scale-105 drop-shadow-xl -translate-y-2 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-2 after:border-yellow-300 after:rounded-[inherit]': matchedCards?.includes(
+          'scale-105 drop-shadow-xl -translate-y-2 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-500 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': matchedCards?.includes(
             card
           ),
           '-translate-y-2 drop-shadow-xl': selectedCard === card,
@@ -100,7 +100,7 @@ watch(
 
 const { getCardUrl } = useCardDesign();
 
-const { useSelectedCard, useMatchedCards, handleCardSelect, useActions } = useCardHandler();
+const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler();
 
 const selectedCard = useSelectedCard();
 const matchedCards = useMatchedCards();
@@ -116,8 +116,10 @@ const discarding = computed(() => ([
 const handleDiscard = async (index: number) => {
   if (!selectedCard.value) return;
   displayedCards[index] = selectedCard.value;
-  await sleep(750);
-  useActions().matchOrDiscard();
+  cs.discard(selectedCard.value, "p1");
+  selectedCard.value = null;
+  await sleep();
+  useGameDataStore().nextPhase(); 
 }
 
 const handleClick = (card: CardName) => {

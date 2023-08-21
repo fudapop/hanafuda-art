@@ -8,6 +8,7 @@
           'scale-105 drop-shadow-xl -translate-y-2 z-20': matchedCards?.includes(card),
           '-translate-y-2 drop-shadow-xl': selectedCard === card,
           'pointer-events-none staged': cs.staged.has(card),
+          'after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-500 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': showMatchHint(card),
         }" @click="() => handleClick(card)">
           <template v-if="useConfigStore().cardLabels">
             <span
@@ -36,7 +37,7 @@ import { useCardDesign } from "~/composables/useCardDesign";
 import { CardName, CARDS } from "~/utils/cards";
 import { useCardStore } from "~/stores/cardStore";
 import { useConfigStore } from "~/stores/configStore";
-import { PlayerKey } from "~/stores/playerStore";
+import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 
 const { id } = defineProps<{ id: PlayerKey }>();
 
@@ -104,10 +105,12 @@ watch(
 
 const { getCardUrl } = useCardDesign();
 
-const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler();
+const { useSelectedCard, useMatchedCards, matchExists, handleCardSelect } = useCardHandler();
 
 const selectedCard = useSelectedCard();
 const matchedCards = useMatchedCards();
+
+const showMatchHint = computed(() => (card: CardName) => usePlayerStore().players.p1.isActive && (matchExists(card) as CardName[]).length)
 
 const handleClick = (card: CardName) => {
   handleCardSelect(card);
