@@ -3,21 +3,12 @@
     class="grid max-h-[calc(100dvh-84px)] [@media(max-height:500px)]:max-h-[100dvh] xs:max-h-[75vh] gap-4 p-4 overflow-y-auto">
     <ClientOnly>
       <div v-show="!gameStart" class="space-y-5">
-        <div class="gap-y-5 max-sm:grid max-sm:grid-cols-2 gap-x-5">
-          <!-- Set maximum for number of rounds per game -->
-          <OptionsRadioGroup :model-value="config.maxRounds"
-            :update-callback="(option) => (config.maxRounds = option as GameLengthOptions)"
-            :value-options="config.OPTIONS.GAME_LENGTH" :label-template="(option) => `${option} rounds`">
-            Game Length
-          </OptionsRadioGroup>
-
-          <!-- TODO: Set behaviour pattern of the AI opponent -->
-          <OptionsRadioGroup :model-value="config.difficulty"
-            :update-callback="(option) => (config.difficulty = option as DifficultyOptions)"
-            :value-options="config.OPTIONS.DIFFICULTY">
-            Difficulty Level
-          </OptionsRadioGroup>
-        </div>
+        <!-- Set maximum for number of rounds per game -->
+        <OptionsRadioGroup :model-value="config.maxRounds"
+          :update-callback="(option) => (config.maxRounds = option as GameLengthOptions)"
+          :value-options="config.OPTIONS.GAME_LENGTH" :label-template="(option) => `${option} rounds`">
+          Game Length
+        </OptionsRadioGroup>
 
         <!-- Set allowance of TSUKIMI-/HANAMI-ZAKE -->
         <OptionsRadioGroup :model-value="config.allowViewingsYaku"
@@ -67,12 +58,12 @@
       <!-- Hide options and show current settings while game is in progress -->
       <div v-show="gameStart" class="w-full">
         <p class="mb-4 text-gray-600 dark:text-gray-300">
-        <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
-          Settings are locked while a game is in progress.
+          <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
+          Some settings are locked while a game is in progress.
         </p>
-        <ul class="grid w-full px-4 mx-auto tracking-wider gap-y-4">
+        <ul class="grid w-full mx-auto gap-y-4">
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
-            <span class="text-lg font-semibold ">
+            <span class="font-semibold ">
               Game Length
             </span>
             <span class="text-indigo-600 capitalize dark:text-yellow-300">
@@ -80,16 +71,8 @@
             </span>
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
-            <span class="text-lg font-semibold ">
-              Difficulty Level
-            </span>
-            <span class="text-indigo-600 capitalize dark:text-yellow-300">
-              {{ config.difficulty }}
-            </span>
-          </li>
-          <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <div>
-              <span class="text-lg font-semibold ">
+              <span class="font-semibold ">
                 Moon/Flower Viewings
               </span>
               <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
@@ -102,7 +85,7 @@
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <div>
-              <span class="text-lg font-semibold ">
+              <span class="font-semibold ">
                 Wild Card Sake Cup
               </span>
               <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
@@ -115,7 +98,7 @@
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <div>
-              <span class="text-lg font-semibold">
+              <span class="font-semibold">
                 Double Over Seven
               </span>
               <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
@@ -128,6 +111,14 @@
           </li>
         </ul>
       </div>
+
+      <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
+        Help
+      </p>
+      <ToggleSwitch :callback="toggleLabels" :init-value="config.cardLabels">
+        <template #label>Card Labels</template>
+        <template #description>Include card corner labels to assist with matching.</template>
+      </ToggleSwitch>
     </ClientOnly>
   </div>
 </template>
@@ -138,7 +129,6 @@ import {
   useConfigStore,
   ViewingsOptions,
   GameLengthOptions,
-  DifficultyOptions,
   GameSettings,
 } from "~/stores/configStore";
 import { onClickOutside } from "@vueuse/core";
@@ -154,6 +144,10 @@ const toggleSake = (enabled: boolean) => {
 
 const toggleDouble = (enabled: boolean) => {
   config.doubleScoreOverSeven = enabled;
+};
+
+const toggleLabels = (enabled: boolean) => {
+  config.cardLabels = enabled;
 };
 
 const getOptionDescription = (option: ViewingsOptions) => {

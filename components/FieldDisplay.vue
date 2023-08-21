@@ -16,6 +16,20 @@
           '-translate-y-2 drop-shadow-xl': selectedCard === card,
           'pointer-events-none staged': cs.staged.has(card),
         }" @click="() => handleClick(card)">
+        <template v-if="useConfigStore().cardLabels">
+            <span
+              class="absolute top-0 left-0 z-30 w-0 h-0 border-t-[25px] border-r-[25px] border-t-gray-800 border-r-transparent">
+            </span>
+            <span class="absolute top-0 z-[31] text-white text-xs left-1">
+              {{ CARDS[card].month }}
+            </span>
+            <span
+              class="absolute top-0 right-0 z-30 w-0 h-0 border-t-[25px] border-l-[25px] border-t-gray-800 border-l-transparent">
+            </span>
+            <span class="absolute top-0 z-[31] text-xs text-white right-1">
+              {{ CARDS[card].type[0].toUpperCase() }}
+            </span>
+          </template>
           <CardImage :src="getCardUrl(card)!" :card="card" />
         </div>
 
@@ -44,6 +58,7 @@ import { CardName } from "~/utils/cards";
 import { useCardStore } from "~/stores/cardStore";
 import { usePlayerStore } from "~/stores/playerStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
+import { useConfigStore } from "~/stores/configStore";
 
 const displayedCards: (CardName | undefined)[] = reactive(Array(12));
 const isFarRightCol = (index: number) => index === 5 || index === 11;

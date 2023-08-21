@@ -1,33 +1,26 @@
 import { defineStore } from "pinia";
 import { YakuName } from "~/utils/yaku";
-import { CardDesign } from "~/composables/useCardDesign";
 
 const OPTIONS = {
 	GAME_LENGTH: [3, 6, 12] as const,
 
 	VIEWINGS: ["allow", "limited", "none"] as const,
 
-	DIFFICULTY: ["easy", "normal", "hard"] as const,
 } as const;
 
-type GameOptions = keyof typeof OPTIONS;
 type GameLengthOptions = (typeof OPTIONS.GAME_LENGTH)[number];
 type ViewingsOptions = (typeof OPTIONS.VIEWINGS)[number];
-type DifficultyOptions = (typeof OPTIONS.DIFFICULTY)[number];
 
 export interface GameSettings {
 	rounds: GameLengthOptions;
-	difficulty: DifficultyOptions;
 	viewings: ViewingsOptions;
 	double: boolean;
 	wild: boolean;
-	design?: CardDesign;
+	labels: boolean;
 }
 
 const useConfigStore = defineStore("config", () => {
 	const maxRounds = ref(3) as Ref<GameLengthOptions>;
-
-	const difficulty = ref("normal") as Ref<DifficultyOptions>;
 
 	const allowViewingsYaku = ref("allow") as Ref<ViewingsOptions>;
 
@@ -35,19 +28,20 @@ const useConfigStore = defineStore("config", () => {
 
 	const sakeIsWildCard = ref(false);
 
+	const cardLabels = ref(false);
+
 	const getCurrentSettings = computed(
 		(): GameSettings => ({
 			rounds: maxRounds.value,
-			difficulty: difficulty.value,
 			viewings: allowViewingsYaku.value,
 			double: doubleScoreOverSeven.value,
 			wild: sakeIsWildCard.value,
+			labels: cardLabels.value,
 		})
 	);
 
 	function loadUserSettings(userSettings: GameSettings) {
 		maxRounds.value = userSettings.rounds;
-		difficulty.value = userSettings.difficulty;
 		allowViewingsYaku.value = userSettings.viewings;
 		doubleScoreOverSeven.value = userSettings.double;
 		sakeIsWildCard.value = userSettings.wild;
@@ -107,7 +101,7 @@ const useConfigStore = defineStore("config", () => {
 		allowViewingsYaku,
 		maxRounds,
 		sakeIsWildCard,
-		difficulty,
+		cardLabels,
 		getCurrentSettings,
 		loadUserSettings,
 		applyViewingsOption,
@@ -121,5 +115,4 @@ export {
 	useConfigStore,
 	GameLengthOptions,
 	ViewingsOptions,
-	DifficultyOptions,
 };

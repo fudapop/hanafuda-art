@@ -9,15 +9,15 @@
       sizes="100vw"
       :class="{
         'object-cover h-full w-full -z-20 -scale-x-100 transition-all duration-1000': true,
-        'motion-safe:object-right': koikoiIsCalled,
-        'object-center': !koikoiIsCalled,
+        'motion-safe:object-right': !noCalls,
+        'object-center': noCalls,
       }"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-const { koikoiIsCalled } = useDecisionHandler();
+const { noCalls } = useDecisionHandler();
 const bgIndex = 1;
 const bgImages = [
   {
