@@ -1,6 +1,6 @@
 <template>
   <ul :class="{
-    'transition-all duration-500 ease-out max-sm:flex max-sm:flex-wrap max-sm:w-[320px] sm:w-max sm:grid sm:grid-cols-7 gap-1': true,
+    'transition-all duration-500 ease-out max-sm:flex max-sm:flex-wrap max-sm:w-[300px] sm:w-max sm:grid sm:grid-cols-7 gap-1': true,
     'sm:[&>:nth-child(n+8)]:-translate-y-8 sm:[&>:nth-child(n+8):nth-child(-n+14)]:translate-x-1/2': true,
     'max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:-translate-y-4 max-sm:[&>:nth-child(n+10)]:-translate-y-8 max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:translate-x-1/2': thirdRowIsOccupied,
     'origin-left max-xs:scale-90': thirdRowIsOccupied,
@@ -12,7 +12,7 @@
         leave-to-class="opacity-0 motion-safe:translate-x-1">
         <div v-if="card" :key="`${index}-${card}`" :class="{
           'card drop-shadow-md overflow-hidden cursor-pointer transition-all relative': true,
-          'scale-105 drop-shadow-xl -translate-y-2 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-500 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': matchedCards?.includes(
+          'scale-105 drop-shadow-xl -translate-y-2 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': matchedCards?.includes(
             card
           ),
           '-translate-y-2 drop-shadow-xl': selectedCard === card,

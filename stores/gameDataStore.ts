@@ -22,12 +22,13 @@ type TurnPhase = (typeof PHASES)[number];
 export const useGameDataStore = defineStore("gameData", () => {
 	// State
 	const gameId = ref(getRandomString(28));
-	const roundHistory = useStorage(
-		"hanafuda-data",
-		[] as RoundResult[],
-		localStorage,
-		{ mergeDefaults: true }
-	);
+	// const roundHistory = useStorage(
+	// 	"hanafuda-data",
+	// 	[] as RoundResult[],
+	// 	localStorage,
+	// 	{ mergeDefaults: true }
+	// );
+	const roundHistory: Ref<RoundResult[]> = ref([]);
 	const roundCounter = ref(roundHistory.value.length + 1);
 	const turnCounter = ref(1);
 	const turnPhase = ref("select" as TurnPhase);
@@ -117,8 +118,6 @@ export const useGameDataStore = defineStore("gameData", () => {
 				winner: null,
 				score: 0,
 			});
-		const { winner, score } = getCurrent.value.result;
-		// if (winner) usePlayerStore().updateScore(winner, score);
 		roundOver.value = true;
 		if (
 			roundCounter.value >= useConfigStore().maxRounds ||

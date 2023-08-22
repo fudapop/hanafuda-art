@@ -1,6 +1,6 @@
 <template>
   <span
-    class="absolute top-0 left-0 z-30 w-0 h-0 border-t-[25px] border-r-[25px] border-t-gray-700 border-r-transparent"
+    class="absolute top-0 left-0 z-30 w-0 h-0 border-t-[25px] border-r-[25px] border-t-gray-700/80 border-r-transparent"
   >
   </span>
   <span
@@ -9,7 +9,7 @@
     {{ CARDS[card].month }}
   </span>
   <span
-    class="absolute bottom-0 left-0 z-30 w-0 h-0 border-b-[25px] border-r-[25px] border-b-gray-700 border-r-transparent"
+    class="absolute bottom-0 left-0 z-30 w-0 h-0 border-b-[25px] border-r-[25px] border-b-gray-700/80 border-r-transparent"
   >
   </span>
   <span
@@ -18,7 +18,7 @@
     {{ CARDS[card].type[0].toUpperCase() }}
   </span>
   <span
-    class="absolute bottom-0 right-0 z-30 w-0 h-0 border-b-[25px] border-l-[25px] border-b-gray-700 border-l-transparent"
+    class="absolute bottom-0 right-0 z-30 w-0 h-0 border-b-[25px] border-l-[25px] border-b-gray-700/80 border-l-transparent"
   >
   </span>
   <span
@@ -27,7 +27,7 @@
     {{ CARDS[card].month }}
   </span>
   <span
-    class="absolute top-0 right-0 z-30 w-0 h-0 border-t-[25px] border-l-[25px] border-t-gray-700 border-l-transparent"
+    class="absolute top-0 right-0 z-30 w-0 h-0 border-t-[25px] border-l-[25px] border-t-gray-700/80 border-l-transparent"
   >
   </span>
   <span

@@ -8,14 +8,16 @@
     </button>
     <div class="w-full max-w-lg p-2 mx-auto space-y-2 rounded-2xl">
       <HeadlessDisclosure v-for="yaku in allowedYaku" :key="yaku.name" v-slot="{ open }">
+
         <HeadlessDisclosureButton :class="[
           'relative grid w-full grid-cols-[repeat(2,1fr)_max-content] px-4 py-2 items-center text-sm font-medium text-left rounded-lg focus:outline-none focus-visible:ring focus-visible:ring-opacity-75',
-          isComplete(yaku.name) ? 'text-green-800 bg-green-400 hover:bg-green-200 focus-visible:ring-green-500' : 'text-indigo-900 bg-indigo-100 hover:bg-indigo-200 focus-visible:ring-indigo-500'
+          'text-indigo-900 bg-indigo-100 hover:bg-indigo-200 focus-visible:ring-indigo-500'
         ]">
 
           <span class="font-bold uppercase max-xs:text-xs whitespace-nowrap">
             {{ yaku.name }}
           </span>
+
           <span v-if="!(open || openAll)" class="absolute top-0 inline-flex ml-4">
             <span v-for="_ in yaku.cards.filter(card => playerHas(card))"
               class="self-center w-3 h-1 ml-1 bg-green-400 rounded-full ring-1 ring-inset ring-green-500"></span>
@@ -30,6 +32,7 @@
           </span>
           <ChevronDownIcon :class="['w-5 h-5 text-gray-500 float-right', open || openAll ? 'rotate-180' : '']" />
         </HeadlessDisclosureButton>
+
         <Transition appear enter-active-class="duration-100 origin-top" enter-from-class="-translate-y-4 opacity-0"
           enter-to-class="opacity-100" leave-active-class="duration-100 origin-top" leave-from-class="opacity-100"
           leave-to-class="-translate-y-4 opacity-0">
@@ -70,7 +73,6 @@
 
 <script setup lang="ts">
 import { ChevronDownIcon, CheckCircleIcon, XCircleIcon, ExclamationCircleIcon } from '@heroicons/vue/20/solid';
-import { CompletedYaku, YakuName } from '~/utils/yaku';
 import { useGameDataStore } from '~/stores/gameDataStore';
 import { useCardStore } from '~/stores/cardStore';
 import { useConfigStore } from '~/stores/configStore';
@@ -84,12 +86,8 @@ const openAll = ref(false);
 
 const currentDesign = useCardDesign().useDesign();
 
-const playerHas = computed(() => (card: CardName) => cs.collection.p1.has(card))
-const opponentHas = computed(() => (card: CardName) => cs.collection.p2.has(card))
-
-const playerCompleted: Ref<CompletedYaku[]> = ref([])
-const roundResult = computed(() => ds.getCurrent.result);
-const isComplete = computed(() => (yakuName: YakuName) => playerCompleted.value.find(yaku => yaku.name === yakuName));
+const playerHas = toValue(computed(() => (card: CardName) => cs.collection.p1.has(card)))
+const opponentHas = toValue(computed(() => (card: CardName) => cs.collection.p2.has(card)))
 
 const viewingsAllowed = computed(() => config.allowViewingsYaku);
 const limitedYaku = new Set(["hanami-zake", "tsukimi-zake"]);
@@ -100,9 +98,5 @@ const allowedYaku = computed(() => {
   if (viewingsAllowed.value === "none") return yakuList.filter((yaku) => !limitedYaku.has(yaku.name));
   return yakuList;
 });
-
-watch(roundResult, () => {
-  if (roundResult.value.winner === 'p1') playerCompleted.value.push(...roundResult.value.completedYaku as CompletedYaku[])
-})
 
 </script>

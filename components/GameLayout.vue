@@ -7,7 +7,7 @@
     </div>
 
     <template v-if="gameStart">
-    <div class="absolute z-30 bottom-4 right-4">
+    <div class="absolute z-20 bottom-4 right-4">
       <button 
       v-show="!sidebarOpen" 
       title="View Collection Progress"
