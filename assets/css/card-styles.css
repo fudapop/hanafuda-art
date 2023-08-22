@@ -102,7 +102,7 @@
 	--card-aspect: 58/97;
 	
 	& .card img {
-		object-fit: contain;
+		scale: 1 1.05
 	}
 	
 	& .down {

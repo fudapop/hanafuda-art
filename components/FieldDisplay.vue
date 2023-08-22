@@ -1,7 +1,9 @@
 <template>
   <ul :class="{
-    'transition-transform grid grid-cols-[repeat(6,max-content)] sm:[&_:nth-child(n+7)]:translate-x-1/2 sm:[&_:nth-child(n+7)]:-translate-y-1/3 gap-1': true,
-    'origin-left max-sm:scale-[85%]': farRightColIsOccupied,
+    'transition-all duration-500 ease-out flex flex-wrap w-[320px] sm:w-[450px] gap-1': true,
+    'sm:[&>:nth-child(n+8)]:-translate-y-8 sm:[&>:nth-child(n+8):nth-child(-n+14)]:translate-x-1/2': true,
+    'max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:-translate-y-4 max-sm:[&>:nth-child(n+10)]:-translate-y-8 max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:translate-x-1/2': thirdRowIsOccupied,
+    'origin-left max-xs:scale-90': thirdRowIsOccupied,
   }">
     <li v-for="(card, index) in displayedCards" :key="index" class="origin-center">
       <Transition appear mode="out-in" enter-active-class="duration-300 ease-out"
@@ -9,7 +11,7 @@
         leave-active-class="duration-200 ease-in" leave-from-class="opacity-100"
         leave-to-class="opacity-0 motion-safe:translate-x-1">
         <div v-if="card" :key="`${index}-${card}`" :class="{
-          'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
+          'card drop-shadow-md overflow-hidden cursor-pointer transition-all relative': true,
           'scale-105 drop-shadow-xl -translate-y-2 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-500 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': matchedCards?.includes(
             card
           ),
@@ -17,25 +19,14 @@
           'pointer-events-none staged': cs.staged.has(card),
         }" @click="() => handleClick(card)">
         <template v-if="useConfigStore().cardLabels">
-            <span
-              class="absolute top-0 left-0 z-30 w-0 h-0 border-t-[25px] border-r-[25px] border-t-gray-800 border-r-transparent">
-            </span>
-            <span class="absolute top-0 z-[31] text-white text-xs left-1">
-              {{ CARDS[card].month }}
-            </span>
-            <span
-              class="absolute top-0 right-0 z-30 w-0 h-0 border-t-[25px] border-l-[25px] border-t-gray-800 border-l-transparent">
-            </span>
-            <span class="absolute top-0 z-[31] text-xs text-white right-1">
-              {{ CARDS[card].type[0].toUpperCase() }}
-            </span>
+            <CardLabel :card="card" />
           </template>
           <CardImage :src="getCardUrl(card)!" :card="card" />
         </div>
 
         <!-- Display empty slots -->
         <template v-else>
-          <div v-show="isFarRightCol(index) ? farRightColIsOccupied : true"
+          <div v-show="isThirdRow(index) ? thirdRowIsOccupied : true"
             class="h-[--card-height] aspect-[--card-aspect] rounded-[--card-radius] border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]">
             <span class="sr-only">empty field slot</span>
 
@@ -60,9 +51,9 @@ import { usePlayerStore } from "~/stores/playerStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { useConfigStore } from "~/stores/configStore";
 
-const displayedCards: (CardName | undefined)[] = reactive(Array(12));
-const isFarRightCol = (index: number) => index === 5 || index === 11;
-const farRightColIsOccupied = computed(() => !!displayedCards[5] || !!displayedCards[11]);
+const displayedCards: (CardName | undefined)[] = reactive(Array(14));
+const isThirdRow = (index: number) => index > 9;
+const thirdRowIsOccupied = computed(() => !!displayedCards.slice(10).filter(card => !!card).length || displayedCards.filter(card => !!card).length > 9);
 
 const cs = useCardStore();
 const { field } = storeToRefs(cs);

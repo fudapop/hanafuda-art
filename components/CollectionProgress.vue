@@ -2,7 +2,7 @@
   <div :class="['absolute inset-0 h-full [--card-height:75px]', currentDesign]">
     <button type="button"
     title="Open/close all"
-      class="fixed text-gray-200 rounded-md bottom-8 right-8 bg-gray-500/20 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-yellow-300 focus:ring-offset-2"
+      class="fixed text-gray-900 rounded-md dark:text-gray-200 bottom-8 right-8 bg-gray-500/20 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-yellow-300 focus:ring-offset-2"
       @click="openAll = !openAll">
       <ChevronDownIcon :class="['w-7 h-7', openAll ? 'rotate-180' : '']" />
       <span class="sr-only">Expand/Collapse</span>
@@ -79,8 +79,10 @@ const currentDesign = useCardDesign().useDesign();
 const playerHas = computed(() => (card: CardName) => cs.collection.p1.has(card))
 const opponentHas = computed(() => (card: CardName) => cs.collection.p2.has(card))
 
-const completedYaku = toValue(computed(() => ds.getCurrent.result?.completedYaku as CompletedYaku[] | undefined));
-const isComplete = computed(() => (yakuName: YakuName) => completedYaku && completedYaku.find(yaku => yaku.name === yakuName));
+const playerCompleted: Ref<CompletedYaku[]> = ref([])
+const roundResult = computed(() => ds.getCurrent.result);
+// const completedYaku = computed(() => roundResult.value?.completedYaku as CompletedYaku[] | undefined);
+const isComplete = computed(() => (yakuName: YakuName) => playerCompleted.value.find(yaku => yaku.name === yakuName));
 
 const viewingsAllowed = computed(() => config.allowViewingsYaku);
 const limitedYaku = new Set(["hanami-zake", "tsukimi-zake"]);
@@ -91,5 +93,9 @@ const allowedYaku = computed(() => {
   if (viewingsAllowed.value === "none") return yakuList.filter((yaku) => !limitedYaku.has(yaku.name));
   return yakuList;
 });
+
+watch(roundResult, () => {
+  if (roundResult.value.winner === 'p1') playerCompleted.value.push(...roundResult.value.completedYaku as CompletedYaku[])
+})
 
 </script>

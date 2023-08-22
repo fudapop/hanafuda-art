@@ -57,11 +57,11 @@
 
       <!-- Hide options and show current settings while game is in progress -->
       <div v-show="gameStart" class="w-full">
-        <p class="mb-4 text-gray-600 dark:text-gray-300">
+        <p class="my-6 text-gray-600 dark:text-gray-300">
           <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
           Some settings are locked while a game is in progress.
         </p>
-        <ul class="grid w-full mx-auto gap-y-4">
+        <ul class="grid w-full mx-auto gap-y-5">
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <span class="font-semibold ">
               Game Length
@@ -112,6 +112,7 @@
         </ul>
       </div>
 
+      <div :class="[gameStart ? 'order-first' : '']">
       <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
         Help
       </p>
@@ -119,6 +120,7 @@
         <template #label>Card Labels</template>
         <template #description>Include card corner labels to assist with matching.</template>
       </ToggleSwitch>
+      </div>
     </ClientOnly>
   </div>
 </template>

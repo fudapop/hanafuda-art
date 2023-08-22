@@ -99,6 +99,7 @@ const confirmUnlock = () => {
     coins.value -= UNLOCK_COST;
     unlocked.value.push(newUnlock.value);
     // TODO: add toast
+    selectedDesign.value = newUnlock.value;
     newUnlock.value = undefined;
 }
 </script>

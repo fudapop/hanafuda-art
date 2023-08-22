@@ -1,7 +1,7 @@
 <template>
   <!-- HEADER -->
   <div class="px-4 py-5 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-600 sm:px-6">
-    <div class="flex flex-wrap items-end justify-between -mt-2 -ml-4 sm:flex-nowrap">
+    <div class="grid grid-cols-[1fr_max-content] items-end -mt-2 -ml-4">
       <HeadlessDialogTitle as="h3" class="mb-2 text-lg font-semibold leading-6 text-gray-900 dark:text-white">
         <span v-if="recordedWinner">
           <span v-if="decisionIsPending">
@@ -38,14 +38,14 @@
       <!-- Warning is logged if no focusable elements rendered -->
       <!-- Hidden during opponent decision -->
       <div v-show="decisionIsPending">
-        <div v-show="players.p1.isActive" class="flex flex-shrink-0 gap-2 ml-4">
+        <div v-show="players.p1.isActive" class="flex justify-end flex-shrink-0 gap-2 ml-4">
           <Button button-class="secondary" :action="callStop"> Stop </Button>
           <Button v-show="handNotEmpty(activePlayer.id)" button-class="primary" :action="callKoikoi">
             Koi-Koi
           </Button>
         </div>
       </div>
-      <div v-show="stopIsCalled">
+      <div v-show="stopIsCalled" class="flex justify-end flex-shrink-0 gap-2 ml-4">
         <Button :action="() => $emit('next')"> Next Round </Button>
       </div>
     </div>

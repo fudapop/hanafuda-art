@@ -2,40 +2,32 @@
   <ul class="relative h-full w-max mx-auto isolate pr-[60px]">
     <li v-for="(card, index) in displayedCards.filter((card) => card)" :key="index"
       class="absolute transition-all duration-100 origin-center" :style="styleArr[index]">
-      <CardTransition v-if="card">
-        <div :class="{
+      <Transition appear mode="out-in" enter-active-class="duration-300 ease-out"
+        enter-from-class="opacity-0 motion-safe:-translate-x-1" enter-to-class="opacity-100"
+        leave-active-class="duration-200 ease-in" leave-from-class="opacity-100"
+        leave-to-class="opacity-0 motion-safe:translate-x-1">
+        <div v-if="card" :class="{
           'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
           'scale-105 drop-shadow-xl -translate-y-2 z-20': matchedCards?.includes(card),
-          '-translate-y-2 drop-shadow-xl': selectedCard === card,
+          '-translate-y-4 drop-shadow-xl': selectedCard === card,
           'pointer-events-none staged': cs.staged.has(card),
-          'after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-500 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': showMatchHint(card),
+          '-translate-y-2 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-500 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': showMatchHint(card),
         }" @click="() => handleClick(card)">
           <template v-if="useConfigStore().cardLabels">
-            <span
-              class="absolute top-0 left-0 z-30 w-0 h-0 border-t-[25px] border-r-[25px] border-t-gray-800 border-r-transparent">
-            </span>
-            <span class="absolute top-0 z-[31] text-white text-xs left-1">
-              {{ CARDS[card].month }}
-            </span>
-            <span
-              class="absolute bottom-0 left-0 z-30 w-0 h-0 border-b-[25px] border-r-[25px] border-b-gray-800 border-r-transparent">
-            </span>
-            <span class="absolute bottom-0 z-[31] text-xs text-white left-1">
-              {{ CARDS[card].type[0].toUpperCase() }}
-            </span>
+            <CardLabel :card="card" />
           </template>
           <CardImage :src="getCardUrl(card)!" :card="card" />
         </div>
-      </CardTransition>
-      <div v-else class="scale-0"></div>
+      </Transition>
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
 import { useCardDesign } from "~/composables/useCardDesign";
-import { CardName, CARDS } from "~/utils/cards";
+import { CardName } from "~/utils/cards";
 import { useCardStore } from "~/stores/cardStore";
+import { useGameDataStore } from "~/stores/gameDataStore";
 import { useConfigStore } from "~/stores/configStore";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 
@@ -110,7 +102,7 @@ const { useSelectedCard, useMatchedCards, matchExists, handleCardSelect } = useC
 const selectedCard = useSelectedCard();
 const matchedCards = useMatchedCards();
 
-const showMatchHint = computed(() => (card: CardName) => usePlayerStore().players.p1.isActive && (matchExists(card) as CardName[]).length)
+const showMatchHint = computed(() => (card: CardName) => useGameDataStore().checkCurrentPhase("select") && usePlayerStore().players.p1.isActive && (matchExists(card) as CardName[]).length)
 
 const handleClick = (card: CardName) => {
   handleCardSelect(card);
