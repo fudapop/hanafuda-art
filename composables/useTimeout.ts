@@ -1,20 +1,19 @@
-import { Awaitable } from "@vueuse/core";
-
-type CreateTimeoutFn = (
-	fn: Function,
-	duration: number,
-	key: string,
-	options: TimeoutOptions
-) => () => Promise<void>;
-
-interface TimeoutOptions {
-	callback?: Function;
-	startMsg?: string;
-	endMsg?: string;
-}
+const activeTimeouts = reactive(new Map());
 
 export const useTimeout = () => {
-	const activeTimeouts = reactive(new Map());
+	type CreateTimeoutFn = (
+		fn: Function,
+		duration: number,
+		key: string,
+		options: TimeoutOptions
+	) => () => Promise<void>;
+
+	interface TimeoutOptions {
+		callback?: Function;
+		startMsg?: string;
+		endMsg?: string;
+	}
+
 	const getActiveTimeouts = computed(() => activeTimeouts);
 
 	/**
@@ -33,12 +32,7 @@ export const useTimeout = () => {
 		return () => fnWithTimeout.start();
 	};
 
-	const errorOnTimeout: CreateTimeoutFn = (
-		fn,
-		duration,
-		key,
-		options
-	) => {
+	const errorOnTimeout: CreateTimeoutFn = (fn, duration, key, options) => {
 		const errTimeout = new TimeoutWrapper(
 			fn,
 			duration,

@@ -1,6 +1,12 @@
 import { User, onAuthStateChanged, getAuth } from "firebase/auth";
-import { DocumentData, doc, getDoc, setDoc } from "firebase/firestore";
-import { getFirestore } from "firebase/firestore";
+import {
+	DocumentData,
+	doc,
+	getDoc,
+	setDoc,
+	getFirestore,
+	Timestamp,
+} from "firebase/firestore";
 import { useStorage } from "@vueuse/core";
 import { CardDesign } from "~/composables/useCardDesign";
 
@@ -9,20 +15,17 @@ interface UserProfile {
 	avatar: string;
 	username: string;
 	record: {
-        coins: number;
+		coins: number;
 		win: number;
 		draw: number;
 		loss: number;
 	};
-	lastPlayed?: {
-		date?: Date;
-		result?: string;
-	};
-	settings?: Record<string, any>;
+	lastUpdated: Date;
 	designs: {
 		unlocked: CardDesign[];
 		liked: CardDesign[];
 	};
+	settings: Record<string, any> | null;
 	flags?: Record<string, any>;
 	isGuest?: boolean;
 }
@@ -54,17 +57,19 @@ const defaultDesigns: CardDesign[] = [
 	"cherry-version",
 	"ramen-red",
 	"flash-black",
-]
+];
 
-const useUserProfile = (): Ref<UserProfile | null> =>
-	useState("profile", () => null);
-
-const useGuestProfile = (profile?: UserProfile | Partial<UserProfile>) =>
-	useStorage("hanafuda-guest", profile || {}, sessionStorage, {
-		mergeDefaults: true,
-	});
+const watcher = ref();
 
 export const useProfile = () => {
+	const useUserProfile = (): Ref<UserProfile | null> =>
+		useState("profile", () => null);
+
+	const useGuestProfile = (profile?: UserProfile | Partial<UserProfile>) =>
+		useStorage("hanafuda-guest", profile || {}, sessionStorage, {
+			mergeDefaults: true,
+		});
+
 	const profile = useUserProfile();
 	/**
 	 * Retrieve data from Firestore
@@ -79,6 +84,7 @@ export const useProfile = () => {
 	 */
 	const setUserData = () => {
 		if (!profile.value) return;
+		console.table(profile.value);
 		setDoc(
 			doc(getFirestore(), "users", `u_${profile.value.uid}`),
 			profile.value,
@@ -110,13 +116,12 @@ export const useProfile = () => {
 				userData.username ||
 				user.displayName?.split(" ")[0] ||
 				`User_${user.uid.slice(0, 5)}`,
-			lastPlayed: {
-				date: userData.lastPlayed.date.toDate(),
-				result: userData.lastPlayed.result,
-			},
+			lastUpdated: userData.lastUpdated
+				? new Date(userData.lastUpdated)
+				: new Date(),
 			record: userData.record || { coins: 500, win: 0, draw: 0, loss: 0 },
 			designs: userData.designs || { unlocked: [...defaultDesigns], liked: [] },
-			settings: userData.settings,
+			settings: userData.settings || null,
 			flags: userData.flags || {
 				isNewPlayer: true,
 				hasSubmittedFeedback: false,
@@ -130,6 +135,7 @@ export const useProfile = () => {
 			avatar: user.photoURL || getRandom(avatars),
 			username:
 				user.displayName?.split(" ")[0] || `Guest_${user.uid.slice(0, 5)}`,
+			lastUpdated: new Date(),
 			record: { coins: 0, win: 0, draw: 0, loss: 0 },
 			designs: { unlocked: [...defaultDesigns], liked: [] },
 			isGuest: true,
@@ -143,8 +149,10 @@ export const useProfile = () => {
 			avatar: user.photoURL || getRandom(avatars),
 			username:
 				user.displayName?.split(" ")[0] || `User #${user.uid.slice(0, 5)}`,
+			lastUpdated: new Date(),
 			record: { coins: 500, win: 0, draw: 0, loss: 0 },
 			designs: { unlocked: [...defaultDesigns], liked: [] },
+			settings: null,
 			flags: {
 				isNewPlayer: true,
 				hasSubmittedFeedback: false,
@@ -159,18 +167,16 @@ export const useProfile = () => {
 		return profile.value;
 	};
 
-	const current = computed(() => profile.value);
-
 	const updateProfile = () => {
 		if (!profile.value) return;
 		const data: Partial<UserProfile> = {
 			avatar: profile.value.avatar,
 			username: profile.value.username,
 			settings: profile.value.settings,
-			lastPlayed: profile.value.lastPlayed,
-            record: profile.value.record,
+			record: profile.value.record,
 			flags: profile.value.flags,
 			designs: profile.value.designs,
+			lastUpdated: new Date(),
 		};
 		if (!profile.value.isGuest) {
 			setDoc(doc(getFirestore(), "users", `u_${profile.value.uid}`), data, {
@@ -179,27 +185,36 @@ export const useProfile = () => {
 		} else {
 			const guest = useGuestProfile();
 			for (const key in data) {
-                // @ts-ignore
+				// @ts-ignore
 				guest.value[key as keyof Partial<UserProfile>] = data[key];
 			}
 		}
 	};
 
-	const unwatch = watch(
-		profile,
-		() => {
-			if (!profile.value) unwatch();
-			updateProfile();
-		},
-		{ deep: true }
-	);
+	const current = computed(() => profile.value);
 
-	onAuthStateChanged(getAuth(), () => {
-		if (getAuth().currentUser === null) {
-			profile.value = null;
-			sessionStorage?.removeItem("hanafuda-guest");
-		}
-	});
+	if (!watcher.value) {
+		console.debug("Setting profile watcher...");
+		watcher.value = watch(
+			profile,
+			() => {
+				if (!profile.value) {
+					watcher.value();
+					console.debug("Cleared profile watcher.");
+				}
+				updateProfile();
+			},
+			{ deep: true }
+		);
+
+		console.debug("Setting auth watcher...");
+		onAuthStateChanged(getAuth(), () => {
+			if (getAuth().currentUser === null) {
+				profile.value = null;
+				sessionStorage?.removeItem("hanafuda-guest");
+			}
+		});
+	}
 
 	return {
 		current,

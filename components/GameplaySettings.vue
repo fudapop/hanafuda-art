@@ -1,27 +1,41 @@
 <template>
-  <div ref="settingsPanel"
-    class="grid max-h-[calc(100dvh-84px)] [@media(max-height:500px)]:max-h-[100dvh] xs:max-h-[75vh] gap-4 p-4 overflow-y-auto">
+  <div
+    ref="settingsPanel"
+    class="grid max-h-[calc(100dvh-84px)] [@media(max-height:500px)]:max-h-[100dvh] xs:max-h-[75vh] gap-4 p-4 overflow-y-auto"
+  >
     <ClientOnly>
       <div v-show="!gameStart" class="space-y-5">
         <!-- Set maximum for number of rounds per game -->
-        <OptionsRadioGroup :model-value="config.maxRounds"
+        <OptionsRadioGroup
+          :model-value="config.maxRounds"
           :update-callback="(option) => (config.maxRounds = option as GameLengthOptions)"
-          :value-options="config.OPTIONS.GAME_LENGTH" :label-template="(option) => `${option} rounds`">
+          :value-options="config.OPTIONS.GAME_LENGTH"
+          :label-template="(option) => `${option} rounds`"
+        >
           Game Length
         </OptionsRadioGroup>
 
         <!-- Set allowance of TSUKIMI-/HANAMI-ZAKE -->
-        <OptionsRadioGroup :model-value="config.allowViewingsYaku"
+        <OptionsRadioGroup
+          :model-value="config.allowViewingsYaku"
           :update-callback="(option) => (config.allowViewingsYaku = option as ViewingsOptions)"
           :value-options="config.OPTIONS.VIEWINGS"
-          :description-template="(option) => getOptionDescription(option as ViewingsOptions)">
-          <a title="Tsukimi-/Hanami-zake" class="underline decoration-dotted underline-offset-4 cursor-help">
+          :description-template="(option) => getOptionDescription(option as ViewingsOptions)"
+        >
+          <a
+            title="Tsukimi-/Hanami-zake"
+            class="underline decoration-dotted underline-offset-4 cursor-help"
+          >
             Moon/Flower Viewing
           </a>
-          <a href="https://fudawiki.org/en/hanafuda/games/koi-koi#taming-the-sake-cup"
-            title="Read about this rule on fudawiki.org" target="_blank">
+          <a
+            href="https://fudawiki.org/en/hanafuda/games/koi-koi#taming-the-sake-cup"
+            title="Read about this rule on fudawiki.org"
+            target="_blank"
+          >
             <QuestionMarkCircleIcon
-              class="inline w-5 h-5 mb-1 text-gray-500 cursor-pointer dark:text-gray-300 hover:text-indigo-500 dark:hover:text-yellow-100" />
+              class="inline w-5 h-5 mb-1 text-gray-500 cursor-pointer dark:text-gray-300 hover:text-indigo-500 dark:hover:text-yellow-100"
+            />
             <span class="sr-only">Read about this rule on fudawiki.org</span>
           </a>
         </OptionsRadioGroup>
@@ -30,10 +44,14 @@
           <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
             Other Variations
           </p>
-          <a href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
-            title="Read about scoring on fudawiki.org" target="_blank">
+          <a
+            href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
+            title="Read about scoring on fudawiki.org"
+            target="_blank"
+          >
             <QuestionMarkCircleIcon
-              class="inline w-5 h-5 mb-1 ml-1 text-gray-500 cursor-pointer dark:text-gray-300 hover:text-indigo-500 dark:hover:text-yellow-100" />
+              class="inline w-5 h-5 mb-1 ml-1 text-gray-500 cursor-pointer dark:text-gray-300 hover:text-indigo-500 dark:hover:text-yellow-100"
+            />
             <span class="sr-only">Read about scoring on fudawiki.org</span>
           </a>
         </div>
@@ -41,16 +59,27 @@
           <!-- Set wild-card behavior for KIKU-NI-SAKAZUKI -->
           <ToggleSwitch :callback="toggleSake" :init-value="config.sakeIsWildCard">
             <template #label>Wild Card Sake Cup</template>
-            <template #description>The
-              <a title="Kiku ni sakazuki" class="underline cursor-help underline-offset-4 decoration-dotted">sake cup</a>
-              counts as both animal and plain types.</template>
+            <template #description
+              >The
+              <a
+                title="Kiku ni sakazuki"
+                class="underline cursor-help underline-offset-4 decoration-dotted"
+                >sake cup</a
+              >
+              counts as both animal and plain types.</template
+            >
           </ToggleSwitch>
 
           <!-- Set additional scoring rule -->
-          <ToggleSwitch :callback="toggleDouble" :init-value="config.doubleScoreOverSeven">
+          <ToggleSwitch
+            :callback="toggleDouble"
+            :init-value="config.doubleScoreOverSeven"
+          >
             <template #label>Double Over Seven</template>
-            <template #description>Double the score if the combined yaku value is 7
-              points or greater.</template>
+            <template #description
+              >Double the score if the combined yaku value is 7 points or
+              greater.</template
+            >
           </ToggleSwitch>
         </div>
       </div>
@@ -63,18 +92,14 @@
         </p>
         <ul class="grid w-full mx-auto gap-y-5">
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
-            <span class="font-semibold ">
-              Game Length
-            </span>
+            <span class="font-semibold"> Game Length </span>
             <span class="text-indigo-600 capitalize dark:text-yellow-300">
               {{ config.maxRounds }} rounds
             </span>
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <div>
-              <span class="font-semibold ">
-                Moon/Flower Viewings
-              </span>
+              <span class="font-semibold"> Moon/Flower Viewings </span>
               <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
                 {{ getOptionDescription(config.allowViewingsYaku) }}
               </span>
@@ -85,9 +110,7 @@
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <div>
-              <span class="font-semibold ">
-                Wild Card Sake Cup
-              </span>
+              <span class="font-semibold"> Wild Card Sake Cup </span>
               <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
                 The sake cup counts as both animal and plain types.
               </span>
@@ -98,9 +121,7 @@
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <div>
-              <span class="font-semibold">
-                Double Over Seven
-              </span>
+              <span class="font-semibold"> Double Over Seven </span>
               <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
                 Double the score if the combined yaku value is 7 points or greater.
               </span>
@@ -113,13 +134,15 @@
       </div>
 
       <div :class="[gameStart ? 'order-first' : '']">
-      <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
-        Help
-      </p>
-      <ToggleSwitch :callback="toggleLabels" :init-value="config.cardLabels">
-        <template #label>Card Labels</template>
-        <template #description>Include card corner labels to assist with matching.</template>
-      </ToggleSwitch>
+        <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Help
+        </p>
+        <ToggleSwitch :callback="toggleLabels" :init-value="config.cardLabels">
+          <template #label>Card Labels</template>
+          <template #description
+            >Include card corner labels to assist with matching.</template
+          >
+        </ToggleSwitch>
       </div>
     </ClientOnly>
   </div>
@@ -188,11 +211,13 @@ const loadSettings = async () => {
  */
 const saveSettings = () => {
   if (!settingsUpdated.value || !user) return;
-  if (user.settings) {
-    console.info("Updating settings...", user.settings);
-    user.settings = config.getCurrentSettings;
-    console.info("Profile updated.");
+  if (!user.settings) {
+    console.info("Creating settings...");
+  } else {
+    console.info("Updating settings...");
   }
+  user.settings = config.getCurrentSettings;
+  console.info("Profile updated.");
   settingsUpdated.value = false;
 };
 

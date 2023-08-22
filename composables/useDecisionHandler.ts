@@ -1,10 +1,13 @@
 import { storeToRefs } from "pinia";
 import { useGameDataStore } from "~/stores/gameDataStore";
 
+const watcher = ref();
+
 export const useDecisionHandler = () => {
   type KoikoiDecision = "stop" | "koikoi" | "pending" | null;
-
+  
   const useDecision = (): Ref<KoikoiDecision> => useState("decision", () => null);
+
   const decision = useDecision();
   const getDecision = computed(() => decision.value);
 
@@ -32,13 +35,20 @@ export const useDecisionHandler = () => {
     return decision.value;
   };
 
-  const {roundOver} = storeToRefs(useGameDataStore());
-  const unwatch = watch(roundOver, () => {
-    if (roundOver.value === false) {
-      decision.value = null;
-      unwatch()
-    }
-  })
+  const {roundOver, gameOver} = storeToRefs(useGameDataStore());
+
+  if (!watcher.value) {
+    console.debug("Setting decision watcher...")
+    watcher.value = watch([roundOver, gameOver], () => {
+      if (roundOver.value === false || gameOver.value) {
+        decision.value = null;
+        if (gameOver.value) {
+          watcher.value()
+          console.debug("Cleared decision watcher.")
+        }
+      }
+    })
+  }
 
   return {
     // Setters

@@ -49,6 +49,7 @@ export const useAuth = () => {
     };
     useGuest().value = JSON.stringify(guest);
     useToken().value = JSON.stringify(guest);
+    return guest;
   };
 
   const logout = () => {
