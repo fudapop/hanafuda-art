@@ -196,18 +196,26 @@
 </template>
 <script setup lang="ts">
 import { useAsyncState } from "@vueuse/core";
+import { useToast, POSITION } from "vue-toastification";
 const { loginWithOAuth, loginAsGuest } = useAuth();
 const redirectUrl = (useRoute().query.redirect || "/") as string;
 const userState = useAsyncState(getCurrentUser(), undefined);
 const user = computed(() => userState.state.value);
+const toast = useToast();
 
 const login = async () => {
+  const toastId = toast.info("Building your profile...");
   const guest = await loginAsGuest();
-  if (guest) navigateTo(redirectUrl);
+  if (guest) {
+    toast.dismiss(toastId);
+    toast.success("Good to go! Have fun!", { timeout: 1000 });
+    navigateTo(redirectUrl);
+  }
 };
 
 watch(user, () => {
   if (user.value) {
+    toast.success("Login successful!");
     navigateTo(redirectUrl);
   }
 });

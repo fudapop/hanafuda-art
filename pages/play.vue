@@ -80,6 +80,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import { useToast, POSITION } from "vue-toastification";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
@@ -107,6 +108,8 @@ const autoOpponent: Ref<boolean> = useOpponent();
 const showModal = ref(false);
 const showLoader = ref(false);
 const gameStart = useState("start");
+
+const toast = useToast();
 
 const {
   decisionIsPending,
@@ -153,8 +156,10 @@ const handleStop = () => {
 
 const handleKoikoi = () => {
   console.debug(activePlayer.value.id.toUpperCase(), ">>> Called KOI-KOI");
+  const caller = ps.players.p1.isActive ? "You" : "Player 2";
   ps.incrementBonus();
   showModal.value = false;
+  toast(`${caller} called Koi-Koi!`, { timeout: 2000, position: POSITION.TOP_CENTER });
 };
 
 // Closing the round results modal
