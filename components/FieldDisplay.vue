@@ -1,6 +1,6 @@
 <template>
   <ul :class="{
-    'transition-all duration-500 ease-out flex flex-wrap w-[320px] sm:w-[450px] gap-1': true,
+    'transition-all duration-500 ease-out max-sm:flex max-sm:flex-wrap max-sm:w-[320px] sm:w-max sm:grid sm:grid-cols-7 gap-1': true,
     'sm:[&>:nth-child(n+8)]:-translate-y-8 sm:[&>:nth-child(n+8):nth-child(-n+14)]:translate-x-1/2': true,
     'max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:-translate-y-4 max-sm:[&>:nth-child(n+10)]:-translate-y-8 max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:translate-x-1/2': thirdRowIsOccupied,
     'origin-left max-xs:scale-90': thirdRowIsOccupied,
@@ -19,7 +19,7 @@
           'pointer-events-none staged': cs.staged.has(card),
         }" @click="() => handleClick(card)">
         <template v-if="useConfigStore().cardLabels">
-            <CardLabel :card="card" />
+            <LazyCardLabel :card="card" />
           </template>
           <CardImage :src="getCardUrl(card)!" :card="card" />
         </div>

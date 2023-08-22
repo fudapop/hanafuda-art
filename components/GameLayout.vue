@@ -24,7 +24,7 @@
         <span class="sr-only">Open side panel</span>
       </button>
     </div>
-      <ProgressPanel :open="sidebarOpen" @close="() => sidebarOpen = false" />
+      <LazyProgressPanel :open="sidebarOpen" @close="() => sidebarOpen = false" />
     </template>
 
     <div class="absolute flex top-3 right-3 gap-x-4">
@@ -48,7 +48,7 @@
       '-translate-y-full': !gameStart,
     }">
       <div class="p-2">
-        <StatusBar :user="null" :playerNum="2" />
+        <LazyStatusBar :user="null" :playerNum="2" />
       </div>
     </div>
 
@@ -70,7 +70,7 @@
       'translate-y-full': !gameStart,
     }">
       <div class="p-2">
-        <StatusBar :user="user" :playerNum="1" />
+        <LazyStatusBar :user="user" :playerNum="1" />
       </div>
     </div>
 
@@ -82,8 +82,8 @@
       </button>
     </div>
 
-    <ExitWarning :open="leavingGame" @cancel="leavingGame = false" @confirm="handleExit" />
-    <FeedbackForm :open="requestFeedback" @close="() => (requestFeedback = false)" />
+    <LazyExitWarning :open="leavingGame" @cancel="leavingGame = false" @confirm="handleExit" />
+    <LazyFeedbackForm :open="requestFeedback" @close="() => (requestFeedback = false)" />
   </div>
 </template>
 

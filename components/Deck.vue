@@ -16,7 +16,7 @@
             <img
               src="/images/coin.webp"
               alt="koi-koi bonus"
-              class="object-cover object-center drop-shadow-md"
+              class="object-cover object-center drop-shadow-sm"
             />
           </div>
         </TransitionGroup>
@@ -40,13 +40,18 @@
           leave-from="opacity-100"
           leave-to="opacity-0 motion-safe:translate-x-1"
         >
+        <div v-if="revealedCard" class="relative z-30 overflow-hidden transition-transform -translate-x-4 sm:translate-x-3/4 card">
+          <template v-if="useConfigStore().cardLabels">
+            <LazyCardLabel :card="revealedCard" />
+          </template>
           <CardImage
-            v-if="revealedCard && revealedCardImg"
+            v-if="revealedCardImg"
             :key="revealedCard"
             :card="revealedCard"
             :src="revealedCardImg"
-            class="object-cover mx-auto transition-transform -translate-x-4 sm:translate-x-3/4 card drop-shadow-lg"
+            class="object-cover mx-auto drop-shadow-lg"
           />
+        </div>
         </HeadlessTransitionChild>
       </HeadlessTransitionRoot>
 
@@ -63,6 +68,7 @@
 <script setup lang="ts">
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { usePlayerStore } from "~/stores/playerStore";
+import { useConfigStore } from "~/stores/configStore";
 import { useCardHandler } from "~/composables/useCardHandler";
 import { useCardDesign } from "~/composables/useCardDesign";
 

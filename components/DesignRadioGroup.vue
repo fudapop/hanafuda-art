@@ -5,7 +5,7 @@
                 Select a design
             </HeadlessRadioGroupLabel>
             <div class="font-semibold tracking-wide text-right text-gray-900 dark:text-white">
-                <img src="/images/coin.webp" alt="coin" class="inline w-5 h-5 align-middle drop-shadow-md" />
+                <img src="/images/coin.webp" alt="coin" class="inline w-5 h-5 align-middle drop-shadow-sm" />
                 {{ coins }}
             </div>
         </div>
@@ -25,7 +25,7 @@
                             class="absolute inset-x-0 w-8 h-auto mx-auto text-gray-900 translate-x-1 opacity-0 top-1/3 dark:text-white group-hover:opacity-100" />
                         <div
                             class="absolute inset-x-0 mx-auto text-sm font-semibold tracking-wide text-gray-900 transition-all opacity-0 w-max top-4 dark:text-white group-hover:opacity-100 group-hover:-translate-y-2">
-                            <img src="/images/coin.webp" alt="coin" class="inline w-4 h-4 align-middle drop-shadow-md" />
+                            <img src="/images/coin.webp" alt="coin" class="inline w-4 h-4 align-middle drop-shadow-sm" />
                             {{ UNLOCK_COST }}
                         </div>
                     </button>
@@ -36,7 +36,7 @@
             <!-- <template #title> Unlock a new design </template> -->
     <template #image>
     <div :class="[newUnlock, 'flex items-center text-gray-900 dark:text-white justify-center']">
-        <img src="/images/coin.webp" alt="coin" class="inline w-8 h-8 drop-shadow-md" />
+        <img src="/images/coin.webp" alt="coin" class="inline w-8 h-8 drop-shadow-sm" />
         <ArrowRightIcon class="inline w-5 h-5 mx-2" />
         <LockOpenIcon class="w-8 h-auto" />
 

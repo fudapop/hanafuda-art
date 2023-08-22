@@ -43,7 +43,7 @@
         <AnimatedCards />
         <button type="button" @click="handleLike" class="absolute pointer-events-auto max-sm:bottom-5 max-sm:left-5 sm:top-5 sm:right-5 focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300">
           <HeartIcon :aria-hidden="true"
-            :class="['w-8 h-auto stroke-gray-500 stroke-1', isLiked ? 'fill-red-600 stroke-red-400' : '']" />
+            :class="['w-8 h-auto stroke-gray-500 stroke-1 drop-shadow-md', isLiked ? 'fill-red-600 stroke-red-400' : '']" />
         </button>
       </div>
       <div class="h-full p-4 my-3 rounded-lg shadow-inner bg-gray-50 dark:bg-[#40495a] dark:text-white">

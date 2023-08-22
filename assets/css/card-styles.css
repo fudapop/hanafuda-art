@@ -100,9 +100,12 @@
 .moon-rabbit {
 	--card-radius: 0.1rem;
 	--card-aspect: 58/97;
+	--card-border-w: 2px;
+	--card-border-color: #333;
 	
 	& .card img {
-		scale: 1 1.05
+		padding-top: 1px;
+		scale: 1 1.07;
 	}
 	
 	& .down {
