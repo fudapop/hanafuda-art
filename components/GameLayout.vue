@@ -104,16 +104,45 @@
       </button>
     </div>
 
+    <Transition
+      appear
+      enter-active-class="duration-300 ease-out"
+      enter-from-class="translate-y-4 opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="duration-300 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="translate-y-4 opacity-0"
+    >
+      <div
+        v-if="showLoader"
+        class="absolute inset-0 h-full mx-auto pointer-events-none top-1/3 w-max isolate"
+      >
+        <SakuraLoader class="opacity-80" />
+        <p class="font-semibold tracking-wide text-center text-gray-900 animate-pulse">
+          Just a moment...
+        </p>
+      </div>
+    </Transition>
+
     <LazyExitWarning
       :open="leavingGame"
       @cancel="leavingGame = false"
       @confirm="handleExit"
     />
-    <LazyFeedbackForm :open="requestFeedback" @close="() => (requestFeedback = false)" />
+    <LazyFeedbackForm
+      :open="promptFeedback"
+      @close="
+        () => {
+          promptFeedback = false;
+        }
+      "
+    />
+    <LazySignupPrompt :open="promptSignup" @cancel="handleSignupCancel" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useStorage } from "@vueuse/core";
 import { ArrowLeftOnRectangleIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 import { usePlayerStore } from "~/stores/playerStore";
@@ -126,10 +155,13 @@ const user = toValue(useProfile().current);
 const tabs = ref(["Design", "Gameplay", "Profile"]);
 const gameStart = useState("start", () => false);
 const leavingGame = ref(false);
-const requestFeedback = ref(false);
+const promptFeedback = ref(false);
+const promptSignup = ref(false);
 const sidebarOpen = ref(false);
+const showLoader = ref(false);
 
 const feedbackSubmitted = computed(() => user?.flags?.hasSubmittedFeedback);
+const signupDeclined = useStorage("hanafuda-signup-declined", false, sessionStorage);
 
 const handleClick = () => {
   if (!gameStart.value) {
@@ -144,13 +176,33 @@ const handleExit = () => {
   gameStart.value = false;
 };
 
-const unwatch = watch([gameStart, leavingGame], () => {
-  if (feedbackSubmitted.value) {
+const handleSignupCancel = async () => {
+  showLoader.value = true;
+  promptSignup.value = false;
+  signupDeclined.value = true;
+  await sleep();
+  showLoader.value = false;
+  promptFeedback.value = true;
+};
+
+const unwatch = watch([gameStart, leavingGame], async () => {
+  if (!gameStart.value && !leavingGame.value) {
+    showLoader.value = true;
+    if (user?.isGuest && !signupDeclined.value) {
+      await sleep();
+      showLoader.value = false;
+      promptSignup.value = true;
+      return;
+    }
+    if (!feedbackSubmitted.value) {
+      await sleep();
+      showLoader.value = false;
+      promptFeedback.value = true;
+      return;
+    }
+    await sleep(500);
+    showLoader.value = false;
     unwatch();
-    return;
   }
-  if (!gameStart.value && !leavingGame.value) requestFeedback.value = true;
 });
 </script>
-
-<style scoped></style>

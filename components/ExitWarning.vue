@@ -9,8 +9,10 @@
       </div>
     </template>
     <template #description>
-      The game will be forfeited and progress will not be saved. Are you sure you want to
-      leave?
+      <p class="text-sm text-gray-500 dark:text-gray-300">
+        The game will be forfeited and progress will not be saved. Are you sure you want
+        to leave?
+      </p>
     </template>
     <template #actions>
       <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-2">

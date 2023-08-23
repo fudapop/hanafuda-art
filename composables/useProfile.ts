@@ -5,7 +5,6 @@ import {
 	getDoc,
 	setDoc,
 	getFirestore,
-	Timestamp,
 } from "firebase/firestore";
 import { useStorage } from "@vueuse/core";
 import { CardDesign } from "~/composables/useCardDesign";
@@ -26,7 +25,7 @@ interface UserProfile {
 		liked: CardDesign[];
 	};
 	settings: Record<string, any> | null;
-	flags?: Record<string, any>;
+	flags: Record<string, any>;
 	isGuest?: boolean;
 }
 
@@ -99,10 +98,16 @@ export const useProfile = () => {
 	 */
 	const loadProfile = async (user: User) => {
 		const userData = await getUserData(user);
+		// Get guest profile data if available
+		const guest = useGuestProfile();
+		console.table(guest.value);
+
 		if (userData) {
 			loadUserData(user, userData);
 		} else if (user.isAnonymous) {
 			loadGuestData(user);
+		} else if (user.uid === guest.value?.uid) {
+			upgradeGuestProfile(user, guest.value as UserProfile);
 		} else {
 			createNewProfile(user);
 		}
@@ -116,9 +121,7 @@ export const useProfile = () => {
 				userData.username ||
 				user.displayName?.split(" ")[0] ||
 				`User_${user.uid.slice(0, 5)}`,
-			lastUpdated: userData.lastUpdated
-				? new Date(userData.lastUpdated)
-				: new Date(),
+			lastUpdated: userData.lastUpdated?.toDate() || new Date(),
 			record: userData.record || { coins: 500, win: 0, draw: 0, loss: 0 },
 			designs: userData.designs || { unlocked: [...defaultDesigns], liked: [] },
 			settings: userData.settings || null,
@@ -138,6 +141,10 @@ export const useProfile = () => {
 			lastUpdated: new Date(),
 			record: { coins: 0, win: 0, draw: 0, loss: 0 },
 			designs: { unlocked: [...defaultDesigns], liked: [] },
+			flags: {
+				isNewPlayer: true,
+				hasSubmittedFeedback: false,
+			},
 			isGuest: true,
 		});
 		profile.value = guest.value as UserProfile;
@@ -148,7 +155,7 @@ export const useProfile = () => {
 			uid: user.uid,
 			avatar: user.photoURL || getRandom(avatars),
 			username:
-				user.displayName?.split(" ")[0] || `User #${user.uid.slice(0, 5)}`,
+			user.displayName?.split(" ")[0] || `User #${user.uid.slice(0, 5)}`,
 			lastUpdated: new Date(),
 			record: { coins: 500, win: 0, draw: 0, loss: 0 },
 			designs: { unlocked: [...defaultDesigns], liked: [] },
@@ -160,6 +167,20 @@ export const useProfile = () => {
 		};
 		setUserData();
 	};
+
+	const upgradeGuestProfile = (user: User, guestProfile: UserProfile) => {
+		profile.value = guestProfile;
+		profile.value.lastUpdated = new Date();
+		profile.value.record.coins += 500;
+		delete profile.value.isGuest;
+		setUserData();
+		console.debug("Upgraded guest profile.")
+		deleteGuestProfile();
+	};
+
+	const deleteGuestProfile = () => {
+		sessionStorage?.removeItem("hanafuda-guest");
+	}
 
 	const getProfile = async (user: User) => {
 		if (profile.value) return profile.value;
@@ -184,6 +205,7 @@ export const useProfile = () => {
 			});
 		} else {
 			const guest = useGuestProfile();
+			console.log("Updating guest profile...");
 			for (const key in data) {
 				// @ts-ignore
 				guest.value[key as keyof Partial<UserProfile>] = data[key];
@@ -211,7 +233,7 @@ export const useProfile = () => {
 		onAuthStateChanged(getAuth(), () => {
 			if (getAuth().currentUser === null) {
 				profile.value = null;
-				sessionStorage?.removeItem("hanafuda-guest");
+				deleteGuestProfile();
 			}
 		});
 	}

@@ -10,7 +10,9 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div class="fixed inset-0 transition-opacity bg-gray-600 opacity-50 dark:bg-black" />
+        <div
+          class="fixed inset-0 transition-opacity bg-gray-600 opacity-50 dark:bg-black"
+        />
       </HeadlessTransitionChild>
 
       <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -40,9 +42,7 @@
                     <slot name="title" />
                   </HeadlessDialogTitle>
                   <div class="mt-2">
-                    <p class="text-sm text-gray-500 dark:text-gray-300">
-                      <slot name="description" />
-                    </p>
+                    <slot name="description" />
                   </div>
                 </div>
               </div>

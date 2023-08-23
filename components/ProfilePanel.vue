@@ -95,7 +95,11 @@
 
     <!-- Account sign-in/out -->
     <div class="[@media(max-height:_500px)]:hidden">
-      <SignupPanel v-if="user.isGuest" class="mt-2" />
+      <div v-if="user.isGuest" class="mx-auto w-max">
+        <ExclamationCircleIcon class="w-6 h-6 inline align-top" />
+        <p class="inline ml-2 text-sm">Sign in is required to save your profile.</p>
+        <SignupPanel class="mt-2" />
+      </div>
       <div v-else class="flex flex-col items-center justify-center">
         <LoginButton />
       </div>
@@ -105,7 +109,7 @@
 
 <script setup lang="ts">
 import { onClickOutside, useDateFormat } from "@vueuse/core";
-import { PencilSquareIcon } from "@heroicons/vue/24/outline";
+import { PencilSquareIcon, ExclamationCircleIcon } from "@heroicons/vue/24/outline";
 
 // const user = JSON.parse(useRoute().params.user as string);
 const user = toValue(useProfile().current)!;

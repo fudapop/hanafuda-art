@@ -1,90 +1,91 @@
 import {
-  signInAnonymously,
-  signInWithCredential,
-  signInWithRedirect,
-  GoogleAuthProvider,
-  GithubAuthProvider,
-  signOut,
-  getRedirectResult,
-  UserCredential,
+	signInAnonymously,
+	linkWithRedirect,
+	signInWithRedirect,
+	GoogleAuthProvider,
+	GithubAuthProvider,
+  // FacebookAuthProvider,
+	signOut,
+	getRedirectResult,
 } from "firebase/auth";
 import { useStorage } from "@vueuse/core";
-
-const PROVIDERS = {
-  google: () => new GoogleAuthProvider(),
-  github: () => new GithubAuthProvider(),
-} as const;
-
-type OAuthProviders = keyof typeof PROVIDERS;
-
-const useGuest = () =>
-  useStorage(
-    "hanafuda-guest",
-    (): string | undefined => undefined,
-    localStorage
-  );
-
-const useToken = () =>
-  useStorage(
-    "hanafuda-token",
-    (): string | undefined => undefined,
-    localStorage
-  );
+import { useToast } from "vue-toastification";
 
 export const useAuth = () => {
-  const auth = useFirebaseAuth()!;
-  const error = ref();
+	const PROVIDERS = {
+		google: GoogleAuthProvider,
+		github: GithubAuthProvider,
+		// facebook: FacebookAuthProvider,
+	} as const;
 
-  const loginWithOAuth = (providerName: OAuthProviders) => {
-    const provider = PROVIDERS[providerName]();
-    signInWithRedirect(auth, provider);
-  };
+	type OAuthProviders = keyof typeof PROVIDERS;
 
-  const loginAsGuest = async () => {
-    const { user } = await signInAnonymously(auth);
-    const idToken = await user.getIdToken();
-    const guest = {
-      uid: user.uid,
-      idToken,
-    };
-    useGuest().value = JSON.stringify(guest);
-    useToken().value = JSON.stringify(guest);
-    return guest;
-  };
+	const auth = useFirebaseAuth()!;
+	const error = ref();
+  const toast = useToast();
 
-  const logout = () => {
-    if (auth.currentUser?.isAnonymous) {
-      auth.currentUser.delete();
-    } else {
-      signOut(auth);
-    }
-  };
+	const useGuest = () =>
+		useStorage(
+			"hanafuda-guest",
+			(): Record<string, any> | undefined => undefined,
+			localStorage
+		);
 
-  onMounted(async () => {
-    try {
-      const result = await getRedirectResult(auth);
-      if (result) {
-        // This is the signed-in user
-        const user = result.user;
-        // This gives you a Facebook Access Token.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        useToken().value = JSON.stringify({
-          uid: user.uid,
-          accessToken: credential?.accessToken,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      error.value = err;
-    }
-  });
+	const loginWithOAuth = (providerName: OAuthProviders) => {
+		const provider = new PROVIDERS[providerName]();
+		signInWithRedirect(auth, provider);
+	};
 
-  return {
-    loginWithOAuth,
-    loginAsGuest,
-    logout,
-    error,
-    useGuest,
-    useToken,
-  };
+	const loginAsGuest = async () => {
+		const { user } = await signInAnonymously(auth);
+		const guest = {
+			uid: user.uid,
+		};
+		useGuest().value = guest;
+		return guest;
+	};
+
+	const logout = () => {
+		if (auth.currentUser?.isAnonymous) {
+			auth.currentUser.delete();
+		} else {
+			signOut(auth);
+		}
+	};
+
+	const linkAccount = (providerName: OAuthProviders) => {
+		const user = auth.currentUser;
+		if (!user) return;
+		const provider = PROVIDERS[providerName];
+		linkWithRedirect(user, new provider());
+	};
+
+	onMounted(async () => {
+		try {
+			const result = await getRedirectResult(auth);
+			if (result) {
+				const googleCredential = GoogleAuthProvider.credentialFromResult(result);
+				const githubCredential = GithubAuthProvider.credentialFromResult(result);
+				// const facebookCredential = FacebookAuthProvider.credentialFromResult(result);
+        const credential = googleCredential || githubCredential || null;
+
+        if (credential) {
+          toast.success("You're signed in!", { timeout: 1000 });
+        }
+				
+			}
+		} catch (err) {
+			toast.error("Unable to sign in. Please try again later.");
+			error.value = err;
+		}
+	});
+
+	return {
+		loginWithOAuth,
+		loginAsGuest,
+		logout,
+    linkAccount,
+		error,
+		useGuest,
+	};
 };
