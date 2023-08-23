@@ -1,6 +1,10 @@
 <template>
   <Modal :open="open">
-    <template #title> You've got coins! How about 500 more?</template>
+    <template #title
+      ><span class="[text-wrap:balance]">
+        You've got coins! How about 500 more?
+      </span></template
+    >
     <template #image>
       <img src="/images/coin.webp" alt="coin" class="w-8 h-8 drop-shadow-sm mx-auto" />
     </template>
@@ -15,7 +19,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0 translate-x-4"
       >
-        <div class="h-44 mt-5" v-if="!openSignup">
+        <div class="h-[250px] xs:h-40 mt-5" v-if="!openSignup">
           <p class="text-center text-sm text-gray-600 dark:text-gray-300">
             Your coins can be used to unlock new card designs and avatars. However, guest
             profiles cannot be saved.
@@ -32,11 +36,11 @@
             </button>
           </div>
         </div>
-        <div class="h-44 mt-5 relative" v-else>
+        <div class="h-[250px] xs:h-40 mt-5 relative" v-else>
           <SignupPanel class="" />
           <button
             type="button"
-            class="text-xs underline absolute bottom-0 inset-x-0 mx-auto"
+            class="absolute bottom-0 text-center inset-x-0 mx-auto text-xs underline"
             @click="() => (openSignup = false)"
           >
             Cancel
