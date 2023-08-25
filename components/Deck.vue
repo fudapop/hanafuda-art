@@ -1,29 +1,36 @@
 <template>
   <div class="relative">
     <div class="absolute inset-0 my-auto overflow-visible">
-      <div
-        v-if="ps.bonusMultiplier > 1"
-        class="w-full sm:w-1/2 text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 sm:top-1/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
+      <Transition
+        appear
+        enter-active-class="duration-300 origin-center ease-in"
+        enter-from-class="scale-[3] translate-x-[50vw]"
+        enter-to-class="scale-100 translate-x-0"
       >
-        <TransitionGroup appear name="stamp">
-          <div
-            :title="`Winning score x${n}!`"
-            v-for="n in ps.bonusMultiplier - 1"
-            :key="n"
-            class="absolute w-6 h-6 mt-3 -z-10"
-            :style="{ marginLeft: `${(n - 1) * 10}px` }"
-          >
-            <img
-              src="/images/coin.webp"
-              alt="koi-koi bonus"
-              class="object-cover object-center drop-shadow-sm"
-            />
-          </div>
-        </TransitionGroup>
-        <span class="absolute w-full mt-3 text-center drop-shadow-lg"
-          >x{{ ps.bonusMultiplier }}</span
+        <div
+          v-if="ps.bonusMultiplier > 1"
+          class="w-full sm:w-1/2 text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 sm:top-1/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
         >
-      </div>
+          <TransitionGroup appear name="stamp">
+            <div
+              :title="`Winning score x${n}!`"
+              v-for="n in ps.bonusMultiplier - 1"
+              :key="n"
+              class="absolute w-6 h-6 mt-3 -z-10"
+              :style="{ marginLeft: `${(n - 1) * 10}px` }"
+            >
+              <img
+                src="/images/coin.webp"
+                alt="koi-koi bonus"
+                class="object-cover object-center drop-shadow-sm"
+              />
+            </div>
+          </TransitionGroup>
+          <span class="absolute w-full mt-3 text-center drop-shadow-lg"
+            >x{{ ps.bonusMultiplier }}</span
+          >
+        </div>
+      </Transition>
 
       <!-- DECK PILE -->
       <div
@@ -40,18 +47,21 @@
           leave-from="opacity-100"
           leave-to="opacity-0 motion-safe:translate-x-1"
         >
-        <div v-if="revealedCard" class="relative z-30 overflow-hidden transition-transform -translate-x-4 sm:translate-x-3/4 card">
-          <template v-if="useConfigStore().cardLabels">
-            <LazyCardLabel :card="revealedCard" />
-          </template>
-          <CardImage
-            v-if="revealedCardImg"
-            :key="revealedCard"
-            :card="revealedCard"
-            :src="revealedCardImg"
-            class="object-cover mx-auto drop-shadow-lg"
-          />
-        </div>
+          <div
+            v-if="revealedCard"
+            class="relative z-30 overflow-hidden transition-transform -translate-x-4 sm:translate-x-3/4 card"
+          >
+            <template v-if="useConfigStore().cardLabels">
+              <LazyCardLabel :card="revealedCard" />
+            </template>
+            <CardImage
+              v-if="revealedCardImg"
+              :key="revealedCard"
+              :card="revealedCard"
+              :src="revealedCardImg"
+              class="object-cover mx-auto drop-shadow-lg"
+            />
+          </div>
         </HeadlessTransitionChild>
       </HeadlessTransitionRoot>
 

@@ -95,7 +95,7 @@
 
     <!-- Account sign-in/out -->
     <div class="[@media(max-height:_500px)]:hidden">
-      <div v-if="user.isGuest" class="mx-auto w-max">
+      <div v-if="user.isGuest" class="mx-auto w-max text-gray-900 dark:text-white">
         <ExclamationCircleIcon class="w-6 h-6 inline align-top" />
         <p class="inline ml-2 text-sm">Sign in is required to save your profile.</p>
         <SignupPanel class="mt-2" />

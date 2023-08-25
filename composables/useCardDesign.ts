@@ -1,4 +1,4 @@
-import { tryOnMounted, useStorage } from "@vueuse/core";
+import { useStorage } from "@vueuse/core";
 import { CardName, DECK } from "~/utils/cards";
 import { ref as storageRef } from "firebase/storage";
 import { useFirebaseStorage, useStorageFileUrl } from "vuefire";

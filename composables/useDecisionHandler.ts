@@ -42,10 +42,6 @@ export const useDecisionHandler = () => {
     watcher.value = watch([roundOver, gameOver], () => {
       if (roundOver.value === false || gameOver.value) {
         decision.value = null;
-        if (gameOver.value) {
-          watcher.value()
-          console.debug("Cleared decision watcher.")
-        }
       }
     })
   }

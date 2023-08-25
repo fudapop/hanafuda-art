@@ -100,7 +100,6 @@ export const useProfile = () => {
 		const userData = await getUserData(user);
 		// Get guest profile data if available
 		const guest = useGuestProfile();
-		console.table(guest.value);
 
 		if (userData) {
 			loadUserData(user, userData);

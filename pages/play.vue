@@ -95,7 +95,7 @@ definePageMeta({
 const cs = useCardStore();
 const ps = usePlayerStore();
 const ds = useGameDataStore();
-const { deck, handsEmpty } = storeToRefs(cs);
+const { handsEmpty } = storeToRefs(cs);
 const { players, activePlayer } = storeToRefs(ps);
 const { roundOver, gameOver, turnCounter } = storeToRefs(ds);
 
@@ -155,11 +155,14 @@ const handleStop = () => {
 };
 
 const handleKoikoi = () => {
-  console.debug(activePlayer.value.id.toUpperCase(), ">>> Called KOI-KOI");
-  const caller = ps.players.p1.isActive ? "You" : "Player 2";
+  const caller = activePlayer.value.id.toUpperCase();
+  console.debug(caller, ">>> Called KOI-KOI");
   ps.incrementBonus();
   showModal.value = false;
-  toast(`${caller} called Koi-Koi!`, { timeout: 2000, position: POSITION.TOP_CENTER });
+  toast(`${caller === "P1" ? "You" : "Player 2"} called Koi-Koi!`, {
+    timeout: 2000,
+    position: POSITION.TOP_CENTER,
+  });
 };
 
 // Closing the round results modal
