@@ -115,10 +115,12 @@
     >
       <div
         v-if="showLoader"
-        class="absolute inset-0 h-full mx-auto pointer-events-none top-1/3 w-max isolate"
+        class="absolute inset-0 h-full pointer-events-none top-1/3 isolate"
       >
-        <SakuraLoader class="opacity-80" />
-        <p class="font-semibold tracking-wide text-center text-gray-900 animate-pulse">
+        <SakuraLoader class="opacity-80 w-max mx-auto" />
+        <p
+          class="font-semibold tracking-wide text-center text-white drop-shadow-md animate-pulse"
+        >
           Just a moment...
         </p>
       </div>

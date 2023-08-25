@@ -18,6 +18,7 @@
     <template v-if="submitted" #description>
       Your feedback has been submitted. Thank you!
     </template>
+    <template v-else #description> How was your experience? </template>
     <template #actions>
       <form
         v-show="!submitted"
@@ -36,7 +37,7 @@
             />
           </div>
           <div
-            class="mt-8 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8"
+            class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8"
           >
             <p>Ease of Controls</p>
             <StarRating
@@ -46,7 +47,7 @@
             />
           </div>
           <div
-            class="mt-8 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8"
+            class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8"
           >
             <p>Image Quality</p>
             <StarRating
@@ -63,7 +64,7 @@
             :value-options="tags"
             :update-callback="(option) => comments.tag = (option as CommentTag)"
             :label-template="(option) => includeTagEmoji(option as CommentTag)"
-            class-name="mt-2 mb-4 grid grid-cols-3 gap-y-2 gap-x-2"
+            class-name="mt-2 mb-4 grid grid-cols-3 gap-y-1 gap-x-1 text-xs"
           >
             <span class="sr-only">Comment Type</span>
           </OptionsRadioGroup>
@@ -72,7 +73,7 @@
             rows="3"
             v-model="comments.message"
             class="w-full p-2 text-gray-900 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700 dark:text-white"
-            placeholder="Your feedback is greatly appreciated! 🙏🏽"
+            placeholder="Please enter any comments here. Your feedback is greatly appreciated! 🙏🏽"
           />
         </fieldset>
         <div class="flex float-right mt-4 w-max gap-x-4">
@@ -98,10 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ChatBubbleLeftEllipsisIcon,
-  CheckIcon,
-} from "@heroicons/vue/24/outline";
+import { ChatBubbleLeftEllipsisIcon, CheckIcon } from "@heroicons/vue/24/outline";
 
 const { open } = defineProps<{ open: boolean }>();
 

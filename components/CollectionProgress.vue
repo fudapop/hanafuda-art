@@ -30,7 +30,7 @@
           <span
             v-else
             v-show="!(open || openAll)"
-            class="absolute bottom-0 inline-flex ml-4 mb-2"
+            class="absolute bottom-0 inline-flex ml-4 mb-1"
           >
             <span
               v-for="_ in yaku.cards.filter((card) => playerHas(card))"
