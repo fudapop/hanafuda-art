@@ -94,7 +94,7 @@
             class="relative w-full h-full [@media(min-height:_500px)]:hidden"
           >
             <div class="w-[500px] absolute inset-0 h-max m-auto">
-              <div class="mx-auto w-max mt-5">
+              <div class="mx-auto w-max mt-5 text-gray-900 dark:text-white">
                 <ExclamationCircleIcon class="w-6 h-6 inline align-top ml-3" />
                 <p class="inline ml-2">Sign in is required to save your profile.</p>
                 <SignupPanel class="mt-5" />

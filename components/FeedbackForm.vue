@@ -16,9 +16,13 @@
       </div>
     </template>
     <template v-if="submitted" #description>
-      Your feedback has been submitted. Thank you!
+      <p class="text-gray-900 dark:text-white text-center">
+        Your feedback has been submitted. Thank you!
+      </p>
     </template>
-    <template v-else #description> How was your experience? </template>
+    <template v-else #description>
+      <p class="text-gray-900 dark:text-white text-center">How was your experience?</p>
+    </template>
     <template #actions>
       <form
         v-show="!submitted"
