@@ -2,11 +2,13 @@
   <div
     class="sm:[@media_(max-height:500px)]:[--card-height:80px] grid grid-rows-[80px_1fr_80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-[100dvh] overflow-hidden relative"
   >
+    <!-- BACKGROUND ELEMENTS -->
     <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
       <GameBackground />
       <AnimatedBackground />
     </div>
 
+    <!-- SIDEBAR -->
     <template v-if="gameStart">
       <div class="absolute bottom-4 right-4">
         <button
@@ -35,6 +37,7 @@
       <LazyProgressPanel :open="sidebarOpen" @close="() => (sidebarOpen = false)" />
     </template>
 
+    <!-- OPTIONS MENU -->
     <div class="absolute flex top-3 right-3 gap-x-4">
       <OptionsMenu :tabCategories="tabs">
         <template #tab-panel-1>
@@ -49,7 +52,7 @@
       </OptionsMenu>
     </div>
 
-    <!-- Opponent Status Bar -->
+    <!-- OPPONENT STATUS BAR -->
     <div
       :class="{
         'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-b-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
@@ -62,6 +65,7 @@
       </div>
     </div>
 
+    <!-- GAMEPLAY AREA -->
     <Transition
       mode="out-in"
       appear
@@ -80,7 +84,7 @@
       </div>
     </Transition>
 
-    <!-- Player Status Bar -->
+    <!-- PLAYER STATUS BAR -->
     <div
       :class="{
         'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-t-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
@@ -93,10 +97,11 @@
       </div>
     </div>
 
-    <div class="absolute w-max top-3 right-16">
+    <!-- EXIT BUTTON -->
+    <div v-if="gameStart" class="absolute w-max top-3 right-16">
       <button
         type="button"
-        @click="handleClick"
+        @click="handlePressExit"
         class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold drop-shadow-md"
       >
         <ArrowLeftOnRectangleIcon class="w-8 h-8 text-white" aria-hidden="true" />
@@ -104,6 +109,7 @@
       </button>
     </div>
 
+    <!-- LOADER -->
     <Transition
       appear
       enter-active-class="duration-300 ease-out"
@@ -117,7 +123,7 @@
         v-if="showLoader"
         class="absolute inset-0 h-full pointer-events-none top-1/3 isolate"
       >
-        <SakuraLoader class="opacity-80 w-max mx-auto" />
+        <SakuraLoader class="mx-auto opacity-80 w-max" />
         <p
           class="font-semibold tracking-wide text-center text-white drop-shadow-md animate-pulse"
         >
@@ -126,10 +132,11 @@
       </div>
     </Transition>
 
+    <!-- MODALS -->
     <LazyExitWarning
       :open="leavingGame"
       @cancel="leavingGame = false"
-      @confirm="handleExit"
+      @confirm="handleConfirmExit"
     />
     <LazyFeedbackForm
       :open="promptFeedback"
@@ -165,7 +172,7 @@ const showLoader = ref(false);
 const feedbackSubmitted = computed(() => user?.flags?.hasSubmittedFeedback);
 const signupDeclined = useStorage("hanafuda-signup-declined", false, sessionStorage);
 
-const handleClick = () => {
+const handlePressExit = () => {
   if (!gameStart.value) {
     navigateTo("/");
   } else {
@@ -173,7 +180,7 @@ const handleClick = () => {
   }
 };
 
-const handleExit = () => {
+const handleConfirmExit = () => {
   leavingGame.value = false;
   gameStart.value = false;
 };
