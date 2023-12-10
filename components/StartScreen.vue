@@ -1,6 +1,6 @@
 <template>
   <div class="absolute inset-0 flex flex-col items-center m-auto">
-    <div class="relative my-auto drop-shadow-xl sm:-translate-x-1/4">
+    <div class="relative my-auto drop-shadow-xl">
       <div class="absolute right-8 bottom-1/4 rotate-12 -z-10">
         <AnimatedCards />
       </div>
@@ -9,7 +9,7 @@
         >花札 KOI-KOI
       </h1>
     </div>
-    <div class="absolute shadow-lg w-max top-3/4 sm:top-1/2 sm:left-3/4">
+    <div class="absolute shadow-lg w-max top-3/4">
       <button
         type="button"
         class="px-8 py-3 text-xl rounded-lg pri-btn"
