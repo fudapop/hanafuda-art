@@ -9,9 +9,9 @@
       >
         <!-- CARD IMAGES -->
         <div v-if="showCards" class="[--card-height:60px] w-max pointer-events-none">
-          <ListGrid :cols="'auto'" :rows="1" flow="column">
+          <ul className="list-none grid grid-rows-1 grid-flow-col">
             <CardList :cards="yaku.cards" :stack="true" />
-          </ListGrid>
+          </ul>
         </div>
       </div>
       <!-- YAKU TITLE -->

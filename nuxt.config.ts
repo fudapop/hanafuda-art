@@ -1,5 +1,35 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+	components: [
+		{
+			path: "~/components",
+			pathPrefix: false,
+		},
+		{
+			path: "~/components/buttons",
+			pathPrefix: false,
+		},
+		{
+			path: "~/components/cards",
+			pathPrefix: false,
+		},
+		{
+			path: "~/components/modal",
+			pathPrefix: false,
+		},
+		{
+			path: "~/components/menu",
+			pathPrefix: false,
+		},
+		{
+			path: "~/components/play-area",
+			pathPrefix: false,
+		},
+		{
+			path: "~/components/side-panel",
+			pathPrefix: false,
+		},
+	],
 	css: ["@/assets/css/card-styles.css"],
 	devtools: { enabled: false },
 	app: {
