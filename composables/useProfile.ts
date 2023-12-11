@@ -136,7 +136,7 @@ export const useProfile = () => {
 			uid: user.uid,
 			avatar: user.photoURL || getRandom(avatars),
 			username:
-				user.displayName?.split(" ")[0] || `Guest_${user.uid.slice(0, 5)}`,
+				user.displayName?.split(" ")[0] || `User #${user.uid.slice(0, 5)}`,
 			lastUpdated: new Date(),
 			record: { coins: 0, win: 0, draw: 0, loss: 0 },
 			designs: { unlocked: [...defaultDesigns], liked: [] },
@@ -178,7 +178,7 @@ export const useProfile = () => {
 	};
 
 	const deleteGuestProfile = () => {
-		sessionStorage?.removeItem("hanafuda-guest");
+		useGuestProfile().value = {};
 	}
 
 	const getProfile = async (user: User) => {

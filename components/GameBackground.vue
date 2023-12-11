@@ -18,7 +18,8 @@
 
 <script setup lang="ts">
 const { noCalls } = useDecisionHandler();
-const bgIndex = 1;
+const { index = 1 } = defineProps<{ index: number }>();
+const bgIndex = index;
 const bgImages = [
   {
     src: "/bg/grey-hills-1280.webp",

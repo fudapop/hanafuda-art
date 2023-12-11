@@ -95,10 +95,19 @@
 
     <!-- Account sign-in/out -->
     <div class="[@media(max-height:_500px)]:hidden">
-      <div v-if="user.isGuest" class="mx-auto w-max text-gray-900 dark:text-white">
-        <ExclamationCircleIcon class="w-6 h-6 inline align-top" />
+      <div v-if="user.isGuest" class="mx-auto text-gray-900 w-max dark:text-white">
+        <ExclamationCircleIcon class="inline w-6 h-6 align-top" />
         <p class="inline ml-2 text-sm">Sign in is required to save your profile.</p>
-        <SignupPanel class="mt-2" />
+        <!-- <SignupPanel class="mt-2" /> -->
+        <button
+          type="button"
+          class="block px-8 py-3 mx-auto mt-2 text-sm font-medium rounded-lg sec-btn"
+          @click="() => {
+            navigateTo({path: '/login', query: { link: 'true' }});
+          }"
+        >
+          Sign in
+        </button>
       </div>
       <div v-else class="flex flex-col items-center justify-center">
         <LoginButton />

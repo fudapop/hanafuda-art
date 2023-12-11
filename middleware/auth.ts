@@ -10,11 +10,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     const profile = await getProfile(user)
     to.params.user = JSON.stringify(profile);
   } else {
-    return navigateTo({
-      path: "/login",
-      query: {
-        redirect: to.fullPath,
-      },
-    });
+    return navigateTo("/login");
   }
 });

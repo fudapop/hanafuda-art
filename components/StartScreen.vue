@@ -9,14 +9,24 @@
         >花札 KOI-KOI
       </h1>
     </div>
-    <div class="absolute shadow-lg w-max top-3/4">
-      <button
-        type="button"
-        class="px-8 py-3 text-xl rounded-lg pri-btn"
-        @click="() => $emit('start-game')"
-      >
-        Start
-      </button>
+    <div class="absolute flex flex-col shadow-lg w-max top-3/4 gap-y-2">
+        <button
+          type="button"
+          :class="['px-8 py-3 text-xl rounded-lg pri-btn']"
+          @click="() => $emit('start-game')"
+        >
+          Play now
+        </button>
+        <button
+          v-if="userIsGuest"
+          type="button"
+          class="px-8 py-3 text-xl font-medium text-white bg-transparent rounded-lg hover:bg-gray-500/50 sec-btn"
+          @click="() => {
+            navigateTo({path: '/login', query: { link: 'true' }});
+          }"
+        >
+          Sign in
+        </button>
     </div>
     <StartScreenFooter />
   </div>
@@ -24,6 +34,8 @@
 
 <script setup lang="ts">
 defineEmits(["start-game"]);
+const { userIsGuest } = useAuth();
+
 </script>
 
 <style scoped>

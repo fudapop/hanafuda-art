@@ -1,12 +1,12 @@
 import {
 	signInAnonymously,
-	linkWithRedirect,
-	signInWithRedirect,
 	GoogleAuthProvider,
 	GithubAuthProvider,
   // FacebookAuthProvider,
 	signOut,
-	getRedirectResult,
+	signInWithPopup,
+	linkWithPopup,
+	UserCredential,
 } from "firebase/auth";
 import { useStorage } from "@vueuse/core";
 import { useToast } from "vue-toastification";
@@ -31,9 +31,19 @@ export const useAuth = () => {
 			localStorage
 		);
 
-	const loginWithOAuth = (providerName: OAuthProviders) => {
+	const userIsGuest = computed(() => auth.currentUser?.isAnonymous);
+
+	const loginWithOAuth = async (providerName: OAuthProviders) => {
 		const provider = new PROVIDERS[providerName]();
-		signInWithRedirect(auth, provider);
+		try {
+			const result = await signInWithPopup(auth, provider);
+			if (!result) return false;
+			return handleOAuth(result);
+		} catch (err) {
+			toast.error("Unable to sign in. Please try again later.");
+			error.value = err;
+		};
+		return false;
 	};
 
 	const loginAsGuest = async () => {
@@ -53,32 +63,40 @@ export const useAuth = () => {
 		}
 	};
 
-	const linkAccount = (providerName: OAuthProviders) => {
+	const linkAccount = async (providerName: OAuthProviders) => {
 		const user = auth.currentUser;
-		if (!user) return;
+		if (!user) return false;
 		const provider = PROVIDERS[providerName];
-		linkWithRedirect(user, new provider());
+		try {
+			const result = await linkWithPopup(user, new provider());
+			return handleOAuth(result);
+		} catch (err) {
+			toast.error("Unable to link your account. " + (err as Error).message, {
+				timeout: 8000,
+			});
+			error.value = err;
+			return false;
+		};
 	};
 
-	onMounted(async () => {
+	const handleOAuth = async (result: UserCredential) => {
 		try {
-			const result = await getRedirectResult(auth);
-			if (result) {
-				const googleCredential = GoogleAuthProvider.credentialFromResult(result);
-				const githubCredential = GithubAuthProvider.credentialFromResult(result);
-				// const facebookCredential = FacebookAuthProvider.credentialFromResult(result);
-        const credential = googleCredential || githubCredential || null;
+			const googleCredential = GoogleAuthProvider.credentialFromResult(result);
+			const githubCredential = GithubAuthProvider.credentialFromResult(result);
+			// const facebookCredential = FacebookAuthProvider.credentialFromResult(result);
+			const credential = googleCredential || githubCredential || null;
 
-        if (credential) {
-          toast.success("You're signed in!", { timeout: 1000 });
-        }
-				
+			if (credential) {
+				useGuest().value = {};
+				toast.success("You're signed in!", { timeout: 1000 });
+				return true;
 			}
 		} catch (err) {
 			toast.error("Unable to sign in. Please try again later.");
 			error.value = err;
 		}
-	});
+		return false;
+	};
 
 	return {
 		loginWithOAuth,
@@ -87,5 +105,6 @@ export const useAuth = () => {
     linkAccount,
 		error,
 		useGuest,
+		userIsGuest,
 	};
 };

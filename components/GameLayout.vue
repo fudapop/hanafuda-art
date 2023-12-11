@@ -98,7 +98,7 @@
     </div>
 
     <!-- EXIT BUTTON -->
-    <div v-if="gameStart" class="absolute w-max top-3 right-16">
+    <div class="absolute w-max top-3 right-16">
       <button
         type="button"
         @click="handlePressExit"
@@ -157,6 +157,7 @@ import { storeToRefs } from "pinia";
 import { usePlayerStore } from "~/stores/playerStore";
 
 const currentDesign = useCardDesign().useDesign();
+const { logout } = useAuth();
 
 const { players } = storeToRefs(usePlayerStore());
 const user = toValue(useProfile().current);
@@ -174,7 +175,8 @@ const signupDeclined = useStorage("hanafuda-signup-declined", false, sessionStor
 
 const handlePressExit = () => {
   if (!gameStart.value) {
-    navigateTo("/");
+    logout();
+    navigateTo("/login");
   } else {
     leavingGame.value = true;
   }

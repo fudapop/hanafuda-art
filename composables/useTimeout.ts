@@ -46,7 +46,6 @@ export const useTimeout = () => {
 			options.endMsg
 		);
 		activeTimeouts.set(key, errTimeout);
-		console.log(getActiveTimeouts.value);
 		return () => errTimeout.start();
 	};
 

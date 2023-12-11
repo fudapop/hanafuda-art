@@ -42,7 +42,6 @@
             <button
               :class="[
                 'w-full rounded-lg py-2 text-sm [@media(max-height:500px)]:text-left [@media(max-height:500px)]:pl-4 font-medium leading-5 text-blue-700 dark:text-gray-200',
-                'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 dark:ring-offset-gray-200 focus:outline-none focus:ring-2',
                 selected
                   ? 'bg-white dark:bg-gray-800 shadow'
                   : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
@@ -94,8 +93,8 @@
             class="relative w-full h-full [@media(min-height:_500px)]:hidden"
           >
             <div class="w-[500px] absolute inset-0 h-max m-auto">
-              <div class="mx-auto w-max mt-5 text-gray-900 dark:text-white">
-                <ExclamationCircleIcon class="w-6 h-6 inline align-top ml-3" />
+              <div class="mx-auto mt-5 text-gray-900 w-max dark:text-white">
+                <ExclamationCircleIcon class="inline w-6 h-6 ml-3 align-top" />
                 <p class="inline ml-2">Sign in is required to save your profile.</p>
                 <SignupPanel class="mt-5" />
               </div>
