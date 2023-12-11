@@ -49,7 +49,7 @@
     </template>
     <template #actions>
       <div class="grid grid-flow-row-dense grid-cols-2 gap-3 mt-6">
-        <button type="button" class="sec-btn" @click="() => newUnlock = undefined">
+        <button type="button" class="sec-btn" @click="cancelUnlock">
           No, keep my coins.
         </button>
         <button type="button" class="pri-btn" @click="confirmUnlock">
@@ -63,11 +63,13 @@
 
 <script setup lang="ts">
 import { LockClosedIcon, LockOpenIcon, ArrowRightIcon } from '@heroicons/vue/20/solid';
+import { useToast } from 'vue-toastification';
 
 type CardDesign = typeof DESIGNS[number]
 
 const { DESIGNS, useDesign } = useCardDesign();
 const selectedDesign = useDesign();
+const toast = useToast();
 
 const UNLOCK_COST = 500;
 const currentUser = toValue(useProfile().current)
@@ -79,17 +81,25 @@ const coins = computed({
     }
 })
 
+const emits = defineEmits(["preview"]);
 const unlocked = computed(() => currentUser?.designs.unlocked);
 const newUnlock: Ref<CardDesign | undefined> = ref();
 
 const handleUnlock = (design: CardDesign) => {
+    const initialValue = selectedDesign.value;
+    selectedDesign.value = design;
     if (coins.value === undefined || !unlocked.value) return;
     if (coins.value < UNLOCK_COST) {
-        // TODO: add toast
-        console.warn("Not enough coins.");
+        toast.info("You don't have enough coins yet... 🤗", { timeout: 9000 });
+        setTimeout(() => selectedDesign.value = initialValue, 10000);
         return;
     }
     newUnlock.value = design;
+}
+
+const cancelUnlock = () => {
+    newUnlock.value = undefined;
+    emits("preview", undefined);
 }
 
 const confirmUnlock = () => {
@@ -98,7 +108,7 @@ const confirmUnlock = () => {
 
     coins.value -= UNLOCK_COST;
     unlocked.value.push(newUnlock.value);
-    // TODO: add toast
+    toast.success("You've unlocked a new design! 🎉", { timeout: 5000 });
     selectedDesign.value = newUnlock.value;
     newUnlock.value = undefined;
 }
