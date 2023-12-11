@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 const { noCalls } = useDecisionHandler();
-const { index = 1 } = defineProps<{ index: number }>();
+const { index = 1 } = defineProps<{ index?: number }>();
 const bgIndex = index;
 const bgImages = [
   {

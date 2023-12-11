@@ -60,6 +60,7 @@ export const useAuth = () => {
 			auth.currentUser.delete();
 		} else {
 			signOut(auth);
+			toast.info("You have been signed out.");
 		}
 	};
 
@@ -88,7 +89,6 @@ export const useAuth = () => {
 
 			if (credential) {
 				useGuest().value = {};
-				toast.success("You're signed in!", { timeout: 1000 });
 				return true;
 			}
 		} catch (err) {

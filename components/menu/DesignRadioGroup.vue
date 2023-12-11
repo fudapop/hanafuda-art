@@ -107,6 +107,7 @@ const handleUnlock = (design: CardDesign) => {
 
 const cancelUnlock = () => {
     newUnlock.value = undefined;
+    selectedDesign.value = initialDesign!;
 }
 
 const confirmUnlock = () => {

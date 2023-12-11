@@ -71,25 +71,30 @@
 </template>
 <script setup lang="ts">
 import { useToast } from "vue-toastification";
-const { loginWithOAuth, loginAsGuest, linkAccount } = useAuth();
+const { loginWithOAuth, loginAsGuest, linkAccount, userIsGuest } = useAuth();
 const toast = useToast();
 const loggingIn = ref<boolean>(false);
 
 const handleLoginAsGuest = async () => {
   loggingIn.value = true;
-  const toastId = toast.info("Building your profile...");
+  const toastId = toast.info("Loading your profile...");
   const guest = await loginAsGuest();
   if (guest) {
     await sleep(1000);
     toast.dismiss(toastId);
-    toast.success("Good to go! Have fun!", { timeout: 1000 });
+    toast.success("Good to go! Have fun!", { timeout: 2000 });
     navigateTo("/");
   }
 };
 
-const oauthAction = useRoute().query.link ? linkAccount : loginWithOAuth;
+const oauthAction = userIsGuest.value ? linkAccount : loginWithOAuth;
 
 const handleLogin = () => {
+  if (userIsGuest.value) {
+    toast.success("Account linked! You may need to refresh your browser to update your profile.", { timeout: 8000 });
+  } else {
+    toast.success("You're signed in! Have fun!", { timeout: 2000 });
+  }
   loggingIn.value = true;
   navigateTo("/");
 };
