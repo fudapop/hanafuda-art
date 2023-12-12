@@ -22,12 +22,6 @@ type TurnPhase = (typeof PHASES)[number];
 export const useGameDataStore = defineStore("gameData", () => {
 	// State
 	const gameId = ref(getRandomString(28));
-	// const roundHistory = useStorage(
-	// 	"hanafuda-data",
-	// 	[] as RoundResult[],
-	// 	localStorage,
-	// 	{ mergeDefaults: true }
-	// );
 	const roundHistory: Ref<RoundResult[]> = ref([]);
 	const roundCounter = ref(roundHistory.value.length + 1);
 	const turnCounter = ref(1);

@@ -26,7 +26,6 @@ function getRandomString(length: number) {
 		let char = getRandom(chars);
 		key += getChance(50) ? char.toUpperCase() : char;
 	}
-	console.log("Generated key:", key);
 	return key;
 }
 
