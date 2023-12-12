@@ -84,7 +84,7 @@ import { useToast, POSITION } from "vue-toastification";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
-import { CompletionEvent } from "~/components/CollectionArea.vue";
+import { CompletionEvent } from "~/components/play-area/CollectionArea.vue";
 import { checkForWin } from "~/utils/yaku";
 
 definePageMeta({
@@ -155,11 +155,10 @@ const handleStop = () => {
 };
 
 const handleKoikoi = () => {
-  const caller = activePlayer.value.id.toUpperCase();
-  console.debug(caller, ">>> Called KOI-KOI");
+  console.debug(">>> Called KOI-KOI");
   ps.incrementBonus();
   showModal.value = false;
-  toast(`${caller === "P1" ? "You" : "Player 2"} called Koi-Koi!`, {
+  toast("Koi-koi was called!", {
     timeout: 2000,
     position: POSITION.TOP_CENTER,
   });
@@ -287,7 +286,6 @@ watch(activePlayer, () => {
 
 watch(gameStart, () => {
   if (gameStart.value) {
-    localStorage?.removeItem("hanafuda-data");
     startRound();
   } else {
     console.info("Resetting game...");
@@ -297,9 +295,11 @@ watch(gameStart, () => {
 });
 
 onBeforeUnmount(() => {
-  console.debug("Unmounted play.vue");
+  // Reset the game state if the user navigates away from the page
   ds.endRound();
   ds.nextRound();
   handleClose();
+  // Clear stored data
+  sessionStorage?.removeItem("new-hanafuda");
 });
 </script>
