@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    --card-height: 100px;
+    --card-height: 120px;
     --card-aspect: 2/3;
     --table-grid-rows: calc(var(--card-height) / 1.5) 1fr
       calc(var(--card-height) * 2) 1fr var(--card-height);
@@ -48,6 +48,7 @@
   .collection-area {
     --card-height: 45px;
     height: calc(var(--card-height) / 2);
+    max-height: 25px;
     display: grid;
     padding-left: 0.75rem;
     grid-template-columns: 45% 55%;
