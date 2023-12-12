@@ -11,6 +11,7 @@ const DESIGNS = [
 	"modern",
 	"moon-rabbit",
 	"nishiki-fuda",
+	"vaporwave",
 	"ramen-red",
 	"flash-black",
 ] as const;
@@ -20,6 +21,7 @@ export type CardDesign = (typeof DESIGNS)[number];
 export type DesignInfo = {
 	name: string;
 	title: string;
+	releaseDate?: string | Date;
 	attribution?: string;
 	urlDescription?: string;
 	url?: string;
@@ -192,6 +194,14 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 		urlDescription: "Buy this deck and others from their online store!",
 		url: "https://nishikie.stores.jp",
 	},
+	"vaporwave": {
+		name: "vaporwave",
+		title: "Vaporwave",
+		attribution: "Design by Discord user Heavenlysome!",
+		urlDescription: "Join the Hanafuda Discord!",
+		url: "https://discord.gg/pMAPBMhqHH",
+		releaseDate: "12-12-2023",
+	},
 	"flash-black": {
 		name: "flash-black",
 		title: "Flash Black",
@@ -219,16 +229,16 @@ export const useCardDesign = () => {
 	};
 
 	const checkStorage = (cardDesign: CardDesign) => {
-		const data = localStorage?.getItem(cardDesign);
-		if (data) {
-			return JSON.parse(data);
-		}
+		const data = sessionStorage?.getItem("new-hanafuda");
+		if (!data) return;
+		const designData = JSON.parse(data)[cardDesign];
+		return designData;
 	};
 
 	const getCardMap = async (cardDesign: CardDesign) => {
 		const storedMap = checkStorage(cardDesign);
 		if (storedMap) {
-			console.log({ storedMap });
+			console.debug({ storedMap });
 			return new Map([...Object.entries(storedMap)]) as Map<CardName, string>;
 		}
 
@@ -243,15 +253,18 @@ export const useCardDesign = () => {
 
 		const urlMap: Map<CardName, string> = new Map();
 		useStorage(
-			cardDesign,
-			Object.fromEntries(
-				urlRefs.map((ref, index) => {
-					const [card, url] = [cards[index], ref.url.value];
-					urlMap.set(card, url as string);
-					return [card, url];
-				})
-			),
-			localStorage
+			"new-hanafuda",
+			{
+				[cardDesign]: Object.fromEntries(
+					urlRefs.map((ref, index) => {
+						const [card, url] = [cards[index], ref.url.value];
+						urlMap.set(card, url as string);
+						return [card, url];
+					})
+				),
+			},
+			sessionStorage,
+			{ mergeDefaults: true }
 		);
 		return urlMap;
 	};
