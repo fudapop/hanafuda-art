@@ -10,12 +10,15 @@
             </div>
         </div>
         <div class="flex flex-wrap justify-center w-full gap-3 px-3 mt-2">
-            <HeadlessRadioGroupOption v-for="design in DESIGNS" :class="[design, 'cursor-pointer group']"
+            <HeadlessRadioGroupOption v-for="design in DESIGNS" :class="[design, 'cursor-pointer group w-[100px]']"
                 v-slot="{ checked }" :value="design" :disabled="!unlocked?.includes(design)">
                 <div :class="[
-                    'relative card down isolate drop-shadow-md',
+                    'relative card down isolate drop-shadow-md mx-auto',
                     (design as CardDesign) === selectedDesign ? 'ring-1 ring-offset-2 ring-indigo-600 dark:ring-yellow-300' : '',
                 ]">
+                    <span v-if="isNew(design)" class="absolute top-0 left-0 px-2 py-1 text-xs font-semibold tracking-wide text-white bg-indigo-600 rounded-tl-md rounded-br-md dark:bg-yellow-300 dark:text-gray-900">
+                        New
+                    </span>
                     <button type="button" v-if="unlocked && !unlocked.includes(design)" @click="() => handleUnlock(design)" class="rounded-[inherit]">
                         <div class="absolute inset-0 h-full transition-opacity bg-white opacity-50 ring-1 ring-white dark:ring-gray-800 rounded-[inherit] -z-10 dark:bg-black group-hover:opacity-75">
                         </div>
@@ -68,9 +71,16 @@ import { ToastID } from 'vue-toastification/dist/types/types';
 
 type CardDesign = typeof DESIGNS[number]
 
-const { DESIGNS, useDesign } = useCardDesign();
+const { DESIGNS, useDesign, getDesignInfo } = useCardDesign();
 const selectedDesign = useDesign();
 const toast = useToast();
+
+const isNew = (design: CardDesign) => {
+    const { releaseDate } = getDesignInfo(design);
+    if (!releaseDate) return false;
+    const isLessThanAMonthAgo = (new Date().getTime() - new Date(releaseDate).getTime()) < 1000 * 60 * 60 * 24 * 30;
+    return isLessThanAMonthAgo;
+};
 
 const UNLOCK_COST = 500;
 const currentUser = toValue(useProfile().current)
