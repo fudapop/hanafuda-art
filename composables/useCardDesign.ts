@@ -103,9 +103,9 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"sabling-art": {
 		name: "sabling-art",
 		title: "Sabling Art",
-		attribution: "Pokemon handafuda designed by SablingArt!",
-		urlDescription: "Find more from @SablingArt on Tumblr, Twitter and Etsy!",
-		url: "https://sablingart.tumblr.com",
+		attribution: "Pokemon handafuda deck designed by freelance illustrator Sabling!",
+		urlDescription: "Pick up this deck and more from @SablingArt!",
+		url: "https://ko-fi.com/sabling",
 		backImage: true,
 		arrangement: { reversed: true },
 	},
