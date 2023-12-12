@@ -15,6 +15,33 @@
 	}
 }
 
+.vaporwave {
+	--card-aspect: 3/5;
+	--card-radius: 0.2rem;
+	--card-border-color: #F589FF80;
+	--card-border-w: 2px;
+	
+	& .card img {
+		scale: 1 1.1;
+
+		@media (prefers-reduced-motion: no-preference) {
+			transition: transform 5s ease-in-out 0.2s;
+			transform-origin: top left;
+			
+			&:hover {
+				transform: scale(1.1) translate(-10%, -10%);
+			}
+			&:not(:hover) {
+				transform: scale(1) translate(0, 0);
+			}
+		}
+	}
+
+	& .card.down {
+		--card-bg-color: rgb(189 89 189 / 1);
+	}
+}
+
 .flash-black {
 	--card-border-color: slategray;
 	--card-radius: 0.1rem;
@@ -105,7 +132,7 @@
 	
 	& .card img {
 		padding-top: 1px;
-		scale: 1 1.07;
+		scale: 1 1.12;
 	}
 	
 	& .down {
