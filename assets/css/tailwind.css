@@ -64,6 +64,15 @@
     }
   }
 
+  @media (min-width: 640px) and (min-height: 720px) {
+    .collection-area {
+      --card-height: 60px;
+      height: var(--card-height);
+      grid-template-columns: 15% 22% 23% 40%;
+      grid-template-rows: minmax(var(--card-height), 1fr);
+    }
+  }
+
 
 
   .pri-btn {

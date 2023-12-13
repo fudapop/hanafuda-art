@@ -8,7 +8,7 @@
     </div>
     <!-- <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader> -->
     <div
-      class="z-10 grid grid-rows-[--table-grid-rows] sm:[@media_(max-height:500px)]:grid-rows-[--landscape-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full mx-auto"
+      class="pt-2 z-10 grid grid-rows-[--table-grid-rows] sm:[@media_(max-height:500px)]:grid-rows-[--landscape-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full mx-auto"
     >
       <!-- OPPONENT HAND -->
       <LazyOpponentArea />
@@ -30,8 +30,18 @@
       </div>
 
       <!-- PLAYER COLLECTION -->
-      <div class="h-full pointer-events-none -z-10">
-        <LazyCollectionArea player="p1" @completed="(data) => handleCompletion(data)" />
+      <div class="relative h-full">
+        <!-- ARTIST CREDIT -->
+        <a
+          v-if="getDesignInfo().by"
+          class="absolute right-4 text-xs italic underline opacity-40 !pointer-events-auto -top-8 underline-offset-4 whitespace-nowrap dark:text-white"
+          :title="getDesignInfo().urlDescription"
+          :href="getDesignInfo().url"
+          target="_blank"
+        >
+          Card designs by {{ getDesignInfo().by }} &rarr;
+        </a>
+        <LazyCollectionArea class="-mt-2 pointer-events-none -z-10" player="p1" @completed="(data) => handleCompletion(data)" />
       </div>
 
       <!-- PLAYER HAND -->
@@ -101,6 +111,7 @@ const { roundOver, gameOver, turnCounter } = storeToRefs(ds);
 
 const { useSelectedCard } = useCardHandler();
 const selectedCard = useSelectedCard();
+const { getDesignInfo } = useCardDesign();
 
 const { autoPlay, opponentPlay, useOpponent } = useAutoplay();
 const autoOpponent: Ref<boolean> = useOpponent();
