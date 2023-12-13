@@ -110,7 +110,7 @@ watch(
   { deep: true }
 );
 
-const { getCardUrl, getDesignInfo } = useCardDesign();
+const { getCardUrl } = useCardDesign();
 
 const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler();
 
