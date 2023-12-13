@@ -30,8 +30,17 @@
       </div>
 
       <!-- PLAYER COLLECTION -->
-      <div class="h-full pointer-events-none -z-10">
-        <LazyCollectionArea player="p1" @completed="(data) => handleCompletion(data)" />
+      <div class="relative h-full">
+        <a
+          v-if="getDesignInfo().by"
+          class="absolute right-2 text-xs italic underline opacity-40 !pointer-events-auto -top-10 underline-offset-4 whitespace-nowrap dark:text-white"
+          :title="getDesignInfo().urlDescription"
+          :href="getDesignInfo().url"
+          target="_blank"
+        >
+          Card designs by {{ getDesignInfo().by }} &rarr;
+        </a>
+        <LazyCollectionArea class="pointer-events-none -z-10" player="p1" @completed="(data) => handleCompletion(data)" />
       </div>
 
       <!-- PLAYER HAND -->
@@ -101,6 +110,7 @@ const { roundOver, gameOver, turnCounter } = storeToRefs(ds);
 
 const { useSelectedCard } = useCardHandler();
 const selectedCard = useSelectedCard();
+const { getDesignInfo } = useCardDesign();
 
 const { autoPlay, opponentPlay, useOpponent } = useAutoplay();
 const autoOpponent: Ref<boolean> = useOpponent();
