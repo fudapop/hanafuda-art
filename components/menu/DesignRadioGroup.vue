@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="flex flex-wrap justify-center w-full gap-3 px-3 mt-2">
-            <HeadlessRadioGroupOption v-for="design in DESIGNS" :class="[design, 'cursor-pointer group w-[100px]']"
+            <HeadlessRadioGroupOption v-for="design in DESIGNS" :class="[design, 'cursor-pointer group']"
                 v-slot="{ checked }" :value="design" :disabled="!unlocked?.includes(design)">
                 <div :class="[
                     'relative card down isolate drop-shadow-md mx-auto',
