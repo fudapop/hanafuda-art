@@ -21,6 +21,7 @@ export type CardDesign = (typeof DESIGNS)[number];
 export type DesignInfo = {
 	name: string;
 	title: string;
+	by?: string;
 	releaseDate?: string | Date;
 	attribution?: string;
 	urlDescription?: string;
@@ -36,6 +37,7 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"cherry-version": {
 		name: "cherry-version",
 		title: "Cherry Version",
+		by: "Parish Cherry",
 		attribution:
 			"Design by Parish Cherry, an illustrator & graphic designer based in Honolulu, HI!",
 		urlDescription: "See more at ParishCherry.com!",
@@ -45,6 +47,7 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"modern": {
 		name: "modern",
 		title: "2012 Modern",
+		by: "Sarah Thomas",
 		attribution:
 			"Sarah Thomas designed this beautiful set of Modern Hanafuda and launched her successful Kickstarter in 2012!",
 		urlDescription: "Revisit the journey at ModernHanafuda.net!",
@@ -105,6 +108,7 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"sabling-art": {
 		name: "sabling-art",
 		title: "Sabling Art",
+		by: "Sabling",
 		attribution: "Pokemon handafuda deck designed by freelance illustrator Sabling!",
 		urlDescription: "Pick up this deck and more from @SablingArt!",
 		url: "https://ko-fi.com/sabling",
@@ -114,6 +118,7 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"hanami": {
 		name: "hanami",
 		title: "Hanami",
+		by: "IndianWolf Studios",
 		attribution:
 			"Hanami Hanafuda designed by Jason Johnson of IndianWolf Studios LLC and illustrated by Antonietta Fazio-Johnson of Inner Hue Art Studio LLC!",
 		urlDescription: "Get this deck and more from IndianWolf Studios!",
@@ -122,6 +127,7 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"moon-rabbit": {
 		name: "moon-rabbit",
 		title: "Moon Rabbit Original",
+		by: "Kelsey Cretcher",
 		attribution:
 			"Moon Rabbit Handafuda cards designed and illustrated by Kelsey Cretcher!",
 		urlDescription: "Find more from Kelsey on DeviantArt!",
@@ -182,6 +188,7 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"koinobori": {
 		name: "koinobori",
 		title: "Koinobori",
+		by: "IndianWolf Studios",
 		attribution:
 			"Koinobori Handafuda brought to you by IndianWolf Studios LLC!",
 		urlDescription: "Back their project on Kickstarter!",
@@ -190,6 +197,7 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"nishiki-fuda": {
 		name: "nishiki-fuda",
 		title: "Nishiki Fuda",
+		by: "Estudio Artes",
 		attribution: "Design by Hanako of Estudio Artes in Osaka, Japan!",
 		urlDescription: "Buy this deck and others from their online store!",
 		url: "https://nishikie.stores.jp",
@@ -197,6 +205,7 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"vaporwave": {
 		name: "vaporwave",
 		title: "Vaporwave",
+		by: "Heavenlysome",
 		attribution: "Design by Discord user Heavenlysome!",
 		urlDescription: "Join the Hanafuda Discord!",
 		url: "https://discord.gg/pMAPBMhqHH",
@@ -280,7 +289,7 @@ export const useCardDesign = () => {
 		return url;
 	};
 
-	const getDesignInfo = (designName: CardDesign) => CARD_DESIGNS[designName];
+	const getDesignInfo = (designName?: CardDesign) => CARD_DESIGNS[designName ?? useDesign().value];
 
 	const fetchCardUrls = async () => {
 		cardMap.value = await getCardMap(useDesign().value);
