@@ -58,7 +58,7 @@
     <!-- PLAYER STATUS BAR -->
     <div
       :class="{
-        'relative z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-t-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
+        'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-t-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
         'opacity-40': players.p2.isActive,
         'translate-y-full': !gameStart,
       }"
