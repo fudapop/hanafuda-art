@@ -8,8 +8,8 @@
         leave-to-class="opacity-0 motion-safe:translate-x-1">
         <div v-if="card" :class="{
           'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
-          'scale-105 drop-shadow-xl -translate-y-2 z-20': matchedCards?.includes(card),
-          '-translate-y-4 drop-shadow-xl': selectedCard === card,
+          'drop-shadow-xl -translate-y-2 z-20': matchedCards?.includes(card),
+          '-translate-y-20 drop-shadow-xl': selectedCard === card,
           'pointer-events-none staged': cs.staged.has(card),
           '-translate-y-2 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': showMatchHint(card),
         }" @click="() => handleClick(card)">

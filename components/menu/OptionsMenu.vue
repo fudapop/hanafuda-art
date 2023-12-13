@@ -96,7 +96,15 @@
               <div class="mx-auto mt-5 text-gray-900 w-max dark:text-white">
                 <ExclamationCircleIcon class="inline w-6 h-6 ml-3 align-top" />
                 <p class="inline ml-2">Sign in is required to save your profile.</p>
-                <SignupPanel class="mt-5" />
+                <button
+                  type="button"
+                  class="block px-8 py-3 mx-auto mt-2 text-sm font-medium rounded-lg sec-btn"
+                  @click="() => {
+                    navigateTo({path: '/login', query: { link: 'true' }});
+                  }"
+                >
+                  Sign in
+                </button>
               </div>
             </div>
           </HeadlessTabPanel>

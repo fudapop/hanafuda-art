@@ -25,12 +25,12 @@
 
           <CheckCircleIcon
             v-if="isComplete(yaku)"
-            class="w-6 h-6 absolute -left-2 opacity-80"
+            class="absolute w-6 h-6 -left-2 opacity-80"
           />
           <span
             v-else
             v-show="!(open || openAll)"
-            class="absolute bottom-0 inline-flex ml-4 mb-1"
+            class="absolute bottom-0 inline-flex mb-1 ml-4"
           >
             <span
               v-for="_ in yaku.cards.filter((card) => playerHas(card))"
@@ -130,7 +130,7 @@ import { useGameDataStore } from "~/stores/gameDataStore";
 import { useCardStore } from "~/stores/cardStore";
 import { useConfigStore } from "~/stores/configStore";
 import { CardName } from "~/utils/cards";
-import { YakuName, Yaku } from "~/utils/yaku";
+import { Yaku } from "~/utils/yaku";
 
 const cs = useCardStore();
 const ds = useGameDataStore();

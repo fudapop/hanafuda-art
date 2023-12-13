@@ -98,7 +98,6 @@
       <div v-if="user.isGuest" class="mx-auto text-gray-900 w-max dark:text-white">
         <ExclamationCircleIcon class="inline w-6 h-6 align-top" />
         <p class="inline ml-2 text-sm">Sign in is required to save your profile.</p>
-        <!-- <SignupPanel class="mt-2" /> -->
         <button
           type="button"
           class="block px-8 py-3 mx-auto mt-2 text-sm font-medium rounded-lg sec-btn"

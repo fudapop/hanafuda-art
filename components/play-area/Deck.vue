@@ -3,7 +3,7 @@
     <div class="absolute inset-0 my-auto overflow-visible">
       <Transition
         appear
-        enter-active-class="duration-300 origin-center ease-in"
+        enter-active-class="duration-300 ease-in origin-center"
         enter-from-class="scale-[3] translate-x-[50vw]"
         enter-to-class="scale-100 translate-x-0"
       >
@@ -49,7 +49,7 @@
         >
           <div
             v-if="revealedCard"
-            class="relative z-30 overflow-hidden transition-transform -translate-x-4 sm:translate-x-3/4 card"
+            class="relative z-30 overflow-hidden transition-transform sm:translate-x-3/4 card"
           >
             <template v-if="useConfigStore().cardLabels">
               <LazyCardLabel :card="revealedCard" />
