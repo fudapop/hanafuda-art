@@ -12,6 +12,7 @@ const DESIGNS = [
 	"moon-rabbit",
 	"nishiki-fuda",
 	"vaporwave",
+	"hanamaki",
 	"ramen-red",
 	"flash-black",
 ] as const;
@@ -210,6 +211,15 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 		urlDescription: "Join the Hanafuda Discord!",
 		url: "https://discord.gg/pMAPBMhqHH",
 		releaseDate: "12-12-2023",
+	},
+	"hanamaki": {
+		name: "hanamaki",
+		title: "Hanamaki",
+		by: "Tsuruta",
+		attribution: "Hanafuda design made by Tsuruta in the late Showa period! Provided by Discord user emiko!",
+		urlDescription: "See more traditional designs at Japan Playing Card Museum!",
+		url: "https://japanplayingcardmuseum.com/edo-showa-dentou-hanafuda/",
+		releaseDate: "12-14-2023",
 	},
 	"flash-black": {
 		name: "flash-black",
