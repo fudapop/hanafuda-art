@@ -39,7 +39,6 @@
             </HeadlessRadioGroupOption>
         </div>
         <Modal :open="!!newUnlock">
-            <!-- <template #title> Unlock a new design </template> -->
             <template #image>
                 <div :class="[newUnlock, 'flex items-center text-gray-900 dark:text-white justify-center']">
                     <img src="/images/coin.webp" alt="coin" class="inline w-8 h-8 drop-shadow-sm" />
@@ -81,8 +80,8 @@ const toast = useToast();
 const isNew = (design: CardDesign) => {
     const { releaseDate } = getDesignInfo(design);
     if (!releaseDate) return false;
-    const isLessThanAMonthAgo = (new Date().getTime() - new Date(releaseDate).getTime()) < 1000 * 60 * 60 * 24 * 30;
-    return isLessThanAMonthAgo;
+    const isRecent = (new Date().getTime() - new Date(releaseDate).getTime()) < 1000 * 60 * 60 * 24 * 14;
+    return isRecent;
 };
 
 const UNLOCK_COST = 500;
