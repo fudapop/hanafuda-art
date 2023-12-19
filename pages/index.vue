@@ -311,6 +311,6 @@ onBeforeUnmount(() => {
   ds.nextRound();
   handleClose();
   // Clear stored data
-  sessionStorage?.removeItem("new-hanafuda");
+  // sessionStorage?.removeItem("new-hanafuda");
 });
 </script>
