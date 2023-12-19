@@ -63,11 +63,17 @@
 
 .hana-awase {
 	--card-radius: 0.1rem;
-	--card-aspect: 3/4.9;
+	--card-aspect: 3/5;
 	--card-bg-color: linear-gradient(15deg, #F8F2C3, #309D71 60%);
+	--card-border-color: #55666675;
+
+	& .card img {
+		padding-top: 0.5px;
+		scale: 1 1.025;
+	}
 
 	& .down {
-		--card-border-color: #33FF88;
+		--card-border-color: #33FF8850;
 	}
 }
 
