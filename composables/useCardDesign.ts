@@ -229,7 +229,6 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"hana-awase": {
 		name: "hana-awase",
 		title: "Hana-awase",
-		by: "Tsuruta",
 		attribution: "Mid-Meiji period hanafuda found in Palmer's 'Hana-awase' (1891).",
 		urlDescription: "View more of the collection on the Internet Archive.",
 		url: "https://archive.org/details/hanaawase00palm/page/564/mode/2up",
