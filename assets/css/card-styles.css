@@ -61,6 +61,16 @@
 	}
 }
 
+.hana-awase {
+	--card-radius: 0.1rem;
+	--card-aspect: 3/4.9;
+	--card-bg-color: linear-gradient(15deg, #F8F2C3, #309D71 60%);
+
+	& .down {
+		--card-border-color: #33FF88;
+	}
+}
+
 .koinobori {
 	--card-bg-color: linear-gradient(225deg, skyblue, lightsteelblue);
 	--card-border-color: #333;
