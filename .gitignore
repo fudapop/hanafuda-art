@@ -26,3 +26,7 @@ wip
 
 # Sensitive
 *service_account.json
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

@@ -100,6 +100,7 @@
     <!-- EXIT BUTTON -->
     <div class="absolute w-max top-3 right-16">
       <button
+        id="exit-button"
         type="button"
         @click="handlePressExit"
         class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold drop-shadow-md"
