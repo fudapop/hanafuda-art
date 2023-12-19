@@ -1,12 +1,11 @@
 <template>
   <template v-if="src" v-show="loaded">
     <NuxtImg
-      :title="card.replace(/-\d?/g, ' ')"
       :src="src"
       :alt="card"
       @load="handleLoad"
       loading="eager"
-      class="object-cover aspect-[--card-aspect]"
+      class="object-cover aspect-[--card-aspect] user-select-none pointer-events-none"
     />
   </template>
 </template>

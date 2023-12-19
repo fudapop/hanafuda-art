@@ -18,6 +18,7 @@
           '-translate-y-2 drop-shadow-lg': selectedCard === card.name,
           'pointer-events-none staged': cs.staged.has(card.name),
         }"
+        :title="card.name.replace(/-\d?/g, ' ')"
         @click="() => handleClick(card.name)"
       >
         <CardImage v-if="card.source" :src="card.source" :card="card.name" />

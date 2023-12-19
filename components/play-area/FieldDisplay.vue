@@ -29,6 +29,7 @@
             '-translate-y-2 drop-shadow-xl': selectedCard === card,
             'pointer-events-none staged': cs.staged.has(card),
           }"
+          :title="card.replace(/-\d?/g, ' ')"
           @click="() => handleClick(card)"
         >
           <template v-if="useConfigStore().cardLabels">
