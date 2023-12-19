@@ -11,6 +11,7 @@
     </div>
     <div class="absolute flex flex-col shadow-lg w-max top-3/4 gap-y-2">
         <button
+          id="start-button"
           type="button"
           :class="['px-8 py-3 text-xl rounded-lg pri-btn']"
           @click="() => $emit('start-game')"
@@ -18,6 +19,7 @@
           Play now
         </button>
         <button
+          id="account-link-button"
           v-if="userIsGuest"
           type="button"
           class="px-8 py-3 text-xl font-medium text-white bg-transparent rounded-lg hover:bg-gray-500/50 sec-btn"
