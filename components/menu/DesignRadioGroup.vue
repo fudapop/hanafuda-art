@@ -1,5 +1,5 @@
 <template>
-    <HeadlessRadioGroup v-model="selectedDesign" >
+    <HeadlessRadioGroup v-model="selectedDesign">
         <div class="grid items-center grid-cols-2 px-8">
             <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-gray-900 dark:text-white">
                 Select a design
@@ -16,11 +16,14 @@
                     'relative card down isolate drop-shadow-md mx-auto',
                     (design as CardDesign) === selectedDesign ? 'ring-1 ring-offset-2 ring-indigo-600 dark:ring-yellow-300' : '',
                 ]">
-                    <span v-if="isNew(design)" class="absolute top-0 left-0 px-2 py-1 text-xs font-semibold tracking-wide text-white bg-indigo-600 rounded-tl-md rounded-br-md dark:bg-yellow-300 dark:text-gray-900">
+                    <span v-if="isNew(design)"
+                        class="absolute top-0 left-0 px-2 py-1 text-xs font-semibold tracking-wide text-white bg-indigo-600 rounded-tl-md rounded-br-md dark:bg-yellow-300 dark:text-gray-900">
                         New
                     </span>
-                    <button type="button" v-if="unlocked && !unlocked.includes(design)" @click="() => handleUnlock(design)" class="rounded-[inherit]">
-                        <div class="absolute inset-0 h-full transition-opacity bg-white opacity-50 ring-1 ring-white dark:ring-gray-800 rounded-[inherit] -z-10 dark:bg-black group-hover:opacity-75">
+                    <button type="button" v-if="unlocked && !unlocked.includes(design)" @click="() => handleUnlock(design)"
+                        class="rounded-[inherit]">
+                        <div
+                            class="absolute inset-0 h-full transition-opacity bg-white opacity-50 ring-1 ring-white dark:ring-gray-800 rounded-[inherit] -z-10 dark:bg-black group-hover:opacity-75">
                         </div>
                         <LockClosedIcon
                             class="absolute inset-x-0 w-8 h-auto mx-auto text-gray-900 top-1/3 dark:text-white group-hover:opacity-0" />
@@ -37,29 +40,29 @@
         </div>
         <Modal :open="!!newUnlock">
             <!-- <template #title> Unlock a new design </template> -->
-    <template #image>
-    <div :class="[newUnlock, 'flex items-center text-gray-900 dark:text-white justify-center']">
-        <img src="/images/coin.webp" alt="coin" class="inline w-8 h-8 drop-shadow-sm" />
-        <ArrowRightIcon class="inline w-5 h-5 mx-2" />
-        <LockOpenIcon class="w-8 h-auto" />
+            <template #image>
+                <div :class="[newUnlock, 'flex items-center text-gray-900 dark:text-white justify-center']">
+                    <img src="/images/coin.webp" alt="coin" class="inline w-8 h-8 drop-shadow-sm" />
+                    <ArrowRightIcon class="inline w-5 h-5 mx-2" />
+                    <LockOpenIcon class="w-8 h-auto" />
 
-    </div>
-    </template>
-    <template #description>
-    <span class="text-base">
-      Spend {{ UNLOCK_COST }} coins to use this design?
-    </span>
-    </template>
-    <template #actions>
-      <div class="grid grid-flow-row-dense grid-cols-2 gap-3 mt-6">
-        <button type="button" class="sec-btn" @click="cancelUnlock">
-          No, keep my coins.
-        </button>
-        <button type="button" class="pri-btn" @click="confirmUnlock">
-          Yes, unlock it!
-        </button>
-      </div>
-    </template>
+                </div>
+            </template>
+            <template #description>
+                <span class="text-base text-gray-900 dark:text-white">
+                    Spend {{ UNLOCK_COST }} coins to use this design?
+                </span>
+            </template>
+            <template #actions>
+                <div class="grid grid-flow-row-dense grid-cols-2 gap-3 mt-6">
+                    <button type="button" class="sec-btn" @click="cancelUnlock">
+                        No, keep my coins.
+                    </button>
+                    <button type="button" class="pri-btn" @click="confirmUnlock">
+                        Yes, unlock it!
+                    </button>
+                </div>
+            </template>
         </Modal>
     </HeadlessRadioGroup>
 </template>
