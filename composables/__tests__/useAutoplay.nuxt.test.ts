@@ -5,13 +5,13 @@ import { useAutoplay } from "~/composables/useAutoplay";
 import { useCardStore } from "~/stores/cardStore";
 import { usePlayerStore } from "~/stores/playerStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
-import playVue from "~/pages/play.vue";
+import indexVue from "~/pages/index.vue";
 
 const testingPinia = createTestingPinia({
   stubActions: false,
 });
 
-const wrapper = shallowMount(playVue, {
+const wrapper = shallowMount(indexVue, {
   global: {
     plugins: [testingPinia],
   },
