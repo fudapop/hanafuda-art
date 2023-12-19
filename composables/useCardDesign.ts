@@ -13,6 +13,7 @@ const DESIGNS = [
 	"nishiki-fuda",
 	"vaporwave",
 	"hanamaki",
+	"hana-awase",
 	"ramen-red",
 	"flash-black",
 ] as const;
@@ -27,6 +28,8 @@ export type DesignInfo = {
 	attribution?: string;
 	urlDescription?: string;
 	url?: string;
+	contributor?: string;
+	contributorUrl?: string;
 	backImage?: boolean;
 	arrangement?: {
 		reversed?: boolean;
@@ -216,10 +219,23 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 		name: "hanamaki",
 		title: "Hanamaki",
 		by: "Tsuruta",
-		attribution: "Hanafuda design made by Tsuruta in the late Showa period! Provided by Discord user emiko!",
-		urlDescription: "See more traditional designs at Japan Playing Card Museum!",
-		url: "https://japanplayingcardmuseum.com/edo-showa-dentou-hanafuda/",
+		attribution: "Hanafuda design made by Tsuruta in the late Showa period.",
+		urlDescription: "See more traditional designs at Japan Playing Card Museum.",
+		url: "https://japanplayingcardmuseum.com/112-2-6-reproduction-localcards-kyotomakers/",
+		contributor: "Emiko Osagawara",
+		contributorUrl: "https://emikoogasawara.com/",
 		releaseDate: "12-14-2023",
+	},
+	"hana-awase": {
+		name: "hana-awase",
+		title: "Hana-awase",
+		by: "Tsuruta",
+		attribution: "Mid-Meiji period hanafuda found in Palmer's 'Hana-awase' (1891).",
+		urlDescription: "View more of the collection on the Internet Archive.",
+		url: "https://archive.org/details/hanaawase00palm/page/564/mode/2up",
+		contributor: "Emiko Osagawara",
+		contributorUrl: "https://emikoogasawara.com/",
+		releaseDate: "12-19-2023",
 	},
 	"flash-black": {
 		name: "flash-black",

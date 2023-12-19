@@ -46,15 +46,22 @@
             :class="['w-8 h-auto stroke-gray-500 stroke-1 drop-shadow-md', isLiked ? 'fill-red-600 stroke-red-400' : '']" />
         </button>
       </div>
-      <div class="h-full p-4 my-3 rounded-lg shadow-inner bg-gray-50 dark:bg-[#40495a] dark:text-white">
-        <h3 class="mb-2 text-lg font-semibold tracking-wide text-gray-900 dark:text-white">{{ designInfo.title }}</h3>
-        <p class="mb-4">
+      <div class="h-full space-y-4 p-4 my-3 rounded-lg shadow-inner bg-gray-50 dark:bg-[#40495a] dark:text-white">
+        <h3 class="text-lg font-semibold tracking-wide text-gray-900 dark:text-white">{{ designInfo.title }}</h3>
+        <p>
           {{ designInfo.attribution }}
         </p>
         <a :href="designInfo.url" target="_blank"
           class="text-indigo-600 dark:text-yellow-300 hover:text-indigo-500 dark:hover:text-yellow-100 hover:underline underline-offset-4">
           {{ designInfo.urlDescription }} &rarr;
         </a>
+        <p v-if="designInfo.contributor">
+          Contributed by 
+          <a :href="designInfo.contributorUrl" target="_blank"
+            class="text-indigo-600 dark:text-yellow-300 hover:text-indigo-500 dark:hover:text-yellow-100 hover:underline underline-offset-4">
+            {{ designInfo.contributor }}
+          </a>
+        </p>
       </div>
     </div>
     <DesignRadioGroup />
