@@ -12,7 +12,10 @@
           '-translate-y-20 drop-shadow-xl': selectedCard === card,
           'pointer-events-none staged': cs.staged.has(card),
           '-translate-y-2 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': showMatchHint(card),
-        }" @click="() => handleClick(card)">
+        }" 
+          :title="card.replace(/-\d?/g, ' ')"
+          @click="() => handleClick(card)"
+          >
           <template v-if="useConfigStore().cardLabels">
             <CardLabel :card="card" />
           </template>
