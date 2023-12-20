@@ -1,6 +1,6 @@
 import { useStorage } from "@vueuse/core";
 import { CardName, DECK } from "~/utils/cards";
-import { ref as storageRef } from "firebase/storage";
+import { ref as storageRef, updateMetadata } from "firebase/storage";
 import { useFirebaseStorage, useStorageFileUrl } from "vuefire";
 
 const DESIGNS = [
@@ -258,12 +258,19 @@ export const useCardDesign = () => {
 	const getImage = (designPath: string) => {
 		const storage = useFirebaseStorage();
 		const imageFileRef = storageRef(storage, designPath);
+		const newMetadata = {
+			contentType: "image/webp",
+			cacheControl: "public, max-age=31536000",
+		};
+		updateMetadata(imageFileRef, newMetadata).catch((error) => {
+			console.error({ error });
+		});
 		const { url } = useStorageFileUrl(imageFileRef);
 		return { url };
 	};
 
 	const checkStorage = (cardDesign: CardDesign) => {
-		const data = sessionStorage?.getItem("new-hanafuda");
+		const data = localStorage?.getItem("new-hanafuda");
 		if (!data) return;
 		const designData = JSON.parse(data)[cardDesign];
 		return designData;
@@ -297,7 +304,7 @@ export const useCardDesign = () => {
 					})
 				),
 			},
-			sessionStorage,
+			localStorage,
 			{ mergeDefaults: true }
 		);
 		return urlMap;
