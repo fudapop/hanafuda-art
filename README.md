@@ -23,85 +23,7 @@ Many different rules and game variants exist for Koi-Koi. This version offers so
 ## Artwork
 The artwork featured on this site was created by various artists, and can be found in the "public/cards" directory of the repository. The history of Hanafuda reaches back quite far, but new reimaginations of the classic designs continue to surface to this day!
 
-<div style="display:flex;justify-content:space-around;align-items:center;">
-  <img class="card1" src="https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fhanamaki%2Fmatsu-ni-tsuru.webp?alt=media&token=8a04c131-12d7-4b3c-8f1b-4076f3d67214" alt="Design from gamedesign.jp" />
-  <span class="card2">
-    <img class="card2-1" src="https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fcherry-version%2Fmatsu-ni-tsuru.webp?alt=media&token=411c5696-83dc-4f67-989d-c3e047112868" alt="Design by Parish Cherry" /> 
-    <!-- <img class="card2-2" src="https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fvaporwave%2Fmatsu-ni-tsuru.webp?alt=media&token=771e15ff-5513-4da8-898e-918e65fe36a1" alt="Design by Heavenlysome" />  -->
-  </span>
-  <span class="card3" style="border-radius:1rem;overflow:hidden;height:175px;">
-    <img src="https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fsabling-art%2Fmatsu-ni-tsuru.webp?alt=media&token=214a6b3a-3649-4bc9-8855-35f58b8743a6" alt="Design by Sabling" /> 
-  </span>
-</div>
-<style>
-  :root {
-    --duration: 30s;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .card1 {
-      animation: revolveRight var(--duration) ease-in-out infinite;
-        /* fadeOut1 24s ease-in-out infinite 3s; */
-    }
-    .card2 {
-      position: relative;
-      .card2-1 {
-        /* position: absolute; */
-        /* animation: fadeOut2 var(--duration) ease-in-out infinite; */
-      }
-    }
-    .card3 {
-      animation: revolveLeft var(--duration) ease-in-out infinite;
-    }
-    @keyframes fadeOut1 {
-      25%, 76%  {
-        opacity: 1;
-      }
-      26%, 75% {
-        opacity: 0;
-      }
-    }
-    @keyframes fadeOut2 {
-      24%, 75%  {
-        opacity: 1;
-      }
-      25%, 74% {
-        opacity: 0;
-      }
-    }
-    @keyframes revolveLeft {
-      0%, 100% {
-        translate: 0 0;
-      }
-      25% {
-        scale: 0.8;
-        z-index: -1;
-      }
-      75% {
-        scale: 1.2;
-        z-index: 1;
-      }
-      50% {
-        translate: -450px 0;
-      }
-    }
-    @keyframes revolveRight {
-      0%, 100% {
-        translate: 0 0;
-      }
-      25% {
-        scale: 1.2;
-        z-index: 1;
-      }
-      75% {
-        scale: 0.8;
-        z-index: -1;
-      }
-      50% {
-        translate: 450px 0;
-      }
-    }
-  }
-</style>
+![Hanamaki hanafuda by Tsuruta](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fhanamaki%2Fmatsu-ni-tsuru.webp?alt=media&token=8a04c131-12d7-4b3c-8f1b-4076f3d67214) ![Design by Parish Cherry](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fcherry-version%2Fmatsu-ni-tsuru.webp?alt=media&token=411c5696-83dc-4f67-989d-c3e047112868) ![Design from Paul Spencer's 'Hana-awase'](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fhana-awase%2Fmatsu-ni-tsuru.webp?alt=media&token=80c967e3-d6b4-4a40-8df6-31acf8ff5765)
 
 ### Attributions
 The currently available designs in the game are attributed to the following artists:
@@ -123,7 +45,7 @@ Whether you're an artist, developer, or fellow hanafuda enthusiast, contribution
 
 
 ## Development
-If you would like to run a local copy of Let's Play Koi-Koi for development or testing purposes, follow these steps:
+If you would like to run a local copy for development or testing purposes, follow these steps:
 
 1. Clone the repository to your local machine.
 2. Install the necessary dependencies by running npm install in the root directory of the project.
