@@ -82,7 +82,7 @@ z"
         <span class="sr-only"> View my portfolio </span>
       </a>
       <a
-        href="https://www.github.com/ahamsammich/new-hanafuda"
+        href="https://www.github.com/fuda-cafe/hanafuda-art"
         title="View project on GitHub"
         target="_blank"
       >
