@@ -1,6 +1,8 @@
 <template>
-  <div class="fixed bottom-0 w-screen mb-2 opacity-50">
-    <div class="flex mx-auto gap-x-4 w-max">
+  <div class="fixed bottom-0 w-screen space-y-2 opacity-50">
+    <div class="flex items-center mx-auto gap-x-4 w-max">
+
+      <!-- PORTFOLIO LINK -->
       <a href="https://www.andrehammons.dev" title="View my portfolio" target="_blank">
         <svg
           version="1.1"
@@ -81,13 +83,15 @@ z"
         </svg>
         <span class="sr-only"> View my portfolio </span>
       </a>
+
+      <!-- GITHUB REPOSITORY LINK -->
       <a
         href="https://www.github.com/fuda-cafe/hanafuda-art"
         title="View project on GitHub"
         target="_blank"
       >
         <svg
-          class="w-5 h-5 mx-auto mb-2"
+          class="w-5 h-5 mx-auto"
           aria-hidden="true"
           fill="white"
           viewBox="0 0 20 20"
@@ -100,11 +104,35 @@ z"
         </svg>
         <span class="sr-only">View project on GitHub</span>
       </a>
+
+      <!-- ARTIST/CONTRIBUTOR LINK -->
+      <NuxtLink
+        external
+        v-if="!!designInfo.url || !!designInfo.contributorUrl"
+        :href="designInfo.url || designInfo.contributorUrl"
+        :title="designInfo.url ? 'View artist\'s portfolio' : 'View contributor\'s portfolio'"
+        target="_blank"
+      >
+        <Icon name="fa:paint-brush" class="w-5 h-5 mx-auto text-white" />
+        <span class="sr-only">View artist's portfolio</span>
+      </NuxtLink>
     </div>
-    <p class="text-xs text-center text-white">
-      &copy; {{ new Date().getFullYear() }} Developed by Andre L. Hammons
-    </p>
+    <div class="grid text-xs text-center text-white">
+      <p v-memo="[designInfo]" v-if="!!designInfo.by" class="text-sm">
+        Designs illustrated by {{ designInfo.by }}
+      </p>
+      <p v-memo="[designInfo]" v-else-if="!!designInfo.contributor">
+        Art contributed by {{ designInfo.contributor }}
+      </p>
+      <p>
+        &copy; {{ new Date().getFullYear() }} Site developed by Andre L. Hammons
+      </p>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { getDesignInfo, useDesign } = useCardDesign();
+const currentDesign = useDesign();
+const designInfo = computed(() => getDesignInfo(currentDesign.value));
+</script>
