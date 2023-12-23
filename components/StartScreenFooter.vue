@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bottom-0 w-screen space-y-2 opacity-50">
+  <div class="fixed w-screen space-y-2 opacity-50 bottom-2">
     <div class="flex items-center mx-auto gap-x-4 w-max">
 
       <!-- PORTFOLIO LINK -->
@@ -105,24 +105,38 @@ z"
         <span class="sr-only">View project on GitHub</span>
       </a>
 
-      <!-- ARTIST/CONTRIBUTOR LINK -->
+      <!-- ATTRIBUTION LINKS -->
+      <!-- Link to creator's URL with contributor URL as fallback -->
+      <!-- Example scenario: creator is known, but does not have a site. -->
       <NuxtLink
         external
-        v-if="!!designInfo.url || !!designInfo.contributorUrl"
-        :href="designInfo.url || designInfo.contributorUrl"
-        :title="designInfo.url ? 'View artist\'s portfolio' : 'View contributor\'s portfolio'"
+        v-if="!!design.by"
+        :to="design.url || design.contributorUrl"
+        :title="design.url ? 'View creator\'s portfolio' : 'View contributor\'s website'"
         target="_blank"
       >
         <Icon name="fa:paint-brush" class="w-5 h-5 mx-auto text-white" />
-        <span class="sr-only">View artist's portfolio</span>
+        <span class="sr-only">View creator's or contributor's website</span>
+      </NuxtLink>
+      <!-- Link to contributor's URL with creator's URL as fallback. -->
+      <!-- Example scenario: contributed art is from an unknown artist. -->
+      <NuxtLink
+        external
+        v-else-if="!!design.contributor"
+        :to="design.contributorUrl || design.url"
+        :title="design.url ? 'View contributor\'s website' : 'View creator\'s portfolio'"
+        target="_blank"
+      >
+        <Icon name="fa:paint-brush" class="w-5 h-5 mx-auto text-white" />
+        <span class="sr-only">View creator's or contributor's website</span>
       </NuxtLink>
     </div>
     <div class="grid text-xs text-center text-white">
-      <p v-memo="[designInfo]" v-if="!!designInfo.by" class="text-sm">
-        Designs illustrated by {{ designInfo.by }}
+      <p v-memo="[design]" v-if="!!design.by">
+        Designs created by {{ design.by }}
       </p>
-      <p v-memo="[designInfo]" v-else-if="!!designInfo.contributor">
-        Art contributed by {{ designInfo.contributor }}
+      <p v-memo="[design]" v-else-if="!!design.contributor">
+        Art contributed by {{ design.contributor }}
       </p>
       <p>
         &copy; {{ new Date().getFullYear() }} Site developed by Andre L. Hammons
@@ -132,7 +146,6 @@ z"
 </template>
 
 <script setup lang="ts">
-const { getDesignInfo, useDesign } = useCardDesign();
-const currentDesign = useDesign();
-const designInfo = computed(() => getDesignInfo(currentDesign.value));
+const { getDesignInfo } = useCardDesign();
+const design = computed(() => getDesignInfo());
 </script>
