@@ -321,6 +321,13 @@ export const useCardDesign = () => {
 		return url;
 	};
 
+	/**
+	 * 
+	 * @param designName (optional) Name of design to get info for. Defaults to current design.
+	 * @returns Info for the current design or the design specified. 
+	 * See link for more: {@link DesignInfo}
+	 * 
+	 */
 	const getDesignInfo = (designName?: CardDesign) => CARD_DESIGNS[designName ?? useDesign().value];
 
 	const fetchCardUrls = async () => {
