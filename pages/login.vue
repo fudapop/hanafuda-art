@@ -38,7 +38,7 @@
           </div>
 
           <div class="mt-10">
-            <button id="guest-login-buttonu" type="button" @click="handleLoginAsGuest" class="w-full tracking-wide shadow-md pri-btn">
+            <button id="guest-login-button" type="button" @click="handleLoginAsGuest" class="w-full tracking-wide shadow-md pri-btn">
               Continue as guest
             </button>
 
