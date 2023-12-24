@@ -14,6 +14,7 @@ const DESIGNS = [
 	"vaporwave",
 	"hanamaki",
 	"hana-awase",
+	"kinbotan",
 	"ramen-red",
 	"flash-black",
 ] as const;
@@ -23,9 +24,9 @@ export type CardDesign = (typeof DESIGNS)[number];
 export type DesignInfo = {
 	name: string;
 	title: string;
-	by?: string;
+	creator?: string;
 	releaseDate?: string | Date;
-	attribution?: string;
+	description?: string;
 	urlDescription?: string;
 	url?: string;
 	contributor?: string;
@@ -41,8 +42,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"cherry-version": {
 		name: "cherry-version",
 		title: "Cherry Version",
-		by: "Parish Cherry",
-		attribution:
+		creator: "Parish Cherry",
+		description:
 			"Design by Parish Cherry, an illustrator & graphic designer based in Honolulu, HI!",
 		urlDescription: "See more at ParishCherry.com!",
 		url: "https://parishcherry.com",
@@ -51,8 +52,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"modern": {
 		name: "modern",
 		title: "2012 Modern",
-		by: "Sarah Thomas",
-		attribution:
+		creator: "Sarah Thomas",
+		description:
 			"Sarah Thomas designed this beautiful set of Modern Hanafuda and launched her successful Kickstarter in 2012!",
 		urlDescription: "Revisit the journey at ModernHanafuda.net!",
 		url: "http://www.modernhanafuda.net",
@@ -112,8 +113,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"sabling-art": {
 		name: "sabling-art",
 		title: "Sabling Art",
-		by: "Sabling",
-		attribution: "Pokemon handafuda deck designed by freelance illustrator Sabling!",
+		creator: "Sabling",
+		description: "Pokemon handafuda deck designed by freelance illustrator Sabling!",
 		urlDescription: "Pick up this deck and more from @SablingArt!",
 		url: "https://ko-fi.com/sabling",
 		backImage: true,
@@ -122,8 +123,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"hanami": {
 		name: "hanami",
 		title: "Hanami",
-		by: "IndianWolf Studios",
-		attribution:
+		creator: "IndianWolf Studios",
+		description:
 			"Hanami Hanafuda designed by Jason Johnson of IndianWolf Studios LLC and illustrated by Antonietta Fazio-Johnson of Inner Hue Art Studio LLC!",
 		urlDescription: "Get this deck and more from IndianWolf Studios!",
 		url: "https://indianwolfstudios.com/shop/",
@@ -131,8 +132,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"moon-rabbit": {
 		name: "moon-rabbit",
 		title: "Moon Rabbit Original",
-		by: "Kelsey Cretcher",
-		attribution:
+		creator: "Kelsey Cretcher",
+		description:
 			"Moon Rabbit Handafuda cards designed and illustrated by Kelsey Cretcher!",
 		urlDescription: "Find more from Kelsey on DeviantArt!",
 		url: "https://www.deviantart.com/kcretcher",
@@ -192,8 +193,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"koinobori": {
 		name: "koinobori",
 		title: "Koinobori",
-		by: "IndianWolf Studios",
-		attribution:
+		creator: "IndianWolf Studios",
+		description:
 			"Koinobori Handafuda brought to you by IndianWolf Studios LLC!",
 		urlDescription: "Back their project on Kickstarter!",
 		url: "https://www.kickstarter.com/projects/iws/koinobori-playing-cards-hanafuda-poker-plastic",
@@ -201,16 +202,16 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"nishiki-fuda": {
 		name: "nishiki-fuda",
 		title: "Nishiki Fuda",
-		by: "Estudio Artes",
-		attribution: "Design by Hanako of Estudio Artes in Osaka, Japan!",
+		creator: "Estudio Artes",
+		description: "Design by Hanako of Estudio Artes in Osaka, Japan!",
 		urlDescription: "Buy this deck and others from their online store!",
 		url: "https://nishikie.stores.jp",
 	},
 	"vaporwave": {
 		name: "vaporwave",
 		title: "Vaporwave",
-		by: "Heavenlysome",
-		attribution: "Design by Discord user Heavenlysome!",
+		creator: "Heavenlysome",
+		description: "Design by Discord user Heavenlysome!",
 		urlDescription: "Join the Hanafuda Discord!",
 		url: "https://discord.gg/pMAPBMhqHH",
 		releaseDate: "12-12-2023",
@@ -218,8 +219,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"hanamaki": {
 		name: "hanamaki",
 		title: "Hanamaki",
-		by: "Tsuruta",
-		attribution: "Hanafuda design made by Tsuruta in the late Showa period.",
+		creator: "Tsuruta",
+		description: "Hanafuda design made by Tsuruta in the late Showa period.",
 		urlDescription: "See more traditional designs at Japan Playing Card Museum.",
 		url: "https://japanplayingcardmuseum.com/112-2-6-reproduction-localcards-kyotomakers/",
 		contributor: "Emiko Osagawara",
@@ -229,24 +230,32 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 	"hana-awase": {
 		name: "hana-awase",
 		title: "Hana-awase",
-		attribution: "Mid-Meiji period hanafuda found in Palmer's 'Hana-awase' (1891).",
+		description: "Mid-Meiji period hanafuda found in Palmer's 'Hana-awase' (1891).",
 		urlDescription: "View more of the collection on the Internet Archive.",
 		url: "https://archive.org/details/hanaawase00palm/page/564/mode/2up",
 		contributor: "Emiko Osagawara",
 		contributorUrl: "https://emikoogasawara.com/",
 		releaseDate: "12-19-2023",
 	},
+	"kinbotan": {
+		name: "kinbotan",
+		title: "Kin-botan",
+		description: "This 'Golden Peony' edition produced by Windmill is a replica of an original deck once belonging to Japan's first Prime Minister.",
+		contributor: "Emiko Osagawara",
+		contributorUrl: "https://emikoogasawara.com/",
+		releaseDate: "12-23-2023",
+	},
 	"flash-black": {
 		name: "flash-black",
 		title: "Flash Black",
-		attribution: "Traditional design from Hanafuda Flash and gamedesign.jp!",
+		description: "Traditional design from Hanafuda Flash and gamedesign.jp!",
 		urlDescription: "Free to play online!",
 		url: "https://www.gamedesign.jp/sp/hanafuda",
 	},
 	"ramen-red": {
 		name: "ramen-red",
 		title: "Ramen Red",
-		attribution: "Classic Hwatu design seen in Hanafuda Koi-Koi Ramen!",
+		description: "Classic design seen in Hanafuda Koi-Koi Ramen!",
 		urlDescription: "Download and play for free!",
 		url: "https://pelicapp.itch.io/hanafuda",
 	},

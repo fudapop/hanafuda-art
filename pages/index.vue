@@ -33,13 +33,13 @@
       <div class="relative h-full">
         <!-- ARTIST CREDIT -->
         <a
-          v-if="getDesignInfo().by"
+          v-if="getDesignInfo().creator"
           class="absolute right-4 text-xs italic underline opacity-40 !pointer-events-auto -top-8 underline-offset-4 whitespace-nowrap dark:text-white"
           :title="getDesignInfo().urlDescription"
           :href="getDesignInfo().url"
           target="_blank"
         >
-          Card designs by {{ getDesignInfo().by }} &rarr;
+          Card designs by {{ getDesignInfo().creator }} &rarr;
         </a>
         <LazyCollectionArea class="-mt-2 pointer-events-none -z-10" player="p1" @completed="(data) => handleCompletion(data)" />
       </div>
