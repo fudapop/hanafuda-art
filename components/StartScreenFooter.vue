@@ -110,7 +110,7 @@ z"
       <!-- Example scenario: creator is known, but does not have a site. -->
       <NuxtLink
         external
-        v-if="!!design.by"
+        v-if="!!design.creator"
         :to="design.url || design.contributorUrl"
         :title="design.url ? 'View creator\'s portfolio' : 'View contributor\'s website'"
         target="_blank"
@@ -132,8 +132,8 @@ z"
       </NuxtLink>
     </div>
     <div class="grid text-xs text-center text-white">
-      <p v-memo="[design]" v-if="!!design.by">
-        Designs created by {{ design.by }}
+      <p v-memo="[design]" v-if="!!design.creator">
+        Designs created by {{ design.creator }}
       </p>
       <p v-memo="[design]" v-else-if="!!design.contributor">
         Art contributed by {{ design.contributor }}

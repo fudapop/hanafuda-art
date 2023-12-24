@@ -27,7 +27,6 @@ const login = () => {
 };
 
 const logoutUser = () => {
-  toast.info("Logging out...", { timeout: 1000 });
   logout();
 };
 

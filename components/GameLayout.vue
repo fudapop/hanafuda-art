@@ -157,7 +157,7 @@ import { ArrowLeftOnRectangleIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 import { usePlayerStore } from "~/stores/playerStore";
 
-const { getDesignInfo, useDesign } = useCardDesign();
+const { useDesign } = useCardDesign();
 const currentDesign = useDesign();
 const { logout } = useAuth();
 
