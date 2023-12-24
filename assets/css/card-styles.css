@@ -89,14 +89,18 @@
 		background-blend-mode: screen;
 		--card-border-w: 3px;
 		--card-border-color: #5C381E;
+		isolation: isolate;
 
 		&::after {
 			position: absolute;
 			display: block;
+			top: 0;
+			left: 0;
 			width: 100%;
 			height: 100%;
 			content: "";
 			background: radial-gradient(circle at 100% 100%, #5C381E50, #11000060);
+			z-index: -1;
 		}
 	}
 }
