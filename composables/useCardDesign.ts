@@ -45,8 +45,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 		creator: "Parish Cherry",
 		description:
 			"Design by Parish Cherry, an illustrator & graphic designer based in Honolulu, HI!",
-		urlDescription: "See more at ParishCherry.com!",
-		url: "https://parishcherry.com",
+		urlDescription: "Checkout Parish Cherry's portfolio!",
+		url: "https://www.pulpograph.studio/parishcherry",
 		backImage: true,
 	},
 	"modern": {
