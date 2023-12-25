@@ -21,7 +21,7 @@ Many different rules and game variants exist for Koi-Koi. This version offers so
 
 
 ## Artwork
-The artwork featured on this site was created by various artists, and can be found in the "public/cards" directory of the repository. The history of Hanafuda reaches back quite far, but new reimaginations of the classic designs continue to surface to this day!
+The artwork featured on this site was created by various artists. The history of Hanafuda reaches back quite far, but new reimaginations of the classic designs continue to surface to this day!
 
 ![Hanamaki hanafuda by Tsuruta](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fhanamaki%2Fmatsu-ni-tsuru.webp?alt=media&token=8a04c131-12d7-4b3c-8f1b-4076f3d67214) ![Design by Parish Cherry](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fcherry-version%2Fmatsu-ni-tsuru.webp?alt=media&token=411c5696-83dc-4f67-989d-c3e047112868) ![Design from Paul Spencer's 'Hana-awase'](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fhana-awase%2Fmatsu-ni-tsuru.webp?alt=media&token=80c967e3-d6b4-4a40-8df6-31acf8ff5765)
 
