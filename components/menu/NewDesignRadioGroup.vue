@@ -1,6 +1,6 @@
 <template>
-    <HeadlessRadioGroup v-model="selectedDesign" as="div" class="w-full @container py-4">
-        <div class="flex justify-between px-4">
+    <HeadlessRadioGroup v-model="selectedDesign" as="div" class="relative w-full @container">
+        <div class="sticky top-0 z-10 flex justify-between px-4 py-2 bg-white/70 dark:bg-gray-800/50">
             <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-gray-900 dark:text-white">
                 Select a design
                 <p class="ml-2 text-sm font-medium text-gray-400 whitespace-nowrap">{{ `Current: ${getDesignInfo().title}` }}</p>
@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="grid justify-center w-full px-3 mt-2 space-y-12">
-            <HeadlessRadioGroupOption v-for="design in DESIGNS" :class="[design, 'group grid w-full @md:grid-cols-[200px,1fr] place-items-center grid-rows-2 @md:grid-rows-1']"
+            <HeadlessRadioGroupOption v-for="design in DESIGNS" :class="[design, 'group grid w-full @md:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @md:grid-rows-1']"
                 v-slot="{ checked }" :value="design" :disabled="!unlocked?.includes(design)">
 
                 <Transition 
@@ -53,7 +53,7 @@
                 </Transition>
 
                 <!-- DESCRIPTION SECTION -->
-                <div :class="['relative w-full @md:w-[360px] md:h-[200px] space-y-4 p-4 rounded-lg dark:text-white',
+                <div :class="['relative w-full @md:w-[360px] @md:h-[200px] space-y-4 px-4 pb-4 rounded-lg dark:text-white',
                     checked ? 'dark:bg-[#40495a] bg-gray-50 shadow-inner shadow-gray-400 dark:shadow-gray-900' : ''
                 ]">
                     <button type="button" @click="() => handleLike(design)" class="float-right mt-4 pointer-events-auto focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300">
