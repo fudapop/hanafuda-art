@@ -363,6 +363,8 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 	},
 };
 
+const teyaku = ["kuttsuki", "teshi"] as YakuName[];
+
 function getExtraPoints(numRequired: number, numCollected: number): number {
 	const extraPoints = numCollected - numRequired;
 	return extraPoints;
@@ -379,9 +381,8 @@ function checkAll(collection: Set<CardName>): {
 	score: number;
 } {
 	const completed: YakuName[] = [];
-	const excluded = ["kuttsuki", "teshi"];
 	const pointsArr = [...Object.values(YAKU)]
-		.filter((yaku) => !excluded.includes(yaku.name))
+		.filter((yaku) => !teyaku.includes(yaku.name))
 		.map((yaku) => {
 			const points = yaku.check(collection);
 			if (points) completed.push(yaku.name);
@@ -391,6 +392,29 @@ function checkAll(collection: Set<CardName>): {
 		score: pointsArr.reduce((total, n) => total + n),
 		completed,
 	};
+}
+
+type YakuProgress = {
+	yaku: Yaku;
+	collectedCards: CardName[];
+}
+
+function getProgress(collection: Set<CardName>, opponentCollection: Set<CardName>): YakuProgress[] {
+	let progress: YakuProgress[] = [];
+	progress = [...Object.values(YAKU)]
+		.filter((yaku) => !teyaku.includes(yaku.name))
+		.filter((yaku) => {
+			const yakuOpponentHas = getIntersection(opponentCollection, yaku.cards).length;
+			const yakuNumAvailable = yaku.cards.length - yakuOpponentHas;
+			return  yakuNumAvailable >= yaku.numRequired;
+		})
+		.map((yaku) => ({
+			yaku: yaku,
+			collectedCards: getIntersection(collection, yaku.cards)
+		}))
+		.filter((p) => p.collectedCards.length > 0)
+
+	return progress;
 }
 
 type CompletedYaku = {
@@ -416,9 +440,8 @@ function getCompleted(
 }
 
 function checkForWin(cards: Set<CardName>): CompletedYaku | null {
-	const yaku = ["kuttsuki", "teshi"] as YakuName[];
 	let completed = null;
-	yaku.forEach((name) => {
+	teyaku.forEach((name) => {
 		const points = YAKU[name].check(cards);
 		if (points) {
 			completed = {
@@ -461,6 +484,8 @@ export {
 	Yaku,
 	YakuName,
 	CompletedYaku,
+	YakuProgress,
+	getProgress,	
 	checkAll,
 	getCompleted,
 	checkForWin,

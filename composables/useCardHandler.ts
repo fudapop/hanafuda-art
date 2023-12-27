@@ -1,5 +1,6 @@
 import { storeToRefs } from "pinia";
-import { CardName, matchByMonth, shuffle } from "~/utils/cards";
+import { CardName, matchByMonth, shuffle, CARDS } from "~/utils/cards";
+import { getProgress, YakuProgress } from "~/utils/yaku";
 import { useCardStore } from "~/stores/cardStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
 
@@ -27,6 +28,39 @@ export const useCardHandler = () => {
 			card
 		);
 	};
+
+	const getMatches = (card: CardName) => {
+		return matchByMonth(
+			[...field.value].filter((card) => !staged.value.has(card)),
+			card
+		);
+	};
+
+	const rateProgress = (progress: YakuProgress[]): number => {
+		let score = 0;
+		for (const { yaku, collectedCards } of progress) {
+			const check = yaku.check(new Set(collectedCards))
+			if (!!check) {
+				score += check
+			} else {
+				const rarity = yaku.cards.length / 48.0;
+				const got = collectedCards.length / yaku.numRequired;
+				const payoff = yaku.points;
+				score += rarity * got * payoff;
+			}
+		}
+		return score;
+	}
+
+	const rateDiscard = (card: CardName): number => {
+		const theCard = CARDS[card]
+		switch (theCard.type){
+			case "bright": return -20;
+			case "animal":return -10;
+			case "ribbon":return -5;
+			case "plain":return -1;
+		}
+	}
 
 	const selectedCard = useSelectedCard();
 	const matchedCards = useMatchedCards();
@@ -103,13 +137,37 @@ export const useCardHandler = () => {
 				ds.checkCurrentPhase("select"),
 				`Phase check failed. Expected: 'select'; Received: '${ds.getCurrent.phase}'`
 			);
-			const cardsInHand = shuffle([...cs.hand[ds.getCurrent.player]]);
-			for (const card of cardsInHand) {
-				if (matchExists(card)) {
-					selectedCard.value = card;
-					break;
+			const cardsInHand = [...cs.hand[ds.getCurrent.player]]; // TODO put shuffle back? 
+			const handScores: number[] = Array(cardsInHand.length).fill(0)
+
+			const collection = [...cs.collection[ds.getCurrent.player]];
+			const opponentCollection = new Set([...cs.collection[ds.getCurrent.inactivePlayer]]);
+
+			cardsInHand.forEach((card, i) => {
+				const matches = getMatches(card)
+				switch (matches.length) {
+					case 0:
+						handScores[i] = rateDiscard(card);
+						return;
+					case 1: 
+					case 3: {
+						const p = getProgress(new Set([card, ...matches, ...collection]), opponentCollection);
+						handScores[i] = rateProgress(p);
+						return;
+					}
+					case 2: {
+						const p0 = getProgress(new Set([card, matches[0], ...collection]), opponentCollection);
+						const p1 = getProgress(new Set([card, matches[1], ...collection]), opponentCollection);
+						handScores[i] = Math.max(rateProgress(p0),rateProgress(p1));
+						return
+					}
 				}
-			}
+			})
+
+			console.log(handScores)
+			const maxScoreIndex = handScores.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+			console.log(maxScoreIndex)
+			selectedCard.value = cardsInHand[maxScoreIndex];
 		},
 
 		matchOrDiscard() {
@@ -123,11 +181,17 @@ export const useCardHandler = () => {
 				case 0:
 					cs.discard(selected, ds.getCurrent.player);
 					break;
+				case 1:
 				case 3:
 					cs.stageForCollection([...matches, selected]);
 					break;
-				default:
-					cs.stageForCollection([getRandom(matches), selected]);
+				case 2:
+					const collection = [...cs.collection[ds.getCurrent.player]];
+					const opponentCollection = new Set([...cs.collection[ds.getCurrent.inactivePlayer]]);
+					const p0 = getProgress(new Set([selected, matches[0], ...collection]), opponentCollection);
+					const p1 = getProgress(new Set([selected, matches[1], ...collection]), opponentCollection);
+					const best = rateProgress(p0) > rateProgress(p1) ? 0 : 1;
+					cs.stageForCollection([matches[best], selected]);
 			}
 			selectedCard.value = null;
 			ds.nextPhase();

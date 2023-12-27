@@ -35,6 +35,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 		turn: turnCounter.value,
 		phase: turnPhase.value,
 		player: usePlayerStore().activePlayer.id,
+		inactivePlayer: usePlayerStore().inactivePlayer.id,
 		result: roundHistory.value[roundCounter.value - 1],
 	}));
 
