@@ -36,7 +36,7 @@ export const useCardHandler = () => {
 		);
 	};
 
-	const rateProgress = (progress: YakuProgress[]): number => {
+	const rateProgress = (progress: YakuProgress[], restCards: CardName[]): number => {
 		let score = 0;
 		for (const { yaku, collectedCards } of progress) {
 			const check = yaku.check(new Set(collectedCards))
@@ -45,9 +45,12 @@ export const useCardHandler = () => {
 			} else {
 				// const rarity = yaku.cards.length / 48;
 				const got = collectedCards.length / yaku.numRequired; // [O, 1)  -- It's never 1 because then the Yaku check succeeds.
-				const gotSquared = got * got; // [O, 1)
+
+				const couldGet = yaku.find(new Set([...collectedCards, ...restCards])).length / yaku.numRequired; // [O,1] -- Rarely >1 but let's pretend it's not.
+				
+				const gotCouldGet = got * couldGet; // [O, 1)
 				const payoff = yaku.points;
-				score += gotSquared * payoff; // [O, payoff)
+				score += gotCouldGet * payoff; // [O, payoff)
 			}
 		}
 		return score;
@@ -148,7 +151,7 @@ export const useCardHandler = () => {
 			const opponentCollection = new Set([...cs.collection[ds.getCurrent.inactivePlayer]]);
 
 			cardsInHand.forEach((card, i) => {
-				const restCards = cardsInHand.toSpliced(i,1)
+				const restCards = cardsInHand.toSpliced(i, 1);
 				const matches = getMatches(card)
 				switch (matches.length) {
 					case 0:
@@ -157,13 +160,13 @@ export const useCardHandler = () => {
 					case 1: 
 					case 3: {
 						const p = getProgress(new Set([card, ...matches, ...collection]), opponentCollection);
-						handScores[i] = rateProgress(p);
+						handScores[i] = rateProgress(p, restCards);
 						return;
 					}
 					case 2: {
 						const p0 = getProgress(new Set([card, matches[0], ...collection]), opponentCollection);
 						const p1 = getProgress(new Set([card, matches[1], ...collection]), opponentCollection);
-						handScores[i] = Math.max(rateProgress(p0),rateProgress(p1));
+						handScores[i] = Math.max(rateProgress(p0, restCards),rateProgress(p1, restCards));
 						return
 					}
 				}
@@ -191,11 +194,12 @@ export const useCardHandler = () => {
 					cs.stageForCollection([...matches, selected]);
 					break;
 				case 2:
+					const cardsInHand = [...cs.hand[ds.getCurrent.player]];
 					const collection = [...cs.collection[ds.getCurrent.player]];
 					const opponentCollection = new Set([...cs.collection[ds.getCurrent.inactivePlayer]]);
 					const p0 = getProgress(new Set([selected, matches[0], ...collection]), opponentCollection);
 					const p1 = getProgress(new Set([selected, matches[1], ...collection]), opponentCollection);
-					const best = rateProgress(p0) > rateProgress(p1) ? 0 : 1;
+					const best = rateProgress(p0, cardsInHand) > rateProgress(p1, cardsInHand) ? 0 : 1;
 					cs.stageForCollection([matches[best], selected]);
 			}
 			selectedCard.value = null;
