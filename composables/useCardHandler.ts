@@ -43,23 +43,27 @@ export const useCardHandler = () => {
 			if (!!check) {
 				score += check
 			} else {
-				const rarity = yaku.cards.length / 48.0;
-				const got = collectedCards.length / yaku.numRequired;
+				// const rarity = yaku.cards.length / 48;
+				const got = collectedCards.length / yaku.numRequired; // [O, 1)  -- It's never 1 because then the Yaku check succeeds.
+				const gotSquared = got * got; // [O, 1)
 				const payoff = yaku.points;
-				score += rarity * got * payoff;
+				score += gotSquared * payoff; // [O, payoff)
 			}
 		}
 		return score;
 	}
 
-	const rateDiscard = (card: CardName): number => {
+	const rateDiscard = (card: CardName, restCards: CardName[]): number => {
 		const theCard = CARDS[card]
-		switch (theCard.type){
-			case "bright": return -20;
-			case "animal":return -10;
-			case "ribbon":return -5;
-			case "plain":return -1;
-		}
+		let discardPenality: number
+		switch (theCard.type) {
+			case "bright": discardPenality = -20; break;
+			case "animal": discardPenality = -10; break;
+			case "ribbon": discardPenality = -5; break;
+			case "plain": discardPenality = -1; break;
+		} // [-20, -1]
+		let discardScore: number = matchByMonth(restCards, card).length / 3; // [0,1)
+		return discardPenality + discardScore; // [-20, 0)
 	}
 
 	const selectedCard = useSelectedCard();
@@ -144,10 +148,11 @@ export const useCardHandler = () => {
 			const opponentCollection = new Set([...cs.collection[ds.getCurrent.inactivePlayer]]);
 
 			cardsInHand.forEach((card, i) => {
+				const restCards = cardsInHand.toSpliced(i,1)
 				const matches = getMatches(card)
 				switch (matches.length) {
 					case 0:
-						handScores[i] = rateDiscard(card);
+						handScores[i] = rateDiscard(card, restCards);
 						return;
 					case 1: 
 					case 3: {
