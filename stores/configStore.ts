@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { YakuName } from "~/utils/yaku";
+import { YakuName, viewingYaku } from "~/utils/yaku";
 
 const OPTIONS = {
 	GAME_LENGTH: [3, 6, 12] as const,
@@ -51,8 +51,7 @@ const useConfigStore = defineStore("config", () => {
 	 * Filter an array/set of yaku based on set rule
 	 */
 	function applyViewingsOption(yakuList: YakuName[]) {
-		const limitedYaku = ["hanami-zake", "tsukimi-zake"];
-		const filteredList = yakuList.filter((yaku) => !limitedYaku.includes(yaku));
+		const filteredList = yakuList.filter((yaku) => !viewingYaku.has(yaku));
 
 		switch (allowViewingsYaku.value) {
 			case "none":

@@ -100,7 +100,7 @@
             </div>
 
             <p
-              v-if="viewingsAllowed === 'limited' && limitedYaku.has(yaku.name)"
+              v-if="viewingsAllowed === 'limited' && viewingYaku.has(yaku.name)"
               class="mt-4 text-xs max-w-prose whitespace-nowrap"
             >
               <ExclamationCircleIcon class="inline w-4 h-auto mr-1 pointer-events-none" />
@@ -108,7 +108,7 @@
               <span class="block pl-6"
                 >completed yaku ( not
                 {{
-                  [...limitedYaku].filter((name) => name != yaku.name)[0].toUpperCase()
+                  [...viewingYaku].filter((name) => name != yaku.name)[0].toUpperCase()
                 }})
               </span>
             </p>
@@ -126,14 +126,12 @@ import {
   XCircleIcon,
   ExclamationCircleIcon,
 } from "@heroicons/vue/20/solid";
-import { useGameDataStore } from "~/stores/gameDataStore";
 import { useCardStore } from "~/stores/cardStore";
 import { useConfigStore } from "~/stores/configStore";
 import { CardName } from "~/utils/cards";
-import { Yaku } from "~/utils/yaku";
+import { Yaku, teyaku, viewingYaku } from "~/utils/yaku";
 
 const cs = useCardStore();
-const ds = useGameDataStore();
 const config = useConfigStore();
 
 const openAll = ref(false);
@@ -150,15 +148,13 @@ const isComplete = (yaku: Yaku) => {
 };
 
 const viewingsAllowed = computed(() => config.allowViewingsYaku);
-const limitedYaku = new Set(["hanami-zake", "tsukimi-zake"]);
-const excludedYaku = new Set(["teshi", "kuttsuki"]);
 
 const allowedYaku = computed(() => {
   const yakuList = [...Object.values(YAKU)].filter(
-    (yaku) => !excludedYaku.has(yaku.name)
+    (yaku) => !teyaku.has(yaku.name)
   );
   if (viewingsAllowed.value === "none")
-    return yakuList.filter((yaku) => !limitedYaku.has(yaku.name));
+    return yakuList.filter((yaku) => !viewingYaku.has(yaku.name));
   return yakuList;
 });
 </script>

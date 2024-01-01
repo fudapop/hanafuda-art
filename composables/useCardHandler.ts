@@ -1,12 +1,14 @@
 import { storeToRefs } from "pinia";
 import { CardName, matchByMonth, shuffle, CARDS } from "~/utils/cards";
-import { getProgress, YakuProgress } from "~/utils/yaku";
+import { getProgress, viewingYaku, YakuProgress } from "~/utils/yaku";
 import { useCardStore } from "~/stores/cardStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
+import { useConfigStore } from "~/stores/configStore";
 
 export const useCardHandler = () => {
 	const cs = useCardStore();
 	const ds = useGameDataStore();
+	const config = useConfigStore();
 	const { field, staged } = storeToRefs(cs);
 
 	const useSelectedCard = (): Ref<CardName | null> =>
@@ -37,11 +39,27 @@ export const useCardHandler = () => {
 	};
 
 	const rateProgress = (progress: YakuProgress[], restCards: CardName[]): number => {
+		const filteredList = progress.filter((p) => !viewingYaku.has(p.yaku.name));
+		console.debug(config.allowViewingsYaku)
+		switch (config.allowViewingsYaku) {
+			case "none":
+				progress = filteredList;
+
+			case "limited":
+				if (filteredList.length) {
+					// NOP -- is it okay to only start trying when the prerequisit is fulfilled?
+				} else {
+					progress = filteredList;
+				}
+
+			case "allow":
+				// NOP
+		}
+
 		let score = 0;
-		for (const { yaku, collectedCards } of progress) {
-			const check = yaku.check(new Set(collectedCards))
-			if (!!check) {
-				score += check
+		for (const { yaku, collectedCards, gotPoints } of progress) {
+			if (!!gotPoints) {
+				score += gotPoints
 			} else {
 				// const rarity = yaku.cards.length / 48;
 				const got = collectedCards.length / yaku.numRequired; // [O, 1)  -- It's never 1 because then the Yaku check succeeds.

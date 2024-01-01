@@ -363,7 +363,8 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 	},
 };
 
-const teyaku = ["kuttsuki", "teshi"] as YakuName[];
+const teyaku = new Set(["kuttsuki", "teshi"]) as Set<YakuName>;
+const viewingYaku = new Set(["hanami-zake", "tsukimi-zake"]) as Set<YakuName>;
 
 function getExtraPoints(numRequired: number, numCollected: number): number {
 	const extraPoints = numCollected - numRequired;
@@ -382,7 +383,7 @@ function checkAll(collection: Set<CardName>): {
 } {
 	const completed: YakuName[] = [];
 	const pointsArr = [...Object.values(YAKU)]
-		.filter((yaku) => !teyaku.includes(yaku.name))
+		.filter((yaku) => !teyaku.has(yaku.name))
 		.map((yaku) => {
 			const points = yaku.check(collection);
 			if (points) completed.push(yaku.name);
@@ -397,12 +398,13 @@ function checkAll(collection: Set<CardName>): {
 type YakuProgress = {
 	yaku: Yaku;
 	collectedCards: CardName[];
+	gotPoints: number;
 }
 
 function getProgress(collection: Set<CardName>, opponentCollection: Set<CardName>): YakuProgress[] {
 	let progress: YakuProgress[] = [];
 	progress = [...Object.values(YAKU)]
-		.filter((yaku) => !teyaku.includes(yaku.name))
+		.filter((yaku) => !teyaku.has(yaku.name))
 		.filter((yaku) => {
 			const yakuOpponentHas = getIntersection(opponentCollection, yaku.cards).length;
 			const yakuNumAvailable = yaku.cards.length - yakuOpponentHas;
@@ -410,7 +412,8 @@ function getProgress(collection: Set<CardName>, opponentCollection: Set<CardName
 		})
 		.map((yaku) => ({
 			yaku: yaku,
-			collectedCards: getIntersection(collection, yaku.cards)
+			collectedCards: getIntersection(collection, yaku.cards),
+			gotPoints: yaku.check(collection),
 		}))
 		.filter((p) => p.collectedCards.length > 0)
 
@@ -482,6 +485,8 @@ function checkForKuttsukiOrTeshi(
 export {
 	YAKU,
 	Yaku,
+	teyaku,
+	viewingYaku,
 	YakuName,
 	CompletedYaku,
 	YakuProgress,
