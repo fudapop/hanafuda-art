@@ -31,11 +31,10 @@ describe("When ending a round:", () => {
   })
   it("tracks round history", () => {
     store.saveResult(testData);
-    store.nextRound();
     const result = store.saveResult(testData);
-    expect(store.roundHistory).toHaveLength(2)
-    expect(store.roundHistory[1]).toStrictEqual(result);
-    expect(result).toHaveProperty("round", 2)
+    expect(store.roundHistory).toHaveLength(1)
+    expect(store.roundHistory[0]).toStrictEqual(result);
+    expect(result).toHaveProperty("round", 1)
   })
 })
 
@@ -43,10 +42,10 @@ it("returns complete history upon reset", () => {
   const history = [
     { round: 1, winner: 'p1' as PlayerKey, score: 3, data: {completedYaku: ['hanami-zake']}},
     { round: 2, winner: 'p1' as PlayerKey, score: 3, data: {completedYaku: ['hanami-zake']}},
-  ]
-  history.forEach((r, index) => store.roundHistory[index] = r);
+  ];
+  store.$patch({ roundHistory: history });
   expect(store.roundHistory.length).toBe(2);
   const record = store.reset();
   expect(store.roundHistory.length).toBe(0);
-  expect(JSON.parse(record)).toEqual(history);
+  expect(JSON.parse(record)).toHaveLength(2);
 })

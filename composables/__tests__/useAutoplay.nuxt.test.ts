@@ -44,7 +44,7 @@ test(
       expect(reveal).toHaveBeenCalledTimes(2);
       expect(togglePlayer).toHaveBeenCalledTimes(2);
       expect(nextPhase).toHaveBeenCalledTimes(6);
-      expect(nextRound).not.toHaveBeenCalled();
+      expect(nextRound).toHaveBeenCalledOnce();
     },
   {
     timeout: 60000,
