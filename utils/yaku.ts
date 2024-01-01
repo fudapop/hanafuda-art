@@ -334,7 +334,7 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 		},
 		check: function (hand) {
 			if (hand.size < this.numRequired) return 0;
-			const [yaku, cards] = checkForKuttsukiOrTeshi([...hand]);
+			const [yaku, cards] = checkForTeyaku([...hand]);
 			if (yaku === this.name) {
 				this.cards = cards;
 				return this.points;
@@ -353,7 +353,7 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 		},
 		check: function (hand) {
 			if (hand.size < this.numRequired) return 0;
-			const [yaku, cards] = checkForKuttsukiOrTeshi([...hand]);
+			const [yaku, cards] = checkForTeyaku([...hand]);
 			if (yaku === this.name) {
 				this.cards = cards;
 				return this.points;
@@ -457,7 +457,7 @@ function checkForWin(cards: Set<CardName>): CompletedYaku | null {
 	return completed;
 }
 
-function checkForKuttsukiOrTeshi(
+function checkForTeyaku(
 	cardArr: CardName[]
 ): [YakuName | null, CardName[]] {
 	// Check array for 4 of same suit/flower or 4 pairs
