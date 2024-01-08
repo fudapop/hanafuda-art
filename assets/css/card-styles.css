@@ -185,6 +185,26 @@
 	}
 }
 
+.post-card {
+	--card-radius: 0.3rem;
+	--card-aspect: 12/17;
+	--card-border-color: #03598950;
+
+	& .card img {
+		padding-top: 2px;
+		scale: 1.1;
+	}
+
+	& .down {
+		--card-bg-color: url("/cards/post-card/jp-post-symbol.png"),
+			linear-gradient(45deg, #60A27F, #035989);
+		background-blend-mode: screen;
+		background-size: contain !important;
+		background-repeat: no-repeat !important;
+		background-position: center !important;
+	}
+}
+
 .sabling-art {
 	--card-radius: 8px;
 	--card-border-w: 1px;
