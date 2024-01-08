@@ -15,6 +15,7 @@ const DESIGNS = [
 	"hanamaki",
 	"hana-awase",
 	"kinbotan",
+	"post-card",
 	"ramen-red",
 	"flash-black",
 ] as const;
@@ -244,6 +245,17 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 		contributor: "Emiko Osagawara",
 		contributorUrl: "https://emikoogasawara.com/",
 		releaseDate: "12-23-2023",
+	},
+	"post-card": {
+		name: "postcard",
+		title: "Postcard",
+		description: "Postcards featuring this pattern by Tanaka Sansho were issued in 1906.",
+		creator: "Tanaka Sansho",
+		url: "https://japanplayingcardmuseum.com/112-1-3-postcard-designed-hanacarta/",
+		urlDescription: "Read about this collection at Japan Playing Card Museum.",
+		contributor: "Emiko Osagawara",
+		contributorUrl: "https://emikoogasawara.com/",
+		releaseDate: "01-07-2024",
 	},
 	"flash-black": {
 		name: "flash-black",
