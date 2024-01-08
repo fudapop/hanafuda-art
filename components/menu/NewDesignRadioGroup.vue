@@ -53,10 +53,14 @@
                 </Transition>
 
                 <!-- DESCRIPTION SECTION -->
-                <div :class="['relative w-full @md:w-[360px] @md:h-[200px] space-y-4 px-4 pb-4 rounded-lg dark:text-white',
+                <div :class="['relative w-full @md:w-[360px] space-y-4 px-4 pb-4 rounded-lg dark:text-white',
                     checked ? 'dark:bg-[#40495a] bg-gray-50 shadow-inner shadow-gray-400 dark:shadow-gray-900' : ''
                 ]">
-                    <button type="button" @click="() => handleLike(design)" class="float-right mt-4 pointer-events-auto focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300">
+                    <button 
+                        v-if="unlocked?.includes(design)" 
+                        type="button" @click="() => handleLike(design)" 
+                        class="float-right mt-4 pointer-events-auto focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300"
+                    >
                         <HeartIcon :aria-hidden="true"
                             :class="['w-7 h-auto stroke-gray-500 stroke-1 drop-shadow-md', isLiked(design) ? 'fill-red-600 stroke-red-400' : '']" />
                     </button>

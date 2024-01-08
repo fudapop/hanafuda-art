@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-4 space-y-2">
+	<div class="my-4 space-y-2">
 		<h3 class="text-lg font-semibold tracking-wide text-gray-900 dark:text-white">{{ info.title }}</h3>
 		<p>
 		{{ info.description }}
