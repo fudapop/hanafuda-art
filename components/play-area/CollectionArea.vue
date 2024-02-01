@@ -108,7 +108,7 @@ watch(
     updateCollection();
 
     config.applyWildCardOption();
-    const { score, completed: completedYaku } = checkAll(cs.collection[player]);
+    const { score, completed: completedYaku } = checkAll(cs.collection[player], config.allowViewingsYaku === "none");
 
     // Filter list based on viewings allowance setting
     const newCompleted = config.applyViewingsOption(completedYaku);
@@ -119,13 +119,13 @@ watch(
     // No yaku completed or upgraded since the last update
     if (taggedYaku.every((yaku) => lastCompleted.has(yaku))) return;
 
-    if (completedYaku.length) {
+    if (newCompleted.length) {
       // Emits only if new yaku completed.
       lastCompleted = new Set(taggedYaku);
       emits("completed", {
         player,
         score: config.applyDoubleScoreOption(score),
-        completedYaku: getCompleted(cs.collection[player], completedYaku),
+        completedYaku: getCompleted(cs.collection[player], newCompleted),
       });
     }
   },

@@ -377,13 +377,17 @@ function getIntersection(collectedCards: Set<CardName>, yakuCards: CardName[]) {
 	return collected;
 }
 
-function checkAll(collection: Set<CardName>): {
+function checkAll(collection: Set<CardName>, excludeViewingYaku?: boolean): {
 	completed: YakuName[];
 	score: number;
 } {
 	const completed: YakuName[] = [];
-	const pointsArr = [...Object.values(YAKU)]
-		.filter((yaku) => !teyaku.has(yaku.name))
+	const allowedYaku = [...Object.values(YAKU)].filter((yaku) => {
+		const defaultFilter = !teyaku.has(yaku.name);
+		if (excludeViewingYaku) return defaultFilter && !viewingYaku.has(yaku.name);
+		return defaultFilter;
+	})
+	const pointsArr = allowedYaku
 		.map((yaku) => {
 			const points = yaku.check(collection);
 			if (points) completed.push(yaku.name);
