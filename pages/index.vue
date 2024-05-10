@@ -130,6 +130,8 @@ const {
   stopIsCalled,
 } = useDecisionHandler();
 
+const handleDecision = async () => await makeDecision();
+
 const handleCompletion = (data: CompletionEvent) => {
   const { player, score, completedYaku } = data;
   if (player) {
@@ -140,17 +142,13 @@ const handleCompletion = (data: CompletionEvent) => {
     consoleLogColor(message, "skyblue");
   }
   consoleLogColor("\tScore: " + score, "lightblue");
-  console.log(
-    ds.saveResult({
-      winner: player,
-      score: score * ps.bonusMultiplier,
-      completedYaku,
-    })
-  );
+  ds.saveResult({
+        winner: player,
+        score: score * ps.bonusMultiplier,
+        completedYaku,
+      });
   handleDecision();
 };
-
-const handleDecision = async () => await makeDecision();
 
 const handleStop = () => {
   const player = activePlayer.value.id;

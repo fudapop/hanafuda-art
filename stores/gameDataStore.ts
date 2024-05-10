@@ -64,7 +64,7 @@ export const useGameDataStore = defineStore("gameData", () => {
 	});
 
 	const pointsExhausted = computed(() =>
-		[...Object.values(scoreboard.value)].some((score) => score === 0)
+		scoreboard.value.p1 === 0 || scoreboard.value.p2 === 0
 	);
 
 	// Actions
