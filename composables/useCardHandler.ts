@@ -190,9 +190,9 @@ export const useCardHandler = () => {
 				}
 			})
 
-			console.log(handScores)
+			console.debug({handScores})
 			const maxScoreIndex = handScores.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
-			console.log(maxScoreIndex)
+			console.debug({maxScoreIndex})
 			selectedCard.value = cardsInHand[maxScoreIndex];
 		},
 
