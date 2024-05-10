@@ -81,7 +81,6 @@ const getResult = () => {
 if (user) {
   watch(gameOver, async () => {
     if (!gameOver.value) return;
-    const date = new Date();
     const result = getResult();
     const currentUser = toValue(useProfile().current);
     if (currentUser) {
