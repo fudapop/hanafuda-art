@@ -23,6 +23,7 @@ export const useAuth = () => {
 	const auth = useFirebaseAuth()!;
 	const error = ref();
   const toast = useToast();
+	const { log } = useAnalytics();
 
 	const useGuest = () =>
 		useStorage(
@@ -52,6 +53,7 @@ export const useAuth = () => {
 			uid: user.uid,
 		};
 		useGuest().value = guest;
+    log("login", { method: "anonymous" });
 		return guest;
 	};
 
@@ -79,15 +81,20 @@ export const useAuth = () => {
 			return false;
 		};
 	};
-
+	
 	const handleOAuth = async (result: UserCredential) => {
 		try {
 			const googleCredential = GoogleAuthProvider.credentialFromResult(result);
 			const githubCredential = GithubAuthProvider.credentialFromResult(result);
 			// const facebookCredential = FacebookAuthProvider.credentialFromResult(result);
 			const credential = googleCredential || githubCredential || null;
-
+			
 			if (credential) {
+				if (useGuest().value?.uid) {
+					log("sign_up", { method: credential.signInMethod });
+				} else {
+					log("login", { method: credential.signInMethod });
+				}
 				useGuest().value = {};
 				return true;
 			}
