@@ -44,6 +44,7 @@
     "firebase": "^10.1.0",
     "firebase-admin": "^11.10.1",
     "firebase-functions": "^4.4.1",
+    "nanoid": "^5.0.7",
     "nuxt-vuefire": "^0.2.12",
     "pinia": "^2.1.4",
     "vue-toastification": "^2.0.0-rc.5",
