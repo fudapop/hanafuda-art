@@ -16,12 +16,12 @@
       </div>
     </template>
     <template v-if="submitted" #description>
-      <p class="text-gray-900 dark:text-white text-center">
+      <p class="text-center text-gray-900 dark:text-white">
         Your feedback has been submitted. Thank you!
       </p>
     </template>
     <template v-else #description>
-      <p class="text-gray-900 dark:text-white text-center">How was your experience?</p>
+      <p class="text-center text-gray-900 dark:text-white">How was your experience?</p>
     </template>
     <template #actions>
       <form
@@ -36,8 +36,8 @@
             <p>Animation Smoothness</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
-              ratingId="animation-rating"
-              v-model.number="feedback['animation-rating']"
+              ratingId="animation"
+              v-model.number="ratings['animation']"
             />
           </div>
           <div
@@ -46,8 +46,8 @@
             <p>Ease of Controls</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
-              ratingId="controls-rating"
-              v-model.number="feedback['controls-rating']"
+              ratingId="controls"
+              v-model.number="ratings['controls']"
             />
           </div>
           <div
@@ -56,8 +56,8 @@
             <p>Image Quality</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
-              ratingId="image-rating"
-              v-model.number="feedback['image-rating']"
+              ratingId="image"
+              v-model.number="ratings['image']"
             />
           </div>
         </fieldset>
@@ -104,6 +104,13 @@
 
 <script setup lang="ts">
 import { ChatBubbleLeftEllipsisIcon, CheckIcon } from "@heroicons/vue/24/outline";
+import {
+	doc,
+	setDoc,
+	getFirestore,
+  Timestamp,
+} from "firebase/firestore";
+import { nanoid } from "nanoid";
 
 const { open } = defineProps<{ open: boolean }>();
 
@@ -129,13 +136,25 @@ const includeTagEmoji = (option: CommentTag) => {
 };
 
 interface Feedback {
-  "animation-rating": number;
-  "controls-rating": number;
-  "image-rating": number;
+  "animation": number;
+  "controls": number;
+  "image": number;
   [x: string]: number;
 }
 
 const user = toValue(useProfile().current);
+
+const ratings: Feedback = reactive({
+  "animation": 0,
+  "controls": 0,
+  "image": 0,
+});
+
+const comments = reactive({
+  tag: "other",
+  message: "",
+});
+
 const submitted = computed({
   get: () => user?.flags?.hasSubmittedFeedback,
   set: (value) => {
@@ -145,82 +164,38 @@ const submitted = computed({
   },
 });
 
-const feedback: Feedback = reactive({
-  "animation-rating": 0,
-  "controls-rating": 0,
-  "image-rating": 0,
-});
-
-const comments = reactive({
-  tag: "other",
-  message: "",
-});
-
 const incomplete = computed(() =>
-  [
-    feedback["animation-rating"],
-    feedback["controls-rating"],
-    feedback["image-rating"],
-  ].some((fb) => !fb)
+[
+  ratings["animation"],
+  ratings["controls"],
+  ratings["image"],
+].some((fb) => !fb)
 );
 
 defineEmits(["close"]);
 
+const saveFeedback = async () => {
+    if (!user) return;
+    setDoc(
+      doc(getFirestore(), "feedback", `fb_${nanoid(15)}${Date.now()}`),
+      {
+        ratings: ratings,
+        comments,
+        submitted_at: Timestamp.now(),
+        submitted_by: user.isGuest
+          ? `g_${user?.uid}`
+          : doc(getFirestore(), "users", `u_${user.uid}`)
+      }
+    );
+  };
+
 const handleSubmit = async (ev: Event) => {
   ev.preventDefault();
-  console.log(feedback);
   try {
-    await sendRatings();
-    await sendComments();
+    saveFeedback();
     submitted.value = true;
   } catch (err) {
     console.log(err);
   }
 };
-
-async function sendRatings() {
-  for (const key in feedback) {
-    try {
-      const submittedRatings = await apiCall("/feelbacks/create", {
-        contentSetId: "7abc53d8-e03c-4689-8c66-ee6ca4e3b7d8",
-        key,
-        value: feedback[key],
-      });
-      console.log({ submission: submittedRatings });
-      return submittedRatings;
-    } catch (err) {
-      console.error(err);
-    }
-  }
-}
-
-async function sendComments() {
-  try {
-    const submittedComments = await apiCall("/feelbacks/create", {
-      contentSetId: "d955c173-33b9-4268-a96f-fe97b2d31b7a",
-      key: "post-game-comments",
-      value: {
-        message: comments.message,
-        tag: comments.tag,
-      },
-    });
-    console.log({ submission: submittedComments });
-    return submittedComments;
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-async function apiCall(path: string, ...params: any[]) {
-  const endpoint = "https://api.feelback.dev/v0";
-  const response = await fetch(endpoint + path, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(params),
-  });
-
-  return await response.json();
-}
 </script>
