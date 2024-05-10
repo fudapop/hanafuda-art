@@ -1,7 +1,6 @@
 import { useStorage } from "@vueuse/core";
 import { CardName, DECK } from "~/utils/cards";
-import { ref as storageRef, updateMetadata } from "firebase/storage";
-import { useFirebaseStorage, useStorageFileUrl } from "vuefire";
+import { getDownloadURL, getStorage, ref as storageRef, updateMetadata } from "firebase/storage";
 
 const DESIGNS = [
 	"cherry-version",
@@ -276,8 +275,8 @@ const CARD_DESIGNS: Record<CardDesign, DesignInfo> = {
 const cardMap: Ref<Map<CardName, string> | undefined> = ref();
 
 export const useCardDesign = () => {
-	const getImage = (designPath: string) => {
-		const storage = useFirebaseStorage();
+	const getImage = async (designPath: string) => {
+		const storage = getStorage();
 		const imageFileRef = storageRef(storage, designPath);
 		const newMetadata = {
 			contentType: "image/webp",
@@ -286,7 +285,7 @@ export const useCardDesign = () => {
 		updateMetadata(imageFileRef, newMetadata).catch((error) => {
 			console.error({ error });
 		});
-		const { url } = useStorageFileUrl(imageFileRef);
+		const url = await getDownloadURL(imageFileRef);
 		return { url };
 	};
 
@@ -305,10 +304,10 @@ export const useCardDesign = () => {
 		}
 
 		const cards = [...DECK];
-		const urlRefs = cards.map((cardName) =>
-			getImage(`cards/${cardDesign}/${cardName}.webp`)
-		);
-		while (urlRefs.some((card) => !card.url.value)) {
+		const urls = await Promise.all(cards.map(async (cardName) =>
+			await getImage(`cards/${cardDesign}/${cardName}.webp`)
+		));
+		while (urls.some((card) => !card.url)) {
 			console.log("Fetching...");
 			await sleep();
 		}
@@ -318,8 +317,8 @@ export const useCardDesign = () => {
 			"new-hanafuda",
 			{
 				[cardDesign]: Object.fromEntries(
-					urlRefs.map((ref, index) => {
-						const [card, url] = [cards[index], ref.url.value];
+					urls.map((ref, index) => {
+						const [card, url] = [cards[index], ref.url];
 						urlMap.set(card, url as string);
 						return [card, url];
 					})
