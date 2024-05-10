@@ -18,7 +18,7 @@
           enter-from-class="opacity-0 motion-safe:-scale-x-50" enter-to-class="opacity-100"
           leave-active-class="duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
           <div v-if="selectedCard && players.p2.isActive && checkCurrentPhase('select')"
-            class="relative z-30 overflow-hidden card">
+            class="relative z-[25] overflow-hidden card">
             <CardImage class="drop-shadow-md" :src="getCardUrl(selectedCard)!" :card="selectedCard" />
           </div>
         </Transition>
