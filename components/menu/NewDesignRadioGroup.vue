@@ -104,7 +104,6 @@ import { LockClosedIcon, LockOpenIcon, ArrowRightIcon } from '@heroicons/vue/20/
 import { HeartIcon } from '@heroicons/vue/24/outline';
 
 import { useToast } from 'vue-toastification';
-import { ToastID } from 'vue-toastification/dist/types/types';
 import DesignDescription from './DesignDescription.vue'
 
 type CardDesign = typeof DESIGNS[number]
@@ -134,7 +133,7 @@ const unlocked = computed(() => currentUser?.designs.unlocked);
 const newUnlock: Ref<CardDesign | undefined> = ref();
 let initialDesign: CardDesign | undefined;
 let timeoutId: string | number | NodeJS.Timeout | undefined;
-let toastId: ToastID;
+let toastId: any;
 
 const handleUnlock = (design: CardDesign) => {
     if (!initialDesign) initialDesign = selectedDesign.value;
