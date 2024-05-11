@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { CompletedYaku, YAKU } from "~/utils/yaku";
+import { type CompletedYaku, YAKU } from "~/utils/yaku";
 
 const { completed, showCards } = defineProps<{
   completed: CompletedYaku[];

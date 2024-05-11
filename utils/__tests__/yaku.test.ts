@@ -1,6 +1,6 @@
 import { it, describe, expect } from "vitest";
-import { CardName } from "../cards";
-import { YAKU, YakuName, checkAll, getCompleted } from "../yaku";
+import { type CardName } from "../cards";
+import { YAKU, type YakuName, checkAll, getCompleted } from "../yaku";
 
 describe("YAKU", () => {
   const kasu: Set<CardName> = new Set([

@@ -16,11 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { useToast } from "vue-toastification";
 const { logout, error } = useAuth();
 const user = useCurrentUser();
-
-const toast = useToast();
 
 const login = () => {
   navigateTo("/login");

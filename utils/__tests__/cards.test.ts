@@ -1,5 +1,5 @@
 import { it, describe, expect } from "vitest";
-import { CARDS, shuffle, CardName, sortByType, matchByMonth } from "../cards";
+import { CARDS, shuffle, type CardName, sortByType, matchByMonth } from "../cards";
 
 describe("CARDS", () => {
   it("has 48 values", () => {

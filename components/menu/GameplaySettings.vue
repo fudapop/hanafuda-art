@@ -152,9 +152,9 @@
 import { QuestionMarkCircleIcon, LockClosedIcon } from "@heroicons/vue/24/outline";
 import {
   useConfigStore,
-  ViewingsOptions,
-  GameLengthOptions,
-  GameSettings,
+  type ViewingsOptions,
+  type GameLengthOptions,
+  type GameSettings,
 } from "~/stores/configStore";
 import { onClickOutside } from "@vueuse/core";
 

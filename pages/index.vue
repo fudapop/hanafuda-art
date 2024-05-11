@@ -63,26 +63,25 @@
 
     <!-- DEV BUTTONS -->
     <!-- <div
-      v-if="deck.size === 48 || roundOver"
+      v-if="gameTest"
       v-hide="showLoader"
       class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
     >
       <button
-        v-if="deck.size === 48"
-        type="button"
-        class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        @click="startRound"
-      >
-        Deal Cards
-      </button>
-      <button
-        v-if="nodeEnv === 'development'"
-        v-show="deck.size === 48"
+        v-show="cs.deck.size === 48"
         type="button"
         class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
         @click="startAuto"
       >
         Autoplay
+      </button>
+      <button
+        v-show="!roundOver"
+        type="button"
+        class="rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+        @click="stopAuto"
+      >
+        Stop test
       </button>
     </div> -->
   </GameLayout>
@@ -92,9 +91,9 @@
 import { storeToRefs } from "pinia";
 import { useToast, POSITION } from "vue-toastification";
 import { useGameDataStore } from "~/stores/gameDataStore";
-import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
+import { type PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
-import { CompletionEvent } from "~/components/play-area/CollectionArea.vue";
+import { type CompletionEvent } from "~/components/play-area/CollectionArea.vue";
 import { checkForWin } from "~/utils/yaku";
 
 definePageMeta({
@@ -119,6 +118,7 @@ const autoOpponent: Ref<boolean> = useOpponent();
 const showModal = ref(false);
 const showLoader = ref(false);
 const gameStart = useState("start");
+const gameTest = useState("test");
 
 const toast = useToast();
 
@@ -191,12 +191,19 @@ const handleClose = () => {
   gameStart.value = false;
 };
 
-const startAuto = async () => {
-  autoOpponent.value = false;
-  roundOver.value = false;
-  // Instant win conditions are not checked during autoplay
-  autoPlay({ speed: 3, rounds: Infinity });
-};
+// const startAuto = async () => {
+//   autoOpponent.value = false;
+//   roundOver.value = false;
+//   // Instant win conditions are not checked during autoplay
+//   autoPlay({ speed: 3, rounds: Infinity });
+// };
+
+// const stopAuto = async () => {
+//   console.log("Stopping autoplay...");
+//   roundOver.value = true;
+//   gameOver.value = true;
+//   ds.reset();
+// };
 
 const startRound = async () => {
   // FIX: Opponent played twice on starting new round
@@ -295,7 +302,7 @@ watch(activePlayer, () => {
 
 watch(gameStart, () => {
   if (gameStart.value) {
-    startRound();
+    if (!gameTest.value) startRound();
   } else {
     console.info("Resetting game...");
     if (!roundOver.value) ds.endRound();
@@ -311,4 +318,5 @@ onBeforeUnmount(() => {
   // Clear stored data
   // sessionStorage?.removeItem("new-hanafuda");
 });
+
 </script>

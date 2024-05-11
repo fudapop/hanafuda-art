@@ -17,10 +17,10 @@
 </template>
 
 <script setup lang="ts">
-import { PlayerKey } from "~/stores/playerStore";
+import { type PlayerKey } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
-import { CardName, sortByType } from "~/utils/cards";
-import { checkAll, YAKU, YakuName, CompletedYaku } from "~/utils/yaku";
+import { type CardName, sortByType } from "~/utils/cards";
+import { checkAll, YAKU, type YakuName, type CompletedYaku } from "~/utils/yaku";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { storeToRefs } from "pinia";
 import { useConfigStore } from "~/stores/configStore";

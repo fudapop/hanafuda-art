@@ -1,6 +1,6 @@
 import { storeToRefs } from "pinia";
-import { CardName, matchByMonth, shuffle, CARDS } from "~/utils/cards";
-import { getProgress, viewingYaku, YakuProgress } from "~/utils/yaku";
+import { type CardName, matchByMonth, CARDS } from "~/utils/cards";
+import { getProgress, viewingYaku, type YakuProgress } from "~/utils/yaku";
 import { useCardStore } from "~/stores/cardStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { useConfigStore } from "~/stores/configStore";

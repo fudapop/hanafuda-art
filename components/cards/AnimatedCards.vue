@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { useImage } from "@vueuse/core";
-import { CardName } from "~/utils/cards";
+import { type CardName } from "~/utils/cards";
 const { getCardUrl, useDesign } = useCardDesign();
 
 const selectedDesign = useDesign();

@@ -128,8 +128,8 @@ import {
 } from "@heroicons/vue/20/solid";
 import { useCardStore } from "~/stores/cardStore";
 import { useConfigStore } from "~/stores/configStore";
-import { CardName } from "~/utils/cards";
-import { Yaku, teyaku, viewingYaku } from "~/utils/yaku";
+import { type CardName } from "~/utils/cards";
+import { type Yaku, teyaku, viewingYaku } from "~/utils/yaku";
 
 const cs = useCardStore();
 const config = useConfigStore();

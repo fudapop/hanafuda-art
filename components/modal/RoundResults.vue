@@ -68,7 +68,7 @@ import { QuestionMarkCircleIcon } from "@heroicons/vue/24/outline";
 import { useCardStore } from "~/stores/cardStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { usePlayerStore } from "~/stores/playerStore";
-import { CompletedYaku } from "~/utils/yaku";
+import { type CompletedYaku } from "~/utils/yaku";
 
 defineEmits(["next"]);
 

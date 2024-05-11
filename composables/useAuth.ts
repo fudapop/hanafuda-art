@@ -6,7 +6,7 @@ import {
 	signOut,
 	signInWithPopup,
 	linkWithPopup,
-	UserCredential,
+	type UserCredential,
 } from "firebase/auth";
 import { useStorage } from "@vueuse/core";
 import { useToast } from "vue-toastification";
@@ -59,6 +59,7 @@ export const useAuth = () => {
 
 	const logout = () => {
 		if (auth.currentUser?.isAnonymous) {
+			useGuest().value = {};
 			auth.currentUser.delete();
 		} else {
 			signOut(auth);

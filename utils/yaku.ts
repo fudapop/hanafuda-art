@@ -1,4 +1,4 @@
-import { CardName } from "./cards";
+import { type CardName } from "./cards";
 
 const YAKU_NAMES = [
 	"gokou",
@@ -488,12 +488,12 @@ function checkForTeyaku(
 
 export {
 	YAKU,
-	Yaku,
+	type Yaku,
 	teyaku,
 	viewingYaku,
-	YakuName,
-	CompletedYaku,
-	YakuProgress,
+	type YakuName,
+	type CompletedYaku,
+	type YakuProgress,
 	getProgress,	
 	checkAll,
 	getCompleted,
