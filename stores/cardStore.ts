@@ -5,8 +5,8 @@
  */
 
 import { defineStore } from "pinia";
-import { PlayerKey } from "~/stores/playerStore";
-import { CardName, TEST_DECKS, matchByMonth, shuffle } from "~/utils/cards";
+import { type PlayerKey } from "~/stores/playerStore";
+import { type CardName, shuffle } from "~/utils/cards";
 
 type PlayerCardSet = Record<PlayerKey, Set<CardName>>;
 

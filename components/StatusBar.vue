@@ -44,7 +44,7 @@
 import { storeToRefs } from "pinia";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { useConfigStore } from "~/stores/configStore";
-import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
+import { type PlayerKey, usePlayerStore } from "~/stores/playerStore";
 
 const { user, playerNum } = defineProps(["user", "playerNum"]);
 const ds = useGameDataStore();

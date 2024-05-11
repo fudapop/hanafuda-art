@@ -1,6 +1,4 @@
 // middleware/auth.ts
-import { useProfile } from "~/composables/useProfile";
-
 const { getProfile } = useProfile();
 
 export default defineNuxtRouteMiddleware(async (to, from) => {

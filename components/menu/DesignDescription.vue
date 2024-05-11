@@ -19,8 +19,6 @@
 </template>
 
 <script setup lang="ts">
-import { CardDesign } from 'composables/useCardDesign';
-
 const { design } = defineProps<{ design: CardDesign }>()
 
 const info = computed(() => useCardDesign().getDesignInfo(design))

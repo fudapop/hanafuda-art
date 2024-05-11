@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { CardName } from "~/utils/cards";
+import { type CardName } from "~/utils/cards";
 
 const { card, src } = defineProps<{ card: CardName; src: string }>();
 

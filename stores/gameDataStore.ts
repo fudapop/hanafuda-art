@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
+import { type PlayerKey, usePlayerStore } from "~/stores/playerStore";
 import { useCardStore } from "~/stores/cardStore";
 import { useConfigStore } from "~/stores/configStore";
 import { useStorage } from "@vueuse/core";

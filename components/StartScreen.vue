@@ -9,6 +9,14 @@
         >花札 KOI-KOI
       </h1>
     </div>
+    <!-- <button
+      id="start-button"
+      type="button"
+      :class="['px-8 py-3 text-xl rounded-lg pri-btn', 'absolute top-0 m-auto']"
+      @click="testGame"
+    >
+      Test play
+    </button> -->
     <div class="absolute flex flex-col shadow-lg w-max top-3/4 gap-y-2">
         <button
           id="start-button"
@@ -35,8 +43,21 @@
 </template>
 
 <script setup lang="ts">
-defineEmits(["start-game"]);
+const emit = defineEmits(["start-game"]);
+const testPlay = useState("test", () => false);
+const gameStart = useState("gameStart");
 const { userIsGuest } = useAuth();
+
+const testGame = () => {
+  testPlay.value = true;
+  emit("start-game");
+};
+
+watch(gameStart, () => {
+  if (!gameStart.value) {
+    testPlay.value = false;
+  }
+});
 
 </script>
 

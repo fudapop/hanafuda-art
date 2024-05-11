@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useCardDesign } from "~/composables/useCardDesign";
-import { CardName } from "~/utils/cards";
+import { type CardName } from "~/utils/cards";
 import { useCardStore } from "~/stores/cardStore";
 import { usePlayerStore } from "~/stores/playerStore";
 import { useGameDataStore } from "~/stores/gameDataStore";

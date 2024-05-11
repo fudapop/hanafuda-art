@@ -7,7 +7,7 @@
         leave-active-class="duration-200 ease-in" leave-from-class="opacity-100"
         leave-to-class="opacity-0 motion-safe:translate-x-1">
         <div v-if="card" :class="{
-          'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
+          'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative h-full w-full': true,
           'drop-shadow-xl -translate-y-2 z-20': matchedCards?.includes(card),
           '-translate-y-20 drop-shadow-xl': selectedCard === card,
           'pointer-events-none staged': cs.staged.has(card),
@@ -28,11 +28,11 @@
 
 <script setup lang="ts">
 import { useCardDesign } from "~/composables/useCardDesign";
-import { CardName } from "~/utils/cards";
+import { type CardName } from "~/utils/cards";
 import { useCardStore } from "~/stores/cardStore";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { useConfigStore } from "~/stores/configStore";
-import { PlayerKey, usePlayerStore } from "~/stores/playerStore";
+import { type PlayerKey, usePlayerStore } from "~/stores/playerStore";
 
 const { id } = defineProps<{ id: PlayerKey }>();
 

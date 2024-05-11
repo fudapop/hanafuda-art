@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { useCardDesign } from "~/composables/useCardDesign";
-import { CardName } from "~/utils/cards";
+import { type CardName } from "~/utils/cards";
 import { useCardStore } from "~/stores/cardStore";
 
 const { cards, stack = false } = defineProps<{

@@ -1,5 +1,5 @@
 import { useStorage } from "@vueuse/core";
-import { CardName, DECK } from "~/utils/cards";
+import { type CardName, DECK } from "~/utils/cards";
 import { getDownloadURL, getStorage, ref as storageRef, updateMetadata } from "firebase/storage";
 import CARD_DESIGNS from "~/assets/designInfo.json";
 

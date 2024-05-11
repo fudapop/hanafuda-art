@@ -39,8 +39,8 @@
 
 <script setup lang="ts">
 import { ChevronUpIcon } from "@heroicons/vue/20/solid";
-import { RoundResult, useGameDataStore } from "~/stores/gameDataStore";
-import { CompletedYaku } from "~/utils/yaku";
+import { type RoundResult, useGameDataStore } from "~/stores/gameDataStore";
+import { type CompletedYaku } from "~/utils/yaku";
 
 const { results } = defineProps<{
   results: RoundResult[];
