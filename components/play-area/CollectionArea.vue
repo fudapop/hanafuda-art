@@ -36,7 +36,7 @@ const emits = defineEmits<{
   (event: "completed", data: CompletionEvent): void;
 }>();
 
-const { roundOver } = storeToRefs(useGameDataStore());
+const { roundOver, roundCounter: month } = storeToRefs(useGameDataStore());
 const cs = useCardStore();
 const config = useConfigStore();
 
@@ -93,6 +93,16 @@ const applyExtraTags = (yakuList: YakuName[]) => {
 };
 
 let lastCompleted: Set<YakuName> = new Set([]);
+
+watchEffect(() => {
+  if (config.maxRounds !== 12) {
+    updateTsukiFuda(0);
+    consoleLogColor("TSUKI-FUDA not available for this game.", "skyblue");
+    return;
+  }
+  updateTsukiFuda(month.value);
+  consoleLogColor("TSUKI-FUDA: " + YAKU["tsuki-fuda"].cards.join(", "), "skyblue");
+});
 
 watch(roundOver, () => {
   if (roundOver.value) {
