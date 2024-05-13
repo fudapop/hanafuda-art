@@ -5,7 +5,8 @@
       :alt="card"
       @load="handleLoad"
       loading="eager"
-      class="object-cover aspect-[--card-aspect] user-select-none pointer-events-none"
+      class="object-cover pointer-events-none user-select-none"
+      sizes="100vw"
     />
   </template>
 </template>
