@@ -258,7 +258,6 @@ const CARDS: Readonly<Record<string, FlowerCard>> = {
     type: "plain",
     month: 7,
   },
-
   "susuki-ni-tsuki": {
     name: "susuki-ni-tsuki",
     type: "bright",
