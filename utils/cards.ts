@@ -178,43 +178,43 @@ const CARDS: Readonly<Record<string, FlowerCard>> = {
     type: "plain",
     month: 3,
   },
+  "fuji-ni-kakku": {
+    name: "fuji-ni-kakku",
+    type: "animal",
+    month: 4,
+  },
+  "fuji-no-tan": {
+    name: "fuji-no-tan",
+    type: "ribbon",
+    month: 4,
+  },
+  "fuji-no-kasu-1": {
+    name: "fuji-no-kasu-1",
+    type: "plain",
+    month: 4,
+  },
+  "fuji-no-kasu-2": {
+    name: "fuji-no-kasu-2",
+    type: "plain",
+    month: 4,
+  },
   "ayame-ni-yatsuhashi": {
     name: "ayame-ni-yatsuhashi",
     type: "animal",
-    month: 4,
+    month: 5,
   },
   "ayame-no-tan": {
     name: "ayame-no-tan",
     type: "ribbon",
-    month: 4,
+    month: 5,
   },
   "ayame-no-kasu-1": {
     name: "ayame-no-kasu-1",
     type: "plain",
-    month: 4,
+    month: 5,
   },
   "ayame-no-kasu-2": {
     name: "ayame-no-kasu-2",
-    type: "plain",
-    month: 4,
-  },
-  "hagi-ni-inoshishi": {
-    name: "hagi-ni-inoshishi",
-    type: "animal",
-    month: 5,
-  },
-  "hagi-no-tan": {
-    name: "hagi-no-tan",
-    type: "ribbon",
-    month: 5,
-  },
-  "hagi-no-kasu-1": {
-    name: "hagi-no-kasu-1",
-    type: "plain",
-    month: 5,
-  },
-  "hagi-no-kasu-2": {
-    name: "hagi-no-kasu-2",
     type: "plain",
     month: 5,
   },
@@ -238,26 +238,27 @@ const CARDS: Readonly<Record<string, FlowerCard>> = {
     type: "plain",
     month: 6,
   },
-  "fuji-ni-kakku": {
-    name: "fuji-ni-kakku",
+  "hagi-ni-inoshishi": {
+    name: "hagi-ni-inoshishi",
     type: "animal",
     month: 7,
   },
-  "fuji-no-tan": {
-    name: "fuji-no-tan",
+  "hagi-no-tan": {
+    name: "hagi-no-tan",
     type: "ribbon",
     month: 7,
   },
-  "fuji-no-kasu-1": {
-    name: "fuji-no-kasu-1",
+  "hagi-no-kasu-1": {
+    name: "hagi-no-kasu-1",
     type: "plain",
     month: 7,
   },
-  "fuji-no-kasu-2": {
-    name: "fuji-no-kasu-2",
+  "hagi-no-kasu-2": {
+    name: "hagi-no-kasu-2",
     type: "plain",
     month: 7,
   },
+
   "susuki-ni-tsuki": {
     name: "susuki-ni-tsuki",
     type: "bright",
