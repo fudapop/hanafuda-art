@@ -405,4 +405,6 @@ export {
   shuffle,
   sortByType,
   matchByMonth,
+  getCardsOfMonth,
+  getCardsOfType,
 };

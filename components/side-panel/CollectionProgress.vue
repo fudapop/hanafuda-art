@@ -10,7 +10,7 @@
       <span class="sr-only">Expand/Collapse</span>
     </button>
     <div class="w-full max-w-lg p-2 mx-auto space-y-2 rounded-2xl">
-      <HeadlessDisclosure v-for="yaku in allowedYaku" :key="yaku.name" v-slot="{ open }">
+      <HeadlessDisclosure as="div" v-for="yaku in allowedYaku" :key="yaku.name" v-slot="{ open }" v-show="yaku.cards.length > 0">
         <HeadlessDisclosureButton
           :class="[
             'relative grid w-full grid-cols-[repeat(2,1fr)_max-content] px-4 py-2 items-center text-sm font-medium text-left rounded-lg focus:outline-none focus-visible:ring focus-visible:ring-opacity-75',

@@ -15,6 +15,7 @@ const YAKU_NAMES = [
 	"kasu",
 	"kuttsuki",
 	"teshi",
+	"tsuki-fuda",
 ] as const;
 
 type YakuName = (typeof YAKU_NAMES)[number];
@@ -25,8 +26,8 @@ type Yaku = {
 	points: number;
 	cards: CardName[];
 	numRequired: number;
-	find: (params: Set<CardName>) => CardName[];
-	check: (params: Set<CardName>) => number;
+	find: (param0: Set<CardName>) => CardName[];
+	check: (param0: Set<CardName>, param1?: number) => number;
 };
 
 const YAKU: Readonly<Record<YakuName, Yaku>> = {
@@ -329,7 +330,7 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 		description: ["4 pairs in hand"],
 		cards: [],
 		numRequired: 8,
-		find: function (hand) {
+		find: function (_) {
 			return [];
 		},
 		check: function (hand) {
@@ -348,7 +349,7 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 		description: ["4 of a kind in hand"],
 		cards: [],
 		numRequired: 8,
-		find: function (hand) {
+		find: function (_) {
 			return [];
 		},
 		check: function (hand) {
@@ -361,6 +362,24 @@ const YAKU: Readonly<Record<YakuName, Yaku>> = {
 			return 0;
 		},
 	},
+	"tsuki-fuda": {
+		name: "tsuki-fuda",
+		points: 4,
+		description: ["Cards of the Month"],
+		cards: [], // Updated dynamically
+		numRequired: 4,
+		find: function (collection) {
+			return getIntersection(collection, this.cards);
+		},
+		check: function (collection) {
+			if (collection.size < this.numRequired) return 0;
+
+			const progress = this.find(collection);
+			if (progress.length < this.numRequired) return 0;
+
+			return this.points;
+		},
+	}
 };
 
 const teyaku = new Set(["kuttsuki", "teshi"]) as Set<YakuName>;
@@ -486,11 +505,18 @@ function checkForTeyaku(
 	return [null, [] as CardName[]];
 }
 
+function updateTsukiFuda(
+	month: number
+) {
+	YAKU["tsuki-fuda"].cards = getCardsOfMonth(Object.keys(CARDS) as CardName[], month);
+}
+
 export {
 	YAKU,
 	type Yaku,
 	teyaku,
 	viewingYaku,
+	updateTsukiFuda,
 	type YakuName,
 	type CompletedYaku,
 	type YakuProgress,
