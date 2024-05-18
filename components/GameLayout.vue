@@ -105,7 +105,7 @@
         @click="handlePressExit"
         class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold drop-shadow-md"
       >
-        <ArrowLeftOnRectangleIcon class="w-8 h-8 text-white" aria-hidden="true" />
+        <ArrowLeftEndOnRectangleIcon class="w-8 h-8 text-white" aria-hidden="true" />
         <span class="sr-only">Return to homepage</span>
       </button>
     </div>
@@ -153,7 +153,7 @@
 
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
-import { ArrowLeftOnRectangleIcon } from "@heroicons/vue/24/outline";
+import { ArrowLeftEndOnRectangleIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 import { usePlayerStore } from "~/stores/playerStore";
 

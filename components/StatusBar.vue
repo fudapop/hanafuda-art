@@ -31,7 +31,15 @@
             v-memo="[ds.roundOver, useState('start').value]"
           >
             <img src="/images/coin.webp" alt="coin" class="w-5 h-5 mx-1 drop-shadow-sm" />
-            {{ score }}
+            <NumberAnimation
+              ref="number1"
+              :from="0"
+              :to="score"
+              :format="(value: number) => value.toFixed(0)"
+              :duration="1"
+              autoplay
+              easing="linear"
+            />
           </span>
         </p>
       </div>
@@ -45,6 +53,7 @@ import { storeToRefs } from "pinia";
 import { useGameDataStore } from "~/stores/gameDataStore";
 import { useConfigStore } from "~/stores/configStore";
 import { type PlayerKey, usePlayerStore } from "~/stores/playerStore";
+import NumberAnimation from "vue-number-animation";
 
 const { user, playerNum } = defineProps(["user", "playerNum"]);
 const ds = useGameDataStore();
