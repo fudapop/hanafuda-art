@@ -2,11 +2,24 @@
   <!-- HEADER -->
   <div class="px-4 py-5 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-600 sm:px-6">
     <div class="flex flex-wrap items-end justify-between -mt-2 -ml-4 sm:flex-nowrap">
-      <HeadlessDialogTitle as="h3" class="text-lg font-semibold leading-6 text-gray-900 dark:text-white">
-        {{}}
-        <span v-if="final.result === 'Win'"> YOU WIN! </span>
-        <span v-else-if="final.result === 'Lose'"> YOU LOSE... </span>
-        <span v-else> DRAW </span>
+      <HeadlessDialogTitle as="h3" class="text-xl font-semibold leading-6 tracking-wide text-gray-900 dark:text-white">
+        <div class="flex items-center w-full gap-2">
+          <span v-if="final.result === 'Win'"> YOU WIN! </span>
+          <span v-else-if="final.result === 'Lose'"> YOU LOSE... </span>
+          <span v-else> DRAW </span>
+          <span class="ml-4 text-2xl text-gray-500 dark:text-gray-300">
+          <NumberAnimation
+            ref="number1"
+            :from="0"
+            :to="final.score"
+            :format="(value: number) => `+ ${value.toFixed(0)}`"
+            :duration="1"
+            autoplay
+            easing="linear"
+          />
+            <img src="/images/coin.webp" alt="coin" class="inline w-5 h-5 mb-1 ml-1 drop-shadow-sm" />
+          </span>
+        </div>
       </HeadlessDialogTitle>
 
       <!-- BUTTONS -->
@@ -41,6 +54,7 @@
 import { ChevronUpIcon } from "@heroicons/vue/20/solid";
 import { type RoundResult, useGameDataStore } from "~/stores/gameDataStore";
 import { type CompletedYaku } from "~/utils/yaku";
+import NumberAnimation from "vue-number-animation";
 
 const { results } = defineProps<{
   results: RoundResult[];
@@ -51,21 +65,18 @@ defineEmits(["close"]);
 const ds = useGameDataStore();
 
 const final = computed(() => {
-  let score, result;
+  let result;
   const [p1Score, p2Score] = [ds.scoreboard.p1, ds.scoreboard.p2];
   if (p1Score === p2Score) {
-    score = 0;
     result = "Draw";
   } else if (p1Score > p2Score) {
-    score = p1Score;
     result = "Win";
   } else {
-    score = p2Score;
     result = "Lose";
   }
   return {
     result,
-    score,
+    score: p1Score,
   };
 });
 </script>
