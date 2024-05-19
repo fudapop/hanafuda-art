@@ -1,13 +1,13 @@
-import { User, onAuthStateChanged, getAuth } from "firebase/auth";
+import { type User, onAuthStateChanged, getAuth } from "firebase/auth";
 import {
-	DocumentData,
+	type DocumentData,
 	doc,
 	getDoc,
 	setDoc,
 	getFirestore,
 } from "firebase/firestore";
 import { useStorage } from "@vueuse/core";
-import { CardDesign } from "~/composables/useCardDesign";
+import { type CardDesign } from "~/composables/useCardDesign";
 
 interface UserProfile {
 	uid: string;
@@ -65,7 +65,7 @@ export const useProfile = () => {
 		useState("profile", () => null);
 
 	const useGuestProfile = (profile?: UserProfile | Partial<UserProfile>) =>
-		useStorage("hanafuda-guest", profile || {}, sessionStorage, {
+		useStorage("hanafuda-guest", profile?.isGuest ? profile : {}, sessionStorage, {
 			mergeDefaults: true,
 		});
 
@@ -83,7 +83,6 @@ export const useProfile = () => {
 	 */
 	const setUserData = () => {
 		if (!profile.value) return;
-		console.table(profile.value);
 		setDoc(
 			doc(getFirestore(), "users", `u_${profile.value.uid}`),
 			profile.value,
@@ -98,15 +97,10 @@ export const useProfile = () => {
 	 */
 	const loadProfile = async (user: User) => {
 		const userData = await getUserData(user);
-		// Get guest profile data if available
-		const guest = useGuestProfile();
-
 		if (userData) {
 			loadUserData(user, userData);
 		} else if (user.isAnonymous) {
 			loadGuestData(user);
-		} else if (user.uid === guest.value?.uid) {
-			upgradeGuestProfile(user, guest.value as UserProfile);
 		} else {
 			createNewProfile(user);
 		}
@@ -167,11 +161,11 @@ export const useProfile = () => {
 		setUserData();
 	};
 
-	const upgradeGuestProfile = (user: User, guestProfile: UserProfile) => {
+	const upgradeGuestProfile = (guestProfile: UserProfile) => {
+		delete guestProfile.isGuest;
 		profile.value = guestProfile;
 		profile.value.lastUpdated = new Date();
 		profile.value.record.coins += 500;
-		delete profile.value.isGuest;
 		setUserData();
 		console.debug("Upgraded guest profile.")
 		deleteGuestProfile();
@@ -241,5 +235,6 @@ export const useProfile = () => {
 		current,
 		getProfile,
 		updateProfile,
+		upgradeGuestProfile,
 	};
 };

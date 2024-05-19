@@ -28,8 +28,8 @@ export const useAuth = () => {
 	const useGuest = () =>
 		useStorage(
 			"hanafuda-guest",
-			(): Record<string, any> | undefined => undefined,
-			localStorage
+			{} as Record<string, any>,
+			sessionStorage
 		);
 
 	const userIsGuest = computed(() => auth.currentUser?.isAnonymous);

@@ -59,8 +59,8 @@
               </div>
 
               <div class="grid gap-4 mt-6">
-                <OAuthProviderButton :action="oauthAction" provider="google" :onSuccess="handleLogin" />
-                <OAuthProviderButton :action="oauthAction" provider="github" :onSuccess="handleLogin" />
+                <OAuthProviderButton :action="oauthAction" provider="google" :onSuccess="handleOAuthLogin" />
+                <OAuthProviderButton :action="oauthAction" provider="github" :onSuccess="handleOAuthLogin" />
               </div>
             </div>
           </div>
@@ -72,6 +72,7 @@
 <script setup lang="ts">
 import { useToast } from "vue-toastification";
 const { loginWithOAuth, loginAsGuest, linkAccount, userIsGuest } = useAuth();
+const { upgradeGuestProfile, current } = useProfile();
 const toast = useToast();
 const loggingIn = ref<boolean>(false);
 
@@ -89,9 +90,10 @@ const handleLoginAsGuest = async () => {
 
 const oauthAction = userIsGuest.value ? linkAccount : loginWithOAuth;
 
-const handleLogin = () => {
+const handleOAuthLogin = () => {
   if (userIsGuest.value) {
     toast.success("Account linked! You may need to refresh your browser to update your profile.", { timeout: 8000 });
+    upgradeGuestProfile(current.value!);
   } else {
     toast.success("You're signed in! Have fun!", { timeout: 2000 });
   }
