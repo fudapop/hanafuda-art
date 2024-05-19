@@ -3,7 +3,7 @@
     <button
       type="button"
       title="Open/close all"
-      class="fixed text-gray-900 rounded-md dark:text-gray-200 bottom-8 right-8 bg-gray-500/20 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-yellow-300 focus:ring-offset-2"
+      class="fixed z-50 text-gray-200 bg-gray-400 rounded-md bottom-8 right-8 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-yellow-300 focus:ring-offset-2"
       @click="openAll = !openAll"
     >
       <ChevronDownIcon :class="['w-7 h-7', openAll ? 'rotate-180' : '']" />

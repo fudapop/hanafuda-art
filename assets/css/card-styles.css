@@ -44,6 +44,11 @@
 	--card-aspect: 3/5;
 	--card-border-color: #333;
 	--card-bg-color: #883311;
+
+	& .card img {
+		padding-top: 1px;
+		scale: 1 1.03;
+	}
 }
 
 .hanami {
@@ -79,7 +84,7 @@
 
 .kinbotan {
 	--card-radius: 0.1rem;
-	--card-aspect: 40/63;
+	--card-aspect: 20/31;
 	--card-border-color: #333;
 	
 	& .down {
@@ -150,13 +155,13 @@
 
 .moon-rabbit {
 	--card-radius: 0.1rem;
-	--card-aspect: 58/97;
+	--card-aspect: 21/32;
 	--card-border-w: 2px;
 	--card-border-color: #333;
 	
 	& .card img {
 		padding-top: 1px;
-		scale: 1 1.12;
+		scale: 1 1.1;
 	}
 	
 	& .down {
