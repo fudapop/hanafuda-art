@@ -1,6 +1,6 @@
 <template>
     <HeadlessRadioGroup v-model="selectedDesign" as="div" class="relative w-full @container">
-        <div class="sticky top-0 z-10 flex justify-between px-4 py-2 bg-white/70 dark:bg-gray-800/50">
+        <div class="sticky top-0 z-10 flex justify-between px-4 py-2 bg-white shadow-sm dark:bg-gray-800">
             <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-gray-900 dark:text-white">
                 Select a design
                 <p class="ml-2 text-sm font-medium text-gray-400 whitespace-nowrap">{{ `Current: ${getDesignInfo().title}` }}</p>
@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="grid justify-center w-full px-3 mt-2 space-y-12">
-            <HeadlessRadioGroupOption v-for="design in DESIGNS" :class="[design, 'group grid w-full @md:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @md:grid-rows-1']"
+            <HeadlessRadioGroupOption v-for="(design, index) in DESIGNS" :class="[design, 'group grid w-full @md:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @md:grid-rows-1 relative']"
                 v-slot="{ checked }" :value="design" :disabled="!unlocked?.includes(design)">
 
                 <Transition 
@@ -57,17 +57,25 @@
                     checked ? 'dark:bg-[#40495a] bg-gray-50 shadow-inner shadow-gray-400 dark:shadow-gray-900' : ''
                 ]">
                     <button 
-                        v-if="unlocked?.includes(design)" 
                         type="button" @click="() => handleLike(design)" 
-                        class="float-right mt-4 pointer-events-auto focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300"
+                        class="relative float-right mt-4 pointer-events-auto focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300"
                     >
+                        <span class="absolute z-10 pt-1 m-auto text-sm text-gray-900 opacity-50 -left-3 dark:text-white">{{ likesCount.get(design) }}</span>
                         <HeartIcon :aria-hidden="true"
                             :class="['w-7 h-auto stroke-gray-500 stroke-1 drop-shadow-md', isLiked(design) ? 'fill-red-600 stroke-red-400' : '']" />
                     </button>
 
                     <DesignDescription :design="design" />
                 </div>
+                <div v-if="index < DESIGNS.length - 1" class="absolute bottom-0 left-0 right-0">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div class="w-[90%] mx-auto mt-12 border-b border-gray-300 opacity-30" />
+                        </div>
+                    </div>
+                </div>
             </HeadlessRadioGroupOption>
+
         </div>
 
         <Modal :open="!!newUnlock">
@@ -102,7 +110,7 @@
 <script setup lang="ts">
 import { LockClosedIcon, LockOpenIcon, ArrowRightIcon } from '@heroicons/vue/20/solid';
 import { HeartIcon } from '@heroicons/vue/24/outline';
-
+import { getFirestore, collection, getCountFromServer, query, where } from 'firebase/firestore';
 import { useToast } from 'vue-toastification';
 import DesignDescription from './DesignDescription.vue'
 
@@ -172,23 +180,37 @@ const userIsGuest = toValue(useAuth().userIsGuest);
 const userLiked = toValue(computed(() => currentUser?.value?.designs.liked));
 
 const currentDesign = useDesign();
+const coll = collection(getFirestore(), 'users');
+const likesCount = reactive<Map<CardDesign, number>>(new Map());
+const getLikesCount = async (design: CardDesign) => {
+    if (likesCount.has(design)) return likesCount.get(design);
+    const q = query(coll, where('designs.liked', 'array-contains', design));
+    const count = (await getCountFromServer(q)).data().count;
+    likesCount.set(design, count);
+    return count;
+}
 
 const isLiked = (design: CardDesign) => userLiked?.includes(design);
 const handleLike = (design: CardDesign) => {
   if (!userLiked) return;
   if (isLiked(design)) {
     userLiked.splice(userLiked.indexOf(design), 1);
+    likesCount.set(design, likesCount.get(design)! - 1);
   } else {
     userLiked.push(design);
+    likesCount.set(design, likesCount.get(design)! + 1);
   }
 }
 
 onMounted(() => {
-    if (userIsGuest) {
+  if (userIsGuest) {
     currentDesign.value = "cherry-version";
   } else {
-    currentDesign.value = userLiked?.[0] || "cherry-version";
+    currentDesign.value = unlocked.value?.find(d => userLiked?.includes(d)) || "cherry-version";
   }
+  DESIGNS.forEach(async (design) => {
+    likesCount.set(design, await getLikesCount(design) ?? 0);
+  });
 });
 </script>
 
