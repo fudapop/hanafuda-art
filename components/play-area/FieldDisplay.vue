@@ -23,7 +23,7 @@
           :key="`${index}-${card}`"
           :class="{
             'card drop-shadow-md overflow-hidden cursor-pointer transition-all relative': true,
-            'drop-shadow-xl -translate-y-2 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': matchedCards?.includes(
+            'drop-shadow-xl -translate-y-2 z-10 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse': matchedCards?.includes(
               card
             ),
             '-translate-y-2 drop-shadow-xl': selectedCard === card,
