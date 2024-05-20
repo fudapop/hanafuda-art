@@ -95,7 +95,7 @@
 
     <!-- Account sign-in/out -->
     <div class="[@media(max-height:_500px)]:hidden">
-      <div v-if="user.isGuest" class="mx-auto text-gray-900 w-max dark:text-white">
+      <div v-if="user?.isGuest" class="mx-auto text-gray-900 w-max dark:text-white">
         <ExclamationCircleIcon class="inline w-6 h-6 align-top" />
         <p class="inline ml-2 text-sm">Sign in is required to save your profile.</p>
         <button
@@ -119,20 +119,23 @@
 import { onClickOutside, useDateFormat } from "@vueuse/core";
 import { PencilSquareIcon, ExclamationCircleIcon } from "@heroicons/vue/24/outline";
 
-// const user = JSON.parse(useRoute().params.user as string);
-const user = toValue(useProfile().current)!;
+const user = useProfile().current;
 const avatar = computed({
-  get: () => user.avatar,
-  set: (url: string) => (user.avatar = url.replace(window.location.origin, "")),
+  get: () => user.value?.avatar ?? "",
+  set: (url: string) => {
+    if (user.value) user.value.avatar = url.replace(window.location.origin, "");
+  },
 });
 const username = computed({
-  get: () => user.username,
-  set: (username: string) => (user.username = username),
+  get: () => user.value?.username ?? "",
+  set: (username: string) => {
+    if (user.value) user.value.username = username;
+  },
 });
 const record = computed(() => ({
-  wins: user.record.win,
-  losses: user.record.loss,
-  draws: user.record.draw,
+  wins: Number(user.value?.record.win),
+  losses: Number(user.value?.record.loss),
+  draws: Number(user.value?.record.draw),
 }));
 
 const usernameInputRef: Ref<HTMLInputElement | null> = ref(null);
