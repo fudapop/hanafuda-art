@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
 const { open } = defineProps<{ open: boolean }>();
-const emit = defineEmits(["cancel", "sent"]);
+const emit = defineEmits(["cancel"]);
 
 const { resetPassword } = useAuth();
 const rememberedEmail = useStorage("hanafuda-email", "", localStorage, { mergeDefaults: true });
@@ -48,6 +48,6 @@ const email = ref(rememberedEmail.value);
 const handlePressSend = async () => {
   await resetPassword(email.value);
   email.value = "";
-  emit("sent");
+  emit("cancel");
 };
 </script>
