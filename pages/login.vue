@@ -104,7 +104,7 @@
         </div>
       </div>
     </Transition>
-    <LazyPasswordResetForm :open="showResetModal" @cancel="() => showResetModal = false" @sent="() => toast.success('Password reset email sent! Check your inbox.')" />
+    <LazyPasswordResetForm :open="showResetModal" @cancel="() => showResetModal = false" />
   </div>
 </template>
 <script setup lang="ts">
@@ -137,7 +137,9 @@ const handleLoginAsGuest = async () => {
   }
 };
 
-const oauthAction = userIsGuest.value ? linkAccount : loginWithOAuth;
+const oauthAction = 
+  userIsGuest.value ? linkAccount : 
+  loginWithOAuth;
 
 const handleOAuthLogin = () => {
   if (userIsGuest.value) {
@@ -150,7 +152,10 @@ const handleOAuthLogin = () => {
   navigateTo("/");
 };
 
-const emailAction = userIsGuest.value ? linkWithEmail : newAccount.value ? signUpWithEmail : loginWithEmail;
+const emailAction = 
+  userIsGuest.value ? linkWithEmail : 
+  newAccount.value ? signUpWithEmail : 
+  loginWithEmail;
 
 const handleEmailLogin = () => {
   loggingIn.value = true;
