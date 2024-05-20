@@ -17,9 +17,7 @@
         </div>
 
         <!-- START User Info Panel-->
-        <div
-          class="flex flex-col justify-center text-center sm:text-left sm:items-start gap-y-2"
-        >
+        <div class="flex flex-col justify-center text-center sm:text-left sm:items-start gap-y-2">
           <!-- Username -->
           <input
             ref="usernameInputRef"
@@ -41,10 +39,7 @@
           </p>
 
           <!-- Player Coins -->
-          <div
-            v-if="user?.record"
-            class="flex items-center justify-center px-4 gap-x-2 sm:justify-start"
-          >
+          <div v-if="user?.record" class="flex items-center justify-center px-4 gap-x-2 sm:justify-start">
             <img src="/images/coin.webp" alt="coin" class="w-5 h-5" />
             <p class="text-lg font-semibold text-gray-900 select-none dark:text-white">
               {{ user.record.coins }}
@@ -76,17 +71,11 @@
         Player Record
       </h3>
       <dl class="flex justify-around">
-        <div
-          v-for="(val, key) in record"
-          :key="key"
-          class="px-4 py-3 overflow-hidden sm:py-5 sm:p-6"
-        >
+        <div v-for="(val, key) in record" :key="key" class="px-4 py-3 overflow-hidden sm:py-5 sm:p-6">
           <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-300">
             {{ key }}
           </dt>
-          <dd
-            class="text-lg font-semibold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50"
-          >
+          <dd class="text-lg font-semibold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50">
             {{ val }}
           </dd>
         </div>
@@ -101,9 +90,11 @@
         <button
           type="button"
           class="block px-8 py-3 mx-auto mt-2 text-sm font-medium rounded-lg sec-btn"
-          @click="() => {
-            navigateTo({path: '/login', query: { signup: 'true' }});
-          }"
+          @click="
+            () => {
+              navigateTo({ path: '/login', query: { signup: 'true' } });
+            }
+          "
         >
           Sign in
         </button>

@@ -1,0 +1,15 @@
+# Default ignore
+**/.git
+**/.svn
+**/.hg
+**/node_modules
+
+# Ignore the build directory
+output
+public
+
+# Ignore settings directories
+.vscode
+.firebase
+.github
+.nuxt
