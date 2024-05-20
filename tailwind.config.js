@@ -1,21 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 
-const defaultTheme = require('tailwindcss/defaultTheme');
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
   content: [],
+  darkMode: ["selector", ".dark"],
   theme: {
-    extend: {
-    },
+    extend: {},
     screens: {
-      "xs": "420px",
+      xs: "420px",
       ...defaultTheme.screens,
-    }
+    },
   },
   plugins: [
-    require('@tailwindcss/container-queries'),
-    require('@tailwindcss/forms'),
-    require('@headlessui/tailwindcss')({ prefix: 'ui' }),
+    require("@tailwindcss/container-queries"),
+    require("@tailwindcss/forms"),
+    require("@headlessui/tailwindcss")({ prefix: "ui" }),
   ],
-}
-
+};
