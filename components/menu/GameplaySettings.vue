@@ -22,10 +22,7 @@
           :value-options="config.OPTIONS.VIEWINGS"
           :description-template="(option) => getOptionDescription(option as ViewingsOptions)"
         >
-          <a
-            title="Tsukimi-/Hanami-zake"
-            class="underline decoration-dotted underline-offset-4 cursor-help"
-          >
+          <a title="Tsukimi-/Hanami-zake" class="underline decoration-dotted underline-offset-4 cursor-help">
             Moon/Flower Viewing
           </a>
           <a
@@ -41,9 +38,7 @@
         </OptionsRadioGroup>
 
         <div class="flex">
-          <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
-            Other Variations
-          </p>
+          <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">Other Variations</p>
           <a
             href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
             title="Read about scoring on fudawiki.org"
@@ -61,9 +56,7 @@
             <template #label>Wild Card Sake Cup</template>
             <template #description
               >The
-              <a
-                title="Kiku ni sakazuki"
-                class="underline cursor-help underline-offset-4 decoration-dotted"
+              <a title="Kiku ni sakazuki" class="underline cursor-help underline-offset-4 decoration-dotted"
                 >sake cup</a
               >
               counts as both animal and plain types.</template
@@ -71,15 +64,9 @@
           </ToggleSwitch>
 
           <!-- Set additional scoring rule -->
-          <ToggleSwitch
-            :callback="toggleDouble"
-            :init-value="config.doubleScoreOverSeven"
-          >
+          <ToggleSwitch :callback="toggleDouble" :init-value="config.doubleScoreOverSeven">
             <template #label>Double Over Seven</template>
-            <template #description
-              >Double the score if the combined yaku value is 7 points or
-              greater.</template
-            >
+            <template #description>Double the score if the combined yaku value is 7 points or greater.</template>
           </ToggleSwitch>
         </div>
       </div>
@@ -93,9 +80,7 @@
         <ul class="grid w-full mx-auto gap-y-5">
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <span class="font-semibold"> Game Length </span>
-            <span class="text-indigo-600 capitalize dark:text-yellow-300">
-              {{ config.maxRounds }} rounds
-            </span>
+            <span class="text-indigo-600 capitalize dark:text-yellow-300"> {{ config.maxRounds }} rounds </span>
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <div>
@@ -133,15 +118,16 @@
         </ul>
       </div>
 
-      <div :class="[gameStart ? 'order-first' : '']">
-        <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
-          Help
-        </p>
+      <div :class="['space-y-5 pb-5', gameStart ? 'order-first' : '']">
+        <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">Interface</p>
         <ToggleSwitch :callback="toggleLabels" :init-value="config.cardLabels">
           <template #label>Card Labels</template>
-          <template #description
-            >Include card corner labels to assist with matching.</template
-          >
+          <template #description>Include card corner labels to assist with matching.</template>
+        </ToggleSwitch>
+
+        <ToggleSwitch :callback="toggleFullscreen" :init-value="config.allowFullscreen">
+          <template #label>Allow Fullscreen</template>
+          <template #description>Enable to hide/show toggle button to enter/exit fullscreen mode.</template>
         </ToggleSwitch>
       </div>
     </ClientOnly>
@@ -150,12 +136,7 @@
 
 <script setup lang="ts">
 import { QuestionMarkCircleIcon, LockClosedIcon } from "@heroicons/vue/24/outline";
-import {
-  useConfigStore,
-  type ViewingsOptions,
-  type GameLengthOptions,
-  type GameSettings,
-} from "~/stores/configStore";
+import { useConfigStore, type ViewingsOptions, type GameLengthOptions, type GameSettings } from "~/stores/configStore";
 import { onClickOutside } from "@vueuse/core";
 
 const config = useConfigStore();
@@ -173,6 +154,10 @@ const toggleDouble = (enabled: boolean) => {
 
 const toggleLabels = (enabled: boolean) => {
   config.cardLabels = enabled;
+};
+
+const toggleFullscreen = (enabled: boolean) => {
+  config.allowFullscreen = enabled;
 };
 
 const getOptionDescription = (option: ViewingsOptions) => {

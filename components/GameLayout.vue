@@ -23,6 +23,15 @@
       </OptionsMenu>
     </div>
 
+    <!-- Allows interaction when game not started -->
+    <Teleport to="body">
+      <!-- UI TOGGLE BUTTONS -->
+      <div class="absolute right-3 grid text-white min-w-[48px] top-20">
+        <FullscreenToggle />
+        <ColorModeToggle />
+      </div>
+    </Teleport>
+
     <!-- OPPONENT STATUS BAR -->
     <div
       :class="{
@@ -79,12 +88,7 @@
           @click="() => (sidebarOpen = true)"
         >
           <span class="w-8 h-8 text-gray-900 dark:text-white">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
                 d="M11.19 2.25c-.26 0-.52.06-.77.15L3.06 5.45a1.994 1.994 0 0 0-1.09 2.6L6.93 20a2 2 0 0 0 1.81 1.25c.26 0 .53-.03.79-.15l7.37-3.05a2.02 2.02 0 0 0 1.23-1.8c.01-.25-.04-.54-.13-.8L13 3.5a1.954 1.954 0 0 0-1.81-1.25m3.48 0l3.45 8.35V4.25a2 2 0 0 0-2-2m4.01 1.54v9.03l2.43-5.86a1.99 1.99 0 0 0-1.09-2.6m-10.28-.14l4.98 12.02l-7.39 3.06L3.8 7.29"
@@ -120,25 +124,14 @@
       leave-from-class="opacity-100"
       leave-to-class="translate-y-4 opacity-0"
     >
-      <div
-        v-if="showLoader"
-        class="absolute inset-0 h-full pointer-events-none top-1/3 isolate"
-      >
+      <div v-if="showLoader" class="absolute inset-0 h-full pointer-events-none top-1/3 isolate">
         <SakuraLoader class="mx-auto opacity-80 w-max" />
-        <p
-          class="font-semibold tracking-wide text-center text-white drop-shadow-md animate-pulse"
-        >
-          Just a moment...
-        </p>
+        <p class="font-semibold tracking-wide text-center text-white drop-shadow-md animate-pulse">Just a moment...</p>
       </div>
     </Transition>
 
     <!-- MODALS -->
-    <LazyExitWarning
-      :open="leavingGame"
-      @cancel="leavingGame = false"
-      @confirm="handleConfirmExit"
-    />
+    <LazyExitWarning :open="leavingGame" @cancel="leavingGame = false" @confirm="handleConfirmExit" />
     <LazyFeedbackForm
       :open="promptFeedback"
       @close="

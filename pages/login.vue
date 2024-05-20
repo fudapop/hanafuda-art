@@ -112,8 +112,8 @@ onBeforeMount(async () => {
   margin: 0 auto;
   z-index: 1;
 }
-@media (prefers-color-scheme: dark) {
-  #login-title {
+.dark {
+  &#login-title {
     background: linear-gradient(15deg, gold, palegoldenrod, lightgoldenrodyellow);
     background-clip: text;
     color: transparent;
