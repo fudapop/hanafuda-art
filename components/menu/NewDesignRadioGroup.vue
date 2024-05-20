@@ -120,16 +120,17 @@ const isNew = (design: CardDesign) => {
 };
 
 const UNLOCK_COST = 500;
-const currentUser = toValue(useProfile().current)
+const currentUser = useProfile().current
 const coins = computed({
-    get: () => currentUser?.record.coins,
+    get: () => currentUser?.value?.record.coins ?? 0,
     set: (value) => {
-        if (!currentUser || !value) return;
-        currentUser.record.coins = value;
+        if (!currentUser) return;
+        if (!currentUser.value) return;
+        currentUser.value.record.coins = Number(value);
     }
 })
 
-const unlocked = computed(() => currentUser?.designs.unlocked);
+const unlocked = computed(() => currentUser?.value?.designs.unlocked);
 const newUnlock: Ref<CardDesign | undefined> = ref();
 let initialDesign: CardDesign | undefined;
 let timeoutId: string | number | NodeJS.Timeout | undefined;
@@ -160,7 +161,6 @@ const cancelUnlock = () => {
 const confirmUnlock = () => {
     if (coins.value === undefined || !unlocked.value) return;
     if (!newUnlock.value) return;
-
     coins.value -= UNLOCK_COST;
     unlocked.value.push(newUnlock.value);
     toast.success("You've unlocked a new design!", { timeout: 5000 });
@@ -168,8 +168,8 @@ const confirmUnlock = () => {
     newUnlock.value = undefined;
 }
 
-const userIsGuest = toValue(computed(() => currentUser?.isGuest))
-const userLiked = toValue(computed(() => currentUser?.designs.liked));
+const userIsGuest = toValue(useAuth().userIsGuest);
+const userLiked = toValue(computed(() => currentUser?.value?.designs.liked));
 
 const currentDesign = useDesign();
 
