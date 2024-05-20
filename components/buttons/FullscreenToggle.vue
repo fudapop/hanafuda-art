@@ -1,8 +1,16 @@
 <template>
+  <!-- Fullscreen Toggle Button 
+    This button toggles fullscreen mode when clicked.
+    It is only visible if fullscreen is supported in the browser 
+    and the allowFullscreen option is enabled in the config store.
+  -->
   <button
     v-if="isSupported && allowFullscreen"
     title="Toggle Fullscreen"
-    class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold drop-shadow-md text-white"
+    :class="[
+      'inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold',
+      'drop-shadow-md text-white',
+    ]"
     type="button"
     @click="toggle"
   >
@@ -21,9 +29,10 @@ const { isFullscreen, toggle, enter, exit, isSupported } = useFullscreen(undefin
 const { allowFullscreen } = storeToRefs(useConfigStore());
 
 onMounted(async () => {
-  if (!isSupported) {
+  if (!isSupported.value) {
     console.warn("Fullscreen is not supported in this browser.");
   }
+  // Toggle fullscreen when allowFullscreen option changes in the store
   watch(allowFullscreen, () => {
     allowFullscreen.value ? enter() : exit();
   });
