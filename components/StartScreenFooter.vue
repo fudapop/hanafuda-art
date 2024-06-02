@@ -1,6 +1,6 @@
 <template>
-  <div class="fixed w-screen space-y-2 opacity-50 bottom-2">
-    <div class="flex items-center mx-auto gap-x-4 w-max">
+  <div class="fixed flex justify-between w-screen gap-4 px-4 opacity-50 bottom-2">
+    <div class="flex items-center justify-end order-last w-max gap-x-4">
 
       <!-- PORTFOLIO LINK -->
       <a href="https://www.andrehammons.dev" title="View my portfolio" target="_blank">
@@ -131,7 +131,7 @@ z"
         <span class="sr-only">View creator's or contributor's website</span>
       </NuxtLink>
     </div>
-    <div class="grid text-xs text-center text-white">
+    <div class="grid text-xs text-white">
       <p v-memo="[design]" v-if="!!design.creator">
         Designs created by {{ design.creator }}
       </p>

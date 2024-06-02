@@ -29,7 +29,7 @@ const logoutUser = () => {
 
 watch(user, () => {
   if (!user.value && useRoute().meta.requiresAuth) {
-    navigateTo("/login");
+    navigateTo("/login?exit=true");
   }
 });
 </script>

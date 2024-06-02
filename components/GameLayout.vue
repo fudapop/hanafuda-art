@@ -178,7 +178,7 @@ const signupDeclined = useStorage("hanafuda-signup-declined", false, sessionStor
 const handlePressExit = () => {
   if (!gameStart.value) {
     logout();
-    navigateTo("/login");
+    navigateTo({ path: "/login", query: { exit: "true" }});
   } else {
     leavingGame.value = true;
   }

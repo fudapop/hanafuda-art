@@ -1,6 +1,6 @@
 <template>
   <div class="absolute inset-0 flex flex-col items-center m-auto">
-    <div class="relative my-auto drop-shadow-xl">
+    <div class="relative my-auto drop-shadow-xl [@media(max-height:500px)]:scale-75">
       <div class="absolute right-8 bottom-1/4 rotate-12 -z-10">
         <AnimatedCards />
       </div>
@@ -17,11 +17,13 @@
     >
       Test play
     </button> -->
-    <div class="absolute flex flex-col shadow-lg w-max top-3/4 gap-y-2">
+
+    <div class="absolute flex flex-col items-center w-max top-3/4 gap-y-4 [@media(max-height:500px)]:scale-75">
+      <div class="flex gap-4 [@media(min-height:500px)]:flex-col">
         <button
           id="start-button"
           type="button"
-          :class="['px-8 py-3 text-xl rounded-lg pri-btn']"
+          :class="['px-6 py-2 text-lg rounded-lg pri-btn']"
           @click="() => $emit('start-game')"
         >
           Play now
@@ -30,13 +32,25 @@
           id="account-link-button"
           v-if="userIsGuest"
           type="button"
-          class="px-8 py-3 text-xl font-medium text-white bg-transparent rounded-lg hover:bg-gray-500/50 sec-btn"
-          @click="() => {
-            navigateTo({path: '/login', query: { link: 'true' }});
-          }"
+          class="px-6 py-2 text-lg font-medium text-white bg-transparent rounded-lg hover:bg-gray-500/50 sec-btn"
+          @click="
+            () => {
+              navigateTo({ path: '/login', query: { signup: 'true' } });
+            }
+          "
         >
-          Sign in
+          Sign up
         </button>
+      </div>
+      <p
+        v-if="userIsGuest"
+        role="link"
+        id="sign-in-link"
+        @click="handleSignin"
+        class="text-xs text-center text-gray-300 cursor-pointer dark:text-white hover:underline"
+      >
+        Sign in to an existing account &rarr;
+      </p>
     </div>
     <StartScreenFooter />
   </div>
@@ -46,11 +60,16 @@
 const emit = defineEmits(["start-game"]);
 const testPlay = useState("test", () => false);
 const gameStart = useState("gameStart");
-const { userIsGuest } = useAuth();
+const { userIsGuest, logout } = useAuth();
 
 const testGame = () => {
   testPlay.value = true;
   emit("start-game");
+};
+
+const handleSignin = () => {
+  logout();
+  navigateTo({ path: "/login", query: { exit: "true" } });
 };
 
 watch(gameStart, () => {
@@ -58,7 +77,6 @@ watch(gameStart, () => {
     testPlay.value = false;
   }
 });
-
 </script>
 
 <style scoped>
