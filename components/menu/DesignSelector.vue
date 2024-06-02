@@ -1,6 +1,6 @@
 <template>
   <div class="max-h-[calc(100dvh-84px)] [@media(max-height:500px)]:max-h-[100dvh] xs:max-h-[75vh] overflow-y-auto pb-4">
-    <NewDesignRadioGroup />
+    <DesignRadioGroup />
   </div>
 </template>
 
@@ -23,17 +23,16 @@ const preloadImages = () => {
       link: preloadTags.value,
     });
   });
-}
+};
 
 onMounted(() => {
   useHead(
     {
       link: [{ rel: "preconnect", href: "https://firebasestorage.googleapis.com" }],
     },
-    { tagPriority: "high" }
+    { tagPriority: "high" },
   );
   preloadImages();
   watch(currentDesign, preloadImages);
 });
-
 </script>
