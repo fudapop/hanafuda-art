@@ -1,12 +1,14 @@
 <template>
   <div class="absolute inset-0 flex flex-col items-center m-auto">
+    <Teleport to="body">
+      <span className="text-xs absolute text-white/30 z-50 top-4 left-4 tracking-widest select-none">1.0.0</span>
+    </Teleport>
     <div class="relative my-auto drop-shadow-xl [@media(max-height:500px)]:scale-75">
       <div class="absolute right-8 bottom-1/4 rotate-12 -z-10">
         <AnimatedCards />
       </div>
       <h1 id="hero-title" class="text-4xl text-center sm:text-5xl">
-        <span class="block text-xl italic text-left text-white sm:text-3xl">Hanafuda</span
-        >花札 KOI-KOI
+        <span class="block text-xl italic text-left text-white sm:text-3xl">Hanafuda</span>花札 KOI-KOI
       </h1>
     </div>
     <!-- <button

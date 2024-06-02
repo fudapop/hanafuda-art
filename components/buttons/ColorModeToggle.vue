@@ -1,8 +1,8 @@
-<template>
-  <!-- Color Mode Toggle Button 
+<!-- Color Mode Toggle Button 
     This button toggles the color mode when clicked.
     It cycles between dark, light, and auto modes.
   -->
+<template>
   <button
     @click="handleClick"
     title="Toggle Color Mode"
