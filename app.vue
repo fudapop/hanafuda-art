@@ -52,10 +52,7 @@ onMounted(() => {
   const googleScripts = [/.*\/www\.gstatic\.com\/.*/, /.*\/apis\.google\.com\/.*/];
   const scripts = ref(document.head.querySelectorAll("script"));
   scripts.value.forEach((script) => {
-    if (
-      googleScripts.some((regex) => regex.test(script.src)) &&
-      script.type !== "text/partytown-x"
-    )
+    if (googleScripts.some((regex) => regex.test(script.src)) && script.type !== "text/partytown-x")
       script.type = "text/partytown";
   });
   window.dispatchEvent(new CustomEvent("ptupdate"));

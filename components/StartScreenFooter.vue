@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed flex w-screen gap-4 px-4 opacity-50 bottom-2">
+  <div class="fixed flex w-screen gap-4 px-4 opacity-30 bottom-2">
     <div class="flex items-center justify-end order-last w-max gap-x-4">
       <!-- PORTFOLIO LINK -->
       <a href="https://www.andrehammons.dev" title="View my portfolio" target="_blank">
