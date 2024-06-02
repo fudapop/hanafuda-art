@@ -8,7 +8,6 @@
     <template #image>
       <img src="/images/coin.webp" alt="coin" class="w-8 h-8 mx-auto drop-shadow-sm" />
     </template>
-    <!-- <template v-if="!openSignup" #description> </template> -->
     <template #actions>
       <Transition
         mode="out-in"
@@ -33,7 +32,7 @@
             </button>
             <button type="button" class="pri-btn" @click="() => navigateTo({
                 path: '/login',
-                query: { link: 'true' },
+                query: { signup: 'true' },
               })">
               Yes, gimme coins!
             </button>

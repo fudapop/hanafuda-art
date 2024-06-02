@@ -34,7 +34,8 @@ export const useAuth = () => {
 		useStorage(
 			"hanafuda-guest",
 			{} as Record<string, any>,
-			sessionStorage
+			sessionStorage,
+			{ mergeDefaults: true }
 		);
 
 	const userIsGuest = computed(() => auth.currentUser?.isAnonymous);
@@ -106,14 +107,15 @@ export const useAuth = () => {
 		return false;
 	};
 
-	const loginAsGuest = async () => {
+	const loginAsGuest = async (username?: string) => {
 		const { user } = await signInAnonymously(auth);
 		const guest = {
 			uid: user.uid,
+			username: username,
 		};
 		useGuest().value = guest;
     log("login", { method: "anonymous" });
-		return guest;
+		return user;
 	};
 
 	const logout = () => {
