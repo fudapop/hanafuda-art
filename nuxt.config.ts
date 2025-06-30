@@ -141,4 +141,10 @@ export default defineNuxtConfig({
       measurementId: "G-RDPJ7SKMBT",
     },
   },
+  vite: {
+    optimizeDeps: {
+      include: ["magic-string", "@jridgewell/sourcemap-codec"],
+      force: true,
+    },
+  },
 });
