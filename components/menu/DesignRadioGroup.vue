@@ -68,7 +68,7 @@
                 class="absolute inset-x-0 mx-auto text-sm font-semibold tracking-wide text-gray-900 transition-all opacity-0 w-max bottom-4 dark:text-white group-hover:opacity-100 group-hover:-translate-y-2"
               >
                 <img src="/images/coin.webp" alt="coin" class="inline w-4 h-4 align-middle drop-shadow-sm" />
-                {{ UNLOCK_COST }}
+                {{ computedCost }}
               </div>
             </button>
           </div>
@@ -121,13 +121,19 @@
       </template>
 
       <template #description>
-        <span class="text-base text-gray-900 dark:text-white"> Spend {{ UNLOCK_COST }} coins to use this design? </span>
+        <template v-if="computedCost === 0">
+          <strong class="block text-xl tracking-wide text-gray-900 dark:text-white">✨ LIMITED TIME OFFER ✨</strong>
+          <br />
+        </template>
+        <span class="text-lg text-gray-900 dark:text-white">
+          Trade in <strong class="tracking-wide">{{ computedCost }}</strong> coins to use this design?</span
+        >
       </template>
 
       <template #actions>
         <div class="grid grid-flow-row-dense grid-cols-2 gap-3 mt-6">
-          <button type="button" class="sec-btn" @click="cancelUnlock">No, keep my coins.</button>
-          <button type="button" class="pri-btn" @click="confirmUnlock">Yes, unlock it!</button>
+          <button type="button" class="text-base sec-btn" @click="cancelUnlock">No, keep my coins.</button>
+          <button type="button" class="text-base pri-btn" @click="confirmUnlock">Yes, unlock it!</button>
         </div>
       </template>
     </Modal>
@@ -187,15 +193,21 @@ const coins = computed({
 
 const unlocked = computed(() => currentUser?.value?.designs.unlocked);
 const newUnlock: Ref<CardDesign | undefined> = ref();
+
 let initialDesign: CardDesign | undefined;
 let timeoutId: string | number | NodeJS.Timeout | undefined;
 let toastId: any;
+
+const computedCost = computed(() => {
+  if (!newUnlock.value || isNew(newUnlock.value)) return 0;
+  return UNLOCK_COST;
+});
 
 const handleUnlock = (design: CardDesign) => {
   if (!initialDesign) initialDesign = selectedDesign.value;
   selectedDesign.value = design;
   if (coins.value === undefined || !unlocked.value) return;
-  if (coins.value < UNLOCK_COST) {
+  if (coins.value < computedCost.value) {
     toast.dismiss(toastId);
     toastId = toast.info("You don't have enough coins yet...", { timeout: 9000 });
     clearTimeout(timeoutId);
@@ -216,7 +228,7 @@ const cancelUnlock = () => {
 const confirmUnlock = () => {
   if (coins.value === undefined || !unlocked.value) return;
   if (!newUnlock.value) return;
-  coins.value -= UNLOCK_COST;
+  coins.value -= computedCost.value;
   unlocked.value.push(newUnlock.value);
   toast.success("You've unlocked a new design!", { timeout: 5000 });
   selectedDesign.value = newUnlock.value;
