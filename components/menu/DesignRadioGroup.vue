@@ -99,7 +99,7 @@
             />
           </button>
 
-          <DesignDescription :design="design" />
+          <DesignDescription :design="design" :is-new="isNew(design)" />
         </div>
         <div v-if="index < DESIGNS.length - 1" class="absolute bottom-0 left-0 right-0">
           <div class="relative">

@@ -1,256 +1,265 @@
 :root {
-	--card-aspect: 2/3;
-	--card-border-color: #111;
-	--card-border-w: 0.5px;
-	--card-radius: 0.3rem;
-	--card-bg-color: rgb(185 28 28 / 1);
+  --card-aspect: 2/3;
+  --card-border-color: #111;
+  --card-border-w: 0.5px;
+  --card-radius: 0.3rem;
+  --card-bg-color: rgb(185 28 28 / 1);
 }
 
 .ramen-red {
-	--card-aspect: 2/3;
-	--card-radius: 0.3rem;
+  --card-aspect: 2/3;
+  --card-radius: 0.3rem;
 
-	& .card.down {
-		--card-bg-color: rgb(185 28 28 / 1);
-	}
+  & .card.down {
+    --card-bg-color: rgb(185 28 28 / 1);
+  }
 }
 
 .flash-black {
-	--card-border-color: slategray;
-	--card-radius: 0.1rem;
-	--card-aspect: 2/3;
+  --card-border-color: slategray;
+  --card-radius: 0.1rem;
+  --card-aspect: 2/3;
 
-	& .card.down {
-		--card-bg-color: #333;
-	}
+  & .card.down {
+    --card-bg-color: #333;
+  }
 }
 
 .cherry-version {
-	--card-radius: 2px;
-	--card-aspect: 3/5;
-	--card-border-color: transparent;
+  --card-radius: 2px;
+  --card-aspect: 3/5;
+  --card-border-color: transparent;
 
-	& .down {
-		--card-border-color: darkslategray;
-		--card-bg-color: url("/cards/cherry-version/card-back.webp");
-		background-size: cover !important;
-		background-repeat: no-repeat !important;
-		background-position: center !important;
-	}
+  & .down {
+    --card-border-color: darkslategray;
+    --card-bg-color: url("/cards/cherry-version/card-back.webp");
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
 }
 
 .hanamaki {
-	--card-radius: 0.1rem;
-	--card-aspect: 3/5;
-	--card-border-color: #333;
-	--card-bg-color: #883311;
+  --card-radius: 0.1rem;
+  --card-aspect: 3/5;
+  --card-border-color: #333;
+  --card-bg-color: #883311;
 
-	& .card img {
-		padding-top: 1px;
-		scale: 1 1.03;
-	}
+  & .card img {
+    padding-top: 1px;
+    scale: 1 1.03;
+  }
 }
 
 .hanami {
-	--card-bg-color: linear-gradient(45deg, seagreen, palegreen);
-	--card-border-color: #555;
-	--card-radius: 0.5rem;
-	--card-aspect: 11/16;
+  --card-bg-color: linear-gradient(45deg, seagreen, palegreen);
+  --card-border-color: #555;
+  --card-radius: 0.5rem;
+  --card-aspect: 11/16;
 
-	& .down {
-		background-image: url("/cards/koinobori/card-back.webp") !important;
-		background-color: lightgoldenrodyellow !important;
-		background-size: 60% !important;
-		background-repeat: no-repeat !important;
-		background-position: bottom 5% left 10% !important;
-	}
+  & .down {
+    background-image: url("/cards/koinobori/card-back.webp") !important;
+    background-color: lightgoldenrodyellow !important;
+    background-size: 60% !important;
+    background-repeat: no-repeat !important;
+    background-position: bottom 5% left 10% !important;
+  }
 }
 
 .hana-awase {
-	--card-radius: 0.1rem;
-	--card-aspect: 3/5;
-	--card-bg-color: linear-gradient(15deg, #F8F2C3, #309D71 60%);
-	--card-border-color: #55666675;
+  --card-radius: 0.1rem;
+  --card-aspect: 3/5;
+  --card-bg-color: linear-gradient(15deg, #f8f2c3, #309d71 60%);
+  --card-border-color: #55666675;
 
-	& .card img {
-		padding-top: 0.5px;
-		scale: 1 1.025;
-	}
+  & .card img {
+    padding-top: 0.5px;
+    scale: 1 1.025;
+  }
 
-	& .down {
-		--card-border-color: #33FF8850;
-	}
+  & .down {
+    --card-border-color: #33ff8850;
+  }
 }
 
 .kinbotan {
-	--card-radius: 0.1rem;
-	--card-aspect: 20/31;
-	--card-border-color: #333;
-	
-	& .down {
-		--card-bg-color: url("/cards/kinbotan/card-back.png"), linear-gradient(0deg, red, #5C381E);
-		background-size: 250%;
-		background-position: 5% top;
-		background-blend-mode: screen;
-		--card-border-w: 3px;
-		--card-border-color: #5C381E;
-		isolation: isolate;
+  --card-radius: 0.1rem;
+  --card-aspect: 20/31;
+  --card-border-color: #333;
 
-		&::after {
-			position: absolute;
-			display: block;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			content: "";
-			background: radial-gradient(circle at 100% 100%, #5C381E50, #11000060);
-			z-index: -1;
-		}
-	}
+  & .down {
+    --card-bg-color: url("/cards/kinbotan/card-back.png"), linear-gradient(0deg, red, #5c381e);
+    background-size: 250%;
+    background-position: 5% top;
+    background-blend-mode: screen;
+    --card-border-w: 3px;
+    --card-border-color: #5c381e;
+    isolation: isolate;
+
+    &::after {
+      position: absolute;
+      display: block;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: "";
+      background: radial-gradient(circle at 100% 100%, #5c381e50, #11000060);
+      z-index: -1;
+    }
+  }
 }
 
 .koinobori {
-	--card-bg-color: linear-gradient(225deg, skyblue, lightsteelblue);
-	--card-border-color: #333;
-	--card-radius: 0.5rem;
-	--card-aspect: 2/3;
+  --card-bg-color: linear-gradient(225deg, skyblue, lightsteelblue);
+  --card-border-color: #333;
+  --card-radius: 0.5rem;
+  --card-aspect: 2/3;
 
-	& .card img {
-		scale: 1.01;
-	}
+  & .card img {
+    scale: 1.01;
+  }
 
-	& .down {
-		background-image: url("/cards/koinobori/butterfly.png") !important;
-		background-color: #59C6AA !important;
-		background-size: 60% !important;
-		background-repeat: no-repeat !important;
-		background-position: top 5% right 5% !important;
-	}
+  & .down {
+    background-image: url("/cards/koinobori/butterfly.png") !important;
+    background-color: #59c6aa !important;
+    background-size: 60% !important;
+    background-repeat: no-repeat !important;
+    background-position: top 5% right 5% !important;
+  }
 }
 
 .modern {
-	--card-aspect: 9/16;
-	--card-border-color: hsla(0 0% 13% / 0.3);
-	--card-radius: 3px;
+  --card-aspect: 9/16;
+  --card-border-color: hsla(0 0% 13% / 0.3);
+  --card-radius: 3px;
 
-	& .card {
-		/* The moon card has a transparent bg for some reason.
+  & .card {
+    /* The moon card has a transparent bg for some reason.
       This fixes it.
     */
-		background-color: #333;
+    background-color: #333;
 
-		& img {
-			scale: 1.05;
-		}
-	}
+    & img {
+      scale: 1.05;
+    }
+  }
 
-	& .down {
-		--card-bg-color: url("/cards/modern/card-back.webp");
-		background-size: cover !important;
-		background-repeat: no-repeat !important;
-		background-position: center !important;
-	}
+  & .down {
+    --card-bg-color: url("/cards/modern/card-back.webp");
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
 }
 
 .moon-rabbit {
-	--card-radius: 0.1rem;
-	--card-aspect: 21/32;
-	--card-border-w: 2px;
-	--card-border-color: #333;
-	
-	& .card img {
-		padding-top: 1px;
-		scale: 1 1.1;
-	}
-	
-	& .down {
-		--card-border-w: 1px;
-		background-image: url("/cards/moon-rabbit/card-back.webp") !important;
-		background-color: lightgray !important;
-		background-size: 40% !important;
-		background-repeat: no-repeat !important;
-		background-position: bottom 5% right 5% !important;
-	}
+  --card-radius: 0.1rem;
+  --card-aspect: 21/32;
+  --card-border-w: 2px;
+  --card-border-color: #333;
+
+  & .card img {
+    padding-top: 1px;
+    scale: 1 1.1;
+  }
+
+  & .down {
+    --card-border-w: 1px;
+    background-image: url("/cards/moon-rabbit/card-back.webp") !important;
+    background-color: lightgray !important;
+    background-size: 40% !important;
+    background-repeat: no-repeat !important;
+    background-position: bottom 5% right 5% !important;
+  }
 }
 
 .nishiki-fuda {
-	--card-radius: 0.1rem;
-	--card-border-color: transparent;
-	--card-aspect: 75/121;
+  --card-radius: 0.1rem;
+  --card-border-color: transparent;
+  --card-aspect: 75/121;
 
-	& .down {
-		--card-border-color: #555;
-		--card-bg-color: url("/cards/nishiki-fuda/card-back.webp"),
-			linear-gradient(45deg, gray, #111);
-		background-blend-mode: screen;
-		background-size: contain !important;
-		background-repeat: no-repeat !important;
-		background-position: center !important;
-	}
+  & .down {
+    --card-border-color: #555;
+    --card-bg-color: url("/cards/nishiki-fuda/card-back.webp"), linear-gradient(45deg, gray, #111);
+    background-blend-mode: screen;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
+}
+
+.otwarte-karty {
+  --card-aspect: 16/25;
+
+  & .down {
+    --card-bg-color: url("/cards/otwarte-karty/card-back.png");
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
 }
 
 .post-card {
-	--card-radius: 0.3rem;
-	--card-aspect: 12/17;
-	--card-border-color: #03598950;
+  --card-radius: 0.3rem;
+  --card-aspect: 12/17;
+  --card-border-color: #03598950;
 
-	& .card img {
-		padding-top: 2px;
-		scale: 1.1;
-	}
+  & .card img {
+    padding-top: 2px;
+    scale: 1.1;
+  }
 
-	& .down {
-		--card-bg-color: url("/cards/post-card/jp-post-symbol.png"),
-			linear-gradient(45deg, #60A27F, #035989);
-		background-blend-mode: screen;
-		background-size: contain !important;
-		background-repeat: no-repeat !important;
-		background-position: center !important;
-	}
+  & .down {
+    --card-bg-color: url("/cards/post-card/jp-post-symbol.png"), linear-gradient(45deg, #60a27f, #035989);
+    background-blend-mode: screen;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
 }
 
 .sabling-art {
-	--card-radius: 8px;
-	--card-border-w: 1px;
-	--card-border-color: midnightblue;
-	--card-aspect: 2/3;
+  --card-radius: 8px;
+  --card-border-w: 1px;
+  --card-border-color: midnightblue;
+  --card-aspect: 2/3;
 
-	& .card img {
-		scale: 1.05;
-	}
+  & .card img {
+    scale: 1.05;
+  }
 
-	& .down {
-		--card-bg-color: url("/cards/sabling-art/card-back.webp");
-		background-size: cover !important;
-		background-repeat: no-repeat !important;
-		background-position: center !important;
-	}
+  & .down {
+    --card-bg-color: url("/cards/sabling-art/card-back.webp");
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
 }
 
 .vaporwave {
-	--card-aspect: 3/5;
-	--card-radius: 0.2rem;
-	--card-border-color: #F589FF80;
-	--card-border-w: 2px;
-	
-	& .card img {
-		scale: 1 1.1;
+  --card-aspect: 3/5;
+  --card-radius: 0.2rem;
+  --card-border-color: #f589ff80;
+  --card-border-w: 2px;
 
-		@media (prefers-reduced-motion: no-preference) {
-			transition: transform 5s ease-in-out 0.2s;
-			transform-origin: top left;
-			
-			&:hover {
-				transform: scale(1.1) translate(-10%, -10%);
-			}
-			&:not(:hover) {
-				transform: scale(1) translate(0, 0);
-			}
-		}
-	}
+  & .card img {
+    scale: 1 1.1;
 
-	& .card.down {
-		--card-bg-color: rgb(189 89 189 / 1);
-	}
+    @media (prefers-reduced-motion: no-preference) {
+      transition: transform 5s ease-in-out 0.2s;
+      transform-origin: top left;
+
+      &:hover {
+        transform: scale(1.1) translate(-10%, -10%);
+      }
+      &:not(:hover) {
+        transform: scale(1) translate(0, 0);
+      }
+    }
+  }
+
+  & .card.down {
+    --card-bg-color: rgb(189 89 189 / 1);
+  }
 }
