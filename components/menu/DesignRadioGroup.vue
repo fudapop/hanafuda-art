@@ -250,7 +250,7 @@ const handleLike = (design: CardDesign) => {
 };
 
 onMounted(() => {
-  const defaultDesign = DESIGNS.find(isNew) || "cherry-version";
+  const defaultDesign = unlocked.value?.find(isNew) || "cherry-version";
   if (userIsGuest) {
     currentDesign.value = defaultDesign;
   } else {
