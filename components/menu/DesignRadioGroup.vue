@@ -16,7 +16,7 @@
     </div>
     <div class="grid justify-center w-full px-3 mt-2 space-y-12">
       <HeadlessRadioGroupOption
-        v-for="(design, index) in DESIGNS"
+        v-for="(design, index) in sortedDesigns"
         :class="[
           design,
           'group grid w-full @md:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @md:grid-rows-1 relative',
@@ -154,6 +154,26 @@ const isNew = (design: CardDesign) => {
   return isRecent;
 };
 
+const sortedDesigns = computed(() => {
+  const newDesigns: CardDesign[] = [];
+  const oldDesigns: CardDesign[] = [];
+  const lockedDesigns: CardDesign[] = [];
+
+  for (const design of DESIGNS) {
+    const isUnlocked = unlocked.value?.includes(design) ?? false;
+
+    if (isNew(design)) {
+      newDesigns.push(design);
+    } else if (!isUnlocked) {
+      lockedDesigns.push(design);
+    } else {
+      oldDesigns.push(design);
+    }
+  }
+
+  return [...newDesigns, ...oldDesigns, ...lockedDesigns];
+});
+
 const UNLOCK_COST = 500;
 const currentUser = useProfile().current;
 const coins = computed({
@@ -230,10 +250,11 @@ const handleLike = (design: CardDesign) => {
 };
 
 onMounted(() => {
+  const defaultDesign = DESIGNS.find(isNew) || "cherry-version";
   if (userIsGuest) {
-    currentDesign.value = "cherry-version";
+    currentDesign.value = defaultDesign;
   } else {
-    currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || "cherry-version";
+    currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || defaultDesign;
   }
   DESIGNS.forEach(async (design) => {
     likesCount.set(design, (await getLikesCount(design)) ?? 0);
