@@ -18,6 +18,7 @@ logs
 .idea
 .vscode
 wip
+.firebase
 
 # Local env files
 .env
