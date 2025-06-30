@@ -1,4 +1,4 @@
-import { DirectiveBinding } from "nuxt/dist/app/compat/capi";
+import type { DirectiveBinding } from "vue";
 import { useGameDataStore } from "~/stores/gameDataStore";
 
 /**
@@ -17,41 +17,41 @@ import { useGameDataStore } from "~/stores/gameDataStore";
  *
  */
 const vHide = (el: HTMLElement, binding: DirectiveBinding) => {
-	const ds = useGameDataStore();
-	const { focus, display } = binding.modifiers;
-	const addHiddenStyle = () => {
-		if (display) {
-			el.hidden = true;
-			return;
-		}
-		if (focus) el.style.setProperty("visibility", "hidden !important");
-		el.style.setProperty("opacity", "0 !important");
-		el.style.setProperty("pointerEvents", "none !important");
-	};
-	const removeHiddenStyle = () => {
-		el.style.removeProperty("opacity");
-		el.style.removeProperty("visibility");
-		el.style.removeProperty("pointerEvents");
-		el.hidden = false;
-	};
-	switch (binding.arg) {
-		case "from":
-			if (binding.value === ds.getCurrent.player) {
-				addHiddenStyle();
-			} else {
-				removeHiddenStyle();
-			}
-			break;
-		case "during":
-			if (binding.value === ds.getCurrent.phase) {
-				addHiddenStyle();
-			} else {
-				removeHiddenStyle();
-			}
-			break;
-		default:
-			removeHiddenStyle();
-	}
+  const ds = useGameDataStore();
+  const { focus, display } = binding.modifiers;
+  const addHiddenStyle = () => {
+    if (display) {
+      el.hidden = true;
+      return;
+    }
+    if (focus) el.style.setProperty("visibility", "hidden !important");
+    el.style.setProperty("opacity", "0 !important");
+    el.style.setProperty("pointerEvents", "none !important");
+  };
+  const removeHiddenStyle = () => {
+    el.style.removeProperty("opacity");
+    el.style.removeProperty("visibility");
+    el.style.removeProperty("pointerEvents");
+    el.hidden = false;
+  };
+  switch (binding.arg) {
+    case "from":
+      if (binding.value === ds.getCurrent.player) {
+        addHiddenStyle();
+      } else {
+        removeHiddenStyle();
+      }
+      break;
+    case "during":
+      if (binding.value === ds.getCurrent.phase) {
+        addHiddenStyle();
+      } else {
+        removeHiddenStyle();
+      }
+      break;
+    default:
+      removeHiddenStyle();
+  }
 };
 
 export { vHide };

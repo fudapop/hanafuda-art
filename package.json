@@ -11,7 +11,6 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@checkly/cli": "^0.4.14",
     "@heroicons/vue": "^2.0.18",
     "@nuxt/devtools": "latest",
     "@nuxt/image": "^1.0.0-rc.1",
@@ -27,7 +26,6 @@
     "@vueuse/core": "^10.2.1",
     "@vueuse/nuxt": "^10.2.1",
     "autoprefixer": "^10.4.14",
-    "checkly": "latest",
     "happy-dom": "^9.20.3",
     "nuxt": "^3.6.5",
     "nuxt-headlessui": "^1.1.4",
