@@ -5,6 +5,7 @@
   >
     <HeadlessDialog
       as="div"
+      :ref="modalRef"
       class="relative z-40"
     >
       <HeadlessTransitionChild
@@ -35,6 +36,10 @@
             <HeadlessDialogPanel
               class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
             >
+              <!-- rounded blur in the background -->
+              <div
+                class="absolute rounded-full inset-8 -z-10 bg-blue-200/20 dark:bg-gray-900/20 blur-xl"
+              ></div>
               <div>
                 <slot name="image" />
 
@@ -60,5 +65,5 @@
 </template>
 
 <script setup lang="ts">
-const { open } = defineProps<{ open: boolean }>()
+const { open, ref: modalRef } = defineProps<{ open: boolean; ref?: string }>()
 </script>
