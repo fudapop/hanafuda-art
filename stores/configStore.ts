@@ -100,6 +100,22 @@ const useConfigStore = defineStore("config", () => {
     return baseScore * 2;
   }
 
+  const initialMaxRounds: GameLengthOptions = 3;
+  const initialAllowViewingsYaku: ViewingsOptions = "allow";
+  const initialDoubleScoreOverSeven = false;
+  const initialSakeIsWildCard = false;
+  const initialCardLabels = false;
+  const initialAllowFullscreen = false;
+
+  function $reset() {
+    maxRounds.value = initialMaxRounds;
+    allowViewingsYaku.value = initialAllowViewingsYaku;
+    doubleScoreOverSeven.value = initialDoubleScoreOverSeven;
+    sakeIsWildCard.value = initialSakeIsWildCard;
+    cardLabels.value = initialCardLabels;
+    allowFullscreen.value = initialAllowFullscreen;
+  }
+
   return {
     doubleScoreOverSeven,
     allowViewingsYaku,
@@ -113,6 +129,7 @@ const useConfigStore = defineStore("config", () => {
     applyWildCardOption,
     applyDoubleScoreOption,
     OPTIONS,
+    $reset, // Added $reset to the return object
   };
 });
 

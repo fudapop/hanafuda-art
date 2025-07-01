@@ -94,6 +94,27 @@ export const usePlayerStore = defineStore("players", () => {
 	console.debug("Set new dealer:", { newDealer, active: activePlayer.value })
   }
 
+  const initialPlayersState = (): Record<PlayerKey, Player> => ({
+    p1: {
+      id: "p1",
+      isActive: true,
+      isDealer: true,
+    },
+    p2: {
+      id: "p2",
+      isActive: false,
+      isDealer: false,
+    },
+  });
+  const initialBonusMultiplier = 1;
+
+  function $reset() {
+    // Deep copy for reactive objects to avoid modifying the initial state blueprint
+    players.p1 = { ...initialPlayersState().p1 };
+    players.p2 = { ...initialPlayersState().p2 };
+    bonusMultiplier.value = initialBonusMultiplier;
+  }
+
 	return {
 		// State
 		players,
@@ -109,6 +130,7 @@ export const usePlayerStore = defineStore("players", () => {
 		toggleDealer,
 		incrementBonus,
 		// updateScore,
-    reset,
+    reset, // Keep original reset if used elsewhere
+    $reset, // Add $reset for testing
 	};
 });

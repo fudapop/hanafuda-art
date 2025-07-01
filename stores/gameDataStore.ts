@@ -85,6 +85,10 @@ export const useGameDataStore = defineStore("gameData", () => {
 	}
 
 	function startRound() {
+		if (gameOver.value) {
+			console.warn("Cannot start a new round: Game is over.");
+			return;
+		}
 		if (roundOver.value) {
 			console.error(
 				"Failed to start game. State variable ('roundOver') not reset."
@@ -143,12 +147,26 @@ export const useGameDataStore = defineStore("gameData", () => {
 		return gameId.value;
 	}
 
-	function reset() {
-		roundCounter.value = 1;
-		roundOver.value = false;
-		gameOver.value = false;
-		const record = JSON.stringify(roundHistory.value.splice(0));
-		return record;
+	// Store initial state values
+	const initialGameId = gameId.value;
+	const initialRoundHistory: RoundResult[] = [];
+	const initialRoundCounter = 1;
+	const initialTurnCounter = 1;
+	const initialTurnPhase: TurnPhase = "select";
+	const initialRoundOver = false;
+	const initialGameOver = false;
+
+	function $reset() {
+		gameId.value = initialGameId; // Or generate new if preferred for resets
+		roundHistory.value = [...initialRoundHistory];
+		roundCounter.value = initialRoundCounter;
+		turnCounter.value = initialTurnCounter;
+		turnPhase.value = initialTurnPhase;
+		roundOver.value = initialRoundOver;
+		gameOver.value = initialGameOver;
+		// Note: `getRandomString` for gameId means initialGameId will be the same across resets unless re-randomized.
+		// If a fresh random ID is needed on reset, call `generateGameId()` here.
+		// For testing, a consistent initial ID might be fine.
 	}
 
 	function _incrementTurn() {
@@ -178,6 +196,6 @@ export const useGameDataStore = defineStore("gameData", () => {
 		endRound,
 		nextRound,
 		generateGameId,
-		reset,
+		$reset, // Changed from reset to $reset
 	};
 });

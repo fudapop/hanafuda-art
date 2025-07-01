@@ -137,5 +137,16 @@ export const useCardStore = defineStore("cards", {
 				state.deck = new Set(shuffle([...DECK]));
 			});
 		},
+		// Renamed from reset to $reset for Pinia testing conventions
+		$reset() {
+			this.$patch((state) => {
+				for (const p in state.collection)
+					state.collection[p as PlayerKey].clear();
+				for (const p in state.hand) state.hand[p as PlayerKey].clear();
+				state.staged.clear();
+				state.field.clear();
+				state.deck = new Set(shuffle([...DECK]));
+			});
+		},
 	},
 });
