@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    --card-height: 120px;
+    --card-height: 140px;
     --card-aspect: 2/3;
     --table-grid-rows: calc(var(--card-height) / 1.5) 1fr calc(var(--card-height) * 2) 1fr
       var(--card-height);
@@ -46,7 +46,7 @@
   }
 
   .collection-area {
-    --card-height: 45px;
+    --card-height: 55px;
     height: calc(var(--card-height) / 2);
     max-height: 25px;
     display: grid;
@@ -57,7 +57,7 @@
 
   @media (min-width: 640px) or (max-height: 720px) {
     .collection-area {
-      --card-height: 40px;
+      --card-height: 45px;
       height: var(--card-height);
       grid-template-columns: 15% 22% 23% 40%;
       grid-template-rows: minmax(var(--card-height), 1fr);
@@ -66,7 +66,7 @@
 
   @media (min-width: 640px) and (min-height: 720px) {
     .collection-area {
-      --card-height: 60px;
+      --card-height: 75px;
       height: var(--card-height);
       grid-template-columns: 15% 22% 23% 40%;
       grid-template-rows: minmax(var(--card-height), 1fr);

@@ -1,7 +1,7 @@
 <template>
   <ul
     :class="{
-      'transition-all duration-500 ease-out max-sm:flex max-sm:flex-wrap max-sm:w-[300px] sm:w-max sm:grid sm:grid-cols-7 gap-1': true,
+      'transition-all duration-500 ease-out max-sm:flex max-sm:flex-wrap max-sm:w-[320px] sm:w-max sm:grid sm:grid-cols-7 gap-1': true,
       'sm:[&>:nth-child(n+8)]:-translate-y-8 sm:[&>:nth-child(n+8):nth-child(-n+14)]:translate-x-1/2': true,
       'max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:-translate-y-4 max-sm:[&>:nth-child(n+10)]:-translate-y-8 max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:translate-x-1/2':
         thirdRowIsOccupied,
@@ -70,11 +70,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useCardDesign } from '~/composables/useCardDesign'
-import { type CardName } from '~/utils/cards'
 import { useCardStore } from '~/stores/cardStore'
-import { usePlayerStore } from '~/stores/playerStore'
-import { useGameDataStore } from '~/stores/gameDataStore'
 import { useConfigStore } from '~/stores/configStore'
+import { useGameDataStore } from '~/stores/gameDataStore'
+import { usePlayerStore } from '~/stores/playerStore'
+import { type CardName } from '~/utils/cards'
 
 const displayedCards: (CardName | undefined)[] = reactive(Array(14))
 const isThirdRow = (index: number) => index > 9
