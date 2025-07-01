@@ -5,6 +5,8 @@
       v-for="type in cardTypes"
       :key="type"
       class="relative flex h-full py-2"
+      @dblclick="modalOpen = true"
+      @dbltap="modalOpen = true"
     >
       <span
         v-show="coll[type].size > 0"
@@ -21,22 +23,67 @@
       />
     </ul>
   </div>
+
+  <LazyModal
+    :open="modalOpen"
+    ref="modalRef"
+    title="Collection"
+  >
+    <template #title> {{ modalTitle }} </template>
+    <template #description>
+      <div class="grid gap-1 [--card-height:140px] px-8 py-4">
+        <ul
+          v-for="type in cardTypes"
+          :key="type"
+          class="relative flex justify-center h-full py-2"
+        >
+          <span
+            v-show="coll[type].size > 0"
+            class="uppercase absolute -top-1 left-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
+          >
+            <span class="mr-1 text-xs align-middle">
+              {{ coll[type].size }}
+            </span>
+            {{ type }}
+          </span>
+          <CardList
+            :cards="coll[type]"
+            :stack="true"
+          />
+        </ul>
+      </div>
+    </template>
+    <template #actions>
+      <div class="flex justify-center w-full mt-6">
+        <button
+          type="button"
+          class="sec-btn"
+          @click="modalOpen = false"
+        >
+          Close
+        </button>
+      </div>
+    </template>
+  </LazyModal>
 </template>
 
 <script setup lang="ts">
-import { type PlayerKey } from '~/stores/playerStore'
-import { useCardStore } from '~/stores/cardStore'
-import { type CardName, sortByType } from '~/utils/cards'
-import { checkAll, YAKU, type YakuName, type CompletedYaku } from '~/utils/yaku'
-import { useGameDataStore } from '~/stores/gameDataStore'
 import { storeToRefs } from 'pinia'
+import { useCardStore } from '~/stores/cardStore'
 import { useConfigStore } from '~/stores/configStore'
+import { useGameDataStore } from '~/stores/gameDataStore'
+import { type PlayerKey } from '~/stores/playerStore'
+import { type CardName, sortByType } from '~/utils/cards'
+import { checkAll, type CompletedYaku, YAKU, type YakuName } from '~/utils/yaku'
 
 export type CompletionEvent = {
   player: PlayerKey
   score: number
   completedYaku: CompletedYaku[]
 }
+
+const modalOpen = ref(false)
+const modalTitle = computed(() => `${player === 'p1' ? 'My' : "Opponent's"} Collection`)
 
 const { player } = defineProps<{ player: PlayerKey }>()
 const emits = defineEmits<{
@@ -145,4 +192,3 @@ watch(
   { flush: 'post' },
 )
 </script>
-lib/cardslib/yaku

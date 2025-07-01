@@ -14,10 +14,10 @@
       <LazyOpponentArea />
 
       <!-- OPPONENT COLLECTION -->
-      <div class="pointer-events-none -z-10">
+      <div class="">
         <LazyCollectionArea
           player="p2"
-          @completed="handleCompletion"
+          @completed="(data) => handleCompletion(data)"
         />
       </div>
 
@@ -103,11 +103,11 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useToast, POSITION } from 'vue-toastification'
+import { POSITION, useToast } from 'vue-toastification'
+import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
+import { useCardStore } from '~/stores/cardStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
-import { useCardStore } from '~/stores/cardStore'
-import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
 import { checkForWin } from '~/utils/yaku'
 
 definePageMeta({
