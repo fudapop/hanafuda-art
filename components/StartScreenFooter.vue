@@ -9,7 +9,7 @@
         </a>
 
         <!-- GITHUB REPOSITORY LINK -->
-        <a href="https://www.github.com/fuda-cafe/hanafuda-art" title="View project on GitHub" target="_blank">
+        <a href="https://www.github.com/fudapop/hanafuda-art" title="View project on GitHub" target="_blank">
           <svg class="w-5 h-5 mx-auto" aria-hidden="true" fill="white" viewBox="0 0 20 20">
             <path
               fill-rule="evenodd"
