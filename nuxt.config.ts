@@ -95,7 +95,7 @@ export default defineNuxtConfig({
     "nuxt-icon",
     "nuxt-headlessui",
     "@nuxt/image",
-    "nuxt-vitest",
+    "@nuxt/test-utils/module",
     "nuxt-vuefire",
     "@nuxtjs/partytown",
     "@nuxtjs/i18n",
