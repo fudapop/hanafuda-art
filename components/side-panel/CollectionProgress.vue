@@ -10,13 +10,19 @@
       <span class="sr-only">Expand/Collapse</span>
     </button>
     <div class="w-full max-w-lg p-2 mx-auto space-y-2 rounded-2xl">
-      <HeadlessDisclosure as="div" v-for="yaku in allowedYaku" :key="yaku.name" v-slot="{ open }" v-show="yaku.cards.length > 0">
+      <HeadlessDisclosure
+        as="div"
+        v-for="yaku in allowedYaku"
+        :key="yaku.name"
+        v-slot="{ open }"
+        v-show="yaku.cards.length > 0"
+      >
         <HeadlessDisclosureButton
           :class="[
             'relative grid w-full grid-cols-[repeat(2,1fr)_max-content] px-4 py-2 items-center text-sm font-medium text-left rounded-lg focus:outline-none focus-visible:ring focus-visible:ring-opacity-75',
-            isComplete(yaku)
-              ? 'text-green-900 bg-green-400 hover:bg-green-200 focus-visible:ring-green-500'
-              : 'text-indigo-900 bg-indigo-100 hover:bg-indigo-200 focus-visible:ring-indigo-500',
+            isComplete(yaku) ?
+              'text-green-900 bg-green-400 hover:bg-green-200 focus-visible:ring-green-500'
+            : 'text-indigo-900 bg-indigo-100 hover:bg-indigo-200 focus-visible:ring-indigo-500',
           ]"
         >
           <span class="font-bold uppercase max-xs:text-xs whitespace-nowrap">
@@ -37,22 +43,22 @@
               class="self-center w-3 h-1 ml-1 bg-green-400 rounded-full ring-1 ring-inset ring-green-500"
             ></span>
             <span
-              v-for="_ in yaku.numRequired -
-              yaku.cards.filter((card) => playerHas(card)).length"
+              v-for="_ in yaku.numRequired - yaku.cards.filter((card) => playerHas(card)).length"
               class="self-center w-3 h-1 ml-1 rounded-full ring-1 ring-inset ring-gray-400"
             ></span>
           </span>
 
           <span class="mr-4 text-right">
             <span class="font-semibold xs:text-lg">{{ yaku.points }}</span>
-            <span v-if="yaku.points === 1" class="font-semibold align-top">+</span>
+            <span
+              v-if="yaku.points === 1"
+              class="font-semibold align-top"
+              >+</span
+            >
             points
           </span>
           <ChevronDownIcon
-            :class="[
-              'w-5 h-5 text-gray-500 float-right',
-              open || openAll ? 'rotate-180' : '',
-            ]"
+            :class="['w-5 h-5 text-gray-500 float-right', open || openAll ? 'rotate-180' : '']"
           />
         </HeadlessDisclosureButton>
 
@@ -87,7 +93,10 @@
                     opponentHas(card) || playerHas(card),
                 }"
               >
-                <CardImage :card="card" :src="useCardDesign().getCardUrl(card)!" />
+                <CardImage
+                  :card="card"
+                  :src="useCardDesign().getCardUrl(card)!"
+                />
                 <CheckCircleIcon
                   v-if="playerHas(card)"
                   class="absolute z-50 w-5 h-5 text-green-400 top-1 left-1"
@@ -107,9 +116,7 @@
               Requires at least one other
               <span class="block pl-6"
                 >completed yaku ( not
-                {{
-                  [...viewingYaku].filter((name) => name != yaku.name)[0].toUpperCase()
-                }})
+                {{ [...viewingYaku].filter((name) => name != yaku.name)[0].toUpperCase() }})
               </span>
             </p>
           </HeadlessDisclosurePanel>
@@ -125,36 +132,32 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   ExclamationCircleIcon,
-} from "@heroicons/vue/20/solid";
-import { useCardStore } from "~/stores/cardStore";
-import { useConfigStore } from "~/stores/configStore";
-import { type CardName } from "~/utils/cards";
-import { type Yaku, teyaku, viewingYaku } from "~/utils/yaku";
+} from '@heroicons/vue/20/solid'
+import { useCardStore } from '~/stores/cardStore'
+import { useConfigStore } from '~/stores/configStore'
+import { type CardName } from '~/utils/cards'
+import { type Yaku, teyaku, viewingYaku } from '~/utils/yaku'
 
-const cs = useCardStore();
-const config = useConfigStore();
+const cs = useCardStore()
+const config = useConfigStore()
 
-const openAll = ref(false);
+const openAll = ref(false)
 
-const currentDesign = useCardDesign().useDesign();
+const currentDesign = useCardDesign().useDesign()
 
-const playerHas = toValue(computed(() => (card: CardName) => cs.collection.p1.has(card)));
-const opponentHas = toValue(
-  computed(() => (card: CardName) => cs.collection.p2.has(card))
-);
+const playerHas = toValue(computed(() => (card: CardName) => cs.collection.p1.has(card)))
+const opponentHas = toValue(computed(() => (card: CardName) => cs.collection.p2.has(card)))
 
 const isComplete = (yaku: Yaku) => {
-  return yaku.cards.filter((card) => playerHas(card)).length >= yaku.numRequired;
-};
+  return yaku.cards.filter((card) => playerHas(card)).length >= yaku.numRequired
+}
 
-const viewingsAllowed = computed(() => config.allowViewingsYaku);
+const viewingsAllowed = computed(() => config.allowViewingsYaku)
 
 const allowedYaku = computed(() => {
-  const yakuList = [...Object.values(YAKU)].filter(
-    (yaku) => !teyaku.has(yaku.name)
-  );
-  if (viewingsAllowed.value === "none")
-    return yakuList.filter((yaku) => !viewingYaku.has(yaku.name));
-  return yakuList;
-});
+  const yakuList = [...Object.values(YAKU)].filter((yaku) => !teyaku.has(yaku.name))
+  if (viewingsAllowed.value === 'none')
+    return yakuList.filter((yaku) => !viewingYaku.has(yaku.name))
+  return yakuList
+})
 </script>

@@ -1,9 +1,7 @@
 <template>
   <Modal :open="open">
     <template #title
-      ><span class="[text-wrap:balance] text-xl">
-        Reset your password?
-      </span></template
+      ><span class="[text-wrap:balance] text-xl"> Reset your password? </span></template
     >
     <template #actions>
       <Transition
@@ -20,12 +18,25 @@
             A link to change your password will be sent if an associated account exists.
           </p>
           <form @submit.prevent="handlePressSend">
-            <input type="email" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" required placeholder="Email" v-model="email"/>
+            <input
+              type="email"
+              class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+              required
+              placeholder="Email"
+              v-model="email"
+            />
             <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-2">
-              <button type="button" class="sec-btn" @click="$emit('cancel')">
+              <button
+                type="button"
+                class="sec-btn"
+                @click="$emit('cancel')"
+              >
                 Cancel
               </button>
-              <button type="submit" class="pri-btn">
+              <button
+                type="submit"
+                class="pri-btn"
+              >
                 Send
               </button>
             </div>
@@ -37,17 +48,17 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
-const { open } = defineProps<{ open: boolean }>();
-const emit = defineEmits(["cancel"]);
+import { useStorage } from '@vueuse/core'
+const { open } = defineProps<{ open: boolean }>()
+const emit = defineEmits(['cancel'])
 
-const { resetPassword } = useAuth();
-const rememberedEmail = useStorage("hanafuda-email", "", localStorage, { mergeDefaults: true });
-const email = ref(rememberedEmail.value);
+const { resetPassword } = useAuth()
+const rememberedEmail = useStorage('hanafuda-email', '', localStorage, { mergeDefaults: true })
+const email = ref(rememberedEmail.value)
 
 const handlePressSend = async () => {
-  await resetPassword(email.value);
-  email.value = "";
-  emit("cancel");
-};
+  await resetPassword(email.value)
+  email.value = ''
+  emit('cancel')
+}
 </script>

@@ -11,7 +11,10 @@
           v-if="ps.bonusMultiplier > 1"
           class="w-full sm:w-1/2 text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 sm:top-1/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
         >
-          <TransitionGroup appear name="stamp">
+          <TransitionGroup
+            appear
+            name="stamp"
+          >
             <div
               :title="`Winning score x${n}!`"
               v-for="n in ps.bonusMultiplier - 1"
@@ -33,12 +36,14 @@
       </Transition>
 
       <!-- DECK PILE -->
-      <div
-        class="absolute inset-y-0 my-auto overflow-hidden shadow-md sm:right-4 card down"
-      ></div>
+      <div class="absolute inset-y-0 my-auto overflow-hidden shadow-md sm:right-4 card down"></div>
 
       <!-- Show revealed card when drawing from deck         -->
-      <HeadlessTransitionRoot appear :show="!!revealedCard" as="template">
+      <HeadlessTransitionRoot
+        appear
+        :show="!!revealedCard"
+        as="template"
+      >
         <HeadlessTransitionChild
           enter="duration-300 ease-out"
           enter-from="opacity-0 motion-safe:-scale-x-50"
@@ -76,72 +81,68 @@
 </template>
 
 <script setup lang="ts">
-import { useGameDataStore } from "~/stores/gameDataStore";
-import { usePlayerStore } from "~/stores/playerStore";
-import { useConfigStore } from "~/stores/configStore";
-import { useCardHandler } from "~/composables/useCardHandler";
-import { useCardDesign } from "~/composables/useCardDesign";
+import { useGameDataStore } from '~/stores/gameDataStore'
+import { usePlayerStore } from '~/stores/playerStore'
+import { useConfigStore } from '~/stores/configStore'
+import { useCardHandler } from '~/composables/useCardHandler'
+import { useCardDesign } from '~/composables/useCardDesign'
 
-const ps = usePlayerStore();
-const ds = useGameDataStore();
+const ps = usePlayerStore()
+const ds = useGameDataStore()
 
-const { getCardUrl } = useCardDesign();
+const { getCardUrl } = useCardDesign()
 
-const { useSelectedCard, useMatchedCards, useActions } = useCardHandler();
-const { decisionIsPending } = useDecisionHandler();
-const { draw, matchOrDiscard, collect } = useActions();
+const { useSelectedCard, useMatchedCards, useActions } = useCardHandler()
+const { decisionIsPending } = useDecisionHandler()
+const { draw, matchOrDiscard, collect } = useActions()
 
-const { errorOnTimeout } = useTimeout();
+const { errorOnTimeout } = useTimeout()
 
-const selectedCard = useSelectedCard();
-const matchedCards = useMatchedCards();
-const revealedCard = computed(() => ds.checkCurrentPhase("draw") && selectedCard.value);
-const revealedCardImg = computed(() =>
-  revealedCard.value ? getCardUrl(revealedCard.value) : null
-);
+const selectedCard = useSelectedCard()
+const matchedCards = useMatchedCards()
+const revealedCard = computed(() => ds.checkCurrentPhase('draw') && selectedCard.value)
+const revealedCardImg = computed(() => (revealedCard.value ? getCardUrl(revealedCard.value) : null))
 
-const isDrawPhase = computed(
-  () => ds.checkCurrentPhase("draw") && ps.players.p1.isActive
-);
-const autoOpponent = useState("opponent");
+const isDrawPhase = computed(() => ds.checkCurrentPhase('draw') && ps.players.p1.isActive)
+const autoOpponent = useState('opponent')
 
 const playDrawPhase = async () => {
-  draw();
-  await sleep();
+  draw()
+  await sleep()
   // Allow player to select match
   if (matchedCards.value.length === 2) {
-    await errorOnTimeout(selectMatchFromField, 30000, "match-on-draw", {
-      startMsg: "Awaiting match selection...",
+    await errorOnTimeout(selectMatchFromField, 30000, 'match-on-draw', {
+      startMsg: 'Awaiting match selection...',
       callback: ds.endRound,
-      endMsg: "Resetting...",
-    })();
+      endMsg: 'Resetting...',
+    })()
   } else {
-    matchOrDiscard();
+    matchOrDiscard()
   }
-  await sleep();
-  collect();
-  await sleep();
+  await sleep()
+  collect()
+  await sleep()
   while (decisionIsPending.value) {
-    await sleep();
+    await sleep()
   }
-  ds.nextPhase();
-};
+  ds.nextPhase()
+}
 
 const selectMatchFromField = async () => {
   while (selectedCard.value) {
-    if (ds.roundOver || ds.gameOver) break;
-    console.log("Awaiting match selection...");
-    await sleep();
+    if (ds.roundOver || ds.gameOver) break
+    console.info('Awaiting match selection...')
+    await sleep()
   }
-};
+}
 
 watch(isDrawPhase, () => {
   if (isDrawPhase.value) {
     // If P2 is active, the turn is controlled by useAutoplay
     if (autoOpponent.value && ps.players.p1.isActive) {
       // Autoplay the draw phase for P1
-      playDrawPhase();
+      playDrawPhase()
     }
   }
-});
+})
 </script>

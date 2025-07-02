@@ -1,8 +1,8 @@
 /**
-  * To learn more about Playwright Test visit:
-  * https://www.checklyhq.com/docs/browser-checks/playwright-test/
-  * https://playwright.dev/docs/writing-tests
-  */
+ * To learn more about Playwright Test visit:
+ * https://www.checklyhq.com/docs/browser-checks/playwright-test/
+ * https://playwright.dev/docs/writing-tests
+ */
 
 import { test, expect } from '@playwright/test'
 

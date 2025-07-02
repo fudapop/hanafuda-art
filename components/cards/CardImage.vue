@@ -1,5 +1,8 @@
 <template>
-  <template v-if="src" v-show="loaded">
+  <template
+    v-if="src"
+    v-show="loaded"
+  >
     <NuxtImg
       :src="src"
       :alt="card"
@@ -12,13 +15,13 @@
 </template>
 
 <script setup lang="ts">
-import { type CardName } from "~/utils/cards";
+import { type CardName } from '~/utils/cards'
 
-const { card, src } = defineProps<{ card: CardName; src: string }>();
+const { card, src } = defineProps<{ card: CardName; src: string }>()
 
-const loaded = ref(false);
+const loaded = ref(false)
 
 const handleLoad = () => {
-  loaded.value = true;
-};
+  loaded.value = true
+}
 </script>

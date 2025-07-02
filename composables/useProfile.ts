@@ -1,26 +1,26 @@
-import { type User, onAuthStateChanged, getAuth } from "firebase/auth";
-import { type DocumentData, doc, getDoc, setDoc, getFirestore } from "firebase/firestore";
-import { useStorage } from "@vueuse/core";
-import { type CardDesign } from "~/composables/useCardDesign";
+import { type User, onAuthStateChanged, getAuth } from 'firebase/auth'
+import { type DocumentData, doc, getDoc, setDoc, getFirestore } from 'firebase/firestore'
+import { useStorage } from '@vueuse/core'
+import { type CardDesign } from '~/composables/useCardDesign'
 
 interface UserProfile {
-  uid: string;
-  avatar: string;
-  username: string;
+  uid: string
+  avatar: string
+  username: string
   record: {
-    coins: number;
-    win: number;
-    draw: number;
-    loss: number;
-  };
-  lastUpdated: Date;
+    coins: number
+    win: number
+    draw: number
+    loss: number
+  }
+  lastUpdated: Date
   designs: {
-    unlocked: CardDesign[];
-    liked: CardDesign[];
-  };
-  settings: Record<string, any> | null;
-  flags: Record<string, any>;
-  isGuest?: boolean;
+    unlocked: CardDesign[]
+    liked: CardDesign[]
+  }
+  settings: Record<string, any> | null
+  flags: Record<string, any>
+  isGuest?: boolean
 }
 
 const avatars = [
@@ -33,69 +33,70 @@ const avatars = [
   // "/avatars/flat-moon.webp",
   // "/avatars/flat-deer.webp",
   // "/avatars/flat-phoenix.webp",
-  "/avatars/origami-crane.webp",
-  "/avatars/origami-warbler.webp",
-  "/avatars/origami-curtain.webp",
-  "/avatars/origami-cuckoo.webp",
-  "/avatars/origami-bridge.webp",
-  "/avatars/origami-butterflies.webp",
-  "/avatars/origami-boar.webp",
-  "/avatars/origami-moon.webp",
-  "/avatars/origami-deer.webp",
-  "/avatars/origami-rainman.webp",
-  "/avatars/origami-phoenix.webp",
-];
+  '/avatars/origami-crane.webp',
+  '/avatars/origami-warbler.webp',
+  '/avatars/origami-curtain.webp',
+  '/avatars/origami-cuckoo.webp',
+  '/avatars/origami-bridge.webp',
+  '/avatars/origami-butterflies.webp',
+  '/avatars/origami-boar.webp',
+  '/avatars/origami-moon.webp',
+  '/avatars/origami-deer.webp',
+  '/avatars/origami-rainman.webp',
+  '/avatars/origami-phoenix.webp',
+]
 
-const defaultDesigns: CardDesign[] = ["cherry-version", "ramen-red", "flash-black"];
+const defaultDesigns: CardDesign[] = ['cherry-version', 'ramen-red', 'flash-black']
 
 export const useProfile = () => {
-  const useWatcher = (): Ref<any> => useState("watcher", () => null);
-  const useUserProfile = (): Ref<UserProfile | null> => useState("profile", () => null);
+  const useWatcher = (): Ref<any> => useState('watcher', () => null)
+  const useUserProfile = (): Ref<UserProfile | null> => useState('profile', () => null)
 
   const useGuestProfile = (profile?: UserProfile | Partial<UserProfile>) =>
-    useStorage("hanafuda-guest", profile?.isGuest ? profile : {}, sessionStorage, {
+    useStorage('hanafuda-guest', profile?.isGuest ? profile : {}, sessionStorage, {
       mergeDefaults: true,
-    });
+    })
 
-  const profile = useUserProfile();
-  const watcher = useWatcher();
+  const profile = useUserProfile()
+  const watcher = useWatcher()
   /**
    * Retrieve data from Firestore
    */
   const getUserData = async (user: User) => {
-    const docRef = await getDoc(doc(getFirestore(), "users", `u_${user.uid}`));
-    return docRef.exists() ? docRef.data() : null;
-  };
+    const docRef = await getDoc(doc(getFirestore(), 'users', `u_${user.uid}`))
+    return docRef.exists() ? docRef.data() : null
+  }
 
   /**
    * Save new data to Firestore
    */
   const setUserData = () => {
-    if (!profile.value) return;
-    setDoc(doc(getFirestore(), "users", `u_${profile.value.uid}`), profile.value, {
+    if (!profile.value) return
+    setDoc(doc(getFirestore(), 'users', `u_${profile.value.uid}`), profile.value, {
       merge: true,
-    });
-  };
+    })
+  }
 
   /**
    * Load data from Firestore if available, sessionStorage if guest, or create a new profile
    */
   const loadProfile = async (user: User) => {
-    const userData = await getUserData(user);
+    const userData = await getUserData(user)
     if (userData) {
-      loadUserData(user, userData);
+      loadUserData(user, userData)
     } else if (user.isAnonymous) {
-      loadGuestData(user);
+      loadGuestData(user)
     } else {
-      createNewProfile(user);
+      createNewProfile(user)
     }
-  };
+  }
 
   const loadUserData = (user: User, userData: DocumentData) => {
     profile.value = {
       uid: user.uid,
       avatar: userData.avatar || user.photoURL || getRandom(avatars),
-      username: userData.username || user.displayName?.split(" ")[0] || `User_${user.uid.slice(0, 5)}`,
+      username:
+        userData.username || user.displayName?.split(' ')[0] || `User_${user.uid.slice(0, 5)}`,
       lastUpdated: userData.lastUpdated?.toDate() || new Date(),
       record: userData.record || { coins: 500, win: 0, draw: 0, loss: 0 },
       designs: userData.designs || { unlocked: [...defaultDesigns], liked: [] },
@@ -104,14 +105,14 @@ export const useProfile = () => {
         isNewPlayer: true,
         hasSubmittedFeedback: false,
       },
-    };
-  };
+    }
+  }
 
   const loadGuestData = (user: User) => {
     const guest = useGuestProfile({
       uid: user.uid,
       avatar: user.photoURL || getRandom(avatars),
-      username: user.displayName?.split(" ")[0] || `User #${user.uid.slice(0, 5)}`,
+      username: user.displayName?.split(' ')[0] || `User #${user.uid.slice(0, 5)}`,
       lastUpdated: new Date(),
       record: { coins: 0, win: 0, draw: 0, loss: 0 },
       designs: { unlocked: [...defaultDesigns], liked: [] },
@@ -120,15 +121,15 @@ export const useProfile = () => {
         hasSubmittedFeedback: false,
       },
       isGuest: true,
-    });
-    profile.value = guest.value as UserProfile;
-  };
+    })
+    profile.value = guest.value as UserProfile
+  }
 
   const createNewProfile = (user: User) => {
     profile.value = {
       uid: user.uid,
       avatar: user.photoURL || getRandom(avatars),
-      username: user.displayName?.split(" ")[0] || `User #${user.uid.slice(0, 5)}`,
+      username: user.displayName?.split(' ')[0] || `User #${user.uid.slice(0, 5)}`,
       lastUpdated: new Date(),
       record: { coins: 500, win: 0, draw: 0, loss: 0 },
       designs: { unlocked: [...defaultDesigns], liked: [] },
@@ -137,32 +138,32 @@ export const useProfile = () => {
         isNewPlayer: true,
         hasSubmittedFeedback: false,
       },
-    };
-    setUserData();
-  };
+    }
+    setUserData()
+  }
 
   const upgradeGuestProfile = (guestProfile: UserProfile) => {
-    delete guestProfile.isGuest;
-    profile.value = guestProfile;
-    profile.value.lastUpdated = new Date();
-    profile.value.record.coins += 500;
-    setUserData();
-    console.debug("Upgraded guest profile.");
-    deleteGuestProfile();
-  };
+    delete guestProfile.isGuest
+    profile.value = guestProfile
+    profile.value.lastUpdated = new Date()
+    profile.value.record.coins += 500
+    setUserData()
+    console.debug('Upgraded guest profile.')
+    deleteGuestProfile()
+  }
 
   const deleteGuestProfile = () => {
-    useGuestProfile().value = {};
-  };
+    useGuestProfile().value = {}
+  }
 
   const getProfile = async (user: User) => {
-    if (profile.value) return profile.value;
-    await loadProfile(user);
-    return profile.value;
-  };
+    if (profile.value) return profile.value
+    await loadProfile(user)
+    return profile.value
+  }
 
   const updateProfile = () => {
-    if (!profile.value) return;
+    if (!profile.value) return
     const data: Partial<UserProfile> = {
       avatar: profile.value.avatar,
       username: profile.value.username,
@@ -171,44 +172,44 @@ export const useProfile = () => {
       flags: profile.value.flags,
       designs: profile.value.designs,
       lastUpdated: new Date(),
-    };
+    }
     if (!profile.value.isGuest) {
-      console.log("Updating profile...");
-      setDoc(doc(getFirestore(), "users", `u_${profile.value.uid}`), data, {
+      console.log('Updating profile...')
+      setDoc(doc(getFirestore(), 'users', `u_${profile.value.uid}`), data, {
         merge: true,
-      });
+      })
     } else {
-      const guest = useGuestProfile();
-      console.log("Updating guest profile...");
+      const guest = useGuestProfile()
+      console.log('Updating guest profile...')
       for (const key in data) {
         // @ts-ignore
-        guest.value[key as keyof Partial<UserProfile>] = data[key];
+        guest.value[key as keyof Partial<UserProfile>] = data[key]
       }
     }
-  };
+  }
 
-  const current = computed(() => profile.value);
+  const current = computed(() => profile.value)
 
   if (!watcher.value) {
-    console.debug("Setting profile watcher...");
+    console.debug('Setting profile watcher...')
     watcher.value = watch(
       current,
       () => {
         if (!current.value) {
-          console.debug("Cleared profile watcher.");
+          console.debug('Cleared profile watcher.')
         }
-        updateProfile();
+        updateProfile()
       },
       { deep: true },
-    );
+    )
 
-    console.debug("Setting auth watcher...");
+    console.debug('Setting auth watcher...')
     onAuthStateChanged(getAuth(), () => {
       if (getAuth().currentUser === null) {
-        profile.value = null;
-        deleteGuestProfile();
+        profile.value = null
+        deleteGuestProfile()
       }
-    });
+    })
   }
 
   return {
@@ -216,5 +217,5 @@ export const useProfile = () => {
     getProfile,
     updateProfile,
     upgradeGuestProfile,
-  };
-};
+  }
+}

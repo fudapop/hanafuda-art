@@ -1,12 +1,14 @@
 <template>
   <Modal :open="open">
     <template #title
-      ><span class="[text-wrap:balance]">
-        You've got coins! How about 500 more?
-      </span></template
+      ><span class="[text-wrap:balance]"> You've got coins! How about 500 more? </span></template
     >
     <template #image>
-      <img src="/images/coin.webp" alt="coin" class="w-8 h-8 mx-auto drop-shadow-sm" />
+      <img
+        src="/images/coin.webp"
+        alt="coin"
+        class="w-8 h-8 mx-auto drop-shadow-sm"
+      />
     </template>
     <template #actions>
       <Transition
@@ -20,20 +22,31 @@
       >
         <div class="h-[250px] xs:h-40 mt-5">
           <p class="text-sm text-center text-gray-600 dark:text-gray-300">
-            Your coins can be used to unlock new card designs and avatars. However, guest
-            profiles cannot be saved.
+            Your coins can be used to unlock new card designs and avatars. However, guest profiles
+            cannot be saved.
           </p>
           <p class="mt-5 text-sm text-center text-gray-600 dark:text-gray-300">
             Sign in to save your profile and receive an extra 500 coins?
           </p>
           <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-2">
-            <button type="button" class="sec-btn" @click="$emit('cancel')">
+            <button
+              type="button"
+              class="sec-btn"
+              @click="$emit('cancel')"
+            >
               No thanks, delete me
             </button>
-            <button type="button" class="pri-btn" @click="() => navigateTo({
-                path: '/login',
-                query: { signup: 'true' },
-              })">
+            <button
+              type="button"
+              class="pri-btn"
+              @click="
+                () =>
+                  navigateTo({
+                    path: '/login',
+                    query: { signup: 'true' },
+                  })
+              "
+            >
               Yes, gimme coins!
             </button>
           </div>
@@ -44,6 +57,6 @@
 </template>
 
 <script setup lang="ts">
-const { open } = defineProps<{ open: boolean }>();
-defineEmits(["cancel"]);
+const { open } = defineProps<{ open: boolean }>()
+defineEmits(['cancel'])
 </script>

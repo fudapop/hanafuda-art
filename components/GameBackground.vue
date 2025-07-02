@@ -17,19 +17,21 @@
 </template>
 
 <script setup lang="ts">
-const { noCalls } = useDecisionHandler();
-const { index = 1 } = defineProps<{ index?: number }>();
-const bgIndex = index;
+const { noCalls } = useDecisionHandler()
+const { index = 1 } = defineProps<{ index?: number }>()
+const bgIndex = index
 const bgImages = [
   {
-    src: "/bg/grey-hills-1280.webp",
-    srcset: "/bg/grey-hills-768.webp 768w, /bg/grey-hills-1024.webp 1024w, /bg/grey-hills-1280.webp 1280w, /bg/grey-hills-1920.webp 1920w",
-    alt: "Full moon over grey hills",
+    src: '/bg/grey-hills-1280.webp',
+    srcset:
+      '/bg/grey-hills-768.webp 768w, /bg/grey-hills-1024.webp 1024w, /bg/grey-hills-1280.webp 1280w, /bg/grey-hills-1920.webp 1920w',
+    alt: 'Full moon over grey hills',
   },
   {
-    src: "/bg/crane-man-1280.webp",
-    srcset: "/bg/crane-man-768.webp 768w, /bg/crane-man-1024.webp 1024w, /bg/crane-man-1280.webp 1280w, /bg/crane-man-1440.webp 1440w, /bg/crane-man-1920.webp 1920w",
-    alt: "Crane, Butterfly & Rain-Man",
+    src: '/bg/crane-man-1280.webp',
+    srcset:
+      '/bg/crane-man-768.webp 768w, /bg/crane-man-1024.webp 1024w, /bg/crane-man-1280.webp 1280w, /bg/crane-man-1440.webp 1440w, /bg/crane-man-1920.webp 1920w',
+    alt: 'Crane, Butterfly & Rain-Man',
   },
 ]
 </script>

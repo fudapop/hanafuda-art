@@ -1,6 +1,12 @@
 <template>
-  <HeadlessTransitionRoot as="template" :show="open">
-    <HeadlessDialog as="div" class="relative z-40">
+  <HeadlessTransitionRoot
+    as="template"
+    :show="open"
+  >
+    <HeadlessDialog
+      as="div"
+      class="relative z-40"
+    >
       <HeadlessTransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -10,9 +16,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div
-          class="fixed inset-0 transition-opacity bg-gray-600 opacity-50 dark:bg-black"
-        />
+        <div class="fixed inset-0 transition-opacity bg-gray-600 opacity-50 dark:bg-black" />
       </HeadlessTransitionChild>
 
       <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -56,5 +60,5 @@
 </template>
 
 <script setup lang="ts">
-const { open } = defineProps<{ open: boolean }>();
+const { open } = defineProps<{ open: boolean }>()
 </script>

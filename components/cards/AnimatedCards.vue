@@ -8,15 +8,28 @@
     leave-from-class="opacity-100"
     leave-active-class="duration-400"
   >
-    <div v-if="loaded" :key="selectedDesign" :class="['cards', selectedDesign]">
+    <div
+      v-if="loaded"
+      :key="selectedDesign"
+      :class="['cards', selectedDesign]"
+    >
       <div class="drop-shadow-md animated-card card one">
-        <CardImage card="matsu-ni-tsuru" :src="getCardUrl('matsu-ni-tsuru')!" />
+        <CardImage
+          card="matsu-ni-tsuru"
+          :src="getCardUrl('matsu-ni-tsuru')!"
+        />
       </div>
       <div class="drop-shadow-md animated-card card two">
-        <CardImage card="sakura-ni-maku" :src="getCardUrl('sakura-ni-maku')!" />
+        <CardImage
+          card="sakura-ni-maku"
+          :src="getCardUrl('sakura-ni-maku')!"
+        />
       </div>
       <div class="drop-shadow-md animated-card card three">
-        <CardImage card="susuki-ni-tsuki" :src="getCardUrl('susuki-ni-tsuki')!" />
+        <CardImage
+          card="susuki-ni-tsuki"
+          :src="getCardUrl('susuki-ni-tsuki')!"
+        />
       </div>
       <div class="drop-shadow-md animated-card card four">
         <CardImage
@@ -25,46 +38,60 @@
         />
       </div>
       <div class="drop-shadow-md animated-card card five">
-        <CardImage card="kiri-ni-ho-oh" :src="getCardUrl('kiri-ni-ho-oh')!" />
+        <CardImage
+          card="kiri-ni-ho-oh"
+          :src="getCardUrl('kiri-ni-ho-oh')!"
+        />
       </div>
-      <p v-if="title" class="tracking-wide">{{ title }}</p>
+      <p
+        v-if="title"
+        class="tracking-wide"
+      >
+        {{ title }}
+      </p>
     </div>
-    <CardsLoader v-else :no-text="true" :class="selectedDesign" />
+    <CardsLoader
+      v-else
+      :no-text="true"
+      :class="selectedDesign"
+    />
   </Transition>
 </template>
 
 <script setup lang="ts">
-import { useImage } from "@vueuse/core";
-import { type CardName } from "~/utils/cards";
-const { getCardUrl, useDesign } = useCardDesign();
+import { useImage } from '@vueuse/core'
+import { type CardName } from '~/utils/cards'
+const { getCardUrl, useDesign } = useCardDesign()
 
-const selectedDesign = useDesign();
-const loaded = ref(false);
+const selectedDesign = useDesign()
+const loaded = ref(false)
 
 const loadImages = async () => {
-  loaded.value = false;
-  const images = ([
-    "matsu-ni-tsuru",
-    "sakura-ni-maku",
-    "susuki-ni-tsuki",
-    "yanagi-ni-ono-no-toufuu",
-    "kiri-ni-ho-oh",
-  ] as CardName[]).map((cardName) => useImage({ src: getCardUrl(cardName)! }));
+  loaded.value = false
+  const images = (
+    [
+      'matsu-ni-tsuru',
+      'sakura-ni-maku',
+      'susuki-ni-tsuki',
+      'yanagi-ni-ono-no-toufuu',
+      'kiri-ni-ho-oh',
+    ] as CardName[]
+  ).map((cardName) => useImage({ src: getCardUrl(cardName)! }))
   while (images.every((img) => img.isLoading.value)) {
-    await sleep(500);
+    await sleep(500)
   }
-  await sleep(1500);
-  loaded.value = true;
-};
+  await sleep(1500)
+  loaded.value = true
+}
 
-const { title } = defineProps<{ title?: string }>();
+const { title } = defineProps<{ title?: string }>()
 
 onMounted(() => {
-  loadImages();
+  loadImages()
   watch(selectedDesign, () => {
-    loadImages();
-  });
-});
+    loadImages()
+  })
+})
 </script>
 <style scoped>
 .cards {

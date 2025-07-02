@@ -1,11 +1,17 @@
 <template>
-  <HeadlessPopover class="relative inline-block text-left" v-slot="{ open }">
+  <HeadlessPopover
+    class="relative inline-block text-left"
+    v-slot="{ open }"
+  >
     <div>
       <HeadlessPopoverButton
         class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm bg-gray-500/20 font-semibold drop-shadow-md ring-1 ring-inset ring-gray-300/50 dark:ring-gray-500/50"
       >
         <span class="sr-only"> Options </span>
-        <AdjustmentsHorizontalIcon class="w-8 h-8 text-white" aria-hidden="true" />
+        <AdjustmentsHorizontalIcon
+          class="w-8 h-8 text-white"
+          aria-hidden="true"
+        />
       </HeadlessPopoverButton>
     </div>
     <HeadlessPopoverOverlay class="fixed inset-0 z-20 bg-black opacity-50" />
@@ -25,7 +31,10 @@
       <HeadlessPopoverButton class="absolute z-50 -left-8 top-4 max-xs:hidden">
         <div class="relative flex text-gray-700 dark:text-gray-300 gap-x-2">
           <span class="sr-only">Close</span>
-          <XMarkIcon class="w-6 h-6" aria-hidden="true" />
+          <XMarkIcon
+            class="w-6 h-6"
+            aria-hidden="true"
+          />
         </div>
       </HeadlessPopoverButton>
 
@@ -42,23 +51,27 @@
             <button
               :class="[
                 'w-full rounded-lg py-2 text-sm [@media(max-height:500px)]:text-left [@media(max-height:500px)]:pl-4 font-medium leading-5 text-blue-700 dark:text-gray-200',
-                selected
-                  ? 'bg-white dark:bg-gray-800 shadow'
-                  : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+                selected ?
+                  'bg-white dark:bg-gray-800 shadow'
+                : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
               ]"
             >
               {{ category }}
             </button>
           </HeadlessTab>
           <!-- Move signup panel to separate tab for mobile landscape layout -->
-          <HeadlessTab v-if="isGuest" as="template" v-slot="{ selected }">
+          <HeadlessTab
+            v-if="isGuest"
+            as="template"
+            v-slot="{ selected }"
+          >
             <button
               :class="[
                 'absolute bottom-4 inset-x-1 rounded-lg py-2 [@media(max-height:500px)]:text-left [@media(max-height:500px)]:pl-4 text-sm font-medium leading-5 text-blue-700 dark:text-gray-200 [@media(min-height:_500px)]:hidden',
                 'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 dark:ring-offset-gray-200 focus:outline-none focus:ring-2',
-                selected
-                  ? 'bg-white dark:bg-gray-800 shadow'
-                  : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+                selected ?
+                  'bg-white dark:bg-gray-800 shadow'
+                : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
               ]"
             >
               Sign In
@@ -99,9 +112,11 @@
                 <button
                   type="button"
                   class="block px-8 py-3 mx-auto mt-2 text-sm font-medium rounded-lg sec-btn"
-                  @click="() => {
-                    navigateTo({path: '/login', query: { link: 'true' }});
-                  }"
+                  @click="
+                    () => {
+                      navigateTo({ path: '/login', query: { link: 'true' } })
+                    }
+                  "
                 >
                   Sign in
                 </button>
@@ -119,20 +134,23 @@
         class="relative flex items-center justify-center w-full h-full text-blue-700 dark:text-gray-200 bg-blue-900/20 dark:bg-blue-300/20 gap-x-2"
       >
         <span class="sr-only">Close</span>
-        <XMarkIcon class="w-6 h-6" aria-hidden="true" />
+        <XMarkIcon
+          class="w-6 h-6"
+          aria-hidden="true"
+        />
       </div>
     </HeadlessPopoverButton>
   </HeadlessPopover>
 </template>
 
 <script setup lang="ts">
-import { AdjustmentsHorizontalIcon } from "@heroicons/vue/20/solid";
-import { ExclamationCircleIcon } from "@heroicons/vue/24/outline";
-import { XMarkIcon } from "@heroicons/vue/24/outline";
+import { AdjustmentsHorizontalIcon } from '@heroicons/vue/20/solid'
+import { ExclamationCircleIcon } from '@heroicons/vue/24/outline'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 const { tabCategories } = defineProps<{
-  tabCategories: string[];
-}>();
+  tabCategories: string[]
+}>()
 
-const isGuest = computed(() => useProfile().current.value?.isGuest);
+const isGuest = computed(() => useProfile().current.value?.isGuest)
 </script>

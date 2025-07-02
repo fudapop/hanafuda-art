@@ -1,8 +1,14 @@
 <template>
   <div>
-    <form class="space-y-4 min-w-[300px] border-t pt-4 border-gray-400/20" action="" @submit.prevent="handleEmailLogin">
+    <form
+      class="space-y-4 min-w-[300px] border-t pt-4 border-gray-400/20"
+      action=""
+      @submit.prevent="handleEmailLogin"
+    >
       <div>
-        <label for="email" class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+        <label
+          for="email"
+          class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
           >Email address</label
         >
         <div class="mt-1">
@@ -20,7 +26,11 @@
       </div>
 
       <div>
-        <label for="password" class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">Password</label>
+        <label
+          for="password"
+          class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+          >Password</label
+        >
         <div class="mt-1">
           <input
             id="password"
@@ -34,18 +44,34 @@
         </div>
       </div>
 
-      <Transition name="section" mode="out-in" tag="div">
-        <section v-if="newAccount" class="space-y-4 text-xs text-gray-600 dark:text-gray-300 min-h-40">
+      <Transition
+        name="section"
+        mode="out-in"
+        tag="div"
+      >
+        <section
+          v-if="newAccount"
+          class="space-y-4 text-xs text-gray-600 dark:text-gray-300 min-h-40"
+        >
           <div class="space-y-2">
             <p>Password must contain at least:</p>
             <ul class="grid grid-cols-2 list-none list-inside">
               <li
                 v-for="requirement in requirements"
                 :key="requirement.text"
-                :class="{ 'text-green-500 relative': requirement.valid, 'text-red-500 relative': !requirement.valid }"
+                :class="{
+                  'text-green-500 relative': requirement.valid,
+                  'text-red-500 relative': !requirement.valid,
+                }"
               >
-                <CheckIcon v-if="requirement.valid" class="inline w-3 h-3 mr-1 text-green-500" />
-                <span v-else class="inline-block w-3 h-3 mr-1" />
+                <CheckIcon
+                  v-if="requirement.valid"
+                  class="inline w-3 h-3 mr-1 text-green-500"
+                />
+                <span
+                  v-else
+                  class="inline-block w-3 h-3 mr-1"
+                />
                 {{ requirement.text }}
               </li>
             </ul>
@@ -62,7 +88,7 @@
           </button>
 
           <a
-            v-show="!useRoute().query.signup"
+            v-show="!query.signup"
             href="#"
             class="block w-full mt-2 text-sm text-center text-indigo-500 hover:text-indigo-400"
             @click="newAccount = false"
@@ -71,7 +97,10 @@
           </a>
         </section>
 
-        <section v-else class="space-y-4 min-h-40">
+        <section
+          v-else
+          class="space-y-4 min-h-40"
+        >
           <div class="flex items-center justify-between">
             <div class="flex items-center">
               <input
@@ -83,13 +112,18 @@
                 v-model="rememberMe"
                 @change="rememberEmail"
               />
-              <label for="remember-me" class="block ml-3 text-sm leading-6 text-gray-900 dark:text-white"
+              <label
+                for="remember-me"
+                class="block ml-3 text-sm leading-6 text-gray-900 dark:text-white"
                 >Remember me</label
               >
             </div>
 
             <div class="text-sm leading-6">
-              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500" @click="handleForgotPassword"
+              <a
+                href="#"
+                class="font-semibold text-indigo-600 hover:text-indigo-500"
+                @click="handleForgotPassword"
                 >Forgot password?</a
               >
             </div>
@@ -113,77 +147,82 @@
         </section>
       </Transition>
     </form>
-    <LazyPasswordResetForm :open="showResetModal" @cancel="() => (showResetModal = false)" />
+    <LazyPasswordResetForm
+      :open="showResetModal"
+      @cancel="() => (showResetModal = false)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { CheckIcon } from "@heroicons/vue/20/solid";
-import { useStorage } from "@vueuse/core";
+import { CheckIcon } from '@heroicons/vue/20/solid'
+import { useStorage } from '@vueuse/core'
 
-const emit = defineEmits(["success", "error", "linked"]);
+const emit = defineEmits(['success', 'error', 'linked'])
 
-const { useGuest, linkWithEmail, loginWithEmail, signUpWithEmail } = useAuth();
+const { useGuest, linkWithEmail, loginWithEmail, signUpWithEmail } = useAuth()
 
-const newAccount = ref<boolean>(useRoute().query.signup === "true");
-const rememberedEmail = useStorage("hanafuda-email", "", localStorage, { mergeDefaults: true });
-const rememberMe = ref<boolean>(rememberedEmail.value !== "");
+const newAccount = ref<boolean>(useRoute().query.signup === 'true')
+const rememberedEmail = useStorage('hanafuda-email', '', localStorage, { mergeDefaults: true })
+const rememberMe = ref<boolean>(rememberedEmail.value !== '')
 const rememberEmail = () => {
-  rememberedEmail.value = rememberMe.value ? values.email : "";
-};
+  rememberedEmail.value = rememberMe.value ? values.email : ''
+}
 const values = reactive({
   email: rememberedEmail.value,
-  password: "",
-});
+  password: '',
+})
 
-const userIsGuest = ref<boolean>(false);
+const { query } = useRoute()
+const userIsGuest = ref<boolean>(false)
 
 const emailAction = computed(() =>
-  userIsGuest.value ? linkWithEmail : newAccount.value ? signUpWithEmail : loginWithEmail,
-);
+  userIsGuest.value ? linkWithEmail
+  : newAccount.value ? signUpWithEmail
+  : loginWithEmail,
+)
 
 const handleEmailLogin = () => {
-  if (!isValidPassword.value) return;
+  if (!isValidPassword.value) return
   emailAction.value(values.email, values.password).then((success) => {
     if (success) {
       if (userIsGuest.value) {
-        emit("linked");
+        emit('linked')
       } else {
-        emit("success");
+        emit('success')
       }
     } else {
-      emit("error");
+      emit('error')
     }
-  });
-};
+  })
+}
 
-const hasNumber = computed(() => /\d/.test(values.password));
-const hasUpper = computed(() => /[A-Z]/.test(values.password));
-const hasLower = computed(() => /[a-z]/.test(values.password));
-const hasSpecial = computed(() => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(values.password));
-const hasSufficientLength = computed(() => values.password.length >= 6);
+const hasNumber = computed(() => /\d/.test(values.password))
+const hasUpper = computed(() => /[A-Z]/.test(values.password))
+const hasLower = computed(() => /[a-z]/.test(values.password))
+const hasSpecial = computed(() => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(values.password))
+const hasSufficientLength = computed(() => values.password.length >= 6)
 
 const requirements = computed(() => [
-  { valid: hasSufficientLength.value, text: "6 characters" },
-  { valid: hasNumber.value, text: "1 number" },
-  { valid: hasUpper.value, text: "1 uppercase letter" },
-  { valid: hasLower.value, text: "1 lowercase letter" },
-  { valid: hasSpecial.value, text: "1 special character" },
-]);
+  { valid: hasSufficientLength.value, text: '6 characters' },
+  { valid: hasNumber.value, text: '1 number' },
+  { valid: hasUpper.value, text: '1 uppercase letter' },
+  { valid: hasLower.value, text: '1 lowercase letter' },
+  { valid: hasSpecial.value, text: '1 special character' },
+])
 
 const isValidPassword = computed(() => {
-  console.log({ newAccount: newAccount.value, emailAction: emailAction.value.name });
-  return hasSufficientLength && hasNumber && hasUpper && hasLower && hasSpecial;
-});
+  return hasSufficientLength && hasNumber && hasUpper && hasLower && hasSpecial
+})
 
-const showResetModal = ref(false);
+const showResetModal = ref(false)
 const handleForgotPassword = () => {
-  showResetModal.value = true;
-};
+  showResetModal.value = true
+}
 
 onMounted(() => {
-  userIsGuest.value = Boolean(useGuest().value.uid);
-});
+  userIsGuest.value = Boolean(useGuest().value.uid)
+})
 </script>
 
 <style scoped>

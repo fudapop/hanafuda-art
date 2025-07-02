@@ -12,16 +12,18 @@
       <div
         :class="{
           'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative': true,
-          'scale-105 drop-shadow-lg -translate-y-2 z-20': matchedCards?.includes(
-            card.name
-          ),
+          'scale-105 drop-shadow-lg -translate-y-2 z-20': matchedCards?.includes(card.name),
           '-translate-y-2 drop-shadow-lg': selectedCard === card.name,
           'pointer-events-none staged': cs.staged.has(card.name),
         }"
         :title="card.name.replace(/-\d?/g, ' ')"
         @click="() => handleClick(card.name)"
       >
-        <CardImage v-if="card.source" :src="card.source" :card="card.name" />
+        <CardImage
+          v-if="card.source"
+          :src="card.source"
+          :card="card.name"
+        />
         <!-- TODO: Add loading placeholder -->
       </div>
     </CardTransition>
@@ -29,32 +31,32 @@
 </template>
 
 <script setup lang="ts">
-import { useCardDesign } from "~/composables/useCardDesign";
-import { type CardName } from "~/utils/cards";
-import { useCardStore } from "~/stores/cardStore";
+import { useCardDesign } from '~/composables/useCardDesign'
+import { type CardName } from '~/utils/cards'
+import { useCardStore } from '~/stores/cardStore'
 
 const { cards, stack = false } = defineProps<{
-  cards: Set<CardName> | CardName[];
-  stack?: boolean;
-}>();
+  cards: Set<CardName> | CardName[]
+  stack?: boolean
+}>()
 
-const { getCardUrl, useDesign } = useCardDesign();
-const currentDesign = useDesign();
+const { getCardUrl, useDesign } = useCardDesign()
+const currentDesign = useDesign()
 
 const cardImages = computed(() =>
   [...cards].map((cardName) => ({
     name: cardName,
     source: getCardUrl(cardName),
-  }))
-);
+  })),
+)
 
-const cs = useCardStore();
-const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler();
+const cs = useCardStore()
+const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler()
 
-const selectedCard = useSelectedCard();
-const matchedCards = useMatchedCards();
+const selectedCard = useSelectedCard()
+const matchedCards = useMatchedCards()
 
 const handleClick = (card: CardName) => {
-  handleCardSelect(card);
-};
+  handleCardSelect(card)
+}
 </script>

@@ -14,15 +14,21 @@
       :for="ratingId"
       class="absolute flex inset-0 m-auto pl-[1.5ch] -top-2 justify-between pointer-events-none text-3xl rounded-lg peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-600"
     >
-      <span v-for="n in getRange(modelValue)" class="text-indigo-600 dark:text-yellow-300"
+      <span
+        v-for="n in getRange(modelValue)"
+        class="text-indigo-600 dark:text-yellow-300"
         >&starf;</span
       >
-      <span v-for="n in getRange(5 - modelValue)" class="text-gray-500">&star;</span>
+      <span
+        v-for="n in getRange(5 - modelValue)"
+        class="text-gray-500"
+        >&star;</span
+      >
     </label>
   </div>
 </template>
 
 <script setup lang="ts">
-const { ratingId, modelValue } = defineProps<{ ratingId: string; modelValue: number }>();
-defineEmits(["update:modelValue"]);
+const { ratingId, modelValue } = defineProps<{ ratingId: string; modelValue: number }>()
+defineEmits(['update:modelValue'])
 </script>

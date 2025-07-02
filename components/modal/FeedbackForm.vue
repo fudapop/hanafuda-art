@@ -6,21 +6,33 @@
         v-if="!submitted"
         class="flex items-center justify-center w-12 h-12 mx-auto bg-indigo-100 rounded-full"
       >
-        <ChatBubbleLeftEllipsisIcon class="w-6 h-6 text-indigo-800" aria-hidden="true" />
+        <ChatBubbleLeftEllipsisIcon
+          class="w-6 h-6 text-indigo-800"
+          aria-hidden="true"
+        />
       </div>
       <div
         v-else
         class="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full"
       >
-        <CheckIcon class="w-6 h-6 text-green-600" aria-hidden="true" />
+        <CheckIcon
+          class="w-6 h-6 text-green-600"
+          aria-hidden="true"
+        />
       </div>
     </template>
-    <template v-if="submitted" #description>
+    <template
+      v-if="submitted"
+      #description
+    >
       <p class="text-center text-gray-900 dark:text-white">
         Your feedback has been submitted. Thank you!
       </p>
     </template>
-    <template v-else #description>
+    <template
+      v-else
+      #description
+    >
       <p class="text-center text-gray-900 dark:text-white">How was your experience?</p>
     </template>
     <template #actions>
@@ -40,9 +52,7 @@
               v-model.number="ratings['animation']"
             />
           </div>
-          <div
-            class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8"
-          >
+          <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>Ease of Controls</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
@@ -50,9 +60,7 @@
               v-model.number="ratings['controls']"
             />
           </div>
-          <div
-            class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8"
-          >
+          <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>Image Quality</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
@@ -66,7 +74,7 @@
           <OptionsRadioGroup
             :model-value="comments.tag"
             :value-options="tags"
-            :update-callback="(option) => comments.tag = (option as CommentTag)"
+            :update-callback="(option) => (comments.tag = option as CommentTag)"
             :label-template="(option) => includeTagEmoji(option as CommentTag)"
             class-name="mt-2 mb-4 grid grid-cols-3 gap-y-1 gap-x-1 text-xs"
           >
@@ -81,7 +89,11 @@
           />
         </fieldset>
         <div class="flex float-right mt-4 w-max gap-x-4">
-          <button type="button" class="sec-btn" @click="() => $emit('close')">
+          <button
+            type="button"
+            class="sec-btn"
+            @click="() => $emit('close')"
+          >
             Close
           </button>
           <button
@@ -95,107 +107,102 @@
           </button>
         </div>
       </form>
-      <div v-show="submitted" class="float-right mt-4 w-max">
-        <button type="button" class="pri-btn" @click="() => $emit('close')">Close</button>
+      <div
+        v-show="submitted"
+        class="float-right mt-4 w-max"
+      >
+        <button
+          type="button"
+          class="pri-btn"
+          @click="() => $emit('close')"
+        >
+          Close
+        </button>
       </div>
     </template>
   </Modal>
 </template>
 
 <script setup lang="ts">
-import { ChatBubbleLeftEllipsisIcon, CheckIcon } from "@heroicons/vue/24/outline";
-import {
-	doc,
-	setDoc,
-	getFirestore,
-  Timestamp,
-} from "firebase/firestore";
-import { nanoid } from "nanoid";
+import { ChatBubbleLeftEllipsisIcon, CheckIcon } from '@heroicons/vue/24/outline'
+import { doc, setDoc, getFirestore, Timestamp } from 'firebase/firestore'
+import { nanoid } from 'nanoid'
 
-const { open } = defineProps<{ open: boolean }>();
+const { open } = defineProps<{ open: boolean }>()
 
-const tags = ["idea", "error", "other"] as const;
-type CommentTag = typeof tags[number];
+const tags = ['idea', 'error', 'other'] as const
+type CommentTag = (typeof tags)[number]
 
 const includeTagEmoji = (option: CommentTag) => {
-  let emoji = "";
+  let emoji = ''
   switch (option) {
-    case "idea":
-      emoji = "💡";
-      break;
+    case 'idea':
+      emoji = '💡'
+      break
 
-    case "error":
-      emoji = "🪲";
-      break;
+    case 'error':
+      emoji = '🪲'
+      break
 
-    case "other":
+    case 'other':
     default:
-      emoji = "💬";
+      emoji = '💬'
   }
-  return `${emoji} ${option}`;
-};
-
-interface Feedback {
-  "animation": number;
-  "controls": number;
-  "image": number;
-  [x: string]: number;
+  return `${emoji} ${option}`
 }
 
-const user = toValue(useProfile().current);
+interface Feedback {
+  animation: number
+  controls: number
+  image: number
+  [x: string]: number
+}
+
+const user = toValue(useProfile().current)
 
 const ratings: Feedback = reactive({
-  "animation": 0,
-  "controls": 0,
-  "image": 0,
-});
+  animation: 0,
+  controls: 0,
+  image: 0,
+})
 
 const comments = reactive({
-  tag: "other",
-  message: "",
-});
+  tag: 'other',
+  message: '',
+})
 
 const submitted = computed({
   get: () => user?.flags?.hasSubmittedFeedback,
   set: (value) => {
-    if (!user) return;
-    if (!user.flags) user.flags = {};
-    user.flags.hasSubmittedFeedback = value;
+    if (!user) return
+    if (!user.flags) user.flags = {}
+    user.flags.hasSubmittedFeedback = value
   },
-});
+})
 
 const incomplete = computed(() =>
-[
-  ratings["animation"],
-  ratings["controls"],
-  ratings["image"],
-].some((fb) => !fb)
-);
+  [ratings['animation'], ratings['controls'], ratings['image']].some((fb) => !fb),
+)
 
-defineEmits(["close"]);
+defineEmits(['close'])
 
 const saveFeedback = async () => {
-    if (!user) return;
-    setDoc(
-      doc(getFirestore(), "feedback", `fb_${nanoid(15)}${Date.now()}`),
-      {
-        ratings: ratings,
-        comments,
-        submitted_at: Timestamp.now(),
-        submitted_by: user.isGuest
-          ? `g_${user?.uid}`
-          : doc(getFirestore(), "users", `u_${user.uid}`)
-      }
-    );
-  };
+  if (!user) return
+  setDoc(doc(getFirestore(), 'feedback', `fb_${nanoid(15)}${Date.now()}`), {
+    ratings: ratings,
+    comments,
+    submitted_at: Timestamp.now(),
+    submitted_by: user.isGuest ? `g_${user?.uid}` : doc(getFirestore(), 'users', `u_${user.uid}`),
+  })
+}
 
 const handleSubmit = async (ev: Event) => {
-  ev.preventDefault();
+  ev.preventDefault()
   try {
-    saveFeedback();
-    submitted.value = true;
+    saveFeedback()
+    submitted.value = true
   } catch (err) {
-    console.log(err);
+    console.error('Error saving feedback:', err)
   }
-};
+}
 </script>

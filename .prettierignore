@@ -13,3 +13,14 @@ public
 .firebase
 .github
 .nuxt
+
+# Ignore lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+bun.lockb
+
+# Misc
+*.py
+*.md
+.*ignore

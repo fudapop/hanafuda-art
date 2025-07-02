@@ -11,27 +11,39 @@
       'drop-shadow-md text-white dark:hover:text-yellow-300 hover:text-indigo-600',
     ]"
   >
-    <Icon v-if="state === 'dark'" name="ic:outline-dark-mode" class="w-6 h-6 drop-shadow-sm" />
-    <Icon v-else-if="state === 'light'" name="ic:outline-light-mode" class="w-6 h-6 drop-shadow-sm" />
-    <Icon v-else name="ic:round-monitor" class="w-6 h-6 drop-shadow-sm hover:text-yellow-300" />
+    <Icon
+      v-if="state === 'dark'"
+      name="ic:outline-dark-mode"
+      class="w-6 h-6 drop-shadow-sm"
+    />
+    <Icon
+      v-else-if="state === 'light'"
+      name="ic:outline-light-mode"
+      class="w-6 h-6 drop-shadow-sm"
+    />
+    <Icon
+      v-else
+      name="ic:round-monitor"
+      class="w-6 h-6 drop-shadow-sm hover:text-yellow-300"
+    />
     <span class="sr-only">{{ state }}</span>
   </button>
 </template>
 
 <script setup lang="ts">
-import { useColorMode, useCycleList } from "@vueuse/core";
+import { useColorMode, useCycleList } from '@vueuse/core'
 
 const mode = useColorMode({
   emitAuto: true,
-});
+})
 
-const { state, next } = useCycleList(["dark", "light", "auto"], { initialValue: mode.value });
+const { state, next } = useCycleList(['dark', 'light', 'auto'], { initialValue: mode.value })
 
 const handleClick = () => {
-  next();
-};
+  next()
+}
 
 watchEffect(() => {
-  mode.value = state.value as any;
-});
+  mode.value = state.value as any
+})
 </script>

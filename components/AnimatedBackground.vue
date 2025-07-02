@@ -32,22 +32,22 @@
 </template>
 
 <script setup lang="ts">
-import { useWindowSize } from "@vueuse/core";
-const { width, height } = useWindowSize();
+import { useWindowSize } from '@vueuse/core'
+const { width, height } = useWindowSize()
 
-const { koikoiIsCalled } = useDecisionHandler();
+const { koikoiIsCalled } = useDecisionHandler()
 
-const posArr: Ref<any[]> = ref([]);
+const posArr: Ref<any[]> = ref([])
 const generatedPositions = (n: number) => {
   return getRange(n).map((n) => ({
     y: Math.floor(Math.random() * width.value),
     x: Math.floor(Math.random() * height.value),
-  }));
-};
+  }))
+}
 
 onMounted(() => {
-  posArr.value = generatedPositions(8);
-});
+  posArr.value = generatedPositions(8)
+})
 </script>
 
 <style scoped></style>

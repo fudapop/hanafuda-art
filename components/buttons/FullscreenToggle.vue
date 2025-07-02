@@ -14,27 +14,37 @@
     type="button"
     @click="toggle"
   >
-    <Icon v-if="!isFullscreen" class="w-8 h-8 drop-shadow-sm" name="mdi:fullscreen" />
-    <Icon v-else class="w-8 h-8 drop-shadow-sm" name="mdi:fullscreen-exit" />
+    <Icon
+      v-if="!isFullscreen"
+      class="w-8 h-8 drop-shadow-sm"
+      name="mdi:fullscreen"
+    />
+    <Icon
+      v-else
+      class="w-8 h-8 drop-shadow-sm"
+      name="mdi:fullscreen-exit"
+    />
     <span class="sr-only">Toggle Fullscreen</span>
   </button>
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-import { useFullscreen } from "@vueuse/core";
-import { useConfigStore } from "~/stores/configStore";
+import { storeToRefs } from 'pinia'
+import { useFullscreen } from '@vueuse/core'
+import { useConfigStore } from '~/stores/configStore'
 
-const { isFullscreen, toggle, enter, exit, isSupported } = useFullscreen(undefined, { autoExit: true });
-const { allowFullscreen } = storeToRefs(useConfigStore());
+const { isFullscreen, toggle, enter, exit, isSupported } = useFullscreen(undefined, {
+  autoExit: true,
+})
+const { allowFullscreen } = storeToRefs(useConfigStore())
 
 onMounted(async () => {
   if (!isSupported.value) {
-    console.warn("Fullscreen is not supported in this browser.");
+    console.warn('Fullscreen is not supported in this browser.')
   }
   // Toggle fullscreen when allowFullscreen option changes in the store
   watch(allowFullscreen, () => {
-    allowFullscreen.value ? enter() : exit();
-  });
-});
+    allowFullscreen.value ? enter() : exit()
+  })
+})
 </script>

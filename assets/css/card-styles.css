@@ -32,7 +32,7 @@
 
   & .down {
     --card-border-color: darkslategray;
-    --card-bg-color: url("/cards/cherry-version/card-back.webp");
+    --card-bg-color: url('/cards/cherry-version/card-back.webp');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -58,7 +58,7 @@
   --card-aspect: 11/16;
 
   & .down {
-    background-image: url("/cards/koinobori/card-back.webp") !important;
+    background-image: url('/cards/koinobori/card-back.webp') !important;
     background-color: lightgoldenrodyellow !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -88,7 +88,7 @@
   --card-border-color: #333;
 
   & .down {
-    --card-bg-color: url("/cards/kinbotan/card-back.png"), linear-gradient(0deg, red, #5c381e);
+    --card-bg-color: url('/cards/kinbotan/card-back.png'), linear-gradient(0deg, red, #5c381e);
     background-size: 250%;
     background-position: 5% top;
     background-blend-mode: screen;
@@ -103,7 +103,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      content: "";
+      content: '';
       background: radial-gradient(circle at 100% 100%, #5c381e50, #11000060);
       z-index: -1;
     }
@@ -121,7 +121,7 @@
   }
 
   & .down {
-    background-image: url("/cards/koinobori/butterfly.png") !important;
+    background-image: url('/cards/koinobori/butterfly.png') !important;
     background-color: #59c6aa !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -146,7 +146,7 @@
   }
 
   & .down {
-    --card-bg-color: url("/cards/modern/card-back.webp");
+    --card-bg-color: url('/cards/modern/card-back.webp');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -166,7 +166,7 @@
 
   & .down {
     --card-border-w: 1px;
-    background-image: url("/cards/moon-rabbit/card-back.webp") !important;
+    background-image: url('/cards/moon-rabbit/card-back.webp') !important;
     background-color: lightgray !important;
     background-size: 40% !important;
     background-repeat: no-repeat !important;
@@ -181,7 +181,7 @@
 
   & .down {
     --card-border-color: #555;
-    --card-bg-color: url("/cards/nishiki-fuda/card-back.webp"), linear-gradient(45deg, gray, #111);
+    --card-bg-color: url('/cards/nishiki-fuda/card-back.webp'), linear-gradient(45deg, gray, #111);
     background-blend-mode: screen;
     background-size: contain !important;
     background-repeat: no-repeat !important;
@@ -193,7 +193,7 @@
   --card-aspect: 16/25;
 
   & .down {
-    --card-bg-color: url("/cards/otwarte-karty/card-back.png");
+    --card-bg-color: url('/cards/otwarte-karty/card-back.png');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -211,7 +211,8 @@
   }
 
   & .down {
-    --card-bg-color: url("/cards/post-card/jp-post-symbol.png"), linear-gradient(45deg, #60a27f, #035989);
+    --card-bg-color:
+      url('/cards/post-card/jp-post-symbol.png'), linear-gradient(45deg, #60a27f, #035989);
     background-blend-mode: screen;
     background-size: contain !important;
     background-repeat: no-repeat !important;
@@ -230,7 +231,7 @@
   }
 
   & .down {
-    --card-bg-color: url("/cards/sabling-art/card-back.webp");
+    --card-bg-color: url('/cards/sabling-art/card-back.webp');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;

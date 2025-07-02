@@ -1,9 +1,15 @@
 <template>
   <div class="grid gap-y-4">
-    <div id="user-info" class="grid p-4 mx-3">
+    <div
+      id="user-info"
+      class="grid p-4 mx-3"
+    >
       <div class="sm:grid sm:grid-cols-2 sm:px-8">
         <!-- Avatar -->
-        <div v-if="user" class="relative mx-auto w-max group">
+        <div
+          v-if="user"
+          class="relative mx-auto w-max group"
+        >
           <PencilSquareIcon
             class="absolute right-0 w-5 h-auto text-gray-400 opacity-50 bottom-4 group-hover:opacity-100"
           />
@@ -39,8 +45,15 @@
           </p>
 
           <!-- Player Coins -->
-          <div v-if="user?.record" class="flex items-center justify-center px-4 gap-x-2 sm:justify-start">
-            <img src="/images/coin.webp" alt="coin" class="w-5 h-5" />
+          <div
+            v-if="user?.record"
+            class="flex items-center justify-center px-4 gap-x-2 sm:justify-start"
+          >
+            <img
+              src="/images/coin.webp"
+              alt="coin"
+              class="w-5 h-5"
+            />
             <p class="text-lg font-semibold text-gray-900 select-none dark:text-white">
               {{ user.record.coins }}
             </p>
@@ -51,7 +64,7 @@
             <p class="px-4 text-gray-900 dark:text-white">
               Last updated:
               <span class="block mt-1 text-sm text-gray-500 dark:text-gray-300">{{
-                useDateFormat(user.lastUpdated, "MMM-DD-YYYY HH:mm").value
+                useDateFormat(user.lastUpdated, 'MMM-DD-YYYY HH:mm').value
               }}</span>
             </p>
           </div>
@@ -71,11 +84,17 @@
         Player Record
       </h3>
       <dl class="flex justify-around">
-        <div v-for="(val, key) in record" :key="key" class="px-4 py-3 overflow-hidden sm:py-5 sm:p-6">
+        <div
+          v-for="(val, key) in record"
+          :key="key"
+          class="px-4 py-3 overflow-hidden sm:py-5 sm:p-6"
+        >
           <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-300">
             {{ key }}
           </dt>
-          <dd class="text-lg font-semibold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50">
+          <dd
+            class="text-lg font-semibold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50"
+          >
             {{ val }}
           </dd>
         </div>
@@ -84,7 +103,10 @@
 
     <!-- Account sign-in/out -->
     <div class="[@media(max-height:_500px)]:hidden">
-      <div v-if="user?.isGuest" class="mx-auto text-gray-900 w-max dark:text-white">
+      <div
+        v-if="user?.isGuest"
+        class="mx-auto text-gray-900 w-max dark:text-white"
+      >
         <ExclamationCircleIcon class="inline w-6 h-6 align-top" />
         <p class="inline ml-2 text-sm">Sign in is required to save your profile.</p>
         <button
@@ -92,14 +114,17 @@
           class="block px-8 py-3 mx-auto mt-2 text-sm font-medium rounded-lg sec-btn"
           @click="
             () => {
-              navigateTo({ path: '/login', query: { signup: 'true' } });
+              navigateTo({ path: '/login', query: { signup: 'true' } })
             }
           "
         >
           Sign in
         </button>
       </div>
-      <div v-else class="flex flex-col items-center justify-center">
+      <div
+        v-else
+        class="flex flex-col items-center justify-center"
+      >
         <LoginButton />
       </div>
     </div>
@@ -107,48 +132,48 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside, useDateFormat } from "@vueuse/core";
-import { PencilSquareIcon, ExclamationCircleIcon } from "@heroicons/vue/24/outline";
+import { onClickOutside, useDateFormat } from '@vueuse/core'
+import { PencilSquareIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 
-const user = useProfile().current;
+const user = useProfile().current
 const avatar = computed({
-  get: () => user.value?.avatar ?? "",
+  get: () => user.value?.avatar ?? '',
   set: (url: string) => {
-    if (user.value) user.value.avatar = url.replace(window.location.origin, "");
+    if (user.value) user.value.avatar = url.replace(window.location.origin, '')
   },
-});
+})
 const username = computed({
-  get: () => user.value?.username ?? "",
+  get: () => user.value?.username ?? '',
   set: (username: string) => {
-    if (user.value) user.value.username = username;
+    if (user.value) user.value.username = username
   },
-});
+})
 const record = computed(() => ({
   wins: Number(user.value?.record.win),
   losses: Number(user.value?.record.loss),
   draws: Number(user.value?.record.draw),
-}));
+}))
 
-const usernameInputRef: Ref<HTMLInputElement | null> = ref(null);
-const usernameInputVal = ref(username.value);
-const editUsername = ref(false);
+const usernameInputRef: Ref<HTMLInputElement | null> = ref(null)
+const usernameInputVal = ref(username.value)
+const editUsername = ref(false)
 
 const handleInputEnter = () => {
-  username.value = usernameInputVal.value;
-  editUsername.value = false;
-};
+  username.value = usernameInputVal.value
+  editUsername.value = false
+}
 
 const handleEdit = () => {
-  editUsername.value = true;
+  editUsername.value = true
   const cleanup = onClickOutside(usernameInputRef, () => {
-    username.value = usernameInputVal.value;
-    editUsername.value = false;
-  });
+    username.value = usernameInputVal.value
+    editUsername.value = false
+  })
   const unwatch = watch(editUsername, () => {
     if (!editUsername.value) {
-      cleanup?.();
-      unwatch();
+      cleanup?.()
+      unwatch()
     }
-  });
-};
+  })
+}
 </script>

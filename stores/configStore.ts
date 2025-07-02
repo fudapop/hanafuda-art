@@ -1,36 +1,36 @@
-import { defineStore } from "pinia";
-import { type YakuName, viewingYaku } from "~/utils/yaku";
+import { defineStore } from 'pinia'
+import { type YakuName, viewingYaku } from '~/utils/yaku'
 
 const OPTIONS = {
   GAME_LENGTH: [3, 6, 12] as const,
 
-  VIEWINGS: ["allow", "limited", "none"] as const,
-} as const;
+  VIEWINGS: ['allow', 'limited', 'none'] as const,
+} as const
 
-type GameLengthOptions = (typeof OPTIONS.GAME_LENGTH)[number];
-type ViewingsOptions = (typeof OPTIONS.VIEWINGS)[number];
+type GameLengthOptions = (typeof OPTIONS.GAME_LENGTH)[number]
+type ViewingsOptions = (typeof OPTIONS.VIEWINGS)[number]
 
 export interface GameSettings {
-  rounds: GameLengthOptions;
-  viewings: ViewingsOptions;
-  double: boolean;
-  wild: boolean;
-  labels: boolean;
-  fullscreen: boolean;
+  rounds: GameLengthOptions
+  viewings: ViewingsOptions
+  double: boolean
+  wild: boolean
+  labels: boolean
+  fullscreen: boolean
 }
 
-const useConfigStore = defineStore("config", () => {
-  const maxRounds = ref(3) as Ref<GameLengthOptions>;
+const useConfigStore = defineStore('config', () => {
+  const maxRounds = ref(3) as Ref<GameLengthOptions>
 
-  const allowViewingsYaku = ref("allow") as Ref<ViewingsOptions>;
+  const allowViewingsYaku = ref('allow') as Ref<ViewingsOptions>
 
-  const doubleScoreOverSeven = ref(false);
+  const doubleScoreOverSeven = ref(false)
 
-  const sakeIsWildCard = ref(false);
+  const sakeIsWildCard = ref(false)
 
-  const cardLabels = ref(false);
+  const cardLabels = ref(false)
 
-  const allowFullscreen = ref(false);
+  const allowFullscreen = ref(false)
 
   const getCurrentSettings = computed(
     (): GameSettings => ({
@@ -41,37 +41,37 @@ const useConfigStore = defineStore("config", () => {
       labels: cardLabels.value,
       fullscreen: allowFullscreen.value,
     }),
-  );
+  )
 
   function loadUserSettings(userSettings: GameSettings) {
-    maxRounds.value = userSettings.rounds;
-    allowViewingsYaku.value = userSettings.viewings;
-    doubleScoreOverSeven.value = userSettings.double;
-    sakeIsWildCard.value = userSettings.wild;
-    cardLabels.value = userSettings.labels;
-    allowFullscreen.value = userSettings.fullscreen;
+    maxRounds.value = userSettings.rounds
+    allowViewingsYaku.value = userSettings.viewings
+    doubleScoreOverSeven.value = userSettings.double
+    sakeIsWildCard.value = userSettings.wild
+    cardLabels.value = userSettings.labels
+    allowFullscreen.value = userSettings.fullscreen
   }
 
   /**
    * Filter an array/set of yaku based on set rule
    */
   function applyViewingsOption(yakuList: YakuName[]) {
-    const filteredList = yakuList.filter((yaku) => !viewingYaku.has(yaku));
+    const filteredList = yakuList.filter((yaku) => !viewingYaku.has(yaku))
 
     switch (allowViewingsYaku.value) {
-      case "none":
-        return filteredList;
+      case 'none':
+        return filteredList
 
-      case "limited":
+      case 'limited':
         if (filteredList.length) {
-          return yakuList;
+          return yakuList
         } else {
-          return filteredList;
+          return filteredList
         }
 
-      case "allow":
+      case 'allow':
       default:
-        return yakuList;
+        return yakuList
     }
   }
 
@@ -79,14 +79,14 @@ const useConfigStore = defineStore("config", () => {
    * Adds/removes the sake cup to the check for plains
    */
   function applyWildCardOption() {
-    const plains = YAKU.kasu.cards;
-    const isIncluded = plains.includes("kiku-ni-sakazuki");
+    const plains = YAKU.kasu.cards
+    const isIncluded = plains.includes('kiku-ni-sakazuki')
 
     if (sakeIsWildCard.value) {
-      if (!isIncluded) plains.push("kiku-ni-sakazuki");
+      if (!isIncluded) plains.push('kiku-ni-sakazuki')
     } else {
       if (isIncluded) {
-        plains.splice(plains.indexOf("kiku-ni-sakazuki"), 1);
+        plains.splice(plains.indexOf('kiku-ni-sakazuki'), 1)
       }
     }
   }
@@ -95,9 +95,9 @@ const useConfigStore = defineStore("config", () => {
    * Double score if base score (w/o bonus from koi-koi) is 7 or greater
    */
   function applyDoubleScoreOption(baseScore: number) {
-    if (!doubleScoreOverSeven.value) return baseScore;
-    if (baseScore < 7) return baseScore;
-    return baseScore * 2;
+    if (!doubleScoreOverSeven.value) return baseScore
+    if (baseScore < 7) return baseScore
+    return baseScore * 2
   }
 
   return {
@@ -113,7 +113,7 @@ const useConfigStore = defineStore("config", () => {
     applyWildCardOption,
     applyDoubleScoreOption,
     OPTIONS,
-  };
-});
+  }
+})
 
-export { useConfigStore, type GameLengthOptions, type ViewingsOptions };
+export { useConfigStore, type GameLengthOptions, type ViewingsOptions }

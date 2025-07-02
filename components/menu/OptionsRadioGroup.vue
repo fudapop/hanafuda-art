@@ -16,9 +16,9 @@
       >
         <div
           :class="[
-            active
-              ? 'border-indigo-600 dark:border-yellow-100 ring-2 ring-indigo-600 dark:ring-yellow-100'
-              : 'border-gray-300',
+            active ?
+              'border-indigo-600 dark:border-yellow-100 ring-2 ring-indigo-600 dark:ring-yellow-100'
+            : 'border-gray-300',
             'relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-800 p-4 shadow-sm focus:outline-none',
           ]"
         >
@@ -47,10 +47,7 @@
             </span>
           </span>
           <CheckCircleIcon
-            :class="[
-              !checked ? 'invisible' : '',
-              'h-5 w-5 text-indigo-600 dark:text-yellow-300',
-            ]"
+            :class="[!checked ? 'invisible' : '', 'h-5 w-5 text-indigo-600 dark:text-yellow-300']"
             aria-hidden="true"
           />
           <span
@@ -68,27 +65,21 @@
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon } from "@heroicons/vue/20/solid";
+import { CheckCircleIcon } from '@heroicons/vue/20/solid'
 
-type ModelVal = string | number | boolean | Record<string, any> | undefined;
+type ModelVal = string | number | boolean | Record<string, any> | undefined
 
-const {
-  modelValue,
-  updateCallback,
-  valueOptions,
-  labelTemplate,
-  optionDescriptions,
-  className,
-} = defineProps<{
-  modelValue: ModelVal;
-  valueOptions: ModelVal[] | readonly ModelVal[];
-  updateCallback: (param: ModelVal) => void;
-  className?: string;
-  optionDescriptions?: string[];
-  labelTemplate?: (param: ModelVal) => string;
-  descriptionTemplate?: (param: ModelVal) => string;
-}>();
+const { modelValue, updateCallback, valueOptions, labelTemplate, optionDescriptions, className } =
+  defineProps<{
+    modelValue: ModelVal
+    valueOptions: ModelVal[] | readonly ModelVal[]
+    updateCallback: (param: ModelVal) => void
+    className?: string
+    optionDescriptions?: string[]
+    labelTemplate?: (param: ModelVal) => string
+    descriptionTemplate?: (param: ModelVal) => string
+  }>()
 
-const selectedOption = ref(modelValue);
-watch(selectedOption, () => updateCallback(selectedOption.value));
+const selectedOption = ref(modelValue)
+watch(selectedOption, () => updateCallback(selectedOption.value))
 </script>

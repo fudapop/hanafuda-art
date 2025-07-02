@@ -1,9 +1,19 @@
 <template>
   <div>
-    <button type="button" v-if="!user" class="sec-btn" @click="login">
+    <button
+      type="button"
+      v-if="!user"
+      class="sec-btn"
+      @click="login"
+    >
       Login &rarr;
     </button>
-    <button type="button" v-else class="sec-btn" @click="logoutUser">
+    <button
+      type="button"
+      v-else
+      class="sec-btn"
+      @click="logoutUser"
+    >
       &larr; Logout
     </button>
     <div
@@ -16,22 +26,22 @@
 </template>
 
 <script setup lang="ts">
-const { logout, error } = useAuth();
-const user = useCurrentUser();
+const { logout, error } = useAuth()
+const user = useCurrentUser()
 
 const login = () => {
-  navigateTo("/login");
-};
+  navigateTo('/login')
+}
 
 const logoutUser = () => {
-  logout();
-};
+  logout()
+}
 
 watch(user, () => {
   if (!user.value && useRoute().meta.requiresAuth) {
-    navigateTo("/login?exit=true");
+    navigateTo('/login?exit=true')
   }
-});
+})
 </script>
 
 <style scoped></style>

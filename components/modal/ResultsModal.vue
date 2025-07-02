@@ -1,6 +1,13 @@
 <template>
-  <HeadlessDialog :open="show" class="relative z-10">
-    <HeadlessTransitionRoot appear :show="show" unmount>
+  <HeadlessDialog
+    :open="show"
+    class="relative z-10"
+  >
+    <HeadlessTransitionRoot
+      appear
+      :show="show"
+      unmount
+    >
       <!-- BACKDROP -->
       <HeadlessTransitionChild
         as="template"
@@ -42,11 +49,20 @@
     </HeadlessTransitionRoot>
     <Teleport to="body">
       <div class="absolute inset-x-0 z-50 mx-auto w-max text-white bottom-[5%]">
-        <Button button-class="primary" :action="toggleOpacity">
-          <span class="mr-1 animate-pulse"> 
-          <EyeSlashIcon class="inline w-8 h-8 pb-1" v-if="modalHidden" />
-          <EyeIcon class="inline w-8 h-8 pb-1" v-else />
-          Show Board 
+        <Button
+          button-class="primary"
+          :action="toggleOpacity"
+        >
+          <span class="mr-1 animate-pulse">
+            <EyeSlashIcon
+              class="inline w-8 h-8 pb-1"
+              v-if="modalHidden"
+            />
+            <EyeIcon
+              class="inline w-8 h-8 pb-1"
+              v-else
+            />
+            Show Board
           </span>
         </Button>
       </div>
@@ -55,13 +71,13 @@
 </template>
 
 <script setup lang="ts">
-import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/outline";
-const { show } = defineProps<{ show: boolean }>();
-const dialogRef: Ref<HTMLElement | null> = ref(null);
-const modalHidden = ref(false);
+import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
+const { show } = defineProps<{ show: boolean }>()
+const dialogRef: Ref<HTMLElement | null> = ref(null)
+const modalHidden = ref(false)
 
 const toggleOpacity = () => {
-  modalHidden.value = !modalHidden.value;
-  dialogRef?.value?.classList.toggle("opacity-0");
-};
+  modalHidden.value = !modalHidden.value
+  dialogRef?.value?.classList.toggle('opacity-0')
+}
 </script>

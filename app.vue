@@ -18,45 +18,45 @@
 </template>
 
 <script setup lang="ts">
-import Toast, { POSITION } from "vue-toastification";
-import { vHide } from "~/utils/directives/vHide";
-import { vClickDisabled } from "~/utils/directives/vClickDisabled";
-import "vue-toastification/dist/index.css";
+import Toast, { POSITION } from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+import { vClickDisabled } from '~/utils/directives/vClickDisabled'
+import { vHide } from '~/utils/directives/vHide'
 
-const loading = ref(false);
-const nuxtApp = useNuxtApp();
-const vueApp = nuxtApp.vueApp;
+const loading = ref(false)
+const nuxtApp = useNuxtApp()
+const vueApp = nuxtApp.vueApp
 
-vueApp.directive("hide", vHide);
-vueApp.directive("click-disabled", vClickDisabled);
+vueApp.directive('hide', vHide)
+vueApp.directive('click-disabled', vClickDisabled)
 
 vueApp.use(Toast, {
   position: POSITION.TOP_CENTER,
   timeout: 2000,
-  transition: "Vue-Toastification__bounce",
+  transition: 'Vue-Toastification__bounce',
   maxToasts: 20,
   newestOnTop: true,
-});
+})
 
-nuxtApp.hook("page:start", () => {
-  loading.value = true;
-});
+nuxtApp.hook('page:start', () => {
+  loading.value = true
+})
 
-nuxtApp.hook("page:finish", async () => {
-  await sleep(500);
-  loading.value = false;
-  window.dispatchEvent(new CustomEvent("ptupdate"));
-});
+nuxtApp.hook('page:finish', async () => {
+  await sleep(500)
+  loading.value = false
+  window.dispatchEvent(new CustomEvent('ptupdate'))
+})
 
 onMounted(() => {
-  const googleScripts = [/.*\/www\.gstatic\.com\/.*/, /.*\/apis\.google\.com\/.*/];
-  const scripts = ref(document.head.querySelectorAll("script"));
+  const googleScripts = [/.*\/www\.gstatic\.com\/.*/, /.*\/apis\.google\.com\/.*/]
+  const scripts = ref(document.head.querySelectorAll('script'))
   scripts.value.forEach((script) => {
-    if (googleScripts.some((regex) => regex.test(script.src)) && script.type !== "text/partytown-x")
-      script.type = "text/partytown";
-  });
-  window.dispatchEvent(new CustomEvent("ptupdate"));
-});
+    if (googleScripts.some((regex) => regex.test(script.src)) && script.type !== 'text/partytown-x')
+      script.type = 'text/partytown'
+  })
+  window.dispatchEvent(new CustomEvent('ptupdate'))
+})
 </script>
 
 <style>

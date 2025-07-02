@@ -1,16 +1,17 @@
 {
   "bracketSameLine": false,
-  "singleQuote": false,
+  "singleQuote": true,
   "trailingComma": "all",
-  "semi": true,
+  "semi": false,
   "embeddedLanguageFormatting": "auto",
   "tabWidth": 2,
   "useTabs": false,
-  "printWidth": 120,
+  "printWidth": 100,
   "quoteProps": "consistent",
   "arrowParens": "always",
   "experimentalTernaries": true,
   "vueIndentScriptAndStyle": false,
   "bracketSpacing": true,
-  "proseWrap": "always"
+  "proseWrap": "always",
+  "singleAttributePerLine": true
 }

@@ -1,47 +1,47 @@
-import { storeToRefs } from "pinia";
-import { useGameDataStore } from "~/stores/gameDataStore";
+import { storeToRefs } from 'pinia'
+import { useGameDataStore } from '~/stores/gameDataStore'
 
-const watcher = ref();
+const watcher = ref()
 
 export const useDecisionHandler = () => {
-  type KoikoiDecision = "stop" | "koikoi" | "pending" | null;
-  
-  const useDecision = (): Ref<KoikoiDecision> => useState("decision", () => null);
+  type KoikoiDecision = 'stop' | 'koikoi' | 'pending' | null
 
-  const decision = useDecision();
-  const getDecision = computed(() => decision.value);
+  const useDecision = (): Ref<KoikoiDecision> => useState('decision', () => null)
 
-  const decisionIsPending = computed(() => decision.value === "pending");
+  const decision = useDecision()
+  const getDecision = computed(() => decision.value)
 
-  const koikoiIsCalled = computed(() => decision.value === "koikoi");
+  const decisionIsPending = computed(() => decision.value === 'pending')
+
+  const koikoiIsCalled = computed(() => decision.value === 'koikoi')
   const callKoikoi = () => {
-    decision.value = "koikoi";
-  };
+    decision.value = 'koikoi'
+  }
 
-  const stopIsCalled = computed(() => decision.value === "stop");
+  const stopIsCalled = computed(() => decision.value === 'stop')
   const callStop = () => {
-    decision.value = "stop";
-  };
+    decision.value = 'stop'
+  }
 
-  const noCalls = computed(() => decision.value === null);
+  const noCalls = computed(() => decision.value === null)
 
   const makeDecision = async (): Promise<KoikoiDecision> => {
-    decision.value = "pending";
+    decision.value = 'pending'
     while (decisionIsPending.value) {
-      console.log("Player is deciding...");
-      await sleep(500);
+      console.log('Player is deciding...')
+      await sleep(500)
     }
-    if (decision.value) console.info(decision.value.toUpperCase(), "was called.");
-    return decision.value;
-  };
+    if (decision.value) console.info(decision.value.toUpperCase(), 'was called.')
+    return decision.value
+  }
 
-  const {roundOver, gameOver} = storeToRefs(useGameDataStore());
+  const { roundOver, gameOver } = storeToRefs(useGameDataStore())
 
   if (!watcher.value) {
-    console.debug("Setting decision watcher...")
+    console.debug('Setting decision watcher...')
     watcher.value = watch([roundOver, gameOver], () => {
       if (roundOver.value === false || gameOver.value) {
-        decision.value = null;
+        decision.value = null
       }
     })
   }
@@ -58,5 +58,5 @@ export const useDecisionHandler = () => {
     getDecision,
     // Functions
     makeDecision,
-  };
-};
+  }
+}

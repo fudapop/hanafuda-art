@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-const { design, isNew = false } = defineProps<{ design: CardDesign; isNew?: boolean }>();
+const { design, isNew = false } = defineProps<{ design: CardDesign; isNew?: boolean }>()
 
-const info = computed(() => useCardDesign().getDesignInfo(design));
+const info = computed(() => useCardDesign().getDesignInfo(design))
 </script>

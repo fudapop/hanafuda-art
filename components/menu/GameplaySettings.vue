@@ -4,7 +4,10 @@
     class="grid max-h-[calc(100dvh-84px)] [@media(max-height:500px)]:max-h-[100dvh] xs:max-h-[75vh] gap-4 p-4 overflow-y-auto"
   >
     <ClientOnly>
-      <div v-show="!gameStart" class="space-y-5">
+      <div
+        v-show="!gameStart"
+        class="space-y-5"
+      >
         <!-- Set maximum for number of rounds per game -->
         <OptionsRadioGroup
           :model-value="config.maxRounds"
@@ -22,7 +25,10 @@
           :value-options="config.OPTIONS.VIEWINGS"
           :description-template="(option) => getOptionDescription(option as ViewingsOptions)"
         >
-          <a title="Tsukimi-/Hanami-zake" class="underline decoration-dotted underline-offset-4 cursor-help">
+          <a
+            title="Tsukimi-/Hanami-zake"
+            class="underline decoration-dotted underline-offset-4 cursor-help"
+          >
             Moon/Flower Viewing
           </a>
           <a
@@ -38,7 +44,9 @@
         </OptionsRadioGroup>
 
         <div class="flex">
-          <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">Other Variations</p>
+          <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
+            Other Variations
+          </p>
           <a
             href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
             title="Read about scoring on fudawiki.org"
@@ -52,11 +60,16 @@
         </div>
         <div class="pb-5 space-y-5">
           <!-- Set wild-card behavior for KIKU-NI-SAKAZUKI -->
-          <ToggleSwitch :callback="toggleSake" :init-value="config.sakeIsWildCard">
+          <ToggleSwitch
+            :callback="toggleSake"
+            :init-value="config.sakeIsWildCard"
+          >
             <template #label>Wild Card Sake Cup</template>
             <template #description
               >The
-              <a title="Kiku ni sakazuki" class="underline cursor-help underline-offset-4 decoration-dotted"
+              <a
+                title="Kiku ni sakazuki"
+                class="underline cursor-help underline-offset-4 decoration-dotted"
                 >sake cup</a
               >
               counts as both animal and plain types.</template
@@ -64,15 +77,23 @@
           </ToggleSwitch>
 
           <!-- Set additional scoring rule -->
-          <ToggleSwitch :callback="toggleDouble" :init-value="config.doubleScoreOverSeven">
+          <ToggleSwitch
+            :callback="toggleDouble"
+            :init-value="config.doubleScoreOverSeven"
+          >
             <template #label>Double Over Seven</template>
-            <template #description>Double the score if the combined yaku value is 7 points or greater.</template>
+            <template #description
+              >Double the score if the combined yaku value is 7 points or greater.</template
+            >
           </ToggleSwitch>
         </div>
       </div>
 
       <!-- Hide options and show current settings while game is in progress -->
-      <div v-show="gameStart" class="w-full">
+      <div
+        v-show="gameStart"
+        class="w-full"
+      >
         <p class="my-6 text-gray-600 dark:text-gray-300">
           <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
           Some settings are locked while a game is in progress.
@@ -80,7 +101,9 @@
         <ul class="grid w-full mx-auto gap-y-5">
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <span class="font-semibold"> Game Length </span>
-            <span class="text-indigo-600 capitalize dark:text-yellow-300"> {{ config.maxRounds }} rounds </span>
+            <span class="text-indigo-600 capitalize dark:text-yellow-300">
+              {{ config.maxRounds }} rounds
+            </span>
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
             <div>
@@ -101,7 +124,7 @@
               </span>
             </div>
             <span class="self-center text-indigo-600 capitalize dark:text-yellow-300">
-              {{ config.sakeIsWildCard ? "Enabled" : "Disabled" }}
+              {{ config.sakeIsWildCard ? 'Enabled' : 'Disabled' }}
             </span>
           </li>
           <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
@@ -112,7 +135,7 @@
               </span>
             </div>
             <span class="self-center text-indigo-600 capitalize dark:text-yellow-300">
-              {{ config.doubleScoreOverSeven ? "Enabled" : "Disabled" }}
+              {{ config.doubleScoreOverSeven ? 'Enabled' : 'Disabled' }}
             </span>
           </li>
         </ul>
@@ -120,14 +143,22 @@
 
       <div :class="['space-y-5 pb-5', gameStart ? 'order-first' : '']">
         <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">Interface</p>
-        <ToggleSwitch :callback="toggleLabels" :init-value="config.cardLabels">
+        <ToggleSwitch
+          :callback="toggleLabels"
+          :init-value="config.cardLabels"
+        >
           <template #label>Card Labels</template>
           <template #description>Include card corner labels to assist with matching.</template>
         </ToggleSwitch>
 
-        <ToggleSwitch :callback="toggleFullscreen" :init-value="config.allowFullscreen">
+        <ToggleSwitch
+          :callback="toggleFullscreen"
+          :init-value="config.allowFullscreen"
+        >
           <template #label>Allow Fullscreen</template>
-          <template #description>Enable to hide/show toggle button to enter/exit fullscreen mode.</template>
+          <template #description
+            >Enable to hide/show toggle button to enter/exit fullscreen mode.</template
+          >
         </ToggleSwitch>
       </div>
     </ClientOnly>
@@ -135,43 +166,48 @@
 </template>
 
 <script setup lang="ts">
-import { QuestionMarkCircleIcon, LockClosedIcon } from "@heroicons/vue/24/outline";
-import { useConfigStore, type ViewingsOptions, type GameLengthOptions, type GameSettings } from "~/stores/configStore";
-import { onClickOutside } from "@vueuse/core";
+import { QuestionMarkCircleIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
+import {
+  useConfigStore,
+  type ViewingsOptions,
+  type GameLengthOptions,
+  type GameSettings,
+} from '~/stores/configStore'
+import { onClickOutside } from '@vueuse/core'
 
-const config = useConfigStore();
-const settingsPanel: Ref<HTMLElement | null> = ref(null);
-const settingsUpdated = ref(false);
-const gameStart: Ref<boolean> = useState("start");
+const config = useConfigStore()
+const settingsPanel: Ref<HTMLElement | null> = ref(null)
+const settingsUpdated = ref(false)
+const gameStart: Ref<boolean> = useState('start')
 
 const toggleSake = (enabled: boolean) => {
-  config.sakeIsWildCard = enabled;
-};
+  config.sakeIsWildCard = enabled
+}
 
 const toggleDouble = (enabled: boolean) => {
-  config.doubleScoreOverSeven = enabled;
-};
+  config.doubleScoreOverSeven = enabled
+}
 
 const toggleLabels = (enabled: boolean) => {
-  config.cardLabels = enabled;
-};
+  config.cardLabels = enabled
+}
 
 const toggleFullscreen = (enabled: boolean) => {
-  config.allowFullscreen = enabled;
-};
+  config.allowFullscreen = enabled
+}
 
 const getOptionDescription = (option: ViewingsOptions) => {
   switch (option) {
-    case "allow":
-      return "Completion is scored normally.";
-    case "limited":
-      return "Requires another completed yaku to score points.";
-    case "none":
-      return "No points are scored for completion.";
+    case 'allow':
+      return 'Completion is scored normally.'
+    case 'limited':
+      return 'Requires another completed yaku to score points.'
+    case 'none':
+      return 'No points are scored for completion.'
   }
-};
+}
 
-const user = toValue(useProfile().current);
+const user = toValue(useProfile().current)
 
 /**
  * Load game settings from local storage or
@@ -180,9 +216,9 @@ const user = toValue(useProfile().current);
 const loadSettings = async () => {
   // const userSettings = getLocalData() ?? (await getProfileData())?.settings
   if (user && user.settings) {
-    config.loadUserSettings(user.settings as GameSettings);
+    config.loadUserSettings(user.settings as GameSettings)
   }
-};
+}
 
 // const getLocalData = () => {
 //   const localSettings = localStorage.getItem("hanafuda-settings");
@@ -195,27 +231,27 @@ const loadSettings = async () => {
  * Save selection in local storage and database if settings were changed
  */
 const saveSettings = () => {
-  if (!settingsUpdated.value || !user) return;
+  if (!settingsUpdated.value || !user) return
   if (!user.settings) {
-    console.info("Creating settings...");
+    console.info('Creating settings...')
   } else {
-    console.info("Updating settings...");
+    console.info('Updating settings...')
   }
-  user.settings = config.getCurrentSettings;
-  console.info("Profile updated.");
-  settingsUpdated.value = false;
-};
+  user.settings = config.getCurrentSettings
+  console.info('Profile updated.')
+  settingsUpdated.value = false
+}
 
 onMounted(async () => {
   // Database reads/writes minimized by using local storage.
-  await loadSettings();
+  await loadSettings()
   watch(config, () => {
-    settingsUpdated.value = true;
+    settingsUpdated.value = true
     // Register listener to save settings when the panel is closed.
     const cleanup = onClickOutside(settingsPanel, () => {
-      saveSettings();
-      cleanup?.();
-    });
-  });
-});
+      saveSettings()
+      cleanup?.()
+    })
+  })
+})
 </script>

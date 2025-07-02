@@ -12,14 +12,22 @@
       </div>
     </div>
     <div class="grid gap-4 pt-4 xs:grid-cols-2">
-      <OAuthProviderButton :action="linkAccount" provider="google" :onSuccess="() => $emit('success')" />
-      <OAuthProviderButton :action="linkAccount" provider="github" :onSuccess="() => $emit('success')" />
+      <OAuthProviderButton
+        :action="linkAccount"
+        provider="google"
+        :onSuccess="() => $emit('success')"
+      />
+      <OAuthProviderButton
+        :action="linkAccount"
+        provider="github"
+        :onSuccess="() => $emit('success')"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const { linkAccount } = useAuth();
+const { linkAccount } = useAuth()
 
-defineEmits(["success", "error"]);
+defineEmits(['success', 'error'])
 </script>

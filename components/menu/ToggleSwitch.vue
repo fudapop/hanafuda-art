@@ -1,5 +1,8 @@
 <template>
-  <HeadlessSwitchGroup as="div" class="flex items-center ml-1">
+  <HeadlessSwitchGroup
+    as="div"
+    class="flex items-center ml-1"
+  >
     <HeadlessSwitch
       v-model="enabled"
       :class="[
@@ -16,14 +19,16 @@
       >
         <span
           :class="[
-            enabled
-              ? 'opacity-0 duration-100 ease-out'
-              : 'opacity-100 duration-200 ease-in',
+            enabled ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in',
             'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity',
           ]"
           aria-hidden="true"
         >
-          <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+          <svg
+            class="w-3 h-3 text-gray-400"
+            fill="none"
+            viewBox="0 0 12 12"
+          >
             <path
               d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2"
               stroke="currentColor"
@@ -35,9 +40,7 @@
         </span>
         <span
           :class="[
-            enabled
-              ? 'opacity-100 duration-200 ease-in'
-              : 'opacity-0 duration-100 ease-out',
+            enabled ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out',
             'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity',
           ]"
           aria-hidden="true"
@@ -75,10 +78,10 @@
 
 <script setup lang="ts">
 const { callback, invert, initValue } = defineProps<{
-  callback: (param: boolean) => void;
-  invert?: boolean;
-  initValue: boolean;
-}>();
-const enabled = ref(initValue);
-watchEffect(() => callback(invert ? !enabled.value : enabled.value));
+  callback: (param: boolean) => void
+  invert?: boolean
+  initValue: boolean
+}>()
+const enabled = ref(initValue)
+watchEffect(() => callback(invert ? !enabled.value : enabled.value))
 </script>

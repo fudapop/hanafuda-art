@@ -1,1 +1,1 @@
-declare module "vue-number-animation";
+declare module 'vue-number-animation'
