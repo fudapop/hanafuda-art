@@ -1,9 +1,6 @@
 <template>
   <GameLayout>
-    <div
-      v-show="showLoader"
-      class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]"
-    >
+    <div v-show="showLoader" class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]">
       <CardsLoader />
     </div>
     <!-- <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader> -->
@@ -15,7 +12,7 @@
 
       <!-- OPPONENT COLLECTION -->
       <div class="pointer-events-none -z-10">
-        <LazyCollectionArea player="p2" @completed="(data) => handleCompletion(data)" />
+        <LazyCollectionArea player="p2" @completed="handleCompletion" />
       </div>
 
       <!-- FIELD -->
@@ -41,7 +38,7 @@
         >
           Card designs by {{ getDesignInfo().creator }} &rarr;
         </a>
-        <LazyCollectionArea class="-mt-2 pointer-events-none -z-10" player="p1" @completed="(data) => handleCompletion(data)" />
+        <LazyCollectionArea class="-mt-2 pointer-events-none -z-10" player="p1" @completed="handleCompletion" />
       </div>
 
       <!-- PLAYER HAND -->
@@ -122,13 +119,7 @@ const gameTest = useState("test");
 
 const toast = useToast();
 
-const {
-  decisionIsPending,
-  makeDecision,
-  callStop,
-  koikoiIsCalled,
-  stopIsCalled,
-} = useDecisionHandler();
+const { decisionIsPending, makeDecision, callStop, koikoiIsCalled, stopIsCalled } = useDecisionHandler();
 
 const handleDecision = async () => await makeDecision();
 
@@ -143,10 +134,10 @@ const handleCompletion = (data: CompletionEvent) => {
   }
   consoleLogColor("\tScore: " + score, "lightblue");
   ds.saveResult({
-        winner: player,
-        score: score * ps.bonusMultiplier,
-        completedYaku,
-      });
+    winner: player,
+    score: score * ps.bonusMultiplier,
+    completedYaku,
+  });
   handleDecision();
 };
 
@@ -248,9 +239,7 @@ const checkDeal = () => {
       };
       // Game round is reset if win condition exists on the field
       if (result?.player === "field") {
-        console.log(
-          `Revealed ${result.completedYaku[0].name.toUpperCase()}. Resetting...`
-        );
+        console.log(`Revealed ${result.completedYaku[0].name.toUpperCase()}. Resetting...`);
         cs.reset();
         startRound();
         return;
@@ -318,5 +307,4 @@ onBeforeUnmount(() => {
   // Clear stored data
   // sessionStorage?.removeItem("new-hanafuda");
 });
-
 </script>

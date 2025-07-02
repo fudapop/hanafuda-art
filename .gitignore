@@ -19,6 +19,7 @@ logs
 .vscode
 wip
 .firebase
+assets/HNFD*
 
 # Local env files
 .env

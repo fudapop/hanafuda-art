@@ -35,11 +35,7 @@
           v-if="userIsGuest"
           type="button"
           class="px-6 py-2 text-lg font-medium text-white bg-transparent rounded-lg hover:bg-gray-500/50 sec-btn"
-          @click="
-            () => {
-              navigateTo({ path: '/login', query: { signup: 'true' } });
-            }
-          "
+          @click="goToLogin"
         >
           Sign up
         </button>
@@ -67,6 +63,10 @@ const { userIsGuest, logout } = useAuth();
 const testGame = () => {
   testPlay.value = true;
   emit("start-game");
+};
+
+const goToLogin = () => {
+  navigateTo({ path: "/login", query: { signup: "true" } });
 };
 
 const handleSignin = () => {

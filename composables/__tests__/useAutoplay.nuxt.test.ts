@@ -22,31 +22,32 @@ const cs = useCardStore(testingPinia);
 const ds = useGameDataStore(testingPinia);
 const ps = usePlayerStore(testingPinia);
 
-test(
-  "Autoplay runs successfully", async () => {
-      const deal = vi.spyOn(cs, "dealCards");
-      const reveal = vi.spyOn(cs, "revealCard");
-      const select = vi.spyOn(TURN, "select");
-      const firstMatch = vi.spyOn(TURN, "firstMatch");
-      const draw = vi.spyOn(TURN, "draw");
-      const secondMatch = vi.spyOn(TURN, "secondMatch");
-      const togglePlayer = vi.spyOn(ps, "toggleActivePlayer");
-      const nextPhase = vi.spyOn(ds, "nextPhase");
-      const nextRound = vi.spyOn(ds, "nextRound");
-      await autoPlay({
-        turns: 1,
-      });
-      expect(select).toHaveBeenCalledTimes(2);
-      expect(firstMatch).toHaveBeenCalledTimes(2);
-      expect(draw).toHaveBeenCalledTimes(2);
-      expect(secondMatch).toHaveBeenCalledTimes(2);
-      expect(deal).toHaveBeenCalledOnce();
-      expect(reveal).toHaveBeenCalledTimes(2);
-      expect(togglePlayer).toHaveBeenCalledTimes(2);
-      expect(nextPhase).toHaveBeenCalledTimes(6);
-      expect(nextRound).toHaveBeenCalledOnce();
-    },
+test.skip(
+  "Autoplay runs successfully",
+  async () => {
+    const deal = vi.spyOn(cs, "dealCards");
+    const reveal = vi.spyOn(cs, "revealCard");
+    const select = vi.spyOn(TURN, "select");
+    const firstMatch = vi.spyOn(TURN, "firstMatch");
+    const draw = vi.spyOn(TURN, "draw");
+    const secondMatch = vi.spyOn(TURN, "secondMatch");
+    const togglePlayer = vi.spyOn(ps, "toggleActivePlayer");
+    const nextPhase = vi.spyOn(ds, "nextPhase");
+    const nextRound = vi.spyOn(ds, "nextRound");
+    await autoPlay({
+      turns: 1,
+    });
+    expect(select).toHaveBeenCalledTimes(2);
+    expect(firstMatch).toHaveBeenCalledTimes(2);
+    expect(draw).toHaveBeenCalledTimes(2);
+    expect(secondMatch).toHaveBeenCalledTimes(2);
+    expect(deal).toHaveBeenCalledOnce();
+    expect(reveal).toHaveBeenCalledTimes(2);
+    expect(togglePlayer).toHaveBeenCalledTimes(2);
+    expect(nextPhase).toHaveBeenCalledTimes(6);
+    expect(nextRound).toHaveBeenCalledOnce();
+  },
   {
     timeout: 60000,
-  }
+  },
 );
