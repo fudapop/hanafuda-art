@@ -1,6 +1,7 @@
 {
-  "name": "nuxt-app",
+  "name": "new-hanafuda",
   "private": true,
+  "version": "1.0.0",
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
@@ -8,7 +9,13 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "prerelease": "npm run test",
+    "version": "npm run generate && git add -A",
+    "postversion": "git push && git push --tags",
+    "release:patch": "npm version patch -m \"Release v%s\"",
+    "release:minor": "npm version minor -m \"Release v%s\"",
+    "release:major": "npm version major -m \"Release v%s\""
   },
   "devDependencies": {
     "@heroicons/vue": "^2.0.18",

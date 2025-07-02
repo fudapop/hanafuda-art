@@ -1,4 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { readFileSync } from "fs";
+import { resolve } from "path";
+
+const pkg = JSON.parse(readFileSync(resolve("./package.json"), "utf-8"));
+
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   components: [
@@ -118,6 +123,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       nodeEnv: process.env.NODE_ENV,
+      version: pkg.version,
     },
   },
   ssr: false,
