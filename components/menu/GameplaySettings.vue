@@ -138,6 +138,17 @@
               {{ config.doubleScoreOverSeven ? 'Enabled' : 'Disabled' }}
             </span>
           </li>
+          <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
+            <div>
+              <span class="font-semibold"> Card Size </span>
+              <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
+                Controls the size of cards throughout the game.
+              </span>
+            </div>
+            <span class="self-center text-indigo-600 capitalize dark:text-yellow-300">
+              {{ getCardSizeLabel(config.cardSizeMultiplier) }}
+            </span>
+          </li>
         </ul>
       </div>
 
@@ -160,20 +171,30 @@
             >Enable to hide/show toggle button to enter/exit fullscreen mode.</template
           >
         </ToggleSwitch>
+
+        <OptionsRadioGroup
+          :model-value="config.cardSizeMultiplier"
+          :update-callback="(option) => (config.cardSizeMultiplier = option as CardSizeOptions)"
+          :value-options="config.OPTIONS.CARD_SIZE"
+          :label-template="(option) => getCardSizeLabel(option as CardSizeOptions)"
+        >
+          Card Size
+        </OptionsRadioGroup>
       </div>
     </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
-import { QuestionMarkCircleIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
+import { LockClosedIcon, QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
+import { onClickOutside } from '@vueuse/core'
 import {
   useConfigStore,
-  type ViewingsOptions,
+  type CardSizeOptions,
   type GameLengthOptions,
   type GameSettings,
+  type ViewingsOptions,
 } from '~/stores/configStore'
-import { onClickOutside } from '@vueuse/core'
 
 const config = useConfigStore()
 const settingsPanel: Ref<HTMLElement | null> = ref(null)
@@ -194,6 +215,23 @@ const toggleLabels = (enabled: boolean) => {
 
 const toggleFullscreen = (enabled: boolean) => {
   config.allowFullscreen = enabled
+}
+
+const updateCardSize = (size: CardSizeOptions) => {
+  config.cardSizeMultiplier = size
+}
+
+const getCardSizeLabel = (size: CardSizeOptions) => {
+  switch (size) {
+    case 0.8:
+      return 'Small'
+    case 1.0:
+      return 'Normal'
+    case 1.2:
+      return 'Large'
+    default:
+      return 'Normal'
+  }
 }
 
 const getOptionDescription = (option: ViewingsOptions) => {

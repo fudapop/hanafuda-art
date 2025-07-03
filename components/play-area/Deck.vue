@@ -9,7 +9,7 @@
       >
         <div
           v-if="ps.bonusMultiplier > 1"
-          class="w-full sm:w-1/2 text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 sm:top-1/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
+          class="w-full text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
         >
           <TransitionGroup
             appear
@@ -36,7 +36,9 @@
       </Transition>
 
       <!-- DECK PILE -->
-      <div class="absolute inset-y-0 my-auto overflow-hidden shadow-md sm:right-4 card down"></div>
+      <div
+        class="absolute inset-y-0 my-auto overflow-hidden -translate-x-1/2 shadow-md left-1/2 card down"
+      ></div>
 
       <!-- Show revealed card when drawing from deck         -->
       <HeadlessTransitionRoot
@@ -54,7 +56,7 @@
         >
           <div
             v-if="revealedCard"
-            class="relative z-30 overflow-hidden transition-transform sm:translate-x-3/4 card"
+            class="relative z-30 overflow-hidden transition-transform card"
           >
             <template v-if="useConfigStore().cardLabels">
               <LazyCardLabel :card="revealedCard" />
@@ -81,11 +83,11 @@
 </template>
 
 <script setup lang="ts">
+import { useCardDesign } from '~/composables/useCardDesign'
+import { useCardHandler } from '~/composables/useCardHandler'
+import { useConfigStore } from '~/stores/configStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { usePlayerStore } from '~/stores/playerStore'
-import { useConfigStore } from '~/stores/configStore'
-import { useCardHandler } from '~/composables/useCardHandler'
-import { useCardDesign } from '~/composables/useCardDesign'
 
 const ps = usePlayerStore()
 const ds = useGameDataStore()

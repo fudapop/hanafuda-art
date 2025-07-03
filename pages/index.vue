@@ -14,10 +14,10 @@
       <LazyOpponentArea />
 
       <!-- OPPONENT COLLECTION -->
-      <div class="">
+      <div>
         <LazyCollectionArea
           player="p2"
-          @completed="(data) => handleCompletion(data)"
+          @completed="handleCompletion"
         />
       </div>
 
@@ -44,11 +44,12 @@
         >
           Card designs by {{ getDesignInfo().creator }} &rarr;
         </a>
-        <LazyCollectionArea
-          class="-mt-2 pointer-events-none -z-10"
-          player="p1"
-          @completed="handleCompletion"
-        />
+        <div class="-mt-2 -z-10">
+          <LazyCollectionArea
+            player="p1"
+            @completed="handleCompletion"
+          />
+        </div>
       </div>
 
       <!-- PLAYER HAND -->
@@ -124,7 +125,7 @@ const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
 
 const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
-const { getDesignInfo } = useCardDesign()
+const { getDesignInfo, applyCardSizeMultiplier } = useCardDesign()
 
 const { autoPlay, opponentPlay, useOpponent } = useAutoplay()
 const autoOpponent: Ref<boolean> = useOpponent()
@@ -324,5 +325,10 @@ onBeforeUnmount(() => {
   handleClose()
   // Clear stored data
   // sessionStorage?.removeItem("new-hanafuda");
+})
+
+onMounted(() => {
+  // Apply card size multiplier from user settings
+  applyCardSizeMultiplier()
 })
 </script>

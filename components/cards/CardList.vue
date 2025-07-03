@@ -31,15 +31,13 @@
 </template>
 
 <script setup lang="ts">
-import { useCardDesign } from '~/composables/useCardDesign'
-import { type CardName } from '~/utils/cards'
 import { useCardStore } from '~/stores/cardStore'
+import { type CardName } from '~/utils/cards'
 
 const { cards, stack = false } = defineProps<{
   cards: Set<CardName> | CardName[]
   stack?: boolean
 }>()
-
 const { getCardUrl, useDesign } = useCardDesign()
 const currentDesign = useDesign()
 

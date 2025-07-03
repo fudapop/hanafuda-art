@@ -1,7 +1,8 @@
 import { useStorage } from '@vueuse/core'
-import { type CardName, DECK } from '~/utils/cards'
 import { getDownloadURL, getStorage, ref as storageRef, updateMetadata } from 'firebase/storage'
 import CARD_DESIGNS from '~/assets/designInfo.json'
+import { useConfigStore } from '~/stores/configStore'
+import { type CardName, DECK } from '~/utils/cards'
 
 export type DesignInfo = {
   name: string
@@ -133,12 +134,32 @@ export const useCardDesign = () => {
     return CARD_MAP.value
   }
 
+  /**
+   * Apply card size multiplier from config to CSS custom properties
+   */
+  const applyCardSizeMultiplier = () => {
+    const config = useConfigStore()
+
+    watch(
+      () => config.cardSizeMultiplier,
+      (multiplier) => {
+        if (document) {
+          const baseHeight = 140 // Base card height in pixels
+          const newHeight = baseHeight * multiplier
+          document.body.style.setProperty('--card-height', `${newHeight}px`)
+        }
+      },
+      { immediate: true },
+    )
+  }
+
   return {
     fetchCardUrls,
     useDesign,
     useDesignPath,
     getCardUrl,
     getDesignInfo,
+    applyCardSizeMultiplier,
     DESIGNS,
   }
 }

@@ -5,10 +5,13 @@ const OPTIONS = {
   GAME_LENGTH: [3, 6, 12] as const,
 
   VIEWINGS: ['allow', 'limited', 'none'] as const,
+
+  CARD_SIZE: [0.8, 1.0, 1.2] as const,
 } as const
 
 type GameLengthOptions = (typeof OPTIONS.GAME_LENGTH)[number]
 type ViewingsOptions = (typeof OPTIONS.VIEWINGS)[number]
+type CardSizeOptions = (typeof OPTIONS.CARD_SIZE)[number]
 
 export interface GameSettings {
   rounds: GameLengthOptions
@@ -17,6 +20,7 @@ export interface GameSettings {
   wild: boolean
   labels: boolean
   fullscreen: boolean
+  cardSize: CardSizeOptions
 }
 
 const useConfigStore = defineStore('config', () => {
@@ -32,6 +36,8 @@ const useConfigStore = defineStore('config', () => {
 
   const allowFullscreen = ref(false)
 
+  const cardSizeMultiplier = ref(1.0) as Ref<CardSizeOptions>
+
   const getCurrentSettings = computed(
     (): GameSettings => ({
       rounds: maxRounds.value,
@@ -40,6 +46,7 @@ const useConfigStore = defineStore('config', () => {
       wild: sakeIsWildCard.value,
       labels: cardLabels.value,
       fullscreen: allowFullscreen.value,
+      cardSize: cardSizeMultiplier.value,
     }),
   )
 
@@ -50,6 +57,7 @@ const useConfigStore = defineStore('config', () => {
     sakeIsWildCard.value = userSettings.wild
     cardLabels.value = userSettings.labels
     allowFullscreen.value = userSettings.fullscreen
+    cardSizeMultiplier.value = userSettings.cardSize ?? 1.0
   }
 
   /**
@@ -107,6 +115,7 @@ const useConfigStore = defineStore('config', () => {
     sakeIsWildCard,
     cardLabels,
     allowFullscreen,
+    cardSizeMultiplier,
     getCurrentSettings,
     loadUserSettings,
     applyViewingsOption,
@@ -116,4 +125,4 @@ const useConfigStore = defineStore('config', () => {
   }
 })
 
-export { useConfigStore, type GameLengthOptions, type ViewingsOptions }
+export { useConfigStore, type CardSizeOptions, type GameLengthOptions, type ViewingsOptions }
