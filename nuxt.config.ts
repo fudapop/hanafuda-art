@@ -89,6 +89,11 @@ export default defineNuxtConfig({
       baseURL: 'https://res.cloudinary.com/dap2o5kiu/image/upload',
     },
   },
+  i18n: {
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
+  },
   modules: [
     '@pinia/nuxt',
     '@nuxtjs/tailwindcss',

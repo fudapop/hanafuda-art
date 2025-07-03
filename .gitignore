@@ -21,6 +21,8 @@ wip
 .firebase
 assets/HNFD*
 *.sh
+.cursorrules
+/notes
 
 # Local env files
 .env
