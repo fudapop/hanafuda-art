@@ -65,5 +65,5 @@
 </template>
 
 <script setup lang="ts">
-const { open, ref: modalRef } = defineProps<{ open: boolean; ref?: string }>()
+const { open, modalRef } = defineProps<{ open: boolean; modalRef?: string }>()
 </script>
