@@ -119,5 +119,31 @@ const { noText } = defineProps<{ noText?: boolean }>()
       } */
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animated-card {
+      animation-duration: 0s;
+    }
+    .one {
+      animation-name: none;
+      transform: translate(-30px, 5px) rotate(-45deg);
+    }
+    .two {
+      animation-name: none;
+      transform: translate(-15px) rotate(-25deg);
+    }
+    .three {
+      animation-name: none;
+      transform: rotate(-5deg);
+    }
+    .four {
+      animation-name: none;
+      transform: translate(15px, 5px) rotate(15deg);
+    }
+    .five {
+      animation-name: none;
+      transform: translate(28px, 14px) rotate(35deg);
+    }
+  }
 }
 </style>
