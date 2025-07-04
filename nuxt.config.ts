@@ -103,6 +103,7 @@ export default defineNuxtConfig({
     'nuxt-vuefire',
     '@nuxtjs/partytown',
     '@nuxtjs/i18n',
+    '@nuxt/content',
   ],
   postcss: {
     plugins: {
