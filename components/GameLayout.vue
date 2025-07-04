@@ -180,8 +180,8 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
 import { ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/24/outline'
+import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { usePlayerStore } from '~/stores/playerStore'
 

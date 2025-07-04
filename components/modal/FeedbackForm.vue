@@ -125,7 +125,7 @@
 
 <script setup lang="ts">
 import { ChatBubbleLeftEllipsisIcon, CheckIcon } from '@heroicons/vue/24/outline'
-import { doc, setDoc, getFirestore, Timestamp } from 'firebase/firestore'
+import { doc, getFirestore, setDoc, Timestamp } from 'firebase/firestore'
 import { nanoid } from 'nanoid'
 
 const { open } = defineProps<{ open: boolean }>()
