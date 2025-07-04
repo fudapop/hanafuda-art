@@ -1,6 +1,5 @@
 <template>
   <div class="gap-1 opacity-75 collection-area">
-    <!-- PLAYER 1 COLLECTION -->
     <ul
       v-for="type in cardTypes"
       :key="type"

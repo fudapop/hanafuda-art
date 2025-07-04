@@ -102,13 +102,14 @@
         >
           <button
             type="button"
+            aria-label="Like this design"
             @click="() => handleLike(design)"
             class="relative float-right mt-4 pointer-events-auto focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300"
           >
-            <span
+            <!-- <span
               class="absolute pt-1 m-auto text-sm text-gray-900 opacity-50 -left-3 dark:text-white"
               >{{ likesCount.get(design) }}</span
-            >
+            > -->
             <HeartIcon
               :aria-hidden="true"
               :class="[

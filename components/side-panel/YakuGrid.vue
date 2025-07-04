@@ -1,5 +1,51 @@
 <template>
+  <div
+    class="min-w-[300px]"
+    v-if="!!focusedYaku"
+  >
+    <div
+      class="block w-full overflow-y-visible rounded-sm group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
+    >
+      <!-- CARD IMAGES -->
+      <div
+        v-if="showCards"
+        class="[--card-height:100px] w-max"
+      >
+        <ul className="list-none grid grid-rows-1 grid-flow-col">
+          <CardList
+            :cards="focusedYaku.cards"
+            :stack="false"
+            itemClass="transition-transform duration-200 motion-safe:hover:-translate-y-[5%] motion-safe:hover:scale-150 motion-safe:hover:z-10"
+          />
+        </ul>
+      </div>
+    </div>
+    <!-- YAKU TITLE -->
+    <div class="flex items-center justify-between mt-2">
+      <div class="flex items-center gap-x-4">
+        <a
+          :title="YAKU[focusedYaku.name].description.toString()"
+          class="block text-sm font-semibold tracking-wide text-gray-900 truncate dark:text-white cursor-help"
+        >
+          {{ focusedYaku.name.toUpperCase() }}
+        </a>
+        <!-- YAKU POINTS -->
+        <p class="block text-sm font-medium text-gray-500 pointer-events-none dark:text-gray-400">
+          {{ focusedYaku.points }}
+          points
+        </p>
+      </div>
+
+      <button
+        class="sec-btn"
+        @click="focusedYaku = null"
+      >
+        Back
+      </button>
+    </div>
+  </div>
   <ul
+    v-else
     role="list"
     class="min-w-[300px] grid p-2 gap-4 sm:grid-cols-[repeat(2,minmax(300px,1fr))]"
   >
@@ -25,28 +71,40 @@
         </div>
       </div>
       <!-- YAKU TITLE -->
-      <a
-        :title="YAKU[yaku.name].description.toString()"
-        class="block mt-2 text-sm font-semibold tracking-wide text-gray-900 truncate dark:text-white cursor-help"
-      >
-        {{ yaku.name.toUpperCase() }}
-      </a>
-      <!-- YAKU POINTS -->
-      <p class="block text-sm font-medium text-gray-500 pointer-events-none dark:text-gray-400">
-        {{ yaku.points }}
-        points
-      </p>
+      <div class="flex items-center mt-2 gap-x-4">
+        <div class="flex flex-col">
+          <a
+            :title="YAKU[yaku.name].description.toString()"
+            class="block text-sm font-semibold tracking-wide text-gray-900 truncate dark:text-white cursor-help"
+          >
+            {{ yaku.name.toUpperCase() }}
+          </a>
+          <!-- YAKU POINTS -->
+          <p class="block text-sm font-medium text-gray-500 pointer-events-none dark:text-gray-400">
+            {{ yaku.points }}
+            points
+          </p>
+        </div>
+        <button
+          button-class="secondary"
+          @click="focusedYaku = yaku"
+        >
+          <MagnifyingGlassIcon class="w-4 h-4" />
+          <span class="sr-only">View Cards</span>
+        </button>
+      </div>
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
+import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 import { type CompletedYaku, YAKU } from '~/utils/yaku'
 
 const { completed, showCards } = defineProps<{
   completed: CompletedYaku[]
   showCards?: boolean
 }>()
-</script>
 
-<style scoped></style>
+const focusedYaku: Ref<CompletedYaku | null> = ref(null)
+</script>

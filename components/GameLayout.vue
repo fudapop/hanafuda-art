@@ -1,32 +1,48 @@
 <template>
   <div
-    class="sm:[@media_(max-height:500px)]:[--card-height:80px] grid grid-rows-[80px_1fr_80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-[100dvh] overflow-hidden relative"
+    class="sm:[@media_(max-height:500px)]:[--card-height:80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-[100dvh] overflow-hidden relative"
   >
     <!-- BACKGROUND ELEMENTS -->
-    <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
+    <div class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
       <GameBackground />
       <AnimatedBackground />
     </div>
 
-    <!-- OPTIONS MENU -->
-    <div class="absolute flex top-3 right-3 gap-x-4">
-      <OptionsMenu :tabCategories="tabs">
-        <template #tab-panel-1>
-          <DesignSelector />
-        </template>
-        <template #tab-panel-2>
-          <GameplaySettings />
-        </template>
-        <template #tab-panel-3>
-          <LazyProfilePanel />
-        </template>
-      </OptionsMenu>
-    </div>
-
     <!-- Allows interaction when game not started -->
     <Teleport to="body">
+      <!-- EXIT BUTTON -->
+      <div class="fixed w-max top-3 right-16">
+        <button
+          id="exit-button"
+          type="button"
+          @click="handlePressExit"
+          class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold drop-shadow-md"
+        >
+          <ArrowLeftEndOnRectangleIcon
+            class="w-8 h-8 text-white"
+            aria-hidden="true"
+          />
+          <span class="sr-only">Return to homepage</span>
+        </button>
+      </div>
+
+      <!-- OPTIONS MENU -->
+      <div class="fixed flex top-3 right-3 gap-x-4">
+        <OptionsMenu :tabCategories="tabs">
+          <template #tab-panel-1>
+            <DesignSelector />
+          </template>
+          <template #tab-panel-2>
+            <GameplaySettings />
+          </template>
+          <template #tab-panel-3>
+            <LazyProfilePanel />
+          </template>
+        </OptionsMenu>
+      </div>
+
       <!-- UI TOGGLE BUTTONS -->
-      <div class="absolute right-3 grid text-white min-w-[48px] top-20">
+      <div class="fixed right-3 grid text-white min-w-[48px] top-20">
         <FullscreenToggle />
         <ColorModeToggle />
       </div>
@@ -35,7 +51,7 @@
     <!-- OPPONENT STATUS BAR -->
     <div
       :class="{
-        'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-b-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
+        'z-[-1] fixed top-0 inset-x-0 duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-b-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
         'opacity-40': players.p1.isActive,
         '-translate-y-full': !gameStart,
       }"
@@ -76,7 +92,7 @@
     <!-- PLAYER STATUS BAR -->
     <div
       :class="{
-        'z-[-1] duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-t-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
+        'z-[-1] fixed bottom-0 inset-x-0 duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-t-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
         'opacity-40': players.p2.isActive,
         'translate-y-full': !gameStart,
       }"
@@ -91,7 +107,7 @@
 
     <!-- SIDEBAR -->
     <template v-if="gameStart">
-      <div class="absolute bottom-4 right-4">
+      <div class="fixed bottom-4 right-4">
         <button
           v-show="!sidebarOpen"
           title="View Collection Progress"
@@ -120,22 +136,6 @@
         @close="() => (sidebarOpen = false)"
       />
     </template>
-
-    <!-- EXIT BUTTON -->
-    <div class="absolute w-max top-3 right-16">
-      <button
-        id="exit-button"
-        type="button"
-        @click="handlePressExit"
-        class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold drop-shadow-md"
-      >
-        <ArrowLeftEndOnRectangleIcon
-          class="w-8 h-8 text-white"
-          aria-hidden="true"
-        />
-        <span class="sr-only">Return to homepage</span>
-      </button>
-    </div>
 
     <!-- LOADER -->
     <Transition
