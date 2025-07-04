@@ -2,7 +2,7 @@
   <Transition
     mode="out-in"
     enter-to-class="opacity-100"
-    enter-from-class="opacity-0 -scale-x-[25%]"
+    enter-from-class="opacity-0 -scale-x-[25%] motion-reduce:scale-x-100"
     enter-active-class="duration-500"
     leave-to-class="opacity-0"
     leave-from-class="opacity-100"
@@ -53,7 +53,7 @@
     <CardsLoader
       v-else
       :no-text="true"
-      :class="selectedDesign"
+      :class="[selectedDesign]"
     />
   </Transition>
 </template>
@@ -224,6 +224,32 @@ onMounted(() => {
       /* to {
         transform: translate(0) rotate(0deg);
       } */
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animated-card {
+      animation-duration: 0s;
+    }
+    .one {
+      animation-name: none;
+      transform: translate(-30px, 5px) rotate(-45deg);
+    }
+    .two {
+      animation-name: none;
+      transform: translate(-15px) rotate(-25deg);
+    }
+    .three {
+      animation-name: none;
+      transform: rotate(-5deg);
+    }
+    .four {
+      animation-name: none;
+      transform: translate(15px, 5px) rotate(15deg);
+    }
+    .five {
+      animation-name: none;
+      transform: translate(28px, 14px) rotate(35deg);
     }
   }
 }

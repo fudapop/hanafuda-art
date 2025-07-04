@@ -31,11 +31,21 @@ type CardMap = Map<CardName, string>
 const CARD_MAP: Ref<CardMap | undefined> = ref()
 
 export const useCardDesign = () => {
+  /**
+   *
+   * @param designName (optional) Name of design to get info for. Defaults to current design.
+   * @returns Info for the current design or the design specified.
+   * See link for more: {@link DesignInfo}
+   *
+   */
+  const getDesignInfo = (designName?: CardDesign) =>
+    CARD_DESIGNS[designName ?? useDesign().value] as DesignInfo
+
   const getImage = async (designPath: string) => {
     const storage = getStorage()
     const imageFileRef = storageRef(storage, designPath)
     const newMetadata = {
-      contentType: 'image/webp',
+      contentType: `image/${designPath.split('.').pop() || 'webp'}`,
       cacheControl: 'public, max-age=31536000',
     }
     updateMetadata(imageFileRef, newMetadata).catch((error) => {
@@ -118,16 +128,6 @@ export const useCardDesign = () => {
     const url = CARD_MAP.value?.get(cardName)
     return url
   }
-
-  /**
-   *
-   * @param designName (optional) Name of design to get info for. Defaults to current design.
-   * @returns Info for the current design or the design specified.
-   * See link for more: {@link DesignInfo}
-   *
-   */
-  const getDesignInfo = (designName?: CardDesign) =>
-    CARD_DESIGNS[designName ?? useDesign().value] as DesignInfo
 
   const fetchCardUrls = async () => {
     CARD_MAP.value = await getCardMap(useDesign().value)

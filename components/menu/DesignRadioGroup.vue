@@ -40,7 +40,7 @@
         <Transition
           mode="out-in"
           enter-to-class="opacity-100"
-          enter-from-class="opacity-0 -scale-x-[25%]"
+          enter-from-class="opacity-0 -scale-x-[25%] motion-reduce:scale-x-100"
           enter-active-class="duration-500"
           leave-to-class="opacity-0"
           leave-from-class="opacity-100"
