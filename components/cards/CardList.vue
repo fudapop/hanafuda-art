@@ -6,6 +6,7 @@
       stack ? '[&:not(:first-child)]:max-sm:-ml-3 sm:[&:not(:first-child)]:-ml-2' : '',
       'origin-center',
       currentDesign,
+      itemClass,
     ]"
   >
     <CardTransition>
@@ -34,9 +35,14 @@
 import { useCardStore } from '~/stores/cardStore'
 import { type CardName } from '~/utils/cards'
 
-const { cards, stack = false } = defineProps<{
+const {
+  cards,
+  stack = false,
+  itemClass = '',
+} = defineProps<{
   cards: Set<CardName> | CardName[]
   stack?: boolean
+  itemClass?: string
 }>()
 const { getCardUrl, useDesign } = useCardDesign()
 const currentDesign = useDesign()

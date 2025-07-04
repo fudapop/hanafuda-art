@@ -3,8 +3,11 @@
     <HeadlessRadioGroupLabel
       class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200"
     >
-      <slot />
+      <slot name="group-label" />
     </HeadlessRadioGroupLabel>
+    <HeadlessRadioGroupDescription class="text-sm text-gray-500 dark:text-gray-300">
+      <slot name="group-description" />
+    </HeadlessRadioGroupDescription>
 
     <div :class="className || 'grid grid-cols-1 mt-2 mb-4 gap-y-3 sm:grid-cols-3 sm:gap-x-4'">
       <HeadlessRadioGroupOption
@@ -16,9 +19,9 @@
       >
         <div
           :class="[
-            active ?
-              'border-indigo-600 dark:border-yellow-100 ring-2 ring-indigo-600 dark:ring-yellow-100'
-            : 'border-gray-300',
+            active
+              ? 'border-indigo-600 dark:border-yellow-100 ring-2 ring-indigo-600 dark:ring-yellow-100'
+              : 'border-gray-300',
             'relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-800 p-4 shadow-sm focus:outline-none',
           ]"
         >

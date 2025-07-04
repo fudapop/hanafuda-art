@@ -138,17 +138,6 @@
               {{ config.doubleScoreOverSeven ? 'Enabled' : 'Disabled' }}
             </span>
           </li>
-          <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
-            <div>
-              <span class="font-semibold"> Card Size </span>
-              <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
-                Controls the size of cards throughout the game.
-              </span>
-            </div>
-            <span class="self-center text-indigo-600 capitalize dark:text-yellow-300">
-              {{ getCardSizeLabel(config.cardSizeMultiplier) }}
-            </span>
-          </li>
         </ul>
       </div>
 
@@ -178,7 +167,8 @@
           :value-options="config.OPTIONS.CARD_SIZE"
           :label-template="(option) => getCardSizeLabel(option as CardSizeOptions)"
         >
-          Card Size
+          <template #group-label>Card Size</template>
+          <template #group-description>Select the size that best suits your screen.</template>
         </OptionsRadioGroup>
       </div>
     </ClientOnly>
