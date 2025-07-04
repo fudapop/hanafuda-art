@@ -72,6 +72,22 @@
                 Continue as guest
               </NuxtLink>
             </div>
+
+            <!-- Legal Links -->
+            <div class="w-full space-x-4 text-xs text-center text-gray-500 dark:text-gray-400">
+              <NuxtLink
+                to="/terms"
+                class="underline hover:text-gray-700 dark:hover:text-gray-200"
+              >
+                Terms of Use
+              </NuxtLink>
+              <NuxtLink
+                to="/privacy"
+                class="underline hover:text-gray-700 dark:hover:text-gray-200"
+              >
+                Privacy Policy
+              </NuxtLink>
+            </div>
           </div>
         </div>
       </div>
