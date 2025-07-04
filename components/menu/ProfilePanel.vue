@@ -132,8 +132,8 @@
 </template>
 
 <script setup lang="ts">
+import { ExclamationCircleIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { onClickOutside, useDateFormat } from '@vueuse/core'
-import { PencilSquareIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 
 const user = useProfile().current
 const avatar = computed({

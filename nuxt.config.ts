@@ -5,7 +5,7 @@ import { resolve } from 'path'
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2024-11-01',
   components: [
     {
       path: '~/components',
@@ -36,7 +36,7 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-  css: ['@/assets/css/card-styles.css'],
+  css: ['~/assets/css/card-styles.css', '~/assets/css/global.css'],
   devtools: { enabled: false },
   app: {
     head: {
@@ -96,7 +96,6 @@ export default defineNuxtConfig({
   },
   modules: [
     '@pinia/nuxt',
-    '@nuxtjs/tailwindcss',
     'nuxt-icon',
     'nuxt-headlessui',
     '@nuxt/image',
@@ -133,9 +132,6 @@ export default defineNuxtConfig({
     },
   },
   ssr: false,
-  tailwindcss: {
-    viewer: false,
-  },
   vuefire: {
     auth: true,
     appCheck: {
