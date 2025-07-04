@@ -52,6 +52,7 @@
     "@firebase/app-types": "^0.9.0",
     "@headlessui/tailwindcss": "^0.2.0",
     "@nuxt/content": "^3.6.2",
+    "@tailwindcss/typography": "^0.5.16",
     "better-sqlite3": "^12.0.0",
     "firebase": "^10.1.0",
     "firebase-admin": "^11.10.1",

@@ -1,7 +1,16 @@
 <template>
   <div class="fixed flex justify-between w-screen gap-4 px-4 opacity-30 bottom-2">
-    <div class="flex items-center gap-x-4">
-      <div class="flex items-center justify-end order-last w-max gap-x-4">
+    <!-- Left side: Attribution and links -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-2">
+      <!-- Attribution text -->
+      <div class="grid text-xs text-white">
+        <p v-if="!!design.creator">Designs by {{ design.creator }}</p>
+        <p v-else-if="!!design.contributor">Art by {{ design.contributor }}</p>
+        <p>&copy; {{ new Date().getFullYear() }} FudaPop - Developed by Andre Hammons</p>
+      </div>
+
+      <!-- Action links -->
+      <div class="flex items-center gap-x-4">
         <!-- PORTFOLIO LINK -->
         <a
           href="https://www.andrehammons.dev"
@@ -19,7 +28,7 @@
           target="_blank"
         >
           <svg
-            class="w-5 h-5 mx-auto"
+            class="w-5 h-5 mx-auto transition-colors fill-white/70 hover:fill-white"
             aria-hidden="true"
             fill="white"
             viewBox="0 0 20 20"
@@ -45,7 +54,7 @@
         >
           <Icon
             name="fa:paint-brush"
-            class="w-5 h-5 mx-auto text-white"
+            class="w-5 h-5 mx-auto transition-colors text-white/70 hover:text-white"
           />
           <span class="sr-only">View creator's or contributor's website</span>
         </NuxtLink>
@@ -60,27 +69,29 @@
         >
           <Icon
             name="fa:paint-brush"
-            class="w-5 h-5 mx-auto text-white"
+            class="w-5 h-5 mx-auto transition-colors text-white/70 hover:text-white"
           />
           <span class="sr-only">View creator's or contributor's website</span>
         </NuxtLink>
       </div>
-      <div class="grid text-xs text-white">
-        <p
-          v-memo="[design]"
-          v-if="!!design.creator"
+
+      <!-- LEGAL LINKS -->
+      <div class="flex items-center text-xs gap-x-2 text-white/70">
+        <NuxtLink
+          to="/terms"
+          class="transition-colors hover:text-white"
+          >Terms</NuxtLink
         >
-          Designs created by {{ design.creator }}
-        </p>
-        <p
-          v-memo="[design]"
-          v-else-if="!!design.contributor"
+        <span>•</span>
+        <NuxtLink
+          to="/privacy"
+          class="transition-colors hover:text-white"
+          >Privacy</NuxtLink
         >
-          Art contributed by {{ design.contributor }}
-        </p>
-        <p>&copy; {{ new Date().getFullYear() }} Site developed by Andre L. Hammons</p>
       </div>
     </div>
+
+    <!-- Right side: Version -->
     <div>
       <span class="text-xs tracking-widest text-white select-none">
         {{ $config.public.version }}
