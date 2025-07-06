@@ -2,13 +2,13 @@
   <div>
     <div class="grid items-center grid-cols-[1fr_1fr_1fr] w-full">
       <div aria-hidden="true">
-        <div class="w-full border-t border-gray-800 dark:border-gray-400/20" />
+        <div class="w-full border-t border-border" />
       </div>
       <div class="flex justify-center text-sm font-medium leading-6 w-max">
-        <span class="px-6 text-gray-900 dark:text-gray-300">or continue with</span>
+        <span class="px-6 text-text">or continue with</span>
       </div>
       <div aria-hidden="true">
-        <div class="w-full border-t border-gray-800 dark:border-gray-400/20" />
+        <div class="w-full border-t border-border" />
       </div>
     </div>
     <div class="grid gap-4 pt-4 xs:grid-cols-2">

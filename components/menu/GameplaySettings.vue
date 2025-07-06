@@ -6,7 +6,7 @@
     <ClientOnly>
       <div
         v-show="!gameStart"
-        class="space-y-5"
+        class="space-y-8"
       >
         <!-- Set maximum for number of rounds per game -->
         <OptionsRadioGroup
@@ -15,7 +15,7 @@
           :value-options="config.OPTIONS.GAME_LENGTH"
           :label-template="(option) => `${option} rounds`"
         >
-          Game Length
+          <template #group-label> Game Length </template>
         </OptionsRadioGroup>
 
         <!-- Set allowance of TSUKIMI-/HANAMI-ZAKE -->
@@ -25,67 +25,69 @@
           :value-options="config.OPTIONS.VIEWINGS"
           :description-template="(option) => getOptionDescription(option as ViewingsOptions)"
         >
-          <a
-            title="Tsukimi-/Hanami-zake"
-            class="underline decoration-dotted underline-offset-4 cursor-help"
-          >
-            Moon/Flower Viewing
-          </a>
-          <a
-            href="https://fudawiki.org/en/hanafuda/games/koi-koi#taming-the-sake-cup"
-            title="Read about this rule on fudawiki.org"
-            target="_blank"
-          >
-            <QuestionMarkCircleIcon
-              class="inline w-5 h-5 mb-1 text-gray-500 cursor-pointer dark:text-gray-300 hover:text-indigo-500 dark:hover:text-yellow-100"
-            />
-            <span class="sr-only">Read about this rule on fudawiki.org</span>
-          </a>
+          <template #group-label>
+            <a
+              title="Tsukimi-/Hanami-zake"
+              class="underline decoration-dotted underline-offset-4 cursor-help"
+            >
+              Moon/Flower Viewing
+            </a>
+            <a
+              href="https://fudawiki.org/en/hanafuda/games/koi-koi#taming-the-sake-cup"
+              title="Read about this rule on fudawiki.org"
+              target="_blank"
+            >
+              <QuestionMarkCircleIcon
+                class="inline w-5 h-5 mb-1 cursor-pointer text-text-secondary hover:text-primary"
+              />
+              <span class="sr-only">Read about this rule on fudawiki.org</span>
+            </a>
+          </template>
         </OptionsRadioGroup>
 
-        <div class="flex">
-          <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
-            Other Variations
-          </p>
-          <a
-            href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
-            title="Read about scoring on fudawiki.org"
-            target="_blank"
-          >
-            <QuestionMarkCircleIcon
-              class="inline w-5 h-5 mb-1 ml-1 text-gray-500 cursor-pointer dark:text-gray-300 hover:text-indigo-500 dark:hover:text-yellow-100"
-            />
-            <span class="sr-only">Read about scoring on fudawiki.org</span>
-          </a>
-        </div>
-        <div class="pb-5 space-y-5">
-          <!-- Set wild-card behavior for KIKU-NI-SAKAZUKI -->
-          <ToggleSwitch
-            :callback="toggleSake"
-            :init-value="config.sakeIsWildCard"
-          >
-            <template #label>Wild Card Sake Cup</template>
-            <template #description
-              >The
-              <a
-                title="Kiku ni sakazuki"
-                class="underline cursor-help underline-offset-4 decoration-dotted"
-                >sake cup</a
+        <div class="space-y-4">
+          <div class="flex">
+            <p class="text-base font-semibold leading-6 text-text">Other Variations</p>
+            <a
+              href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
+              title="Read about scoring on fudawiki.org"
+              target="_blank"
+            >
+              <QuestionMarkCircleIcon
+                class="inline w-5 h-5 mb-1 ml-1 cursor-pointer text-text-secondary hover:text-primary"
+              />
+              <span class="sr-only">Read about scoring on fudawiki.org</span>
+            </a>
+          </div>
+          <div class="pb-4 space-y-4">
+            <!-- Set wild-card behavior for KIKU-NI-SAKAZUKI -->
+            <ToggleSwitch
+              :callback="toggleSake"
+              :init-value="config.sakeIsWildCard"
+            >
+              <template #label>Wild Card Sake Cup</template>
+              <template #description
+                >The
+                <a
+                  title="Kiku ni sakazuki"
+                  class="underline cursor-help underline-offset-4 decoration-dotted"
+                  >sake cup</a
+                >
+                counts as both animal and plain types.</template
               >
-              counts as both animal and plain types.</template
-            >
-          </ToggleSwitch>
+            </ToggleSwitch>
 
-          <!-- Set additional scoring rule -->
-          <ToggleSwitch
-            :callback="toggleDouble"
-            :init-value="config.doubleScoreOverSeven"
-          >
-            <template #label>Double Over Seven</template>
-            <template #description
-              >Double the score if the combined yaku value is 7 points or greater.</template
+            <!-- Set additional scoring rule -->
+            <ToggleSwitch
+              :callback="toggleDouble"
+              :init-value="config.doubleScoreOverSeven"
             >
-          </ToggleSwitch>
+              <template #label>Double Over Seven</template>
+              <template #description
+                >Double the score if the combined yaku value is 7 points or greater.</template
+              >
+            </ToggleSwitch>
+          </div>
         </div>
       </div>
 
@@ -94,55 +96,53 @@
         v-show="gameStart"
         class="w-full"
       >
-        <p class="my-6 text-gray-600 dark:text-gray-300">
+        <p class="my-4 text-text-secondary">
           <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
           Some settings are locked while a game is in progress.
         </p>
-        <ul class="grid w-full mx-auto gap-y-5">
-          <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
+        <ul class="grid w-full mx-auto gap-y-4">
+          <li class="flex justify-between leading-6 text-text">
             <span class="font-semibold"> Game Length </span>
-            <span class="text-indigo-600 capitalize dark:text-yellow-300">
-              {{ config.maxRounds }} rounds
-            </span>
+            <span class="capitalize text-primary"> {{ config.maxRounds }} rounds </span>
           </li>
-          <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
+          <li class="flex justify-between leading-6 text-text">
             <div>
               <span class="font-semibold"> Moon/Flower Viewings </span>
-              <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
+              <span class="block w-3/4 pl-2 text-sm text-text-secondary">
                 {{ getOptionDescription(config.allowViewingsYaku) }}
               </span>
             </div>
-            <span class="self-center text-indigo-600 capitalize dark:text-yellow-300">
+            <span class="self-center capitalize text-primary">
               {{ config.allowViewingsYaku }}
             </span>
           </li>
-          <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
+          <li class="flex justify-between leading-6 text-text">
             <div>
               <span class="font-semibold"> Wild Card Sake Cup </span>
-              <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
+              <span class="block w-3/4 pl-2 text-sm text-text-secondary">
                 The sake cup counts as both animal and plain types.
               </span>
             </div>
-            <span class="self-center text-indigo-600 capitalize dark:text-yellow-300">
+            <span class="self-center capitalize text-primary">
               {{ config.sakeIsWildCard ? 'Enabled' : 'Disabled' }}
             </span>
           </li>
-          <li class="flex justify-between leading-6 text-gray-900 dark:text-gray-200">
+          <li class="flex justify-between leading-6 text-text">
             <div>
               <span class="font-semibold"> Double Over Seven </span>
-              <span class="block w-3/4 pl-2 text-sm text-gray-600 dark:text-gray-300">
+              <span class="block w-3/4 pl-2 text-sm text-text-secondary">
                 Double the score if the combined yaku value is 7 points or greater.
               </span>
             </div>
-            <span class="self-center text-indigo-600 capitalize dark:text-yellow-300">
+            <span class="self-center capitalize text-primary">
               {{ config.doubleScoreOverSeven ? 'Enabled' : 'Disabled' }}
             </span>
           </li>
         </ul>
       </div>
 
-      <div :class="['space-y-5 pb-5', gameStart ? 'order-first' : '']">
-        <p class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">Interface</p>
+      <div :class="['space-y-4 pb-4', gameStart ? 'order-first' : '']">
+        <p class="text-base font-semibold leading-6 text-text">Interface</p>
         <ToggleSwitch
           :callback="toggleLabels"
           :init-value="config.cardLabels"
@@ -176,7 +176,6 @@
 </template>
 
 <script setup lang="ts">
-import { LockClosedIcon, QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import { onClickOutside } from '@vueuse/core'
 import {
   useConfigStore,
@@ -212,6 +211,7 @@ const updateCardSize = (size: CardSizeOptions) => {
 }
 
 const getCardSizeLabel = (size: CardSizeOptions) => {
+  // TODO: Create an enum
   switch (size) {
     case 0.8:
       return 'Small'

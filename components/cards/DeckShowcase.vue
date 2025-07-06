@@ -52,9 +52,7 @@ const currentDesign = useDesign()
 const initialDesign = currentDesign.value
 
 const revealedCard = ref<CardName | null>(null)
-const revealedCardImg = computed(() =>
-  revealedCard.value ? getCardUrl(revealedCard.value, design) : null,
-)
+const revealedCardImg = computed(() => (revealedCard.value ? getCardUrl(revealedCard.value) : null))
 
 const revealRandomCard = () => {
   revealedCard.value = getRandom([...DECK])

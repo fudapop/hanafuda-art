@@ -5,7 +5,7 @@
   >
     <div>
       <HeadlessPopoverButton
-        class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm bg-gray-500/20 font-semibold drop-shadow-md ring-1 ring-inset ring-gray-300/50 dark:ring-gray-500/50"
+        class="inline-flex w-full justify-center gap-x-1.5 rounded-md px-2 py-1.5 text-sm bg-surface/50 font-semibold drop-shadow-md ring-1 ring-inset ring-border/50"
       >
         <span class="sr-only"> Options </span>
         <AdjustmentsHorizontalIcon
@@ -24,12 +24,12 @@
       [@media(max-height:500px)]:grid [@media(max-height:500px)]:grid-cols-[15%_1fr] [@media(max-height:500px)]:rounded-none 
       [@media(max-height:500px)]:h-full [@media(max-height:500px)]:w-[90%]
       max-xs:rounded-none max-xs:w-full max-xs:h-full max-xs:m-0 max-xs:inset-0 max-xs:fixed 
-      bg-white dark:bg-gray-800 rounded-lg ring-1 ring-black dark:ring-gray-600 ring-opacity-5 focus:outline-none
+      bg-surface rounded-md ring-1 ring-black ring-opacity-5 focus:outline-none
       `"
     >
       <!-- Close indicator; not a button -->
       <HeadlessPopoverButton class="absolute z-50 -left-8 top-4 max-xs:hidden">
-        <div class="relative flex text-gray-700 dark:text-gray-300 gap-x-2">
+        <div class="relative flex text-text-secondary gap-x-2">
           <span class="sr-only">Close</span>
           <XMarkIcon
             class="w-6 h-6"
@@ -40,20 +40,25 @@
 
       <HeadlessTabGroup>
         <HeadlessTabList
-          class="relative flex [@media(max-height:500px)]:flex-col [@media(max-height:500px)]:py-4 p-1 gap-1 rounded-[inherit] shadow-inner bg-blue-900/20 dark:bg-blue-300/20"
+          class="relative flex [@media(max-height:500px)]:flex-col [@media(max-height:500px)]:py-4 rounded-t-[inherit] shadow-inner bg-/20"
         >
           <HeadlessTab
-            v-for="category in tabCategories"
+            v-for="(category, index) in tabCategories"
             as="template"
             :key="category"
             v-slot="{ selected }"
           >
             <button
               :class="[
-                'w-full rounded-lg py-2 text-sm [@media(max-height:500px)]:text-left [@media(max-height:500px)]:pl-4 font-medium leading-5 text-blue-700 dark:text-gray-200',
+                'w-full py-2 text-sm [@media(max-height:500px)]:text-left [@media(max-height:500px)]:pl-4 font-medium leading-5',
                 selected
-                  ? 'bg-white dark:bg-gray-800 shadow'
-                  : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+                  ? 'bg-surface text-primary'
+                  : 'text-surface/50 hover:text-white bg-hanafuda-brown',
+                index === 0
+                  ? 'rounded-tl-[inherit]'
+                  : index === tabCategories.length - 1
+                  ? 'rounded-tr-[inherit]'
+                  : '',
               ]"
             >
               {{ category }}
@@ -67,25 +72,22 @@
           >
             <button
               :class="[
-                'absolute bottom-4 inset-x-1 rounded-lg py-2 [@media(max-height:500px)]:text-left [@media(max-height:500px)]:pl-4 text-sm font-medium leading-5 text-blue-700 dark:text-gray-200 [@media(min-height:_500px)]:hidden',
-                'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 dark:ring-offset-gray-200 focus:outline-none focus:ring-2',
+                'absolute bottom-4 inset-x-1 py-2 [@media(max-height:500px)]:text-left [@media(max-height:500px)]:pl-4 text-sm font-medium leading-5 text-primary [@media(min-height:_500px)]:hidden',
                 selected
-                  ? 'bg-white dark:bg-gray-800 shadow'
-                  : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+                  ? 'bg-surface shadow'
+                  : 'text-primary/80 hover:bg-white/[0.12] hover:text-white',
               ]"
             >
-              Sign In
+              SIGN IN
             </button>
           </HeadlessTab>
           <div v-else>
             <div
               :class="[
-                'absolute bottom-4 inset-x-1 rounded-lg py-2 pl-4 [@media(max-height:500px)]:text-left text-sm font-medium leading-5 text-blue-700 dark:text-gray-200 [@media(min-height:_500px)]:hidden',
-                'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 dark:ring-offset-gray-200 focus:outline-none focus:ring-2',
-                'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+                'absolute bottom-4 inset-x-1 py-2 pl-4 [@media(max-height:500px)]:text-left text-sm font-medium leading-5 text-primary [@media(min-height:_500px)]:hidden',
               ]"
             >
-              Logout
+              SIGN OUT
             </div>
             <LoginButton
               class="absolute z-20 py-2 pl-4 opacity-0 bottom-4 inset-x-1 [@media(min-height:_500px)]:hidden"
@@ -106,15 +108,14 @@
             class="relative w-full h-full [@media(min-height:_500px)]:hidden"
           >
             <div class="w-[500px] absolute inset-0 h-max m-auto">
-              <div class="mx-auto mt-5 text-gray-900 w-max dark:text-white">
+              <div class="mx-auto mt-5 text-text w-max">
                 <ExclamationCircleIcon class="inline w-6 h-6 ml-3 align-top" />
                 <p class="inline ml-2">Sign in is required to save your profile.</p>
                 <button
-                  type="button"
-                  class="block px-8 py-3 mx-auto mt-2 text-sm font-medium rounded-lg sec-btn"
+                  class="action-button"
                   @click="gotoLogin"
                 >
-                  Sign in
+                  SIGN IN
                 </button>
               </div>
             </div>
@@ -127,7 +128,7 @@
       class="fixed inset-x-0 bottom-0 z-30 h-10 shadow-inner xs:hidden"
     >
       <div
-        class="relative flex items-center justify-center w-full h-full text-blue-700 dark:text-gray-200 bg-blue-900/20 dark:bg-blue-300/20 gap-x-2"
+        class="relative flex items-center justify-center w-full h-full text-primary bg-primary/20 gap-x-2"
       >
         <span class="sr-only">Close</span>
         <XMarkIcon

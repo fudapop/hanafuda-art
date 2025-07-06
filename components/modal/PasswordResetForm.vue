@@ -13,29 +13,30 @@
         leave-from-class="opacity-100"
         leave-to-class="translate-x-4 opacity-0"
       >
-        <div class="h-[250px] xs:h-40 mt-5">
-          <p class="my-5 text-base text-center text-gray-600 dark:text-gray-300 text-balance">
+        <div class="h-[250px] xs:h-40 my-8">
+          <p class="my-5 text-base text-center text-text-secondary text-balance">
             A link to change your password will be sent if an associated account exists.
           </p>
           <form @submit.prevent="handlePressSend">
             <input
               type="email"
-              class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+              class="w-full px-3 py-2 text-sm border rounded-md border-border bg-surface text-text"
               required
               placeholder="Email"
               v-model="email"
             />
-            <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-2">
+            <div class="grid grid-flow-row-dense gap-3 py-4 sm:grid-cols-2">
               <button
                 type="button"
-                class="sec-btn"
+                class="w-full action-button"
                 @click="$emit('cancel')"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                class="pri-btn"
+                class="w-full action-button bg-border"
+                :disabled="!email"
               >
                 Send
               </button>

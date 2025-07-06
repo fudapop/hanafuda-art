@@ -17,7 +17,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div class="fixed inset-0 transition-opacity bg-gray-600 opacity-50 dark:bg-black" />
+        <div class="fixed inset-0 transition-opacity bg-gray-900 opacity-50" />
       </HeadlessTransitionChild>
 
       <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -34,11 +34,11 @@
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <HeadlessDialogPanel
-              class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+              class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform rounded-md shadow-xl bg-background dark:bg-hanafuda-cream sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
             >
               <!-- rounded blur in the background -->
               <div
-                class="absolute rounded-full inset-8 -z-10 bg-blue-200/20 dark:bg-gray-900/20 blur-xl"
+                class="absolute rounded-full inset-8 -z-10 bg-indigo-200/20 dark:bg-indigo-950/20 blur-xl"
               ></div>
               <div>
                 <slot name="image" />
@@ -46,7 +46,7 @@
                 <div class="mt-3 text-center sm:mt-5">
                   <HeadlessDialogTitle
                     as="h3"
-                    class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+                    class="text-base font-semibold leading-6 text-text-secondary"
                   >
                     <slot name="title" />
                   </HeadlessDialogTitle>

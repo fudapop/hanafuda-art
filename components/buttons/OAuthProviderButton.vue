@@ -3,7 +3,7 @@
     type="button"
     @click="handleClick"
     :class="[
-      'flex w-full items-center justify-center gap-3 shadow-sm rounded-md px-3 py-1.5 tracking-wide text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]',
+      'flex w-full items-center justify-center gap-3 shadow-sm rounded-sm px-3 py-1.5 tracking-wide text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]',
       {
         'bg-[#24292F] hover:bg-gray-700': provider === 'github',
         'bg-[#3367D6] hover:bg-blue-500': provider === 'google',
