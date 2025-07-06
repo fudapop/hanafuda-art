@@ -4,19 +4,19 @@
     <template #image>
       <div
         v-if="!submitted"
-        class="flex items-center justify-center w-12 h-12 mx-auto bg-indigo-100 rounded-full"
+        class="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-primary/10"
       >
         <ChatBubbleLeftEllipsisIcon
-          class="w-6 h-6 text-indigo-800"
+          class="w-6 h-6 text-primary"
           aria-hidden="true"
         />
       </div>
       <div
         v-else
-        class="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full"
+        class="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-hanafuda-green/10"
       >
         <CheckIcon
-          class="w-6 h-6 text-green-600"
+          class="w-6 h-6 text-hanafuda-green"
           aria-hidden="true"
         />
       </div>
@@ -25,24 +25,22 @@
       v-if="submitted"
       #description
     >
-      <p class="text-center text-gray-900 dark:text-white">
-        Your feedback has been submitted. Thank you!
-      </p>
+      <p class="text-center text-text">Your feedback has been submitted. Thank you!</p>
     </template>
     <template
       v-else
       #description
     >
-      <p class="text-center text-gray-900 dark:text-white">How was your experience?</p>
+      <p class="text-center text-text">How was your experience?</p>
     </template>
     <template #actions>
       <form
         v-show="!submitted"
         @submit="handleSubmit"
-        class="text-gray-900 dark:text-white"
+        class="text-text"
       >
         <fieldset
-          class="px-4 pt-4 pb-8 mt-4 rounded-lg shadow-inner sm:pb-2 bg-gray-50 dark:bg-gray-700"
+          class="px-4 pt-4 pb-8 mt-4 border-t border-b rounded-sm border-t-border border-b-border sm:pb-2"
         >
           <div class="grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>Animation Smoothness</p>
@@ -84,8 +82,9 @@
             id="comment-box"
             rows="3"
             v-model="comments.message"
-            class="w-full p-2 text-gray-900 rounded-lg shadow-inner bg-gray-50 dark:bg-gray-700 dark:text-white"
+            class="w-full p-2 border rounded-sm text-text bg-surface border-border placeholder:text-text-secondary placeholder:opacity-80"
             placeholder="Please enter any comments here. Your feedback is greatly appreciated! 🙏🏽"
+            :disabled="submitted"
           />
         </fieldset>
         <div class="flex float-right mt-4 w-max gap-x-4">

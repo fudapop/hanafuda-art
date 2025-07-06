@@ -3,6 +3,77 @@
 @tailwind utilities;
 
 @layer base {
+  /* Hanafuda Color Palette CSS Variables */
+  :root {
+    /* Primary and accent colors */
+    --color-primary: #e4573d; /* coral-red from flower */
+    --color-accent: #e7c46c; /* soft gold from motif */
+
+    /* Purple accent (petals) */
+    --color-purple: #8d6cb3; /* muted purple */
+
+    /* Green accent (leaves) */
+    --color-green: #6bb48d; /* soft green */
+
+    /* Sakura variants (optional, if used elsewhere) */
+    --color-sakura: #ec4899; /* pink-500 - cherry blossom pink */
+    --color-sakura-light: #f9a8d4; /* pink-300 - lighter sakura */
+    --color-sakura-dark: #be185d; /* pink-700 - deeper sakura */
+
+    /* Natural, warm backgrounds */
+    --color-background: #fdfaf3; /* lighter, creamier */
+    --color-surface: #f7f4e9; /* soft off-white */
+    --color-border: #d6cfae; /* warm light border */
+    --color-button: #d6cfae; /* warm light button */
+
+    /* Text colors */
+    --color-text: #2d2321; /* deep brown for contrast */
+    --color-text-secondary: #5d5449; /* darker muted brown for better contrast */
+
+    /* Game-specific colors */
+    --color-hanafuda-red: #e4573d; /* coral-red */
+    --color-hanafuda-gold: #e7c46c; /* soft gold */
+    --color-hanafuda-cream: #fdfaf3; /* background cream */
+    --color-hanafuda-brown: #8c837a; /* natural brown */
+    --color-hanafuda-purple: #8d6cb3; /* purple accent */
+    --color-hanafuda-green: #6bb48d; /* green accent */
+  }
+
+  .dark {
+    /* Primary and accent colors for dark mode */
+    --color-primary: #ff7a5c; /* lighter coral for dark bg */
+    --color-accent: #ffe08a; /* soft, light gold */
+
+    /* Purple accent (petals) */
+    --color-purple: #b39ddb; /* lighter muted purple */
+
+    /* Green accent (leaves) */
+    --color-green: #8fd6b4; /* lighter, soft green */
+
+    /* Sakura variants for dark mode */
+    --color-sakura: #be185d; /* deep pink */
+    --color-sakura-light: #f9a8d4; /* same lighter sakura */
+    --color-sakura-dark: #ec4899; /* original sakura for contrast */
+
+    /* Natural, warm backgrounds for dark mode */
+    --color-background: #181411; /* deep brown-black */
+    --color-surface: #23201c; /* dark, warm surface */
+    --color-border: #6e665a; /* muted, warm border */
+    --color-button: #6e665a; /* muted, warm button */
+
+    /* Text colors for dark mode */
+    --color-text: #f5ede6; /* warm, light text */
+    --color-text-secondary: #c4b5a8; /* lighter for better contrast against dark backgrounds */
+
+    /* Game-specific colors for dark mode */
+    --color-hanafuda-red: #ff7a5c; /* lighter coral */
+    --color-hanafuda-gold: #ffe08a; /* soft, light gold */
+    --color-hanafuda-cream: #181411; /* dark background */
+    --color-hanafuda-brown: #b8a89a; /* lighter brown for contrast */
+    --color-hanafuda-purple: #b39ddb; /* purple accent */
+    --color-hanafuda-green: #8fd6b4; /* green accent */
+  }
+
   body {
     --card-height: 140px;
     --card-aspect: 2/3;
@@ -74,15 +145,29 @@
   }
 
   .pri-btn {
-    @apply relative inline-flex justify-center items-center px-3 py-2 text-sm font-semibold text-white dark:text-gray-900 bg-indigo-600 dark:bg-yellow-300 rounded-md shadow-sm hover:bg-indigo-500 dark:hover:bg-yellow-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-yellow-100;
+    @apply relative inline-flex justify-center items-center px-3 py-2 text-sm font-semibold text-white bg-primary shadow-sm focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-primary;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .pri-btn:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 90%, black);
   }
 
   .sec-btn {
-    @apply rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700;
+    @apply bg-surface px-3 py-2 text-sm font-semibold text-text shadow-sm ring-1 ring-inset ring-border;
+    transition: all 0.2s ease-in-out;
   }
 
-  [disabled]:is(.pri-btn, .sec-btn) {
-    @apply bg-gray-300 dark:bg-gray-600 text-gray-400 cursor-not-allowed ring-0;
+  .sec-btn:hover {
+    background-color: color-mix(in srgb, var(--color-surface) 80%, black);
+  }
+
+  .action-button {
+    @apply px-6 py-2 block mx-auto mt-2 text-xl text-text font-bold bg-background ring-2 ring-border shadow-md hover:ring-primary transition-all duration-200 rounded-sm w-[150px];
+  }
+
+  [disabled]:is(.pri-btn, .sec-btn, .action-button) {
+    @apply bg-gray-300 dark:bg-gray-600 text-gray-400 cursor-not-allowed ring-0 transform-none hover:ring-0;
   }
 }
 

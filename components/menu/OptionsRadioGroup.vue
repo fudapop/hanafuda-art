@@ -1,11 +1,9 @@
 <template>
   <HeadlessRadioGroup v-model="selectedOption">
-    <HeadlessRadioGroupLabel
-      class="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200"
-    >
+    <HeadlessRadioGroupLabel class="text-base font-semibold leading-6 text-text">
       <slot name="group-label" />
     </HeadlessRadioGroupLabel>
-    <HeadlessRadioGroupDescription class="text-sm text-gray-500 dark:text-gray-300">
+    <HeadlessRadioGroupDescription class="text-sm text-text-secondary">
       <slot name="group-description" />
     </HeadlessRadioGroupDescription>
 
@@ -19,45 +17,43 @@
       >
         <div
           :class="[
-            active
-              ? 'border-indigo-600 dark:border-yellow-100 ring-2 ring-indigo-600 dark:ring-yellow-100'
-              : 'border-gray-300',
-            'relative flex cursor-pointer rounded-lg border bg-white dark:bg-gray-800 p-4 shadow-sm focus:outline-none',
+            active ? 'border-primary ring-1 ring-primary' : 'border-border',
+            'relative flex cursor-pointer rounded-sm border bg-surface p-4 shadow-sm focus:outline-none',
           ]"
         >
           <span class="flex flex-1">
             <span class="flex flex-col">
               <HeadlessRadioGroupLabel
                 as="span"
-                class="block text-sm font-medium text-gray-900 capitalize dark:text-white"
+                class="block text-sm font-medium capitalize text-text"
               >
                 {{ labelTemplate ? labelTemplate(option) : option }}
               </HeadlessRadioGroupLabel>
               <HeadlessRadioGroupDescription
                 v-if="descriptionTemplate"
                 as="span"
-                class="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-300"
+                class="flex items-center mt-1 text-sm text-text-secondary"
               >
                 {{ descriptionTemplate(option) }}
               </HeadlessRadioGroupDescription>
               <HeadlessRadioGroupDescription
                 v-else-if="optionDescriptions"
                 as="span"
-                class="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-300"
+                class="flex items-center mt-1 text-sm text-text-secondary"
               >
                 {{ optionDescriptions[index] }}
               </HeadlessRadioGroupDescription>
             </span>
           </span>
           <CheckCircleIcon
-            :class="[!checked ? 'invisible' : '', 'h-5 w-5 text-indigo-600 dark:text-yellow-300']"
+            :class="[!checked ? 'invisible' : '', 'h-5 w-5 text-primary']"
             aria-hidden="true"
           />
           <span
             :class="[
               active ? 'border' : 'border-2',
-              checked ? 'border-indigo-600 dark:border-yellow-300' : 'border-transparent',
-              'pointer-events-none absolute -inset-px rounded-lg',
+              checked ? 'border-primary' : 'border-transparent',
+              'pointer-events-none absolute -inset-px rounded-sm',
             ]"
             aria-hidden="true"
           />

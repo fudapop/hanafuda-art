@@ -1,98 +1,89 @@
 <template>
-  <div class="min-h-screen">
-    <div class="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-      <GameBackground />
+  <ContentLayout>
+    <div class="isolate">
+      <div
+        v-if="!loggingIn"
+        class="flex justify-center my-12 drop-shadow-xl"
+      >
+        <img
+          src="~/assets/images/logo-title.png"
+          class="w-[100px] mb-2"
+          alt="Hanafuda Koi-Koi"
+        />
+        <h1 class="sr-only">Hanafuda Koi-Koi</h1>
+      </div>
+      <Transition
+        appear
+        enter-active-class="duration-300 ease-out"
+        enter-from-class="translate-y-4 opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="duration-300 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="translate-y-4 opacity-0"
+      >
+        <div
+          v-if="loggingIn"
+          class="absolute inset-0 h-full mx-auto pointer-events-none top-1/3 w-max isolate"
+        >
+          <SakuraLoader class="scale-[2] ml-4 origin-bottom opacity-80" />
+          <div class="font-semibold tracking-wide text-center text-gray-900 animate-pulse">
+            Just a moment...
+          </div>
+        </div>
+        <div
+          v-else
+          class="absolute inset-0 px-4 py-8 m-auto overflow-hidden rounded-sm shadow-lg -z-10 bg-white/90 dark:bg-hanafuda-cream w-max h-max sm:px-6 lg:px-20 xl:px-24"
+        >
+          <div class="max-w-sm mx-auto min-w-[300px] w-[90vw] lg:w-96">
+            <div class="pt-8 space-y-4">
+              <EmailLoginForm
+                @success="handleLoginSuccess"
+                @linked="handleLinked"
+                @error="handleLoginError"
+              />
+
+              <OAuthSignupForm
+                v-if="currentUser"
+                @success="handleLinked"
+                @error="handleLoginError"
+              />
+              <OAuthLoginForm
+                v-else
+                @success="handleLoginSuccess"
+                @error="handleLoginError"
+              />
+
+              <div class="w-full text-sm text-center">
+                <NuxtLink
+                  :external="!currentUser"
+                  to="/"
+                  class="text-text-secondary hover:underline hover:text-primary"
+                >
+                  Continue as guest &rarr;
+                </NuxtLink>
+              </div>
+
+              <!-- Legal Links -->
+              <div class="w-full space-x-4 text-xs text-center text-text-secondary">
+                <NuxtLink
+                  to="/terms"
+                  class="underline hover:text-text-secondary/80"
+                >
+                  Terms of Use
+                </NuxtLink>
+                <NuxtLink
+                  to="/privacy"
+                  class="underline hover:text-text-secondary/80"
+                >
+                  Privacy Policy
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </div>
-
-    <Teleport to="body">
-      <!-- UI TOGGLE BUTTONS -->
-      <div class="absolute right-3 grid text-white min-w-[48px] top-20">
-        <ColorModeToggle />
-      </div>
-    </Teleport>
-
-    <Transition
-      appear
-      enter-active-class="duration-300 ease-out"
-      enter-from-class="translate-y-4 opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="duration-300 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="translate-y-4 opacity-0"
-    >
-      <div
-        v-if="loggingIn"
-        class="absolute inset-0 h-full mx-auto pointer-events-none top-1/3 w-max isolate"
-      >
-        <SakuraLoader class="scale-[2] ml-4 origin-bottom opacity-80" />
-        <div class="font-semibold tracking-wide text-center text-gray-900 animate-pulse">
-          Just a moment...
-        </div>
-      </div>
-      <div
-        v-else
-        class="absolute inset-0 px-4 py-8 m-auto overflow-hidden bg-white rounded-lg shadow-lg w-max h-max sm:px-6 lg:px-20 xl:px-24 dark:bg-gray-800"
-      >
-        <div class="max-w-sm mx-auto min-w-[300px] w-[90vw] lg:w-96">
-          <div class="relative my-auto drop-shadow-xl">
-            <h1
-              id="login-title"
-              class="text-4xl text-center"
-            >
-              <span class="block ml-16 text-xl italic text-left text-gray-700 dark:text-white"
-                >Hanafuda</span
-              >花札 KOI-KOI
-            </h1>
-          </div>
-
-          <div class="mt-10 space-y-5">
-            <EmailLoginForm
-              @success="handleLoginSuccess"
-              @linked="handleLinked"
-              @error="handleLoginError"
-            />
-
-            <OAuthSignupForm
-              v-if="currentUser"
-              @success="handleLinked"
-              @error="handleLoginError"
-            />
-            <OAuthLoginForm
-              v-else
-              @success="handleLoginSuccess"
-              @error="handleLoginError"
-            />
-
-            <div class="w-full text-sm text-center">
-              <NuxtLink
-                :external="!currentUser"
-                to="/"
-                class="text-indigo-500 hover:text-indigo-400"
-              >
-                Continue as guest
-              </NuxtLink>
-            </div>
-
-            <!-- Legal Links -->
-            <div class="w-full space-x-4 text-xs text-center text-gray-500 dark:text-gray-400">
-              <NuxtLink
-                to="/terms"
-                class="underline hover:text-gray-700 dark:hover:text-gray-200"
-              >
-                Terms of Use
-              </NuxtLink>
-              <NuxtLink
-                to="/privacy"
-                class="underline hover:text-gray-700 dark:hover:text-gray-200"
-              >
-                Privacy Policy
-              </NuxtLink>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Transition>
-  </div>
+  </ContentLayout>
 </template>
 <script setup lang="ts">
 import { useToast } from 'vue-toastification'

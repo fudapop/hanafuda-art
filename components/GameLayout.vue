@@ -3,7 +3,10 @@
     class="sm:[@media_(max-height:500px)]:[--card-height:80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-[100dvh] overflow-hidden relative"
   >
     <!-- BACKGROUND ELEMENTS -->
-    <div class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
+    <div
+      v-if="gameStart"
+      class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10"
+    >
       <GameBackground />
       <AnimatedBackground />
     </div>
@@ -51,7 +54,7 @@
     <!-- OPPONENT STATUS BAR -->
     <div
       :class="{
-        'z-[-1] fixed top-0 inset-x-0 duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-b-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
+        'z-[-1] fixed top-0 inset-x-0 duration-300 transition-all sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
         'opacity-40': players.p1.isActive,
         '-translate-y-full': !gameStart,
       }"
@@ -83,16 +86,16 @@
       </PlayArea>
       <div
         v-else
-        class="relative h-full"
+        class="relative h-full isolate"
       >
-        <StartScreen @start-game="gameStart = true" />
+        <NewStartScreen @start-game="gameStart = true" />
       </div>
     </Transition>
 
     <!-- PLAYER STATUS BAR -->
     <div
       :class="{
-        'z-[-1] fixed bottom-0 inset-x-0 duration-300 transition-all bg-gray-50 dark:bg-[#40495a] border-t-slate-500 sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
+        'z-[-1] fixed bottom-0 inset-x-0 duration-300 transition-all bg-transparent sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
         'opacity-40': players.p2.isActive,
         'translate-y-full': !gameStart,
       }"

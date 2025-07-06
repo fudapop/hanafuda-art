@@ -23,7 +23,7 @@
               easing="linear"
             />
             <img
-              src="/images/coin.webp"
+              src="~/assets/images/coin.webp"
               alt="coin"
               class="inline w-5 h-5 mb-1 ml-1 drop-shadow-sm"
             />
@@ -47,9 +47,11 @@
   >
     <HeadlessDisclosureButton
       :class="`flex w-full justify-between my-1 rounded-md ${
-        result.winner === 'p1' ? 'text-green-900 bg-green-400'
-        : !result.winner ? 'text-indigo-900 bg-indigo-100'
-        : 'text-red-900 bg-red-300'
+        result.winner === 'p1'
+          ? 'text-green-900 bg-green-400'
+          : !result.winner
+          ? 'text-indigo-900 bg-indigo-100'
+          : 'text-red-900 bg-red-300'
       } px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring focus-visible:ring-indigo-500 dark:focus-visible:ring-gray-100 focus-visible:ring-opacity-75`"
     >
       <span
@@ -86,9 +88,9 @@
 
 <script setup lang="ts">
 import { ChevronUpIcon } from '@heroicons/vue/20/solid'
+import NumberAnimation from 'vue-number-animation'
 import { type RoundResult, useGameDataStore } from '~/stores/gameDataStore'
 import { type CompletedYaku } from '~/utils/yaku'
-import NumberAnimation from 'vue-number-animation'
 
 const { results } = defineProps<{
   results: RoundResult[]

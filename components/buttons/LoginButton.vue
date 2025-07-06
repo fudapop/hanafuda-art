@@ -1,24 +1,22 @@
 <template>
   <div>
     <button
-      type="button"
       v-if="!user"
-      class="sec-btn"
+      class="action-button"
       @click="login"
     >
-      Login &rarr;
+      SIGN IN
     </button>
     <button
-      type="button"
       v-else
-      class="sec-btn"
+      class="action-button"
       @click="logoutUser"
     >
-      &larr; Logout
+      SIGN OUT
     </button>
     <div
       v-if="error"
-      class="absolute inset-0 px-8 py-4 mx-auto text-lg border-red-500 rounded-md"
+      class="absolute inset-0 px-8 py-4 mx-auto text-lg border-red-500 rounded-sm"
     >
       {{ error }}
     </div>

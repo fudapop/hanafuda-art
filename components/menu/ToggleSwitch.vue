@@ -6,15 +6,15 @@
     <HeadlessSwitch
       v-model="enabled"
       :class="[
-        enabled ? 'bg-indigo-600 dark:bg-yellow-300' : 'bg-gray-200',
-        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 dark:focus:ring-gray-100 focus:ring-offset-2',
+        enabled ? 'bg-primary' : 'bg-border',
+        'relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-2',
       ]"
     >
       <span class="sr-only">Use setting</span>
       <span
         :class="[
-          enabled ? 'translate-x-5' : 'translate-x-0',
-          'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+          enabled ? 'translate-x-6' : 'translate-x-0',
+          'pointer-events-none relative inline-block h-5 w-5 transform rounded-md bg-white shadow ring-0 transition duration-200 ease-in-out',
         ]"
       >
         <span
@@ -25,7 +25,7 @@
           aria-hidden="true"
         >
           <svg
-            class="w-3 h-3 text-gray-400"
+            class="w-4 h-4 text-text-secondary"
             fill="none"
             viewBox="0 0 12 12"
           >
@@ -46,7 +46,7 @@
           aria-hidden="true"
         >
           <svg
-            class="w-3 h-3 text-indigo-600 dark:text-yellow-600"
+            class="w-4 h-4 text-primary"
             fill="currentColor"
             viewBox="0 0 12 12"
           >
@@ -58,17 +58,17 @@
       </span>
     </HeadlessSwitch>
 
-    <span class="flex flex-col flex-grow ml-3">
+    <span class="flex flex-col flex-grow ml-4">
       <HeadlessSwitchLabel
         as="span"
-        class="text-sm font-medium leading-6 text-gray-900 dark:text-white"
+        class="text-sm font-medium leading-6 text-text"
         passive
       >
         <slot name="label" />
       </HeadlessSwitchLabel>
       <HeadlessSwitchDescription
         as="span"
-        class="text-sm text-gray-500 dark:text-gray-300"
+        class="text-sm text-text-secondary"
       >
         <slot name="description" />
       </HeadlessSwitchDescription>

@@ -1,5 +1,5 @@
 <template>
-  <div class="my-4 space-y-2">
+  <div class="my-4 space-y-2 cursor-default">
     <h3 class="text-lg font-semibold tracking-wide text-gray-900 dark:text-white">
       {{ info.title }}
       <span v-if="isNew">✨</span>

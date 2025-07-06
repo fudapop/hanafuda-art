@@ -4,22 +4,18 @@
     as="div"
     class="relative w-full @container"
   >
-    <div
-      class="sticky top-0 z-10 flex justify-between px-4 py-2 bg-white shadow-sm dark:bg-gray-800"
-    >
-      <HeadlessRadioGroupLabel
-        class="text-lg font-semibold tracking-wide text-gray-900 dark:text-white"
-      >
+    <div class="sticky top-0 z-10 flex justify-between px-4 py-2 shadow-sm bg-surface">
+      <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-text">
         Select a design
-        <p class="ml-2 text-sm font-medium text-gray-400 whitespace-nowrap">
+        <p class="ml-2 text-sm font-medium text-text-secondary whitespace-nowrap">
           {{ `Current: ${getDesignInfo().title}` }}
         </p>
       </HeadlessRadioGroupLabel>
       <div
-        class="flex items-center self-start font-semibold tracking-wide text-gray-900 gap-x-2 whitespace-nowrap dark:text-white"
+        class="flex items-center self-start font-semibold tracking-wide text-text gap-x-2 whitespace-nowrap"
       >
         <img
-          src="/images/coin.webp"
+          src="~/assets/images/coin.webp"
           alt="coin"
           class="w-5 h-5 drop-shadow-sm"
         />
@@ -29,111 +25,124 @@
     <div class="grid justify-center w-full px-3 mt-2 space-y-12">
       <HeadlessRadioGroupOption
         v-for="(design, index) in sortedDesigns"
+        v-slot="{ checked }"
         :class="[
           design,
-          'group grid w-full @md:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @md:grid-rows-1 relative',
+          'group rounded-sm focus-visible:ring-1 focus-visible:ring-offset-2 focus-visible:ring-primary',
         ]"
-        v-slot="{ checked }"
         :value="design"
         :disabled="!unlocked?.includes(design)"
       >
-        <Transition
-          mode="out-in"
-          enter-to-class="opacity-100"
-          enter-from-class="opacity-0 -scale-x-[25%] motion-reduce:scale-x-100"
-          enter-active-class="duration-500"
-          leave-to-class="opacity-0"
-          leave-from-class="opacity-100"
-          leave-active-class="duration-400"
-        >
-          <div
-            v-if="!checked"
-            :class="[
-              'cursor-pointer relative card down isolate drop-shadow-md mx-auto',
-              checked ? 'ring-1 ring-offset-2 ring-indigo-600 dark:ring-yellow-300' : '',
-            ]"
-          >
-            <!-- NEW DESIGN TAG -->
-            <span
-              v-if="isNew(design)"
-              class="absolute top-0 left-0 px-2 py-1 text-xs font-semibold tracking-wide text-white bg-indigo-600 rounded-tl-md rounded-br-md dark:bg-yellow-300 dark:text-gray-900"
-            >
-              New
-            </span>
-            <!-- UNLOCK BUTTON -->
-            <button
-              type="button"
-              v-if="unlocked && !unlocked.includes(design)"
-              @click="() => handleUnlock(design)"
-              class="rounded-[inherit]"
-            >
-              <div
-                class="absolute inset-0 h-full transition-opacity bg-white opacity-50 ring-1 ring-white dark:ring-gray-800 rounded-[inherit] -z-10 dark:bg-black group-hover:opacity-75"
-              ></div>
-              <LockClosedIcon
-                class="absolute inset-x-0 w-8 h-auto mx-auto text-gray-900 top-1/3 dark:text-white group-hover:opacity-0"
-              />
-              <LockOpenIcon
-                class="absolute inset-x-0 w-8 h-auto mx-auto text-gray-900 translate-x-1 opacity-0 top-1/3 dark:text-white group-hover:opacity-100"
-              />
-              <div
-                class="absolute inset-x-0 mx-auto text-sm font-semibold tracking-wide text-gray-900 transition-all opacity-0 w-max bottom-4 dark:text-white group-hover:opacity-100 group-hover:-translate-y-2"
-              >
-                <img
-                  src="/images/coin.webp"
-                  alt="coin"
-                  class="inline w-4 h-4 align-middle drop-shadow-sm"
-                />
-                {{ computedCost }}
-              </div>
-            </button>
-          </div>
-          <AnimatedCards v-else />
-        </Transition>
-
-        <!-- DESCRIPTION SECTION -->
         <div
           :class="[
-            'relative w-full @md:w-[360px] space-y-4 px-4 pb-4 rounded-lg dark:text-white',
-            checked
-              ? 'dark:bg-[#40495a] bg-gray-50 shadow-inner shadow-gray-400 dark:shadow-gray-900'
-              : '',
+            'grid w-full rounded-[inherit] @md:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @md:grid-rows-1 relative',
+            checked ? 'ring-2 ring-primary' : 'ring-0',
           ]"
         >
-          <button
-            type="button"
-            aria-label="Like this design"
-            @click="() => handleLike(design)"
-            class="relative float-right mt-4 pointer-events-auto focus-visible:ring-1 focus-visible:ring-indigo-600 focus-visible:dark:ring-yellow-300"
+          <!-- CARD DISPLAY -->
+          <Transition
+            mode="out-in"
+            enter-to-class="opacity-100"
+            enter-from-class="opacity-0 -scale-x-[25%] motion-reduce:scale-x-100"
+            enter-active-class="duration-500"
+            leave-to-class="opacity-0"
+            leave-from-class="opacity-100"
+            leave-active-class="duration-400"
           >
-            <!-- <span
-              class="absolute pt-1 m-auto text-sm text-gray-900 opacity-50 -left-3 dark:text-white"
-              >{{ likesCount.get(design) }}</span
-            > -->
-            <HeartIcon
-              :aria-hidden="true"
-              :class="[
-                'w-7 h-auto stroke-gray-500 stroke-1 drop-shadow-md',
-                isLiked(design) ? 'fill-red-600 stroke-red-400' : '',
-              ]"
-            />
-          </button>
-
-          <DesignDescription
-            :design="design"
-            :is-new="isNew(design)"
-          />
-        </div>
-        <div
-          v-if="index < DESIGNS.length - 1"
-          class="absolute bottom-0 left-0 right-0"
-        >
-          <div class="relative">
             <div
-              class="absolute inset-0 flex items-center"
-              aria-hidden="true"
+              v-if="!checked"
+              :class="['cursor-pointer relative card down isolate drop-shadow-md mx-auto']"
             >
-              <div class="w-[90%] mx-auto mt-12 border-b border-gray-300 opacity-30" />
+              <!-- NEW DESIGN TAG -->
+              <span
+                v-if="isNew(design)"
+                class="absolute top-0 left-0 px-2 py-1 text-xs font-semibold tracking-wide text-white bg-primary rounded-tl-md rounded-br-md"
+              >
+                New
+              </span>
+              <!-- UNLOCK BUTTON -->
+              <button
+                type="button"
+                v-if="unlocked && !unlocked.includes(design)"
+                @click="() => handleUnlock(design)"
+                class="rounded-[inherit]"
+              >
+                <div
+                  class="absolute inset-0 h-full transition-opacity bg-surface opacity-50 ring-1 ring-border rounded-[inherit] -z-10 group-hover:opacity-75"
+                ></div>
+                <LockClosedIcon
+                  class="absolute inset-x-0 w-8 h-auto mx-auto text-text top-1/3 group-hover:opacity-0"
+                />
+                <LockOpenIcon
+                  class="absolute inset-x-0 w-8 h-auto mx-auto translate-x-1 opacity-0 text-text top-1/3 group-hover:opacity-100"
+                />
+                <div
+                  class="absolute inset-x-0 mx-auto text-sm font-semibold tracking-wide transition-all opacity-0 text-text w-max bottom-4 group-hover:opacity-100 group-hover:-translate-y-2"
+                >
+                  <img
+                    src="~/assets/images/coin.webp"
+                    alt="coin"
+                    class="inline w-4 h-4 align-middle drop-shadow-sm"
+                  />
+                  {{ computedCost }}
+                </div>
+              </button>
+            </div>
+            <AnimatedCards v-else />
+          </Transition>
+
+          <!-- DESCRIPTION SECTION -->
+          <div :class="['relative w-full @md:w-[360px] space-y-4 px-4 pb-4 rounded-sm text-text']">
+            <div class="flex items-start float-right mt-4 gap-x-2">
+              <!-- SELECTION INDICATOR -->
+              <span
+                v-if="checked"
+                aria-label="Selected"
+                class="w-6 h-6"
+              >
+                <span class="sr-only">Selected</span>
+                <CheckCircleIcon
+                  aria-hidden
+                  class="w-full h-full text-primary"
+                />
+              </span>
+              <!-- LIKE BUTTON -->
+              <button
+                type="button"
+                aria-label="Like this design"
+                @click="() => handleLike(design)"
+                class="pointer-events-auto focus-visible:ring-1 focus-visible:ring-primary"
+              >
+                <!-- <span
+            class="absolute pt-1 m-auto text-sm opacity-50 text-text -left-3"
+            >{{ likesCount.get(design) }}</span
+            > -->
+                <HeartIcon
+                  aria-hidden
+                  :class="[
+                    'ml-2 w-6 h-6 stroke-text-secondary stroke-1',
+                    isLiked(design) ? 'fill-primary stroke-0' : '',
+                  ]"
+                />
+              </button>
+            </div>
+
+            <DesignDescription
+              :design="design"
+              :is-new="isNew(design)"
+            />
+          </div>
+          <div
+            v-if="index < DESIGNS.length - 1"
+            class="absolute bottom-0 left-0 right-0"
+          >
+            <div class="relative">
+              <div
+                class="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
+                <div class="w-[90%] mx-auto mt-12 border-b border-border opacity-30" />
+              </div>
             </div>
           </div>
         </div>
@@ -142,9 +151,9 @@
 
     <Modal :open="!!newUnlock">
       <template #image>
-        <div :class="[newUnlock, 'flex items-center text-gray-900 dark:text-white justify-center']">
+        <div :class="[newUnlock, 'flex items-center text-text justify-center']">
           <img
-            src="/images/coin.webp"
+            src="~/assets/images/coin.webp"
             alt="coin"
             class="inline w-8 h-8 drop-shadow-sm"
           />
@@ -155,12 +164,10 @@
 
       <template #description>
         <template v-if="computedCost === 0">
-          <strong class="block text-xl tracking-wide text-gray-900 dark:text-white"
-            >✨ LIMITED TIME OFFER ✨</strong
-          >
+          <strong class="block text-xl tracking-wide text-text">✨ LIMITED TIME OFFER ✨</strong>
           <br />
         </template>
-        <span class="text-lg text-gray-900 dark:text-white">
+        <span class="text-lg text-text">
           Trade in <strong class="tracking-wide">{{ computedCost }}</strong> coins to use this
           design?</span
         >
@@ -189,7 +196,12 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowRightIcon, LockClosedIcon, LockOpenIcon } from '@heroicons/vue/20/solid'
+import {
+  ArrowRightIcon,
+  CheckCircleIcon,
+  LockClosedIcon,
+  LockOpenIcon,
+} from '@heroicons/vue/20/solid'
 import { HeartIcon } from '@heroicons/vue/24/outline'
 import { collection, getCountFromServer, getFirestore, query, where } from 'firebase/firestore'
 import { useToast } from 'vue-toastification'

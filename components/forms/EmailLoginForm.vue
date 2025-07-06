@@ -1,14 +1,14 @@
 <template>
   <div>
     <form
-      class="space-y-4 min-w-[300px] border-t pt-4 border-gray-400/20"
+      class="space-y-4 min-w-[300px] pt-4 border-border/20"
       action=""
       @submit.prevent="handleEmailLogin"
     >
       <div>
         <label
           for="email"
-          class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+          class="block text-sm font-medium leading-6 text-text"
           >Email address</label
         >
         <div class="mt-1">
@@ -18,7 +18,7 @@
             type="email"
             autocomplete="email"
             required
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            class="block w-full rounded-sm border-0 py-1.5 text-text bg-surface shadow-sm ring-1 ring-inset ring-border placeholder:text-text-secondary focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
             v-model="values.email"
             @blur="rememberEmail"
           />
@@ -28,7 +28,7 @@
       <div>
         <label
           for="password"
-          class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+          class="block text-sm font-medium leading-6 text-text"
           >Password</label
         >
         <div class="mt-1">
@@ -38,7 +38,7 @@
             type="password"
             autocomplete="current-password"
             required
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            class="block w-full rounded-sm border-0 py-1.5 text-text bg-surface shadow-sm ring-1 ring-inset ring-border placeholder:text-text-secondary focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
             v-model="values.password"
           />
         </div>
@@ -51,7 +51,7 @@
       >
         <section
           v-if="newAccount"
-          class="space-y-4 text-xs text-gray-600 dark:text-gray-300 min-h-40"
+          class="space-y-4 text-xs text-text-secondary min-h-40"
         >
           <div class="space-y-2">
             <p>Password must contain at least:</p>
@@ -60,13 +60,13 @@
                 v-for="requirement in requirements"
                 :key="requirement.text"
                 :class="{
-                  'text-green-500 relative': requirement.valid,
-                  'text-red-500 relative': !requirement.valid,
+                  'text-hanafuda-green relative': requirement.valid,
+                  'text-primary relative': !requirement.valid,
                 }"
               >
                 <CheckIcon
                   v-if="requirement.valid"
-                  class="inline w-3 h-3 mr-1 text-green-500"
+                  class="inline w-3 h-3 mr-1 text-hanafuda-green"
                 />
                 <span
                   v-else
@@ -78,19 +78,19 @@
           </div>
           <button
             type="submit"
-            :disabled="!isValidPassword.value"
+            :disabled="!isValidPassword.value || !values.email"
             :class="{
-              'flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600': true,
-              'opacity-50 cursor-not-allowed': !isValidPassword.value,
+              'w-full text-gray-900 dark:text-white action-button bg-border': true,
+              'opacity-50 cursor-not-allowed': !isValidPassword.value || !values.email,
             }"
           >
-            Sign up
+            Sign Up
           </button>
 
           <a
             v-show="!query.signup"
             href="#"
-            class="block w-full mt-2 text-sm text-center text-indigo-500 hover:text-indigo-400"
+            class="block w-full mt-2 text-sm text-center text-text-secondary hover:underline hover:text-primary"
             @click="newAccount = false"
           >
             I already have an account &rarr;
@@ -102,19 +102,19 @@
           class="space-y-4 min-h-40"
         >
           <div class="flex items-center justify-between">
-            <div class="flex items-center">
+            <div class="flex items-center cursor-pointer">
               <input
                 id="remember-me"
                 ref="remember-me"
                 name="remember-me"
                 type="checkbox"
-                class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-600"
+                class="w-4 h-4 rounded text-primary border-border focus:ring-primary"
                 v-model="rememberMe"
                 @change="rememberEmail"
               />
               <label
                 for="remember-me"
-                class="block ml-3 text-sm leading-6 text-gray-900 dark:text-white"
+                class="block ml-3 text-sm leading-6 cursor-pointer text-text"
                 >Remember me</label
               >
             </div>
@@ -122,7 +122,7 @@
             <div class="text-sm leading-6">
               <a
                 href="#"
-                class="font-semibold text-indigo-600 hover:text-indigo-500"
+                class="text-text-secondary hover:underline hover:text-primary"
                 @click="handleForgotPassword"
                 >Forgot password?</a
               >
@@ -131,14 +131,14 @@
           <div>
             <button
               type="submit"
-              class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="w-full text-gray-900 dark:text-white action-button bg-border"
             >
-              Sign in
+              Sign In
             </button>
 
             <a
               href="#"
-              class="block w-full mt-2 text-sm text-center text-indigo-500 hover:text-indigo-400"
+              class="block w-full mt-2 text-sm text-center text-text-secondary hover:underline hover:text-primary"
               @click="newAccount = true"
             >
               I don&apos;t have an account &rarr;
@@ -177,9 +177,7 @@ const { query } = useRoute()
 const userIsGuest = ref<boolean>(false)
 
 const emailAction = computed(() =>
-  userIsGuest.value ? linkWithEmail
-  : newAccount.value ? signUpWithEmail
-  : loginWithEmail,
+  userIsGuest.value ? linkWithEmail : newAccount.value ? signUpWithEmail : loginWithEmail,
 )
 
 const handleEmailLogin = () => {

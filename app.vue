@@ -27,6 +27,9 @@ const loading = ref(false)
 const nuxtApp = useNuxtApp()
 const vueApp = nuxtApp.vueApp
 
+// Initialize audio
+const audio = useAudio()
+
 vueApp.directive('hide', vHide)
 vueApp.directive('click-disabled', vClickDisabled)
 
@@ -37,6 +40,9 @@ vueApp.use(Toast, {
   maxToasts: 20,
   newestOnTop: true,
 })
+
+// Provide audio controls globally
+provide('audio', audio)
 
 nuxtApp.hook('page:start', () => {
   loading.value = true
@@ -56,6 +62,12 @@ onMounted(() => {
       script.type = 'text/partytown'
   })
   window.dispatchEvent(new CustomEvent('ptupdate'))
+
+  // Initialize audio with background music
+  audio.initAudio('/audio/PerituneMaterial_Awayuki.ogg')
+
+  // Setup autoplay after user interaction
+  audio.setupAutoplay()
 })
 </script>
 
