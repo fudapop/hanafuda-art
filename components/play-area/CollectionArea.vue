@@ -48,7 +48,7 @@
         <ul
           v-for="type in cardTypes"
           :key="type"
-          class="relative flex justify-center h-full py-2"
+          class="relative flex flex-wrap h-full max-w-full py-2"
         >
           <span
             v-show="coll[type].size > 0"
@@ -82,6 +82,7 @@
 
 <script setup lang="ts">
 import { MagnifyingGlassPlusIcon } from '@heroicons/vue/24/outline'
+import { onClickOutside } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { useCardStore } from '~/stores/cardStore'
 import { useConfigStore } from '~/stores/configStore'
@@ -96,8 +97,13 @@ export type CompletionEvent = {
   completedYaku: CompletedYaku[]
 }
 
+const modalRef = ref(null)
 const modalOpen = ref(false)
 const modalTitle = computed(() => `${player === 'p1' ? 'My' : "Opponent's"} Collection`)
+
+onClickOutside(modalRef, () => {
+  modalOpen.value = false
+})
 
 const { player } = defineProps<{ player: PlayerKey }>()
 const emits = defineEmits<{

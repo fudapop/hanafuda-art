@@ -37,7 +37,7 @@
           >
             <!-- RESPONSIVE CONTAINER -->
             <div
-              class="p-6 overflow-hidden text-left align-middle transition-all transform text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md shadow-xl w-[clamp(320px,calc(100vw-2rem),800px)]"
+              class="p-6 overflow-hidden text-left align-middle transition-all transform text-text dark:text-text bg-surface dark:bg-surface rounded-md shadow-xl w-[clamp(320px,calc(100vw-2rem),800px)]"
             >
               <div ref="slotRef">
                 <slot />
@@ -49,8 +49,8 @@
     </HeadlessTransitionRoot>
     <Teleport to="body">
       <div class="absolute inset-x-0 z-50 mx-auto w-max text-white bottom-[5%]">
-        <Button
-          button-class="primary"
+        <button
+          class="game-ui-btn"
           :action="toggleOpacity"
         >
           <span class="mr-1 animate-pulse">
@@ -64,7 +64,7 @@
             />
             Show Board
           </span>
-        </Button>
+        </button>
       </div>
     </Teleport>
   </HeadlessDialog>

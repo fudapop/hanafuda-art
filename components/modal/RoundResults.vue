@@ -1,12 +1,12 @@
 <template>
   <!-- HEADER -->
   <div
-    class="px-4 py-5 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-600 sm:px-6"
+    class="px-4 py-5 border-b bg-surface border-border dark:bg-surface dark:border-border sm:px-6"
   >
     <div class="grid grid-cols-[1fr_max-content] items-end -mt-2 -ml-4">
       <HeadlessDialogTitle
         as="h3"
-        class="mb-2 text-lg font-semibold leading-6 text-gray-900 dark:text-white"
+        class="mb-2 text-lg font-semibold leading-6 text-text dark:text-text"
       >
         <span v-if="recordedWinner">
           <span v-if="decisionIsPending">
@@ -31,7 +31,7 @@
               target="_blank"
             >
               <QuestionMarkCircleIcon
-                class="inline w-5 h-5 mb-1 text-gray-500 cursor-pointer dark:text-gray-300 hover:text-indigo-500 dark:hover:text-yellow-100"
+                class="inline w-5 h-5 mb-1 cursor-pointer text-text-secondary dark:text-text-secondary hover:text-primary dark:hover:text-accent"
               />
               <span class="sr-only">Read about this rule on fudawiki.org</span>
             </a>
@@ -49,43 +49,44 @@
           v-show="players.p1.isActive"
           class="flex justify-end flex-shrink-0 gap-2 ml-4"
         >
-          <Button
-            button-class="secondary"
-            :action="callStop"
+          <button
+            class="sec-btn"
+            @click="callStop"
           >
-            Stop
-          </Button>
-          <Button
+            STOP
+          </button>
+          <button
             v-show="handNotEmpty(activePlayer.id)"
-            button-class="primary"
-            :action="callKoikoi"
+            class="pri-btn"
+            @click="callKoikoi"
           >
-            Koi-Koi
-          </Button>
+            KOI-KOI
+          </button>
         </div>
       </div>
       <div
         v-show="stopIsCalled"
         class="flex justify-end flex-shrink-0 gap-2 ml-4"
       >
-        <Button :action="() => $emit('next')"> Next Round </Button>
+        <button
+          class="pri-btn"
+          @click="() => $emit('next')"
+        >
+          NEXT
+        </button>
       </div>
     </div>
   </div>
   <!-- END HEADER -->
-  <h4 class="my-4 text-gray-600 dark:text-gray-400">
+  <h4 class="my-4 text-text-secondary dark:text-text-secondary">
     Total:
-    <span class="text-lg font-semibold text-indigo-700 dark:text-yellow-100"
-      >{{ lastRoundResult.score }} points</span
-    >
+    <span class="text-lg font-semibold text-text">{{ lastRoundResult.score }} points</span>
     <span
       v-if="lastRoundResult.score && bonusMultiplier > 1"
       class="max-sm:block sm:ml-8"
     >
       Koi-Koi Bonus:
-      <span class="text-lg font-semibold text-indigo-700 dark:text-yellow-100"
-        >x{{ bonusMultiplier }}</span
-      >
+      <span class="text-lg font-semibold text-text">x{{ bonusMultiplier }}</span>
     </span>
   </h4>
   <YakuGrid
@@ -97,8 +98,8 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
 import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
+import { storeToRefs } from 'pinia'
 import { useCardStore } from '~/stores/cardStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { usePlayerStore } from '~/stores/playerStore'

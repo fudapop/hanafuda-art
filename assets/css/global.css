@@ -117,21 +117,23 @@
   }
 
   .pri-btn {
-    @apply relative inline-flex justify-center items-center px-3 py-2 text-sm font-semibold text-white bg-primary shadow-sm focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-primary;
+    @apply relative rounded-sm inline-flex justify-center items-center px-4 py-2 font-semibold text-text dark:text-hanafuda-cream bg-accent dark:bg-hanafuda-gold shadow-sm ring-1 ring-inset ring-border;
     transition: all 0.2s ease-in-out;
   }
 
   .pri-btn:hover {
-    background-color: color-mix(in srgb, var(--color-primary) 90%, black);
+    background-color: color-mix(in srgb, var(--color-hanafuda-gold) 90%, black);
+    scale: 1.05;
   }
 
   .sec-btn {
-    @apply bg-surface px-3 py-2 text-sm font-semibold text-text shadow-sm ring-1 ring-inset ring-border;
+    @apply rounded-sm bg-surface px-4 py-2 font-semibold text-text shadow-sm ring-1 ring-inset ring-border;
     transition: all 0.2s ease-in-out;
   }
 
   .sec-btn:hover {
     background-color: color-mix(in srgb, var(--color-surface) 80%, black);
+    scale: 1.05;
   }
 
   .action-button {

@@ -130,6 +130,8 @@ export const useCardDesign = () => {
   }
 
   const fetchCardUrls = async () => {
+    // Clear the current CARD_MAP before fetching new URLs to prevent stale images
+    CARD_MAP.value = undefined
     CARD_MAP.value = await getCardMap(useDesign().value)
     return CARD_MAP.value
   }
