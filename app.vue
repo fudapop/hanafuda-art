@@ -61,7 +61,6 @@ const currentDesign = useDesign()
 
 const preloadTags = ref()
 const preloadHead = useHead({})
-const fetchedDesigns = new Set()
 
 const preloadImages = () => {
   fetchCardUrls().then((urlMap) => {
@@ -76,11 +75,8 @@ const preloadImages = () => {
   })
 }
 
-const unwatchDesign = watch(currentDesign, () => {
-  if (!fetchedDesigns.has(currentDesign.value)) {
-    fetchedDesigns.add(currentDesign.value)
-    preloadImages()
-  }
+watch(currentDesign, () => {
+  preloadImages()
 })
 
 onMounted(() => {
@@ -106,10 +102,6 @@ onMounted(() => {
     { tagPriority: 'high' },
   )
   preloadImages()
-})
-
-onUnmounted(() => {
-  unwatchDesign()
 })
 </script>
 

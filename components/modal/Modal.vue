@@ -35,7 +35,7 @@
           >
             <HeadlessDialogPanel
               :class="[
-                'relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform rounded-md shadow-xl bg-background dark:bg-hanafuda-cream sm:my-8 sm:w-full sm:max-w-lg sm:p-6',
+                'relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform rounded-md shadow-xl bg-surface dark:bg-hanafuda-cream sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl sm:p-6 lg:p-8',
                 isMobile && 'portrait:w-screen',
               ]"
             >
@@ -68,6 +68,9 @@
 </template>
 
 <script setup lang="ts">
-const { open, modalRef } = defineProps<{ open: boolean; modalRef?: string }>()
+const { open, modalRef } = defineProps<{
+  open: boolean
+  modalRef?: string
+}>()
 const { isMobile } = useDevice()
 </script>

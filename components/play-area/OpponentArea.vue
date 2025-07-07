@@ -1,6 +1,6 @@
 <template>
   <div class="relative w-full h-full isolate">
-    <div class="[--card-height:60px] absolute bottom-0 inset-x-0">
+    <div class="[--card-height:60px] lg:[--card-height:75px] absolute bottom-0 inset-x-0">
       <div class="relative mx-auto w-max">
         <!-- OPPONENT HAND -->
         <ListGrid
@@ -21,8 +21,8 @@
           <!-- OPPONENT-SELECTED CARD -->
           <div
             :class="{
-              'transition-transform duration-200 absolute bottom-0 left-1/2 -translate-x-1/2 w-max mx-auto [--card-height:75px]': true,
-              'scale-[1.5] translate-y-1': selectedCard,
+              'transition-transform duration-200 absolute bottom-0 left-1/2 -translate-x-1/2 w-max mx-auto': true,
+              'scale-[2] translate-y-1': selectedCard,
             }"
           >
             <Transition

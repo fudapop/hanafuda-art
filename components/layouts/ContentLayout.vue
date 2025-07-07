@@ -4,12 +4,20 @@
       <GameBackground />
     </div>
     <div class="sticky top-0 z-[5] flex items-center h-20 bg-black/50 backdrop-blur-sm">
-      <NuxtLink
-        to="/"
-        class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+      <button
+        :class="[
+          'absolute w-10 h-10 transition-all duration-300 rounded-md top-4 left-4 place-content-center',
+          'bg-black/20 hover:bg-black/30 hover:scale-105',
+        ]"
       >
-        ← Back to Game
-      </NuxtLink>
+        <NuxtLink to="/">
+          <Icon
+            name="mdi:arrow-left"
+            class="w-5 h-5 text-white transition-transform duration-300"
+          />
+          <span class="sr-only">Back to title screen</span>
+        </NuxtLink>
+      </button>
     </div>
     <slot />
   </div>

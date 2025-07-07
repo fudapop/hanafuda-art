@@ -1,18 +1,18 @@
 <template>
   <!-- HEADER -->
   <div
-    class="px-4 py-5 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-600 sm:px-6"
+    class="px-4 py-5 border-b bg-surface border-border dark:bg-surface dark:border-border sm:px-6"
   >
     <div class="flex flex-wrap items-end justify-between -mt-2 -ml-4 sm:flex-nowrap">
       <HeadlessDialogTitle
         as="h3"
-        class="text-xl font-semibold leading-6 tracking-wide text-gray-900 dark:text-white"
+        class="text-xl font-semibold leading-6 tracking-wide text-text dark:text-text"
       >
         <div class="flex items-center w-full gap-2">
           <span v-if="final.result === 'Win'"> YOU WIN! </span>
           <span v-else-if="final.result === 'Lose'"> YOU LOSE... </span>
           <span v-else> DRAW </span>
-          <span class="ml-4 text-2xl text-gray-500 dark:text-gray-300">
+          <span class="ml-4 text-2xl text-text-secondary dark:text-text-secondary">
             <NumberAnimation
               ref="number1"
               :from="0"
@@ -35,7 +35,12 @@
       <!-- Warning is logged if no focusable elements rendered -->
       <!-- Hidden during opponent decision -->
       <div v-show="ds.gameOver">
-        <Button :action="() => $emit('close')"> Close </Button>
+        <button
+          class="sec-btn"
+          @click="() => $emit('close')"
+        >
+          Close
+        </button>
       </div>
     </div>
   </div>
@@ -48,11 +53,11 @@
     <HeadlessDisclosureButton
       :class="`flex w-full justify-between my-1 rounded-md ${
         result.winner === 'p1'
-          ? 'text-green-900 bg-green-400'
+          ? 'text-text bg-hanafuda-green'
           : !result.winner
-          ? 'text-indigo-900 bg-indigo-100'
-          : 'text-red-900 bg-red-300'
-      } px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring focus-visible:ring-indigo-500 dark:focus-visible:ring-gray-100 focus-visible:ring-opacity-75`"
+          ? 'text-text bg-surface'
+          : 'text-text bg-primary'
+      } px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring focus-visible:ring-primary dark:focus-visible:ring-accent focus-visible:ring-opacity-75`"
     >
       <span
         >Round {{ result.round }}:
@@ -72,10 +77,12 @@
       <span class="float-right font-semibold">{{ result.score }} points</span>
       <ChevronUpIcon
         :class="open ? '' : 'rotate-180 transform'"
-        class="w-5 h-5 text-gray-500"
+        class="w-5 h-5 text-text-secondary"
       />
     </HeadlessDisclosureButton>
-    <HeadlessDisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500 dark:text-gray-300">
+    <HeadlessDisclosurePanel
+      class="px-4 pt-4 pb-2 text-sm text-text-secondary dark:text-text-secondary"
+    >
       <YakuGrid
         v-if="result.winner"
         :winner="result.winner"

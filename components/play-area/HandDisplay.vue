@@ -44,11 +44,11 @@
 
 <script setup lang="ts">
 import { useCardDesign } from '~/composables/useCardDesign'
-import { type CardName } from '~/utils/cards'
 import { useCardStore } from '~/stores/cardStore'
-import { useGameDataStore } from '~/stores/gameDataStore'
 import { useConfigStore } from '~/stores/configStore'
+import { useGameDataStore } from '~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
+import { type CardName } from '~/utils/cards'
 
 const { id } = defineProps<{ id: PlayerKey }>()
 
@@ -59,14 +59,14 @@ const styleArr: string[] = reactive([])
 const generateStyle = () => {
   styleArr.splice(0)
   styleArr.push(
-    'z-index: 1; transform: rotate( -10deg ) translate( -150px , -10px );',
-    'z-index: 2; transform: rotate( -8deg ) translate( -108px , -6px );',
-    'z-index: 3; transform: rotate( -5deg ) translate( -64px , -2px );',
-    'z-index: 4; transform: rotate( -2deg ) translate( -22px , 0px );',
-    'z-index: 5; transform: rotate(  2deg ) translate( 22px , 0px );',
-    'z-index: 6; transform: rotate( 5deg ) translate( 64px , -2px );',
-    'z-index: 7; transform: rotate( 8deg ) translate( 108px , -6px );',
-    'z-index: 8; transform: rotate( 10deg ) translate( 150px , -10px );',
+    'z-index: 1; transform: rotate( -10deg ) translate( -180px , -10px );',
+    'z-index: 2; transform: rotate( -8deg ) translate( -130px , -6px );',
+    'z-index: 3; transform: rotate( -5deg ) translate( -78px , -2px );',
+    'z-index: 4; transform: rotate( -2deg ) translate( -28px , 0px );',
+    'z-index: 5; transform: rotate(  2deg ) translate( 28px , 0px );',
+    'z-index: 6; transform: rotate( 5deg ) translate( 78px , -2px );',
+    'z-index: 7; transform: rotate( 8deg ) translate( 130px , -6px );',
+    'z-index: 8; transform: rotate( 10deg ) translate( 180px , -10px );',
   )
 }
 

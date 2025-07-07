@@ -9,7 +9,7 @@
       >
         <div
           v-if="ps.bonusMultiplier > 1"
-          class="w-full text-white bg-black/25 rounded-md tracking-wide absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
+          class="w-full text-white bg-black/50 rounded-md tracking-wide absolute top-3/4 after:content-['KOI-KOI'] after:text-[0.6rem] after:font-semibold after:w-full after:block after:text-center"
         >
           <TransitionGroup
             appear
@@ -19,8 +19,8 @@
               :title="`Winning score x${n}!`"
               v-for="n in ps.bonusMultiplier - 1"
               :key="n"
-              class="absolute w-6 h-6 mt-3 -z-10"
-              :style="{ marginLeft: `${(n - 1) * 10}px` }"
+              class="absolute w-6 h-6 mt-4 -z-10"
+              :style="{ marginLeft: `${(n - 1) * 15}px` }"
             >
               <img
                 src="~/assets/images/coin.webp"
@@ -29,7 +29,7 @@
               />
             </div>
           </TransitionGroup>
-          <span class="absolute w-full mt-3 text-center drop-shadow-lg"
+          <span class="absolute w-full mt-4 text-center drop-shadow-lg text-text"
             >x{{ ps.bonusMultiplier }}</span
           >
         </div>

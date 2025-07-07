@@ -20,10 +20,10 @@
         <HeadlessDisclosureButton
           :class="[
             'relative grid w-full grid-cols-[repeat(2,1fr)_max-content] px-4 py-2 items-center text-sm font-medium text-left rounded-sm focus:outline-none focus-visible:ring focus-visible:ring-opacity-75',
-            isComplete(yaku)
-              ? 'text-green-900 bg-green-400 hover:bg-green-200 focus-visible:ring-green-500'
-              : 'text-text bg-accent/20 hover:bg-accent/30 focus-visible:ring-primary border border-border',
             open && 'bg-border text-text',
+            isComplete(yaku)
+              ? '!text-green-900 bg-green-400 hover:bg-green-200 focus-visible:ring-green-500'
+              : 'text-text bg-accent/20 hover:bg-accent/30 focus-visible:ring-primary border border-border',
           ]"
         >
           <span class="font-bold uppercase max-xs:text-xs whitespace-nowrap">
