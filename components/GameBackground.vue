@@ -99,8 +99,17 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import mainTheme from '~/assets/audio/PerituneMaterial_Awayuki.ogg'
+import koikoiTheme from '~/assets/audio/PerituneMaterial_EpicBattle_J_loop.ogg'
+import { useGameDataStore } from '~/stores/gameDataStore'
+
 const { noCalls, koikoiIsCalled } = useDecisionHandler()
+
+const { roundCounter } = storeToRefs(useGameDataStore())
+
 const gameIsStarted = useState('start', () => false)
+
 const { index = 1 } = defineProps<{ index?: number }>()
 // const bgIndex = index
 // const bgImages = [
@@ -117,6 +126,26 @@ const { index = 1 } = defineProps<{ index?: number }>()
 //     alt: 'Crane, Butterfly & Rain-Man',
 //   },
 // ]
+
+const audio = inject('audio') as ReturnType<typeof useAudio>
+const unwatch = watch(
+  [koikoiIsCalled, roundCounter, gameIsStarted],
+  ([newCall, newRound], [_, oldRound]) => {
+    if (newCall) {
+      // Koi-koi was called
+      audio.crossfadeTo(koikoiTheme, 0.2)
+    } else if (newRound > oldRound) {
+      // New round started
+      audio.crossfadeTo(mainTheme, 3)
+    }
+  },
+)
+
+onUnmounted(() => {
+  // Left the game screen
+  audio.crossfadeTo(mainTheme, 3)
+  unwatch()
+})
 </script>
 
 <style scoped>
