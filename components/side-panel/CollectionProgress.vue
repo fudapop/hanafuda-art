@@ -1,15 +1,15 @@
 <template>
-  <div :class="['absolute inset-0 h-full [--card-height:75px]', currentDesign]">
+  <div :class="['relative w-full h-full [--card-height:75px]', currentDesign]">
     <button
       type="button"
       title="Open/close all"
-      class="fixed z-50 text-gray-200 bg-gray-400 rounded-md bottom-8 right-8 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-yellow-300 focus:ring-offset-2"
+      class="fixed z-50 border rounded-sm text-text bg-surface bottom-16 right-3 hover:bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary border-border"
       @click="openAll = !openAll"
     >
-      <ChevronDownIcon :class="['w-7 h-7', openAll ? 'rotate-180' : '']" />
+      <ChevronDownIcon :class="['w-8 h-8', openAll ? 'rotate-180' : '']" />
       <span class="sr-only">Expand/Collapse</span>
     </button>
-    <div class="w-full max-w-lg p-2 mx-auto space-y-2 rounded-2xl">
+    <div class="w-full max-w-lg px-2 py-8 mx-auto space-y-2 overflow-y-auto rounded-2xl">
       <HeadlessDisclosure
         as="div"
         v-for="yaku in allowedYaku"
@@ -19,10 +19,11 @@
       >
         <HeadlessDisclosureButton
           :class="[
-            'relative grid w-full grid-cols-[repeat(2,1fr)_max-content] px-4 py-2 items-center text-sm font-medium text-left rounded-lg focus:outline-none focus-visible:ring focus-visible:ring-opacity-75',
-            isComplete(yaku) ?
-              'text-green-900 bg-green-400 hover:bg-green-200 focus-visible:ring-green-500'
-            : 'text-indigo-900 bg-indigo-100 hover:bg-indigo-200 focus-visible:ring-indigo-500',
+            'relative grid w-full grid-cols-[repeat(2,1fr)_max-content] px-4 py-2 items-center text-sm font-medium text-left rounded-sm focus:outline-none focus-visible:ring focus-visible:ring-opacity-75',
+            isComplete(yaku)
+              ? 'text-green-900 bg-green-400 hover:bg-green-200 focus-visible:ring-green-500'
+              : 'text-text bg-accent/20 hover:bg-accent/30 focus-visible:ring-primary border border-border',
+            open && 'bg-border text-text',
           ]"
         >
           <span class="font-bold uppercase max-xs:text-xs whitespace-nowrap">
@@ -44,7 +45,7 @@
             ></span>
             <span
               v-for="_ in yaku.numRequired - yaku.cards.filter((card) => playerHas(card)).length"
-              class="self-center w-3 h-1 ml-1 rounded-full ring-1 ring-inset ring-gray-400"
+              class="self-center w-3 h-1 ml-1 rounded-full bg-surface ring-1 ring-inset ring-border"
             ></span>
           </span>
 
@@ -58,7 +59,10 @@
             points
           </span>
           <ChevronDownIcon
-            :class="['w-5 h-5 text-gray-500 float-right', open || openAll ? 'rotate-180' : '']"
+            :class="[
+              'w-5 h-5 text-text-secondary float-right',
+              open || openAll ? 'rotate-180' : '',
+            ]"
           />
         </HeadlessDisclosureButton>
 
@@ -74,10 +78,7 @@
           <HeadlessDisclosurePanel
             static
             :key="`${openAll || open}`"
-            :class="[
-              'px-4 pt-2 pb-6 text-sm text-gray-900 dark:text-white',
-              open || openAll ? '' : 'hidden',
-            ]"
+            :class="['px-4 pt-2 pb-6 text-sm text-text', open || openAll ? '' : 'hidden']"
           >
             <p class="mb-2">
               {{ yaku.description.toString() }}
@@ -95,7 +96,7 @@
               >
                 <CardImage
                   :card="card"
-                  :src="useCardDesign().getCardUrl(card)!"
+                  :src="cardDesign.getCardUrl(card)!"
                 />
                 <CheckCircleIcon
                   v-if="playerHas(card)"
@@ -110,7 +111,7 @@
 
             <p
               v-if="viewingsAllowed === 'limited' && viewingYaku.has(yaku.name)"
-              class="mt-4 text-xs max-w-prose whitespace-nowrap"
+              class="mt-4 text-xs max-w-prose whitespace-nowrap text-text-secondary"
             >
               <ExclamationCircleIcon class="inline w-4 h-auto mr-1 pointer-events-none" />
               Requires at least one other
@@ -128,10 +129,10 @@
 
 <script setup lang="ts">
 import {
-  ChevronDownIcon,
   CheckCircleIcon,
-  XCircleIcon,
+  ChevronDownIcon,
   ExclamationCircleIcon,
+  XCircleIcon,
 } from '@heroicons/vue/20/solid'
 import { useCardStore } from '~/stores/cardStore'
 import { useConfigStore } from '~/stores/configStore'
@@ -143,7 +144,8 @@ const config = useConfigStore()
 
 const openAll = ref(false)
 
-const currentDesign = useCardDesign().useDesign()
+const cardDesign = useCardDesign()
+const currentDesign = cardDesign.useDesign()
 
 const playerHas = toValue(computed(() => (card: CardName) => cs.collection.p1.has(card)))
 const opponentHas = toValue(computed(() => (card: CardName) => cs.collection.p2.has(card)))

@@ -1,8 +1,17 @@
+import { useStorage } from '@vueuse/core'
+
 export const useAudio = () => {
   const audioRef = ref<HTMLAudioElement>()
   const isPlaying = ref(false)
-  const currentVolume = ref(0.7)
-  const isMuted = ref(false)
+
+  // Load preferences from localStorage
+  const systemPreferences = useStorage('hanafuda-system-preferences', {
+    volume: 0.5,
+    isMuted: false,
+  })
+
+  const currentVolume = ref(systemPreferences.value.volume)
+  const isMuted = ref(systemPreferences.value.isMuted)
 
   // Initialize audio element
   const initAudio = (src: string) => {
@@ -10,7 +19,9 @@ export const useAudio = () => {
       audioRef.value = new Audio(src)
       audioRef.value.loop = true
       audioRef.value.preload = 'auto'
-      audioRef.value.volume = currentVolume.value
+
+      // Use stored preferences
+      audioRef.value.volume = isMuted.value ? 0 : currentVolume.value
     }
   }
 
@@ -142,6 +153,15 @@ export const useAudio = () => {
     }
     isPlaying.value = false
   }
+
+  // Watch and save changes to localStorage
+  watch(currentVolume, (newVolume) => {
+    systemPreferences.value.volume = newVolume
+  })
+
+  watch(isMuted, (newMutedState) => {
+    systemPreferences.value.isMuted = newMutedState
+  })
 
   // Auto-cleanup on unmount
   onUnmounted(() => {

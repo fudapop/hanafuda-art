@@ -1,5 +1,5 @@
 <template>
-  <div class="grid gap-y-4">
+  <div class="grid">
     <div
       id="user-info"
       class="grid p-4 mx-3"
@@ -96,26 +96,26 @@
     </div>
 
     <!-- Account sign-in/out -->
-    <div class="[@media(max-height:_500px)]:hidden">
-      <div
-        v-if="user?.isGuest"
-        class="mx-auto text-text w-max"
-      >
+    <div
+      v-if="user?.isGuest"
+      class="flex flex-col items-center justify-center h-20 gap-4 pt-4 mx-auto sm:flex-row text-text"
+    >
+      <div>
         <ExclamationCircleIcon class="inline w-6 h-6 align-top" />
-        <p class="inline ml-2 text-sm">Sign in is required to save your profile.</p>
-        <button
-          class="action-button"
-          @click="handleSignIn"
-        >
-          SIGN IN
-        </button>
+        <p class="inline ml-2 text-sm w-max">Sign in is required to save your profile.</p>
       </div>
-      <div
-        v-else
-        class="flex flex-col items-center justify-center"
+      <button
+        class="action-button"
+        @click="handleSignIn"
       >
-        <LoginButton />
-      </div>
+        SIGN IN
+      </button>
+    </div>
+    <div
+      v-else
+      class="flex flex-col items-center justify-center pt-4"
+    >
+      <LoginButton />
     </div>
   </div>
 </template>

@@ -1,20 +1,20 @@
 <template>
   <GameLayout>
-    <div
-      v-show="showLoader"
-      class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]"
-    >
-      <CardsLoader />
-    </div>
-    <!-- <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader> -->
-    <div
-      class="pt-2 z-10 grid grid-rows-[--table-grid-rows] sm:[@media_(max-height:500px)]:grid-rows-[--landscape-grid-rows] w-full min-w-[320px] max-w-[1200px] h-full mx-auto"
-    >
+    <div class="isolate">
+      <div
+        v-show="showLoader"
+        class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]"
+      >
+        <CardsLoader />
+      </div>
+      <!-- <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader> -->
       <!-- OPPONENT HAND -->
-      <LazyOpponentArea />
+      <div class="absolute inset-x-0 top-0 h-28">
+        <LazyOpponentArea />
+      </div>
 
       <!-- OPPONENT COLLECTION -->
-      <div>
+      <div class="absolute inset-x-0 -translate-y-1/2 top-1/4 lg:inset-x-auto lg:right-0">
         <LazyCollectionArea
           player="p2"
           @completed="handleCompletion"
@@ -22,20 +22,21 @@
       </div>
 
       <!-- FIELD -->
-      <div
-        v-click-disabled:unless="players.p1.isActive && !!selectedCard"
-        class="max-md:[--card-height:80px] place-content-center grid grid-cols-[80px_1fr] sm:grid-cols-[160px_1fr] sm:translate-y-4 max-[500px]:scale-[90%] max-[500px]:origin-left"
-      >
-        <LazyDeck />
-        <!-- <LazyListGrid :cols="6" :rows="2" flow="column" gap="4px"> -->
-        <LazyFieldDisplay />
-        <!-- </LazyListGrid> -->
+      <div class="absolute inset-x-0 max-w-5xl -translate-y-3/4 top-1/2">
+        <div
+          v-click-disabled:unless="players.p1.isActive && !!selectedCard"
+          class="max-sm:[--card-height:85px] max-lg:[--card-height:100px] place-content-center grid grid-cols-[80px_1fr] sm:grid-cols-[160px_1fr] sm:translate-y-4 origin-left sm:origin-center"
+        >
+          <LazyDeck />
+          <!-- <LazyListGrid :cols="6" :rows="2" flow="column" gap="4px"> -->
+          <LazyFieldDisplay />
+          <!-- </LazyListGrid> -->
+        </div>
       </div>
 
       <!-- PLAYER COLLECTION -->
-      <div class="relative h-full">
-        <!-- ARTIST CREDIT -->
-        <a
+      <!-- ARTIST CREDIT -->
+      <!-- <a
           v-if="getDesignInfo().creator"
           class="absolute right-4 text-xs italic underline opacity-40 !pointer-events-auto -top-8 underline-offset-4 whitespace-nowrap dark:text-white"
           :title="getDesignInfo().urlDescription"
@@ -43,41 +44,39 @@
           target="_blank"
         >
           Card designs by {{ getDesignInfo().creator }} &rarr;
-        </a>
-        <div class="-mt-2 -z-10">
-          <LazyCollectionArea
-            player="p1"
-            @completed="handleCompletion"
-          />
-        </div>
+        </a> -->
+      <div class="absolute inset-x-0 -translate-y-full lg:inset-x-auto lg:right-0 top-3/4">
+        <LazyCollectionArea
+          player="p1"
+          @completed="handleCompletion"
+        />
       </div>
 
       <!-- PLAYER HAND -->
       <div
         v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
         :class="{
-          'transition-all duration-200 absolute bottom-1/4 right-[40%] w-max max-[500px]:scale-[80%] max-[500px]:origin-left': true,
-          'opacity-50 sm:translate-y-[40px]': players.p2.isActive,
+          'transition-all duration-200 absolute bottom-1/4 inset-x-0 pb-8': true,
+          'opacity-80 sm:translate-y-1/2': players.p2.isActive,
         }"
       >
         <LazyHandDisplay id="p1" />
       </div>
-    </div>
 
-    <LazyResultsModal :show="showModal">
-      <LazyFinalResults
-        v-if="gameOver"
-        :results="ds.roundHistory"
-        @close="handleClose"
-      />
-      <LazyRoundResults
-        v-else
-        @next="handleNext"
-      />
-    </LazyResultsModal>
+      <LazyResultsModal :show="showModal">
+        <LazyFinalResults
+          v-if="gameOver"
+          :results="ds.roundHistory"
+          @close="handleClose"
+        />
+        <LazyRoundResults
+          v-else
+          @next="handleNext"
+        />
+      </LazyResultsModal>
 
-    <!-- DEV BUTTONS -->
-    <!-- <div
+      <!-- DEV BUTTONS -->
+      <!-- <div
       v-if="gameTest"
       v-hide="showLoader"
       class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
@@ -99,6 +98,7 @@
         Stop test
       </button>
     </div> -->
+    </div>
   </GameLayout>
 </template>
 
@@ -137,7 +137,7 @@ const gameTest = useState('test')
 
 const toast = useToast()
 
-const { decisionIsPending, makeDecision, callStop, koikoiIsCalled, stopIsCalled } =
+const { decisionIsPending, makeDecision, callStop, koikoiIsCalled, stopIsCalled, cleanup } =
   useDecisionHandler()
 
 const handleDecision = async () => await makeDecision()
@@ -323,6 +323,7 @@ onBeforeUnmount(() => {
   ds.endRound()
   ds.nextRound()
   handleClose()
+  cleanup()
   // Clear stored data
   // sessionStorage?.removeItem("new-hanafuda");
 })

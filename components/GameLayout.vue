@@ -14,15 +14,16 @@
     <!-- Allows interaction when game not started -->
     <Teleport to="body">
       <!-- EXIT BUTTON -->
-      <div class="fixed w-max top-3 right-16">
+      <div class="fixed w-max top-16 right-4">
         <button
           id="exit-button"
           type="button"
           @click="handlePressExit"
-          class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold drop-shadow-md"
+          :class="['game-ui-btn', gameStart && 'opacity-30 hover:opacity-100']"
         >
-          <ArrowLeftEndOnRectangleIcon
-            class="w-8 h-8 text-white"
+          <Icon
+            name="mdi:logout"
+            class="w-5 h-5 text-white transition-transform duration-300"
             aria-hidden="true"
           />
           <span class="sr-only">Return to homepage</span>
@@ -30,24 +31,53 @@
       </div>
 
       <!-- OPTIONS MENU -->
-      <div class="fixed flex top-3 right-3 gap-x-4">
-        <OptionsMenu :tabCategories="tabs">
+      <div class="fixed flex bottom-4 right-4 gap-x-4">
+        <GameOptionsPanel :tab-categories="['Design', 'Yaku List', 'Gameplay', 'Profile']">
           <template #tab-panel-1>
-            <DesignSelector />
+            <DesignRadioGroup />
           </template>
+          <!-- DESIGN TAB -->
+          <template #tab-icon-1>
+            <Icon
+              name="heroicons:swatch"
+              class="w-5 h-5"
+              aria-hidden="true"
+            />
+          </template>
+          <!-- COLLECTION TAB -->
           <template #tab-panel-2>
+            <CollectionProgress />
+          </template>
+          <template #tab-icon-2>
+            <Icon
+              name="mdi:cards-outline"
+              class="w-5 h-5"
+              aria-hidden="true"
+            />
+          </template>
+          <!-- GAMEPLAY TAB -->
+          <template #tab-panel-3>
             <GameplaySettings />
           </template>
-          <template #tab-panel-3>
+          <template #tab-icon-3>
+            <Icon
+              name="mdi:gamepad-variant"
+              class="w-5 h-5"
+              aria-hidden="true"
+            />
+          </template>
+          <!-- PROFILE TAB -->
+          <template #tab-panel-4>
             <LazyProfilePanel />
           </template>
-        </OptionsMenu>
-      </div>
-
-      <!-- UI TOGGLE BUTTONS -->
-      <div class="fixed right-3 grid text-white min-w-[48px] top-20">
-        <FullscreenToggle />
-        <ColorModeToggle />
+          <template #tab-icon-4>
+            <Icon
+              name="heroicons:user"
+              class="w-5 h-5"
+              aria-hidden="true"
+            />
+          </template>
+        </GameOptionsPanel>
       </div>
     </Teleport>
 
@@ -59,12 +89,10 @@
         '-translate-y-full': !gameStart,
       }"
     >
-      <div class="p-2">
-        <LazyStatusBar
-          :user="null"
-          :playerNum="2"
-        />
-      </div>
+      <LazyStatusBar
+        :user="null"
+        :playerNum="2"
+      />
     </div>
 
     <!-- GAMEPLAY AREA -->
@@ -100,45 +128,11 @@
         'translate-y-full': !gameStart,
       }"
     >
-      <div class="p-2">
-        <LazyStatusBar
-          :user="user"
-          :playerNum="1"
-        />
-      </div>
-    </div>
-
-    <!-- SIDEBAR -->
-    <template v-if="gameStart">
-      <div class="fixed bottom-4 right-4">
-        <button
-          v-show="!sidebarOpen"
-          title="View Collection Progress"
-          class="inline-flex w-full justify-center gap-x-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold drop-shadow-md"
-          type="button"
-          @click="() => (sidebarOpen = true)"
-        >
-          <span class="w-8 h-8 text-gray-900 dark:text-white">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M11.19 2.25c-.26 0-.52.06-.77.15L3.06 5.45a1.994 1.994 0 0 0-1.09 2.6L6.93 20a2 2 0 0 0 1.81 1.25c.26 0 .53-.03.79-.15l7.37-3.05a2.02 2.02 0 0 0 1.23-1.8c.01-.25-.04-.54-.13-.8L13 3.5a1.954 1.954 0 0 0-1.81-1.25m3.48 0l3.45 8.35V4.25a2 2 0 0 0-2-2m4.01 1.54v9.03l2.43-5.86a1.99 1.99 0 0 0-1.09-2.6m-10.28-.14l4.98 12.02l-7.39 3.06L3.8 7.29"
-              />
-            </svg>
-          </span>
-          <span class="sr-only">Open side panel</span>
-        </button>
-      </div>
-      <LazyProgressPanel
-        :open="sidebarOpen"
-        @close="() => (sidebarOpen = false)"
+      <LazyStatusBar
+        :user="user"
+        :playerNum="1"
       />
-    </template>
+    </div>
 
     <!-- LOADER -->
     <Transition
@@ -183,7 +177,6 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/24/outline'
 import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { usePlayerStore } from '~/stores/playerStore'
@@ -195,12 +188,10 @@ const { logout } = useAuth()
 const { players } = storeToRefs(usePlayerStore())
 const user = toValue(useProfile().current)
 
-const tabs = ref(['Design', 'Gameplay', 'Profile'])
 const gameStart = useState('start', () => false)
 const leavingGame = ref(false)
 const promptFeedback = ref(false)
 const promptSignup = ref(false)
-const sidebarOpen = ref(false)
 const showLoader = ref(false)
 
 const feedbackSubmitted = computed(() => user?.flags?.hasSubmittedFeedback)

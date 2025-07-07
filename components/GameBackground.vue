@@ -66,7 +66,7 @@
       ></div>
       <!-- Side decorative flowers -->
       <div
-        class="bottom-0 left-0 transition-transform origin-left -translate-x-1/2 flower-ornament lg:-translate-y-1/2 dark:invert dark:grayscale"
+        class="bottom-0 left-0 transition-all origin-left -translate-x-1/2 flower-ornament lg:-translate-y-1/2 dark:invert dark:grayscale"
       >
         <img
           src="~/assets/images/flower_ingame.png"
@@ -78,7 +78,7 @@
         />
       </div>
       <div
-        class="top-0 right-0 transition-transform origin-right translate-x-1/2 flower-ornament lg:translate-y-1/2 dark:invert dark:grayscale"
+        class="top-0 right-0 transition-all origin-right translate-x-1/2 flower-ornament lg:translate-y-1/2 dark:invert dark:grayscale"
       >
         <img
           src="~/assets/images/flower_ingame.png"
@@ -102,21 +102,21 @@
 const { noCalls, koikoiIsCalled } = useDecisionHandler()
 const gameIsStarted = useState('start', () => false)
 const { index = 1 } = defineProps<{ index?: number }>()
-const bgIndex = index
-const bgImages = [
-  {
-    src: '/bg/grey-hills-1280.webp',
-    srcset:
-      '/bg/grey-hills-768.webp 768w, /bg/grey-hills-1024.webp 1024w, /bg/grey-hills-1280.webp 1280w, /bg/grey-hills-1920.webp 1920w',
-    alt: 'Full moon over grey hills',
-  },
-  {
-    src: '/bg/crane-man-1280.webp',
-    srcset:
-      '/bg/crane-man-768.webp 768w, /bg/crane-man-1024.webp 1024w, /bg/crane-man-1280.webp 1280w, /bg/crane-man-1440.webp 1440w, /bg/crane-man-1920.webp 1920w',
-    alt: 'Crane, Butterfly & Rain-Man',
-  },
-]
+// const bgIndex = index
+// const bgImages = [
+//   {
+//     src: '/bg/grey-hills-1280.webp',
+//     srcset:
+//       '/bg/grey-hills-768.webp 768w, /bg/grey-hills-1024.webp 1024w, /bg/grey-hills-1280.webp 1280w, /bg/grey-hills-1920.webp 1920w',
+//     alt: 'Full moon over grey hills',
+//   },
+//   {
+//     src: '/bg/crane-man-1280.webp',
+//     srcset:
+//       '/bg/crane-man-768.webp 768w, /bg/crane-man-1024.webp 1024w, /bg/crane-man-1280.webp 1280w, /bg/crane-man-1440.webp 1440w, /bg/crane-man-1920.webp 1920w',
+//     alt: 'Crane, Butterfly & Rain-Man',
+//   },
+// ]
 </script>
 
 <style scoped>

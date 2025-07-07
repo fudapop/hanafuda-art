@@ -2,9 +2,10 @@
   <div
     class="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden border-frame -z-10"
   >
+    <!-- Dark overlay for dark mode -->
     <div
       class="absolute inset-0 z-20 duration-300 dark:bg-gradient-to-r dark:from-black/30 dark:via-black/10 dark:to-black/30"
-    ></div>
+    />
     <div class="fixed inset-0 -z-20">
       <img
         src="~/assets/images/bg-landing.png"
@@ -14,7 +15,6 @@
         src="~/assets/images/bg-landing.png"
         class="object-cover w-full h-full dark:invert"
       />
-      <!-- Dark overlay for dark mode -->
     </div>
     <!-- Left Oval -->
     <div
@@ -43,7 +43,12 @@
       </div>
     </div>
     <!-- Centered content -->
-    <div class="relative z-20 flex flex-col items-center justify-center gap-4">
+    <div
+      :class="[
+        'relative z-20 flex flex-col items-center justify-center gap-4',
+        isMobile ? 'landscape:flex-row landscape:justify-around landscape:w-full' : '',
+      ]"
+    >
       <img
         src="~/assets/images/logo-title.png"
         class="w-[180px] mb-2"
@@ -52,7 +57,7 @@
       <h1 class="sr-only">Hanafuda Koi-Koi</h1>
       <div class="flex flex-col items-center gap-4">
         <button
-          class="rounded-sm overflow-hidden mt-24 border-2 border-[#23221c] shadow-md hover:border-primary hover:-translate-y-1 transition-all duration-200 w-[150px]"
+          class="rounded-sm overflow-hidden mt-24 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[150px]"
           @click="$emit('start-game')"
         >
           <img
@@ -62,26 +67,40 @@
           <span class="sr-only"> PLAY NOW </span>
         </button>
 
+        <!-- Options Button - Only show when logged in -->
+        <button
+          v-if="!userIsGuest"
+          class="mt-2 ring-inset action-button"
+          @click="openOptions"
+        >
+          OPTIONS
+        </button>
+
         <!-- Authentication buttons -->
         <div class="flex gap-4">
           <button
             v-if="userIsGuest"
-            class="action-button hover:-translate-y-1"
+            class="action-button"
             @click="goToLogin"
           >
             SIGN UP
           </button>
         </div>
+        <span
+          v-if="userIsGuest"
+          role="link"
+          @click="handleSignin"
+          class="block text-sm text-center transition-colors duration-200 cursor-pointer text-text-secondary hover:underline hover:text-primary"
+        >
+          Sign in to an existing account &rarr;
+        </span>
       </div>
-      <span
-        v-if="userIsGuest"
-        role="link"
-        @click="handleSignin"
-        class="block text-sm text-center transition-colors duration-200 cursor-pointer text-text-secondary hover:underline hover:text-primary"
-      >
-        Sign in to an existing account &rarr;
-      </span>
     </div>
+    <div class="fixed bottom-0 z-50 w-full">
+      <StartScreenFooter />
+    </div>
+
+    <AnnouncementModal />
   </div>
 </template>
 
@@ -90,6 +109,8 @@ const emit = defineEmits(['start-game'])
 const testPlay = useState('test', () => false)
 const gameStart = useState('gameStart')
 const { userIsGuest, logout } = useAuth()
+const { isMobile } = useDevice()
+const { openOptions } = useOptionsPanel()
 
 const testGame = () => {
   testPlay.value = true

@@ -1,6 +1,6 @@
-import { type User, onAuthStateChanged, getAuth } from 'firebase/auth'
-import { type DocumentData, doc, getDoc, setDoc, getFirestore } from 'firebase/firestore'
 import { useStorage } from '@vueuse/core'
+import { type User, getAuth, onAuthStateChanged } from 'firebase/auth'
+import { type DocumentData, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { type CardDesign } from '~/composables/useCardDesign'
 
 interface UserProfile {
@@ -197,6 +197,8 @@ export const useProfile = () => {
       () => {
         if (!current.value) {
           console.debug('Cleared profile watcher.')
+          watcher.value?.()
+          watcher.value = null
         }
         updateProfile()
       },

@@ -4,7 +4,7 @@
     as="div"
     class="relative w-full @container"
   >
-    <div class="sticky top-0 z-10 flex justify-between px-4 py-2 shadow-sm bg-surface">
+    <div class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-sm bg-surface">
       <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-text">
         Select a design
         <p class="ml-2 text-sm font-medium text-text-secondary whitespace-nowrap">
@@ -12,7 +12,7 @@
         </p>
       </HeadlessRadioGroupLabel>
       <div
-        class="flex items-center self-start font-semibold tracking-wide text-text gap-x-2 whitespace-nowrap"
+        class="flex items-center font-semibold tracking-wide text-text gap-x-2 whitespace-nowrap"
       >
         <img
           src="~/assets/images/coin.webp"
@@ -22,7 +22,7 @@
         {{ coins }}
       </div>
     </div>
-    <div class="grid justify-center w-full px-3 mt-2 space-y-12">
+    <div class="grid justify-center w-full pt-4 pb-12 space-y-12">
       <HeadlessRadioGroupOption
         v-for="(design, index) in sortedDesigns"
         v-slot="{ checked }"
@@ -35,7 +35,7 @@
       >
         <div
           :class="[
-            'grid w-full rounded-[inherit] @md:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @md:grid-rows-1 relative',
+            'grid w-full rounded-[inherit] @lg:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @lg:grid-rows-1 relative',
             checked ? 'ring-2 ring-primary' : 'ring-0',
           ]"
         >
@@ -141,7 +141,7 @@
                 class="absolute inset-0 flex items-center"
                 aria-hidden="true"
               >
-                <div class="w-[90%] mx-auto mt-12 border-b border-border opacity-30" />
+                <div class="w-[90%] mx-auto mt-12 border-b border-border opacity-80" />
               </div>
             </div>
           </div>
@@ -322,14 +322,20 @@ const handleLike = (design: CardDesign) => {
 }
 
 onMounted(() => {
-  const defaultDesign = unlocked.value?.find(isNew) || 'cherry-version'
-  if (userIsGuest) {
-    currentDesign.value = defaultDesign
-  } else {
-    currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || defaultDesign
+  if (!currentDesign.value || currentDesign.value === 'cherry-version') {
+    const defaultDesign = unlocked.value?.find(isNew) || 'cherry-version'
+    if (userIsGuest) {
+      currentDesign.value = defaultDesign
+    } else {
+      currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || defaultDesign
+    }
   }
-  DESIGNS.forEach(async (design) => {
-    likesCount.set(design, (await getLikesCount(design)) ?? 0)
-  })
+  // DESIGNS.forEach(async (design) => {
+  //   likesCount.set(design, (await getLikesCount(design)) ?? 0)
+  // })
+})
+
+onUnmounted(() => {
+  if (timeoutId) clearTimeout(timeoutId)
 })
 </script>

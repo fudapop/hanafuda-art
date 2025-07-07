@@ -1,7 +1,7 @@
 <template>
   <div>
     <form
-      class="space-y-4 min-w-[300px] pt-4 border-border/20"
+      class="space-y-4 min-w-[300px] border-border/20"
       action=""
       @submit.prevent="handleEmailLogin"
     >
@@ -141,7 +141,7 @@
               class="block w-full mt-2 text-sm text-center text-text-secondary hover:underline hover:text-primary"
               @click="newAccount = true"
             >
-              I don&apos;t have an account &rarr;
+              I don&apos;t have an account
             </a>
           </div>
         </section>

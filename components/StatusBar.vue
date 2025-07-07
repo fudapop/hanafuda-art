@@ -1,53 +1,56 @@
 <template>
-  <div class="sm:flex sm:items-end sm:justify-between max-w-[850px] mx-auto">
-    <div class="flex items-end space-x-2 sm:space-x-5">
-      <div class="flex-shrink-0">
-        <img
-          v-if="user"
-          class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
-          :src="user.avatar"
-          :alt="user.username"
-        />
-        <img
-          v-else
-          :src="avatar2"
-          class="w-16 h-16 sm:[@media_(max-height:500px)]:w-8 sm:[@media_(max-height:500px)]:h-8 mx-auto rounded-full"
-        />
-      </div>
-      <div class="mt-2 sm:mt-0 sm:pt-1 sm:[@media_(max-height:500px)]:flex sm:items-end sm:gap-x-4">
-        <p class="text-lg font-bold text-white sm:text-xl">
-          {{ user?.username || `Player ${playerNum}` }}
-        </p>
-        <p class="flex items-center text-xs font-medium text-white">
-          <span class="[@media_(max-height:500px)]:sr-only pt-1 mr-2 text-gray-300">
-            Round {{ ds.roundCounter }} / {{ useConfigStore().maxRounds }}
-          </span>
-          <span
-            class="flex items-center text-xl font-semibold"
-            v-memo="[ds.roundOver, gameStart]"
+  <div class="relative w-full p-4 h-28">
+    <div :class="['w-full h-full mx-auto flex', isPlayer1 ? 'items-end' : 'items-start']">
+      <div class="flex space-x-2 sm:space-x-4">
+        <div class="flex-shrink-0">
+          <img
+            v-if="user"
+            class="w-20 h-20 mx-auto border-2 rounded-full border-border"
+            :src="user.avatar"
+            :alt="user.username"
+          />
+          <img
+            v-else
+            :src="avatar2"
+            class="w-20 h-20 mx-auto border-2 rounded-full border-border"
+          />
+        </div>
+        <div :class="['flex flex-col gap-y-2', isPlayer1 ? 'justify-end' : 'justify-start']">
+          <p
+            v-if="isPlayer1"
+            class="text-sm font-normal text-white/80"
           >
-            <img
-              src="~/assets/images/coin.webp"
-              alt="coin"
-              class="w-5 h-5 mx-1 drop-shadow-sm"
-            />
-            <NumberAnimation
-              ref="number1"
-              :from="0"
-              :to="score"
-              :format="(value: number) => value.toFixed(0)"
-              :duration="1"
-              autoplay
-              easing="linear"
-            />
-          </span>
-        </p>
+            Round {{ ds.roundCounter }} / {{ config.maxRounds }}
+          </p>
+          <div class="flex text-lg gap-x-4 sm:text-2xl text-white/90">
+            <p class="font-bold">
+              {{ user?.username || `Player ${playerNum}` }}
+            </p>
+            <p class="flex items-center font-bold">
+              <span
+                class="flex items-center"
+                v-memo="[ds.roundOver, gameStart]"
+              >
+                <img
+                  src="~/assets/images/coin.webp"
+                  alt="coin"
+                  class="w-5 h-5 mx-1 drop-shadow-sm"
+                />
+                <NumberAnimation
+                  ref="number1"
+                  :from="0"
+                  :to="score"
+                  :format="(value: number) => value.toFixed(0)"
+                  :duration="1"
+                  autoplay
+                  easing="linear"
+                />
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
-    <div
-      v-if="playerNum == 1"
-      class="flex justify-center mt-5 sm:mt-0 z-[-1]"
-    ></div>
   </div>
 </template>
 
@@ -61,11 +64,14 @@ import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
 const { user, playerNum } = defineProps(['user', 'playerNum'])
 const ds = useGameDataStore()
 const ps = usePlayerStore()
+const config = useConfigStore()
+
 const gameStart = useState('start')
 const { gameOver } = storeToRefs(ds)
 const player = `p${playerNum}` as PlayerKey
 const opponent: PlayerKey = player === 'p1' ? 'p2' : 'p1'
 const score = computed(() => ds.scoreboard[player])
+const isPlayer1 = computed(() => playerNum === 1)
 
 const avatars = [
   '/avatars/origami-crane.webp',
