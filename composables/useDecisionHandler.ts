@@ -46,6 +46,13 @@ export const useDecisionHandler = () => {
     })
   }
 
+  const cleanup = () => {
+    if (watcher.value) {
+      watcher.value()
+      watcher.value = null
+    }
+  }
+
   return {
     // Setters
     callKoikoi,
@@ -58,5 +65,6 @@ export const useDecisionHandler = () => {
     getDecision,
     // Functions
     makeDecision,
+    cleanup,
   }
 }

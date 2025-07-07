@@ -13,6 +13,7 @@
         <SakuraLoader v-if="loading" />
       </Transition>
     </div>
+    <SystemOptionsPopover />
     <NuxtPage />
   </div>
 </template>
@@ -27,9 +28,6 @@ const loading = ref(false)
 const nuxtApp = useNuxtApp()
 const vueApp = nuxtApp.vueApp
 
-// Initialize audio
-const audio = useAudio()
-
 vueApp.directive('hide', vHide)
 vueApp.directive('click-disabled', vClickDisabled)
 
@@ -41,17 +39,48 @@ vueApp.use(Toast, {
   newestOnTop: true,
 })
 
-// Provide audio controls globally
-provide('audio', audio)
-
 nuxtApp.hook('page:start', () => {
   loading.value = true
 })
 
-nuxtApp.hook('page:finish', async () => {
-  await sleep(500)
+nuxtApp.hook('page:finish', () => {
   loading.value = false
   window.dispatchEvent(new CustomEvent('ptupdate'))
+})
+
+// Initialize audio
+const audio = useAudio()
+
+// Provide audio controls globally
+provide('audio', audio)
+
+// Preload images
+const { useDesign, fetchCardUrls } = useCardDesign()
+
+const currentDesign = useDesign()
+
+const preloadTags = ref()
+const preloadHead = useHead({})
+const fetchedDesigns = new Set()
+
+const preloadImages = () => {
+  fetchCardUrls().then((urlMap) => {
+    preloadTags.value = [...urlMap.values()].map((url) => ({
+      rel: 'preload',
+      href: url,
+      as: 'image',
+    }))
+    preloadHead?.patch({
+      link: preloadTags.value,
+    })
+  })
+}
+
+const unwatchDesign = watch(currentDesign, () => {
+  if (!fetchedDesigns.has(currentDesign.value)) {
+    fetchedDesigns.add(currentDesign.value)
+    preloadImages()
+  }
 })
 
 onMounted(() => {
@@ -68,6 +97,19 @@ onMounted(() => {
 
   // Setup autoplay after user interaction
   audio.setupAutoplay()
+
+  // Initialize design selector
+  useHead(
+    {
+      link: [{ rel: 'preconnect', href: 'https://firebasestorage.googleapis.com' }],
+    },
+    { tagPriority: 'high' },
+  )
+  preloadImages()
+})
+
+onUnmounted(() => {
+  unwatchDesign()
 })
 </script>
 

@@ -4,7 +4,7 @@
     v-if="!!focusedYaku"
   >
     <div
-      class="block w-full overflow-y-visible rounded-sm group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
+      class="block w-full overflow-y-visible rounded-sm group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-border"
     >
       <!-- CARD IMAGES -->
       <div
@@ -25,12 +25,12 @@
       <div class="flex items-center gap-x-4">
         <a
           :title="YAKU[focusedYaku.name].description.toString()"
-          class="block text-sm font-semibold tracking-wide text-gray-900 truncate dark:text-white cursor-help"
+          class="block text-sm font-semibold tracking-wide truncate text-text cursor-help"
         >
           {{ focusedYaku.name.toUpperCase() }}
         </a>
         <!-- YAKU POINTS -->
-        <p class="block text-sm font-medium text-gray-500 pointer-events-none dark:text-gray-400">
+        <p class="block text-sm font-medium pointer-events-none text-text">
           {{ focusedYaku.points }}
           points
         </p>
@@ -55,7 +55,7 @@
       class="relative"
     >
       <div
-        class="block w-full overflow-hidden rounded-sm group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100"
+        class="block w-full overflow-hidden rounded-sm group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-border"
       >
         <!-- CARD IMAGES -->
         <div
@@ -75,12 +75,12 @@
         <div class="flex flex-col">
           <a
             :title="YAKU[yaku.name].description.toString()"
-            class="block text-sm font-semibold tracking-wide text-gray-900 truncate dark:text-white cursor-help"
+            class="block text-sm font-semibold tracking-wide truncate text-text cursor-help"
           >
             {{ yaku.name.toUpperCase() }}
           </a>
           <!-- YAKU POINTS -->
-          <p class="block text-sm font-medium text-gray-500 pointer-events-none dark:text-gray-400">
+          <p class="block text-sm font-medium pointer-events-none text-text">
             {{ yaku.points }}
             points
           </p>

@@ -1,13 +1,16 @@
 <template>
   <ContentLayout>
-    <div class="isolate">
+    <div class="overflow-hidden isolate">
       <div
         v-if="!loggingIn"
-        class="flex justify-center my-12 drop-shadow-xl"
+        :class="[
+          'flex justify-center drop-shadow-xl my-12 w-full',
+          'landscape:w-1/2 landscape:h-screen landscape:items-center landscape:my-auto',
+        ]"
       >
         <img
           src="~/assets/images/logo-title.png"
-          class="w-[100px] mb-2"
+          class="landscape:max-h-[20vw] max-h-[120px] h-[40vh]"
           alt="Hanafuda Koi-Koi"
         />
         <h1 class="sr-only">Hanafuda Koi-Koi</h1>
@@ -32,52 +35,55 @@
         </div>
         <div
           v-else
-          class="absolute inset-0 px-4 py-8 m-auto overflow-hidden rounded-sm shadow-lg -z-10 bg-white/90 dark:bg-hanafuda-cream w-max h-max sm:px-6 lg:px-20 xl:px-24"
+          :class="[
+            'absolute px-4 py-8 overflow-hidden rounded-md shadow-lg -z-10 bg-white dark:bg-hanafuda-cream w-max h-max',
+            'landscape:h-screen landscape:top-0 landscape:right-0 landscape:w-1/2 landscape:max-w-none landscape:overflow-y-auto',
+            !isMobile && 'landscape:flex landscape:items-center',
+            'portrait:bottom-1/4 portrait:inset-x-0 portrait:top-32 portrait:w-screen',
+          ]"
         >
-          <div class="max-w-sm mx-auto min-w-[300px] w-[90vw] lg:w-96">
-            <div class="pt-8 space-y-4">
-              <EmailLoginForm
-                @success="handleLoginSuccess"
-                @linked="handleLinked"
-                @error="handleLoginError"
-              />
+          <div class="max-w-md mx-auto min-w-[300px] pt-8 w-full">
+            <EmailLoginForm
+              @success="handleLoginSuccess"
+              @linked="handleLinked"
+              @error="handleLoginError"
+            />
 
-              <OAuthSignupForm
-                v-if="currentUser"
-                @success="handleLinked"
-                @error="handleLoginError"
-              />
-              <OAuthLoginForm
-                v-else
-                @success="handleLoginSuccess"
-                @error="handleLoginError"
-              />
+            <OAuthSignupForm
+              v-if="currentUser"
+              @success="handleLinked"
+              @error="handleLoginError"
+            />
+            <OAuthLoginForm
+              v-else
+              @success="handleLoginSuccess"
+              @error="handleLoginError"
+            />
 
-              <div class="w-full text-sm text-center">
-                <NuxtLink
-                  :external="!currentUser"
-                  to="/"
-                  class="text-text-secondary hover:underline hover:text-primary"
-                >
-                  Continue as guest &rarr;
-                </NuxtLink>
-              </div>
+            <div class="w-full my-8 text-sm text-center">
+              <NuxtLink
+                :external="!currentUser"
+                to="/"
+                class="text-text-secondary hover:underline hover:text-primary"
+              >
+                Continue as guest
+              </NuxtLink>
+            </div>
 
-              <!-- Legal Links -->
-              <div class="w-full space-x-4 text-xs text-center text-text-secondary">
-                <NuxtLink
-                  to="/terms"
-                  class="underline hover:text-text-secondary/80"
-                >
-                  Terms of Use
-                </NuxtLink>
-                <NuxtLink
-                  to="/privacy"
-                  class="underline hover:text-text-secondary/80"
-                >
-                  Privacy Policy
-                </NuxtLink>
-              </div>
+            <!-- Legal Links -->
+            <div class="w-full space-x-4 text-xs text-center text-text-secondary">
+              <NuxtLink
+                to="/terms"
+                class="underline hover:text-text-secondary/80"
+              >
+                Terms of Use
+              </NuxtLink>
+              <NuxtLink
+                to="/privacy"
+                class="underline hover:text-text-secondary/80"
+              >
+                Privacy Policy
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -86,7 +92,13 @@
   </ContentLayout>
 </template>
 <script setup lang="ts">
+import { useScreenOrientation } from '@vueuse/core'
 import { useToast } from 'vue-toastification'
+
+const { isMobile } = useDevice()
+const { orientation } = useScreenOrientation()
+const isLandscape = computed(() => orientation.value?.includes('landscape'))
+
 const { loginAsGuest } = useAuth()
 const { upgradeGuestProfile, current: currentUser } = useProfile()
 const toast = useToast()

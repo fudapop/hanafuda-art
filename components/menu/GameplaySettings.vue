@@ -1,7 +1,7 @@
 <template>
   <div
     ref="settingsPanel"
-    class="grid max-h-[calc(100dvh-84px)] [@media(max-height:500px)]:max-h-[100dvh] xs:max-h-[75vh] gap-4 p-4 overflow-y-auto"
+    class="h-full px-8 py-8"
   >
     <ClientOnly>
       <div
@@ -59,7 +59,7 @@
               <span class="sr-only">Read about scoring on fudawiki.org</span>
             </a>
           </div>
-          <div class="pb-4 space-y-4">
+          <div class="space-y-4">
             <!-- Set wild-card behavior for KIKU-NI-SAKAZUKI -->
             <ToggleSwitch
               :callback="toggleSake"
@@ -141,7 +141,7 @@
         </ul>
       </div>
 
-      <div :class="['space-y-4 pb-4', gameStart ? 'order-first' : '']">
+      <div :class="['space-y-4 pb-4 pt-8']">
         <p class="text-base font-semibold leading-6 text-text">Interface</p>
         <ToggleSwitch
           :callback="toggleLabels"
@@ -176,6 +176,7 @@
 </template>
 
 <script setup lang="ts">
+import { LockClosedIcon, QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import { onClickOutside } from '@vueuse/core'
 import {
   useConfigStore,

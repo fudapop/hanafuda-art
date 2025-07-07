@@ -10,7 +10,7 @@
     viewBox="0 0 1002 1004"
     enable-background="new 0 0 1002 1004"
     xml:space="preserve"
-    class="w-5 h-5 mx-auto transition-colors fill-white/70 hover:fill-white"
+    class="w-5 h-5 mx-auto fill-text"
   >
     <path
       class="accent-fill"

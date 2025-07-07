@@ -1,19 +1,19 @@
+import { useStorage } from '@vueuse/core'
 import {
+  createUserWithEmailAndPassword,
+  EmailAuthProvider,
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  linkWithCredential,
+  linkWithPopup,
+  sendPasswordResetEmail,
   signInAnonymously,
   signInWithEmailAndPassword,
-  EmailAuthProvider,
-  GoogleAuthProvider,
-  GithubAuthProvider,
+  signInWithPopup,
   // FacebookAuthProvider,
   signOut,
-  signInWithPopup,
-  linkWithPopup,
   type UserCredential,
-  linkWithCredential,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
 } from 'firebase/auth'
-import { useStorage } from '@vueuse/core'
 import { useToast } from 'vue-toastification'
 
 export const useAuth = () => {

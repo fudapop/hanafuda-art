@@ -104,6 +104,7 @@ export default defineNuxtConfig({
     '@nuxtjs/partytown',
     '@nuxtjs/i18n',
     '@nuxt/content',
+    '@nuxtjs/device',
   ],
   postcss: {
     plugins: {

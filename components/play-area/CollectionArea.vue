@@ -1,26 +1,40 @@
 <template>
-  <div class="gap-1 opacity-75 collection-area">
-    <ul
-      v-for="type in cardTypes"
-      :key="type"
-      class="relative flex h-full py-2"
-      @dblclick="modalOpen = true"
-      @dbltap="modalOpen = true"
+  <div class="w-full px-4 opacity-90">
+    <button
+      v-if="hasCards"
+      :title="`View ${modalTitle}`"
+      :class="['absolute right-4 my-2', player === 'p1' ? 'bottom-full' : 'top-full']"
+      @click="modalOpen = true"
     >
-      <span
-        v-show="coll[type].size > 0"
-        class="uppercase absolute top-1 left-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
-      >
-        <span class="mr-1 text-xs align-middle">
-          {{ coll[type].size }}
-        </span>
-        {{ type }}
-      </span>
-      <CardList
-        :cards="coll[type]"
-        :stack="true"
+      <span class="sr-only">View {{ modalTitle }}</span>
+      <MagnifyingGlassPlusIcon
+        class="w-6 h-6 stroke-2 stroke-text"
+        aria-hidden
       />
-    </ul>
+    </button>
+    <div class="collection-area">
+      <ul
+        v-for="type in cardTypes"
+        :key="type"
+        class="relative inline-flex flex-wrap justify-end w-full max-w-[200px] -gap-2"
+        @dblclick="modalOpen = true"
+        @dbltap="modalOpen = true"
+      >
+        <span
+          v-show="coll[type].size > 0"
+          class="uppercase absolute top-1 right-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
+        >
+          <span class="mr-1 text-xs align-middle">
+            {{ coll[type].size }}
+          </span>
+          {{ type }}
+        </span>
+        <CardList
+          :cards="coll[type]"
+          :stack="true"
+        />
+      </ul>
+    </div>
   </div>
 
   <LazyModal
@@ -67,6 +81,7 @@
 </template>
 
 <script setup lang="ts">
+import { MagnifyingGlassPlusIcon } from '@heroicons/vue/24/outline'
 import { storeToRefs } from 'pinia'
 import { useCardStore } from '~/stores/cardStore'
 import { useConfigStore } from '~/stores/configStore'
@@ -100,6 +115,7 @@ const coll: Record<string, Set<CardName>> = reactive({
   ribbons: new Set([]),
   plains: new Set([]),
 })
+const hasCards = computed(() => Object.values(coll).some((c) => c.size))
 
 const collection = computed(() => sortByType([...cs.collection[player]]))
 const cBrights = computed(() => collection.value.brights)
@@ -191,3 +207,35 @@ watch(
   { flush: 'post' },
 )
 </script>
+
+<style scoped>
+.collection-area {
+  --card-height: 50px;
+  display: grid;
+  grid-template-columns: 45% 55%;
+  grid-template-rows: repeat(2, minmax(var(--card-height), 1fr));
+}
+
+@media (min-width: 640px) or (max-height: 720px) {
+  .collection-area {
+    /* grid-template-columns: 15% 22% 23% 40%; */
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: minmax(var(--card-height), 1fr);
+  }
+}
+/* 
+@media (min-width: 640px) and (min-height: 720px) {
+  .collection-area {
+    --card-height: 75px;
+  }
+} */
+
+@media (min-width: 1024px) {
+  .collection-area {
+    justify-content: flex-end;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    /* grid-template-rows: repeat(4, minmax(var(--card-height), 1fr)); */
+  }
+}
+</style>
