@@ -1,8 +1,4 @@
 <template>
-  <div
-    v-if="!loaded"
-    class="w-full h-full bg-black/20 animate-pulse"
-  />
   <template
     v-if="!!src"
     v-show="loaded"
@@ -17,10 +13,6 @@
       sizes="100vw"
     />
   </template>
-  <div
-    v-else
-    class="w-full h-full bg-black/20 animate-pulse"
-  />
 </template>
 
 <script setup lang="ts">
