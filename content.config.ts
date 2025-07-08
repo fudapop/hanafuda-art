@@ -10,6 +10,11 @@ export default defineContentConfig({
         description: z.string(),
         date: z.string(),
         features: z.array(z.string()).optional(),
+        // Impression tracking
+        impressions: z.object({
+          views: z.number().default(0),
+          likes: z.number().default(0),
+        }).optional(),
       }),
     }),
     policies: defineCollection({

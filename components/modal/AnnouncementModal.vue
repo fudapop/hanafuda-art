@@ -140,6 +140,47 @@
             />
           </button>
         </div>
+
+        <!-- Impression tracking -->
+        <div
+          v-if="currentAnnouncement"
+          class="flex items-center justify-between pt-3 mt-3 border-t border-gray-200 dark:border-gray-600"
+        >
+          <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <span class="flex items-center gap-1">
+              <Icon
+                name="heroicons:eye"
+                class="w-4 h-4"
+              />
+              {{ impressions[currentAnnouncement.id]?.views || 0 }} views
+            </span>
+            <span class="flex items-center gap-1">
+              <Icon
+                name="heroicons:heart"
+                class="w-4 h-4"
+              />
+              {{ impressions[currentAnnouncement.id]?.likes || 0 }} likes
+            </span>
+          </div>
+          
+          <button
+            type="button"
+            :class="[
+              'flex items-center gap-2 px-2 py-1 text-sm rounded-md transition-colors',
+              isLiked(currentAnnouncement.id)
+                ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+                : 'text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400',
+            ]"
+            @click="handleLike"
+          >
+            <Icon
+              :name="isLiked(currentAnnouncement.id) ? 'heroicons:heart-solid' : 'heroicons:heart'"
+              class="w-4 h-4"
+            />
+            {{ isLiked(currentAnnouncement.id) ? 'Unlike' : 'Like' }}
+          </button>
+        </div>
+        </div>
       </div>
     </template>
 
@@ -175,6 +216,9 @@ const {
   checkAndShowAnnouncements,
   dismissAnnouncements,
   dontShowAnnouncementsAgain,
+  trackLike,
+  isLiked,
+  impressions,
 } = await useAnnouncements()
 
 // Pagination state
@@ -278,6 +322,12 @@ const handleDismiss = () => {
 
 const handleDontShowAgain = () => {
   dontShowAnnouncementsAgain()
+}
+
+const handleLike = () => {
+  if (currentAnnouncement.value) {
+    trackLike(currentAnnouncement.value.id)
+  }
 }
 </script>
 
