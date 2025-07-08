@@ -220,7 +220,7 @@ const handleSignupCancel = async () => {
   promptFeedback.value = true
 }
 
-const unwatch = watch([gameStart, leavingGame], async () => {
+const unwatchGame = watch([gameStart, leavingGame], async () => {
   if (!gameStart.value && !leavingGame.value) {
     showLoader.value = true
     if (user?.isGuest && !signupDeclined.value) {
@@ -237,7 +237,11 @@ const unwatch = watch([gameStart, leavingGame], async () => {
     }
     await sleep(500)
     showLoader.value = false
-    unwatch()
+    unwatchGame()
   }
+})
+
+onUnmounted(() => {
+  unwatchGame?.()
 })
 </script>
