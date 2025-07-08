@@ -206,6 +206,17 @@ export const useAudio = () => {
     cleanup()
   })
 
+  const playSfx = (src: string) => {
+    if (!import.meta.client) return
+    const sfx = new Audio(src)
+    sfx.volume = isMuted.value ? 0 : currentVolume.value
+    sfx.play()
+    return new Promise<void>((resolve) => {
+      sfx.onended = () => resolve()
+      sfx.onerror = () => resolve()
+    })
+  }
+
   return {
     // State
     isPlaying: readonly(isPlaying),
@@ -224,5 +235,6 @@ export const useAudio = () => {
     setupAutoplay,
     cleanup,
     crossfadeTo, // new method
+    playSfx,
   }
 }
