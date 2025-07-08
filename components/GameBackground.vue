@@ -104,31 +104,37 @@ import mainTheme from '~/assets/audio/PerituneMaterial_Awayuki.ogg'
 import koikoiTheme from '~/assets/audio/PerituneMaterial_EpicBattle_J_loop.ogg'
 import { useGameDataStore } from '~/stores/gameDataStore'
 
-const { noCalls, koikoiIsCalled } = useDecisionHandler()
+const { koikoiIsCalled } = useDecisionHandler()
 
 const { roundCounter } = storeToRefs(useGameDataStore())
 
 const gameIsStarted = useState('start', () => false)
 
-const { index = 1 } = defineProps<{ index?: number }>()
-// const bgIndex = index
-// const bgImages = [
-//   {
-//     src: '/bg/grey-hills-1280.webp',
-//     srcset:
-//       '/bg/grey-hills-768.webp 768w, /bg/grey-hills-1024.webp 1024w, /bg/grey-hills-1280.webp 1280w, /bg/grey-hills-1920.webp 1920w',
-//     alt: 'Full moon over grey hills',
-//   },
-//   {
-//     src: '/bg/crane-man-1280.webp',
-//     srcset:
-//       '/bg/crane-man-768.webp 768w, /bg/crane-man-1024.webp 1024w, /bg/crane-man-1280.webp 1280w, /bg/crane-man-1440.webp 1440w, /bg/crane-man-1920.webp 1920w',
-//     alt: 'Crane, Butterfly & Rain-Man',
-//   },
-// ]
+const { fetchCardUrls, useDesign } = useCardDesign()
+const currentDesign = useDesign()
+
+const preloadHead = useHead({})
+
+const preloadImages = () => {
+  fetchCardUrls().then((urlMap) => {
+    const preloadTags = [...urlMap.values()].map((url) => ({
+      rel: 'preload',
+      href: url,
+      as: 'image' as const,
+    }))
+    preloadHead?.patch({
+      link: preloadTags,
+    })
+  })
+}
+
+const cleanupPreload = watch(currentDesign, () => {
+  preloadImages()
+})
 
 const audio = inject('audio') as ReturnType<typeof useAudio>
-const unwatch = watch(
+
+const cleanupAudio = watch(
   [koikoiIsCalled, roundCounter, gameIsStarted],
   ([newCall, newRound], [_, oldRound]) => {
     if (newCall) {
@@ -141,10 +147,15 @@ const unwatch = watch(
   },
 )
 
+onMounted(() => {
+  preloadImages()
+})
+
 onUnmounted(() => {
   // Left the game screen
-  audio.crossfadeTo(mainTheme, 3)
-  unwatch()
+  audio.crossfadeTo?.(mainTheme, 3)
+  cleanupAudio()
+  cleanupPreload()
 })
 </script>
 

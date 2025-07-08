@@ -54,31 +54,6 @@ const audio = useAudio()
 // Provide audio controls globally
 provide('audio', audio)
 
-// Preload images
-const { useDesign, fetchCardUrls } = useCardDesign()
-
-const currentDesign = useDesign()
-
-const preloadTags = ref()
-const preloadHead = useHead({})
-
-const preloadImages = () => {
-  fetchCardUrls().then((urlMap) => {
-    preloadTags.value = [...urlMap.values()].map((url) => ({
-      rel: 'preload',
-      href: url,
-      as: 'image',
-    }))
-    preloadHead?.patch({
-      link: preloadTags.value,
-    })
-  })
-}
-
-watch(currentDesign, () => {
-  preloadImages()
-})
-
 onMounted(() => {
   const googleScripts = [/.*\/www\.gstatic\.com\/.*/, /.*\/apis\.google\.com\/.*/]
   const scripts = ref(document.head.querySelectorAll('script'))
@@ -101,7 +76,6 @@ onMounted(() => {
     },
     { tagPriority: 'high' },
   )
-  preloadImages()
 })
 </script>
 
