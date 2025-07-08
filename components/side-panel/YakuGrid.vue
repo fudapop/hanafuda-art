@@ -9,9 +9,9 @@
       <!-- CARD IMAGES -->
       <div
         v-if="showCards"
-        class="[--card-height:100px] w-max"
+        class="[--card-height:100px] w-full"
       >
-        <ul className="list-none grid grid-rows-1 grid-flow-col">
+        <ul className="list-none flex items-center flex-wrap max-w-full">
           <CardList
             :cards="focusedYaku.cards"
             :stack="false"
@@ -60,9 +60,9 @@
         <!-- CARD IMAGES -->
         <div
           v-if="showCards"
-          class="[--card-height:60px] w-max pointer-events-none"
+          class="[--card-height:60px] w-full pointer-events-none"
         >
-          <ul className="list-none grid grid-rows-1 grid-flow-col">
+          <ul className="list-none flex items-center justify-start flex-wrap max-w-full">
             <CardList
               :cards="yaku.cards"
               :stack="true"
