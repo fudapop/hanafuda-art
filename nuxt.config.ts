@@ -127,6 +127,11 @@ export default defineNuxtConfig({
       },
     },
   },
+  router: {
+    options: {
+      scrollBehaviorType: 'auto',
+    },
+  },
   runtimeConfig: {
     public: {
       nodeEnv: process.env.NODE_ENV,

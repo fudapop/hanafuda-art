@@ -95,6 +95,10 @@
 import { useScreenOrientation } from '@vueuse/core'
 import { useToast } from 'vue-toastification'
 
+definePageMeta({
+  title: 'New Hanafuda | Sign In',
+})
+
 const { isMobile } = useDevice()
 const { orientation } = useScreenOrientation()
 const isLandscape = computed(() => orientation.value?.includes('landscape'))
