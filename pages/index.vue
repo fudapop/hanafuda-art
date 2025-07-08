@@ -114,6 +114,7 @@ import { checkForWin } from '~/utils/yaku'
 definePageMeta({
   requiresAuth: true,
   middleware: ['auth'],
+  title: 'New Hanafuda | Play Hanafuda Koi-Koi',
 })
 
 const cs = useCardStore()
