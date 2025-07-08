@@ -100,8 +100,10 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import mainTheme from '~/assets/audio/PerituneMaterial_Awayuki.ogg'
-import koikoiTheme from '~/assets/audio/PerituneMaterial_EpicBattle_J_loop.ogg'
+import mainTheme from '~/assets/audio/bgm/PerituneMaterial_Awayuki.ogg'
+import koikoiTheme from '~/assets/audio/bgm/PerituneMaterial_EpicBattle_J_loop.ogg'
+import slashSound from '~/assets/audio/sfx/sword-slash-and-swing-185432.mp3'
+
 import { useGameDataStore } from '~/stores/gameDataStore'
 
 const { koikoiIsCalled } = useDecisionHandler()
@@ -136,13 +138,13 @@ const audio = inject('audio') as ReturnType<typeof useAudio>
 
 const cleanupAudio = watch(
   [koikoiIsCalled, roundCounter, gameIsStarted],
-  ([newCall, newRound], [_, oldRound]) => {
+  async ([newCall, newRound], [_, oldRound]) => {
     if (newCall) {
-      // Koi-koi was called
-      audio.crossfadeTo(koikoiTheme, 0.2)
+      // Play SFX, then crossfade to theme
+      audio.playSfx(slashSound)
+      audio.crossfadeTo(koikoiTheme, 1.2)
     } else if (newRound > oldRound) {
-      // New round started
-      audio.crossfadeTo(mainTheme, 3)
+      audio.crossfadeTo(mainTheme, 2)
     }
   },
 )
