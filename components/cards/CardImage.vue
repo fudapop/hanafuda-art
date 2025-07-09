@@ -1,18 +1,20 @@
 <template>
-  <template
-    v-if="!!src"
-    v-show="loaded"
-  >
-    <NuxtImg
-      :key="`${card}-${currentDesign}`"
-      :src="src"
-      :alt="card"
-      @load="handleLoad"
-      loading="eager"
-      class="object-cover pointer-events-none user-select-none"
-      sizes="100vw"
+  <div class="w-full h-full bg-black/30">
+    <div
+      v-if="!src"
+      class="w-full h-full down animate-pulse"
     />
-  </template>
+    <template v-else>
+      <NuxtImg
+        :key="`${card}-${src}`"
+        :src="img(src, { height: 100, quality: 80, format: 'webp' })"
+        :alt="card"
+        loading="eager"
+        class="object-cover pointer-events-none user-select-none"
+        sizes="100vw"
+      />
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -20,11 +22,5 @@ import { type CardName } from '~/utils/cards'
 
 const { card, src } = defineProps<{ card: CardName; src: string | undefined }>()
 
-const loaded = ref(false)
-const { useDesign } = useCardDesign()
-const currentDesign = useDesign()
-
-const handleLoad = () => {
-  loaded.value = true
-}
+const img = useImage()
 </script>

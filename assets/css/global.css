@@ -84,6 +84,7 @@
     max-height: 100vh;
     max-height: 100dvh;
     font-family: Rubik, sans-serif;
+    overscroll-behavior: none;
   }
 
   * {

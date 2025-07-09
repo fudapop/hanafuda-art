@@ -92,8 +92,8 @@ const getResult = () => {
     ds.scoreboard[player] > ds.scoreboard[opponent]
       ? 'win'
       : ds.scoreboard[player] === ds.scoreboard[opponent]
-      ? 'draw'
-      : 'loss'
+        ? 'draw'
+        : 'loss'
   if (result === 'win') ps.reset(player)
   return result
 }

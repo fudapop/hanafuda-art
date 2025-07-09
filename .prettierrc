@@ -9,7 +9,6 @@
   "printWidth": 100,
   "quoteProps": "consistent",
   "arrowParens": "always",
-  "experimentalTernaries": true,
   "vueIndentScriptAndStyle": false,
   "bracketSpacing": true,
   "proseWrap": "always",
