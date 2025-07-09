@@ -51,13 +51,16 @@
     >
       <img
         src="~/assets/images/logo-title.png"
-        class="w-[180px] mb-2"
+        :class="['w-[120px] mb-2', isMobile ? 'landscape:w-[30dvh]' : 'sm:w-[180px]']"
         alt="Hanafuda Koi-Koi"
       />
       <h1 class="sr-only">Hanafuda Koi-Koi</h1>
       <div class="flex flex-col items-center gap-4">
         <button
-          class="rounded-sm overflow-hidden mt-24 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[150px]"
+          :class="[
+            'rounded-sm overflow-hidden mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[150px]',
+            isMobile ? 'landscape:mt-0' : 'sm:mt-24',
+          ]"
           @click="$emit('start-game')"
         >
           <img

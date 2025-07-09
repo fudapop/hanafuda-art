@@ -5,6 +5,8 @@ export const useAudio = () => {
   const audioRefB = ref<HTMLAudioElement>()
   const isUsingA = ref(true)
   const isPlaying = ref(false)
+  const audioContext = ref<AudioContext | null>(null)
+  const hasUserInteracted = ref(false)
 
   // Load preferences from localStorage
   const systemPreferences = useStorage('hanafuda-system-preferences', {
@@ -20,27 +22,94 @@ export const useAudio = () => {
   // Helper to get the inactive audio element
   const inactiveAudioRef = computed(() => (isUsingA.value ? audioRefB : audioRefA))
 
-  // Initialize audio element (for backward compatibility, always uses the active ref)
-  const initAudio = (src: string) => {
-    if (import.meta.client) {
-      const ref = currentAudioRef.value
-      ref.value = new Audio(src)
-      ref.value.loop = true
-      ref.value.preload = 'auto'
-      ref.value.volume = isMuted.value ? 0 : currentVolume.value
+  // Initialize audio context for mobile compatibility
+  const initAudioContext = () => {
+    if (!import.meta.client) return false
+
+    try {
+      // Only create audio context if it doesn't exist
+      if (!audioContext.value) {
+        audioContext.value = new (window.AudioContext || (window as any).webkitAudioContext)()
+      }
+
+      // Resume audio context if suspended (required for iOS)
+      if (audioContext.value.state === 'suspended') {
+        return audioContext.value
+          .resume()
+          .then(() => {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('AudioContext resumed successfully')
+            }
+            return true
+          })
+          .catch((error) => {
+            console.warn('Failed to resume AudioContext:', error)
+            return false
+          })
+      }
+
+      return Promise.resolve(true)
+    } catch (error) {
+      console.warn('Audio context initialization failed:', error)
+      return Promise.resolve(false)
     }
   }
 
-  // Play audio with fade-in (uses the active ref)
+  // Initialize audio element with mobile compatibility
+  const initAudio = (src: string) => {
+    if (!import.meta.client) return
+
+    const ref = currentAudioRef.value
+    ref.value = new Audio(src)
+    ref.value.loop = true
+    ref.value.preload = 'auto'
+    ref.value.volume = isMuted.value ? 0 : currentVolume.value
+
+    // Add mobile-specific attributes
+    ref.value.setAttribute('playsinline', 'true')
+    ref.value.setAttribute('webkit-playsinline', 'true')
+
+    // Handle mobile audio loading
+    ref.value.addEventListener('canplaythrough', () => {
+      // Audio loaded successfully - no need to log this
+    })
+
+    ref.value.addEventListener('error', (e) => {
+      console.error('Audio loading error:', e)
+    })
+  }
+
+  // Enhanced play audio with mobile compatibility
   const playAudio = async (fadeDuration: number = 3) => {
     if (!currentAudioRef.value.value) return
+
     try {
+      // Initialize audio context on first play
+      if (!hasUserInteracted.value) {
+        await initAudioContext()
+        hasUserInteracted.value = true
+      }
+
       currentAudioRef.value.value.volume = 0
-      await currentAudioRef.value.value.play()
-      isPlaying.value = true
-      fadeInAudio(fadeDuration)
+
+      // For mobile, ensure audio context is resumed
+      if (audioContext.value && audioContext.value.state === 'suspended') {
+        await audioContext.value.resume()
+      }
+
+      const playPromise = currentAudioRef.value.value.play()
+
+      if (playPromise !== undefined) {
+        await playPromise
+        isPlaying.value = true
+        fadeInAudio(fadeDuration)
+      }
     } catch (error) {
       console.warn('Audio autoplay failed:', error)
+      // For mobile, try to show a user-friendly message
+      if (error instanceof Error && error.name === 'NotAllowedError') {
+        console.log('Audio blocked by browser policy. User interaction required.')
+      }
     }
   }
 
@@ -112,26 +181,39 @@ export const useAudio = () => {
     if (audioRefB.value) audioRefB.value.volume = isMuted.value ? 0 : currentVolume.value
   }
 
-  // Crossfade to a new track
+  // Enhanced crossfade with mobile compatibility
   const crossfadeTo = async (src: string, duration: number = 3) => {
     if (!import.meta.client) return
+
     const fromRef = currentAudioRef.value
     // Return if the same track is already playing
     if (fromRef.value?.src?.includes(src)) return
+
     const toRef = inactiveAudioRef.value
-    // Prepare new audio element
+
+    // Prepare new audio element with mobile attributes
     toRef.value = new Audio(src)
     toRef.value.loop = true
     toRef.value.preload = 'auto'
     toRef.value.volume = 0
+    toRef.value.setAttribute('playsinline', 'true')
+    toRef.value.setAttribute('webkit-playsinline', 'true')
+
     if (isMuted.value) toRef.value.volume = 0
+
     try {
+      // Ensure audio context is active
+      if (audioContext.value && audioContext.value.state === 'suspended') {
+        await audioContext.value.resume()
+      }
+
       await toRef.value.play()
+      isPlaying.value = true
     } catch (error) {
-      console.warn('Audio autoplay failed:', error)
+      console.warn('Audio crossfade failed:', error)
       return
     }
-    isPlaying.value = true
+
     // Start crossfade
     const startTime = Date.now()
     const fromStartVolume = fromRef.value?.volume ?? 0
@@ -139,6 +221,7 @@ export const useAudio = () => {
     const fadeInterval = setInterval(() => {
       const elapsed = (Date.now() - startTime) / 1000
       const progress = Math.min(elapsed / duration, 1)
+
       // Fade out old, fade in new
       if (fromRef.value) {
         const fromEased = 1 - Math.pow(1 - progress, 2)
@@ -159,22 +242,37 @@ export const useAudio = () => {
     }, 50)
   }
 
-  // Handle user interaction for autoplay (active only)
+  // Enhanced setup autoplay with mobile-specific handling
   const setupAutoplay = (onInteraction?: () => void) => {
     if (!import.meta.client) return
-    const handleUserInteraction = () => {
-      if (onInteraction) {
-        onInteraction()
-      } else {
-        playAudio()
+
+    const handleUserInteraction = async () => {
+      try {
+        // Initialize audio context on first interaction
+        await initAudioContext()
+        hasUserInteracted.value = true
+
+        if (onInteraction) {
+          onInteraction()
+        } else {
+          await playAudio()
+        }
+      } catch (error) {
+        console.warn('User interaction audio setup failed:', error)
       }
+
+      // Remove listeners after successful interaction
       document.removeEventListener('click', handleUserInteraction)
       document.removeEventListener('keydown', handleUserInteraction)
       document.removeEventListener('touchstart', handleUserInteraction)
+      document.removeEventListener('touchend', handleUserInteraction)
     }
+
+    // Add multiple event listeners for better mobile coverage
     document.addEventListener('click', handleUserInteraction)
     document.addEventListener('keydown', handleUserInteraction)
     document.addEventListener('touchstart', handleUserInteraction)
+    document.addEventListener('touchend', handleUserInteraction)
   }
 
   // Cleanup (both refs)
@@ -206,14 +304,32 @@ export const useAudio = () => {
     cleanup()
   })
 
+  // Enhanced SFX with mobile compatibility
   const playSfx = (src: string) => {
     if (!import.meta.client) return
+
     const sfx = new Audio(src)
     sfx.volume = isMuted.value ? 0 : currentVolume.value
-    sfx.play()
+    sfx.setAttribute('playsinline', 'true')
+    sfx.setAttribute('webkit-playsinline', 'true')
+
+    const playPromise = sfx.play()
+
     return new Promise<void>((resolve) => {
-      sfx.onended = () => resolve()
-      sfx.onerror = () => resolve()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            sfx.onended = () => resolve()
+            sfx.onerror = () => resolve()
+          })
+          .catch((error) => {
+            console.warn('SFX playback failed:', error)
+            resolve()
+          })
+      } else {
+        sfx.onended = () => resolve()
+        sfx.onerror = () => resolve()
+      }
     })
   }
 
@@ -222,6 +338,7 @@ export const useAudio = () => {
     isPlaying: readonly(isPlaying),
     currentVolume: readonly(currentVolume),
     isMuted: readonly(isMuted),
+    hasUserInteracted: readonly(hasUserInteracted),
 
     // Methods
     initAudio,
@@ -234,7 +351,8 @@ export const useAudio = () => {
     toggleMute,
     setupAutoplay,
     cleanup,
-    crossfadeTo, // new method
+    crossfadeTo,
     playSfx,
+    initAudioContext,
   }
 }
