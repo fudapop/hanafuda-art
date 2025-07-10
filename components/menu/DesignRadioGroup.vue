@@ -152,7 +152,7 @@
 
     <Modal :open="!!newUnlock">
       <template #image>
-        <div :class="[newUnlock, 'flex items-center text-text justify-center']">
+        <div :class="[newUnlock?.design, 'flex items-center text-text justify-center']">
           <img
             src="~/assets/images/coin.webp"
             alt="coin"
@@ -164,12 +164,12 @@
       </template>
 
       <template #description>
-        <template v-if="computedCost === 0">
+        <template v-if="newUnlock?.cost === 0">
           <strong class="block text-xl tracking-wide text-text">✨ LIMITED TIME OFFER ✨</strong>
           <br />
         </template>
         <span class="text-lg text-text">
-          Trade in <strong class="tracking-wide">{{ computedCost }}</strong> coins to use this
+          Trade in <strong class="tracking-wide">{{ newUnlock?.cost }}</strong> coins to use this
           design?</span
         >
       </template>
@@ -253,47 +253,43 @@ const coins = computed({
 })
 
 const unlocked = computed(() => currentUser?.value?.designs.unlocked)
-const newUnlock: Ref<CardDesign | undefined> = ref()
+const newUnlock: Ref<{ design: CardDesign; cost: number } | null> = ref(null)
 
 let initialDesign: CardDesign | undefined
 let timeoutId: string | number | NodeJS.Timeout | undefined
 let toastId: any
 
-const computedCost = computed(() => {
-  if (newUnlock.value && isNew(newUnlock.value)) return 0
-  return UNLOCK_COST
-})
-
 const handleUnlock = (design: CardDesign) => {
   if (!initialDesign) initialDesign = currentDesign.value
   currentDesign.value = design
   if (coins.value === undefined || !unlocked.value) return
-  if (coins.value < computedCost.value) {
+  if (!isNew(design) && coins.value < UNLOCK_COST) {
     toast.dismiss(toastId)
-    toastId = toast.info("You don't have enough coins yet...", { timeout: 9000 })
+    toastId = toast.info("You don't have enough coins yet...", { timeout: 6000 })
     clearTimeout(timeoutId)
     timeoutId = setTimeout(() => {
       currentDesign.value = initialDesign!
       initialDesign = undefined
-    }, 10000)
+    }, 5000)
     return
   }
-  newUnlock.value = design
+  newUnlock.value = { design, cost: isNew(design) ? 0 : UNLOCK_COST }
 }
 
 const cancelUnlock = () => {
-  newUnlock.value = undefined
+  newUnlock.value = null
   currentDesign.value = initialDesign!
 }
 
 const confirmUnlock = () => {
   if (coins.value === undefined || !unlocked.value) return
   if (!newUnlock.value) return
-  coins.value -= computedCost.value
-  unlocked.value.push(newUnlock.value)
+  coins.value -= newUnlock.value.cost
+  unlocked.value.push(newUnlock.value.design)
   toast.success("You've unlocked a new design!", { timeout: 5000 })
-  currentDesign.value = newUnlock.value
-  newUnlock.value = undefined
+  currentDesign.value = newUnlock.value.design
+  newUnlock.value = null
+  initialDesign = currentDesign.value
 }
 
 const userIsGuest = toValue(useAuth().userIsGuest)
@@ -336,6 +332,13 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (timeoutId) clearTimeout(timeoutId)
+  if (initialDesign) {
+    currentDesign.value = initialDesign
+  }
+  if (timeoutId) {
+    clearTimeout(timeoutId)
+    timeoutId = undefined
+    newUnlock.value = null
+  }
 })
 </script>
