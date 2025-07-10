@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full h-full bg-black/30">
+  <div class="w-full h-full">
     <div
       v-if="!src"
-      class="w-full h-full down animate-pulse"
+      class="w-full h-full down animate-pulse bg-black/30"
     />
     <template v-else>
       <NuxtImg

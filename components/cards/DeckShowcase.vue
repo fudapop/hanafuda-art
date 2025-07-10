@@ -7,19 +7,19 @@
     />
     <!-- Revealed Card (top layer, only if revealed) -->
     <Transition
-      enter-active-class="duration-300 ease-out"
-      enter-from-class="scale-95 opacity-0 -translate-y-1/4 -translate-x-3/4 motion-reduce:scale-100 motion-reduce:translate-y-0 motion-reduce:translate-x-1/2"
-      enter-to-class="scale-100 opacity-100"
+      enter-active-class="duration-500 ease-out"
+      enter-from-class="opacity-0 -scale-x-25 -translate-x-3/4 -translate-y-1/4"
+      enter-to-class="opacity-100"
       leave-active-class="duration-200 ease-in"
       leave-from-class="opacity-100"
-      leave-to-class="scale-95 opacity-0 translate-x-3/4 motion-reduce:scale-100 motion-reduce:translate-x-1/2"
+      leave-to-class="opacity-0"
     >
       <CardImage
         v-if="revealedCard && revealedCardImg"
         :key="revealedCard"
         :card="revealedCard"
         :src="revealedCardImg"
-        class="absolute inset-0 z-10 object-cover translate-x-1/2 rounded-[--card-radius]"
+        class="absolute top-1/8 left-1/2 z-10 object-cover rounded-[--card-radius]"
       />
     </Transition>
     <!-- Clickable area for revealing a card -->
@@ -54,11 +54,25 @@ const initialDesign = currentDesign.value
 const revealedCard = ref<CardName | null>(null)
 const revealedCardImg = computed(() => (revealedCard.value ? getCardUrl(revealedCard.value) : null))
 
-const revealRandomCard = () => {
-  revealedCard.value = getRandom([...DECK])
+const timeout = ref<NodeJS.Timeout | null>(null)
+
+const scheduleNextReveal = () => {
+  if (timeout.value) clearTimeout(timeout.value)
+  timeout.value = setTimeout(() => {
+    revealRandomCard()
+    if (autoReveal) {
+      scheduleNextReveal() // Schedule the next one
+    }
+  }, intervalInMs)
 }
 
-const interval = ref<NodeJS.Timeout | null>(null)
+const revealRandomCard = () => {
+  revealedCard.value = getRandom([...DECK])
+  // Reset the timer when manually revealing a card
+  if (autoReveal) {
+    scheduleNextReveal()
+  }
+}
 
 onMounted(() => {
   if (design) {
@@ -67,13 +81,13 @@ onMounted(() => {
   }
   if (autoReveal) {
     revealRandomCard()
-    interval.value = setInterval(revealRandomCard, intervalInMs)
+    scheduleNextReveal()
   }
 })
 
 onUnmounted(() => {
-  if (interval.value) {
-    clearInterval(interval.value)
+  if (timeout.value) {
+    clearTimeout(timeout.value)
   }
   if (resetOnUnmount && currentDesign.value !== initialDesign) {
     currentDesign.value = initialDesign
