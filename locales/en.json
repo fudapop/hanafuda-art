@@ -1,0 +1,227 @@
+{
+  "app": {
+    "title": "New Hanafuda",
+    "gameTitle": "Hanafuda 花札 KOI-KOI",
+    "version": "Version"
+  },
+  "navigation": {
+    "options": "Options",
+    "close": "Close",
+    "back": "Back",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "next": "Next",
+    "previous": "Previous",
+    "home": "Home"
+  },
+  "buttons": {
+    "playNow": "Play now",
+    "signUp": "Sign up",
+    "signIn": "Sign in",
+    "logout": "Logout",
+    "submit": "Submit",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "reset": "Reset",
+    "start": "Start",
+    "stop": "Stop",
+    "koikoi": "Koi-Koi",
+    "nextRound": "Next Round",
+    "continueAsGuest": "Continue as guest",
+    "testPlay": "Test play",
+    "autoplay": "Autoplay",
+    "stopTest": "Stop test"
+  },
+  "authentication": {
+    "emailAddress": "Email address",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "iAlreadyHaveAccount": "I already have an account →",
+    "iDontHaveAccount": "I don't have an account →",
+    "justAMoment": "Just a moment...",
+    "signInToExistingAccount": "Sign in to an existing account →",
+    "signInRequired": "Sign in is required to save your profile.",
+    "passwordRequirements": "Password must contain at least:",
+    "sixCharacters": "6 characters",
+    "oneNumber": "1 number",
+    "oneUppercase": "1 uppercase letter",
+    "oneLowercase": "1 lowercase letter",
+    "oneSpecialCharacter": "1 special character",
+    "providers": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "accountLinking": {
+      "linkAccount": "Link Account",
+      "upgradeGuestProfile": "Upgrade your guest profile by linking it to an account"
+    }
+  },
+  "game": {
+    "round": "Round",
+    "rounds": "rounds",
+    "youWin": "YOU WIN!",
+    "youLose": "YOU LOSE...",
+    "draw": "DRAW",
+    "makeYourCall": "Make your call...",
+    "yourOpponentIsDeciding": "Your opponent is deciding...",
+    "calledStop": "called stop",
+    "dealedLuckyHand": "got dealt a Lucky Hand!",
+    "roundIsADraw": "The round is a draw.",
+    "total": "Total:",
+    "points": "points",
+    "koikoiBonus": "Koi-Koi Bonus:",
+    "player": "Player",
+    "opponent": "Your opponent",
+    "you": "You",
+    "win": "Win",
+    "lose": "Lose",
+    "wins": "wins",
+    "losses": "losses",
+    "draws": "draws",
+    "coins": "coins",
+    "score": "Score",
+    "luckyHand": "Lucky Hand",
+    "fourOfAKindFourPairs": "Four-of-a-Kind / Four-Pairs",
+    "cardDesignsBy": "Card designs by",
+    "artContributedBy": "Art contributed by",
+    "siteDevelopedBy": "Site developed by Andre L. Hammons"
+  },
+  "settings": {
+    "gameLength": "Game Length",
+    "moonFlowerViewing": "Moon/Flower Viewing",
+    "otherVariations": "Other Variations",
+    "wildCardSakeCup": "Wild Card Sake Cup",
+    "wildCardSakeCupDescription": "The sake cup counts as both animal and plain types.",
+    "doubleOverSeven": "Double Over Seven",
+    "doubleOverSevenDescription": "Double the score if the combined yaku value is 7 points or greater.",
+    "interface": "Interface",
+    "cardLabels": "Card Labels",
+    "cardLabelsDescription": "Include card corner labels to assist with matching.",
+    "allowFullscreen": "Allow Fullscreen",
+    "allowFullscreenDescription": "Enable to hide/show toggle button to enter/exit fullscreen mode.",
+    "settingsLocked": "Some settings are locked while a game is in progress.",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "viewingOptions": {
+      "allow": "Completion is scored normally.",
+      "limited": "Requires another completed yaku to score points.",
+      "none": "No points are scored for completion."
+    }
+  },
+  "profile": {
+    "playerRecord": "Player Record",
+    "lastUpdated": "Last updated:",
+    "editUsername": "Edit username",
+    "avatar": "Avatar",
+    "username": "Username",
+    "signInToSaveProfile": "Sign in is required to save your profile.",
+    "profileSettings": "Profile Settings",
+    "gameSettings": "Game Settings",
+    "cardDesigns": "Card Designs"
+  },
+  "feedback": {
+    "thankYouForPlaying": "Thank you for playing!",
+    "howWasYourExperience": "How was your experience?",
+    "yourFeedbackSubmitted": "Your feedback has been submitted. Thank you!",
+    "animationSmoothness": "Animation Smoothness",
+    "easeOfControls": "Ease of Controls",
+    "imageQuality": "Image Quality",
+    "comments": "Comments",
+    "commentsPlaceholder": "Please enter any comments here. Your feedback is greatly appreciated! 🙏🏽",
+    "commentTypes": {
+      "idea": "💡 idea",
+      "error": "🪲 error",
+      "other": "💬 other"
+    }
+  },
+  "modal": {
+    "signupPrompt": {
+      "title": "You've got coins! How about 500 more?",
+      "description": "Your coins can be used to unlock new card designs and avatars. However, guest profiles cannot be saved.",
+      "question": "Sign in to save your profile and receive an extra 500 coins?",
+      "noThanks": "No thanks, delete me",
+      "yesGimmeCoins": "Yes, gimme coins!"
+    },
+    "exitWarning": {
+      "title": "Are you sure you want to leave?",
+      "description": "Your current game progress will be lost.",
+      "stay": "Stay",
+      "leave": "Leave"
+    }
+  },
+  "notifications": {
+    "success": {
+      "accountLinked": "Account linked! You may need to refresh your browser to update your profile.",
+      "signedIn": "You're signed in! Have fun!",
+      "koikoiCalled": "Koi-koi was called!",
+      "newDesignUnlocked": "You've unlocked a new design!"
+    },
+    "error": {
+      "failedToLink": "Failed to link account. Please try again.",
+      "notEnoughCoins": "You don't have enough coins yet..."
+    },
+    "info": {
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "processing": "Processing..."
+    }
+  },
+  "status": {
+    "round": "Round",
+    "of": "/"
+  },
+  "forms": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "username": "Username",
+    "required": "Required",
+    "optional": "Optional",
+    "validation": {
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordMismatch": "Passwords do not match",
+      "invalidEmail": "Please enter a valid email address"
+    }
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Please try again",
+    "networkError": "Network error. Please check your connection.",
+    "authenticationFailed": "Authentication failed",
+    "profileLoadError": "Failed to load profile",
+    "saveError": "Failed to save changes"
+  },
+  "accessibility": {
+    "screenReaderOnly": "Screen reader only",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "toggleTheme": "Toggle theme",
+    "toggleFullscreen": "Toggle fullscreen",
+    "viewPortfolio": "View my portfolio",
+    "viewGithub": "View project on GitHub",
+    "viewCreatorWebsite": "View creator's or contributor's website",
+    "readAboutRule": "Read about this rule on fudawiki.org",
+    "commentType": "Comment Type"
+  },
+  "help": {
+    "rulesLink": "Read about this rule on fudawiki.org",
+    "scoringVariations": "Read about scoring on fudawiki.org",
+    "tamingSakeCup": "Read about this rule on fudawiki.org",
+    "luckyHands": "Read about this rule on fudawiki.org"
+  },
+  "copyright": {
+    "allRightsReserved": "All rights reserved",
+    "currentYear": "{{ year }}"
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{{ minutes }} minutes ago",
+    "hoursAgo": "{{ hours }} hours ago",
+    "daysAgo": "{{ days }} days ago"
+  }
+}
