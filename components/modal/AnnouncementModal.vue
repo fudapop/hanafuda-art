@@ -4,32 +4,32 @@
     class="announcement-modal"
   >
     <template #title>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col items-center justify-between sm:flex-row">
         <div class="flex items-center gap-x-2">
           <div
-            class="flex items-center justify-center w-8 h-8 mx-auto rounded-full bg-gradient-to-br from-yellow-400 to-orange-500"
+            aria-hidden
+            class="items-center hidden w-8 h-8 mx-auto rounded-full sm:justify-center sm:flex bg-gradient-to-br from-yellow-400 to-orange-500"
           >
             <Icon
               name="heroicons:megaphone"
               class="w-4 h-4 text-white"
             />
           </div>
-          <h1 class="text-xl">What's New in Hanafuda Koi-Koi!</h1>
+          <h1 class="text-lg sm:text-xl">What's New in Hanafuda Koi-Koi!</h1>
         </div>
         <div
           v-if="newAnnouncements.length > 1"
           class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
         >
-          <span>{{ currentPage + 1 }} of {{ newAnnouncements.length }}</span>
+          <span class="text-sm sm:text-base"
+            >{{ currentPage + 1 }} of {{ newAnnouncements.length }}</span
+          >
         </div>
       </div>
     </template>
 
     <template #description>
-      <div
-        class="text-left"
-        ref="containerRef"
-      >
+      <div class="text-left">
         <!-- Current announcement -->
         <div
           v-if="currentAnnouncement"
@@ -38,12 +38,7 @@
           <!-- Use ContentRenderer for markdown body if available -->
           <section
             v-if="currentAnnouncement.body"
-            ref="currentPageRef"
-            :class="{
-              'mx-0 prose-sm prose text-left max-w-none dark:prose-invert': true,
-              'transition-all duration-200 ease-linear': !isSwiping,
-            }"
-            :style="{ left, opacity }"
+            class="mx-0 prose-sm prose text-left max-w-none dark:prose-invert"
           >
             <ContentRenderer
               :value="currentAnnouncement"
@@ -81,6 +76,54 @@
               </ul>
             </div>
           </section>
+        </div>
+
+        <!-- Impression tracking -->
+        <div
+          v-if="currentAnnouncement"
+          class="flex items-center justify-between pt-3 mt-3"
+        >
+          <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <span
+              v-if="isDev"
+              class="flex items-center gap-1"
+            >
+              <Icon
+                name="heroicons:eye"
+                class="w-4 h-4"
+              />
+              {{ impressions[currentAnnouncement.id]?.views || 0 }}
+              <span class="sr-only">views</span>
+            </span>
+            <span
+              v-if="isDev"
+              class="flex items-center gap-1"
+            >
+              <Icon
+                name="heroicons:heart"
+                class="w-4 h-4"
+              />
+              {{ impressions[currentAnnouncement.id]?.likes || 0 }}
+              <span class="sr-only"> likes </span>
+            </span>
+          </div>
+
+          <button
+            type="button"
+            :class="[
+              'flex items-center gap-2 px-2 py-1 text-sm rounded-md transition-colors',
+              isLiked(currentAnnouncement.id)
+                ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+                : 'text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400',
+            ]"
+            @click="handleLike"
+          >
+            <Icon
+              :name="isLiked(currentAnnouncement.id) ? 'heroicons:heart-solid' : 'heroicons:heart'"
+              class="w-4 h-4"
+            />
+            <span class="sr-only">{{ isLiked(currentAnnouncement.id) ? 'Unlike' : 'Like' }}</span>
+          </button>
         </div>
 
         <!-- Pagination controls -->
@@ -147,14 +190,14 @@
       <div class="flex flex-col gap-3 mt-5 sm:mt-6 sm:flex-row">
         <button
           type="button"
-          class="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:ring-gray-600 dark:hover:bg-gray-600"
+          class="w-full rounded-md sec-btn"
           @click="handleDontShowAgain"
         >
           Don't show again
         </button>
         <button
           type="button"
-          class="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-orange-600 rounded-md shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
+          class="w-full rounded-md pri-btn"
           @click="handleDismiss"
         >
           Got it!
@@ -162,10 +205,23 @@
       </div>
     </template>
   </Modal>
+
+  <template v-if="isDev">
+    <button
+      class="fixed z-20 game-ui-btn bottom-20 left-4"
+      @click="resetAnnouncementPreferences"
+    >
+      <Icon
+        name="mdi:restore"
+        class="w-5 h-5 text-white"
+        aria-hidden
+      />
+      <span class="sr-only"> Reset Announcements </span>
+    </button>
+  </template>
 </template>
 
 <script setup lang="ts">
-import { usePointerSwipe, type UseSwipeDirection } from '@vueuse/core'
 import { useAnnouncements } from '~/composables/useAnnouncements'
 
 // Use the announcements composable directly
@@ -175,51 +231,16 @@ const {
   checkAndShowAnnouncements,
   dismissAnnouncements,
   dontShowAnnouncementsAgain,
+  resetAnnouncementPreferences,
+  trackLike,
+  isLiked,
+  impressions,
 } = await useAnnouncements()
 
 // Pagination state
 const currentPage = ref(0)
-const container = shallowRef<HTMLElement | null>(null)
 
-const containerWidth = computed(() => container.value?.offsetWidth)
-
-const left = shallowRef('0')
-const opacity = shallowRef(1)
-
-function reset() {
-  left.value = '0'
-  opacity.value = 1
-}
-
-const currentPageRef = useTemplateRef('currentPageRef')
-const { isSwiping, distanceX } = usePointerSwipe(currentPageRef, {
-  disableTextSelect: true,
-  onSwipe(e: PointerEvent) {
-    if (containerWidth.value) {
-      if (distanceX.value < 0) {
-        const distance = Math.abs(distanceX.value)
-        left.value = `${distance}px`
-        opacity.value = 1.25 - distance / containerWidth.value
-      } else {
-        left.value = '0'
-        opacity.value = 1
-      }
-    }
-  },
-  onSwipeEnd(e: PointerEvent, direction: UseSwipeDirection) {
-    if (
-      distanceX.value < 0 &&
-      containerWidth.value &&
-      Math.abs(distanceX.value) / containerWidth.value >= 0.5
-    ) {
-      left.value = '100%'
-      opacity.value = 0
-    } else {
-      left.value = '0'
-      opacity.value = 1
-    }
-  },
-})
+const isDev = ref(process.env.NUXT_PUBLIC_NODE_ENV === 'development')
 
 // Current announcement computed property
 const currentAnnouncement = computed(() => {
@@ -278,6 +299,12 @@ const handleDismiss = () => {
 
 const handleDontShowAgain = () => {
   dontShowAnnouncementsAgain()
+}
+
+const handleLike = () => {
+  if (currentAnnouncement.value) {
+    trackLike(currentAnnouncement.value.id)
+  }
 }
 </script>
 
