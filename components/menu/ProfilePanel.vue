@@ -167,6 +167,6 @@ const handleEdit = () => {
 }
 
 const handleSignIn = () => {
-  navigateTo({ path: '/login', query: { signup: 'true' } })
+  navigateTo({ path: '/sign-in', query: { signup: 'true' } })
 }
 </script>

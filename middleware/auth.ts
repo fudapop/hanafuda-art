@@ -6,6 +6,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (user) {
     await getProfile(user)
   } else {
-    return navigateTo('/login')
+    return navigateTo('/sign-in')
   }
 })

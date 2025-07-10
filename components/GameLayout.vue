@@ -200,7 +200,7 @@ const signupDeclined = useStorage('hanafuda-signup-declined', false, sessionStor
 const handlePressExit = () => {
   if (!gameStart.value) {
     logout()
-    navigateTo({ path: '/login', query: { exit: 'true' } })
+    navigateTo({ path: '/sign-in', query: { exit: 'true' } })
   } else {
     leavingGame.value = true
   }

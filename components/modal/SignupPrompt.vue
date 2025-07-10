@@ -39,13 +39,7 @@
             <button
               type="button"
               class="pri-btn"
-              @click="
-                () =>
-                  navigateTo({
-                    path: '/login',
-                    query: { signup: 'true' },
-                  })
-              "
+              @click="gotoSignIn"
             >
               Yes, gimme coins!
             </button>
@@ -59,4 +53,9 @@
 <script setup lang="ts">
 const { open } = defineProps<{ open: boolean }>()
 defineEmits(['cancel'])
+const gotoSignIn = () =>
+  navigateTo({
+    path: '/sign-in',
+    query: { signup: 'true' },
+  })
 </script>
