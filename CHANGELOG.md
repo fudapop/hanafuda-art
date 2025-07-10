@@ -2,29 +2,32 @@
 
 All notable changes to Hanafuda Koi-Koi will be documented in this file.
 
-## [2.1.0] - 2024-01-15
+## [2.0.0] - 2025-07-10
 
-### Added
-- New card animations and smoother transitions
-- Sound effects for card plays  
-- Achievement system for tracking progress
-- Enhanced scoring display with detailed breakdowns
+### Announcements & Social
+- **What's New announcement system** with impression tracking (views/likes)
+- **Like/unlike functionality** for announcements with local storage
 
-### Improved
-- Mobile responsiveness across all screen sizes
-- Performance optimizations for smoother gameplay
+### Audio Experience
+- **Adaptive background music** that responds to gameplay state
+- **Cross-fade audio transitions** between menu and gameplay music
 
-## [2.0.0] - 2024-01-01
+### Visual Design & Customization
+- **Otwarte Karty card design** - beginner-friendly and beautiful
+- **Better design organization** with New → Unlocked → Locked structure
+- **Adjustable card sizes** to fit different screens and preferences
+- **Enhanced visual design** with improved backgrounds and UI consistency
+- **Visual hierarchy** in card designs for easier recognition
 
-### Added
-- Complete UI redesign with modern components
-- Dark mode support
-- New card designs and themes
-- Enhanced accessibility features
+### Gameplay Improvements
+- **Collection viewing** with magnifying glass button and double-click support
+- **DeckShowcase component** with auto-reveal functionality
+- **Card visibility** and prominence during gameplay
+- **Collection viewing experience** with expanded display options
 
-### Improved
-- Overall performance and loading times
-- User experience across all devices
+### Interface & Accessibility
+- **Menu and modal layouts** for better usability and accessibility
+- **Accessibility** across all device types
 
 ---
 

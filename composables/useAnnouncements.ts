@@ -1,4 +1,17 @@
 import { useLocalStorage } from '@vueuse/core'
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  increment,
+  orderBy,
+  query,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from 'firebase/firestore'
 
 export interface Announcement {
   id: string
@@ -16,6 +29,8 @@ export interface Announcement {
 }
 
 export interface AnnouncementImpression {
+  date: string
+  title: string
   views: number
   likes: number
   lastViewed?: string
@@ -28,20 +43,57 @@ export const useAnnouncements = async () => {
   const dontShowAnnouncements = useLocalStorage<boolean>('hanafuda-dont-show-announcements', false)
   const likedAnnouncements = useLocalStorage<string[]>('hanafuda-liked-announcements', [])
 
+  // Get current user for authentication checks
+  const user = useCurrentUser()
+
   // Fetch announcements from Nuxt Content
   const { data: contentAnnouncements } = await useAsyncData('announcements', () =>
     queryCollection('announcements').order('date', 'DESC').all(),
   )
 
-  // Impression tracking state - simplified for now
+  // Impression tracking state - now synced with Firestore
   const impressions = ref<Record<string, AnnouncementImpression>>({})
+
+  // Load impressions from Firestore on initialization
+  const loadImpressionsFromFirestore = async () => {
+    try {
+      const db = getFirestore()
+      const impressionsQuery = query(
+        collection(db, 'announcement_impressions'),
+        orderBy('lastUpdated', 'desc'),
+      )
+      const snapshot = await getDocs(impressionsQuery)
+
+      const firestoreImpressions: Record<string, AnnouncementImpression> = {}
+      snapshot.forEach((doc) => {
+        const data = doc.data()
+        firestoreImpressions[doc.id] = {
+          title: data.title,
+          date: data.date,
+          views: data.views || 0,
+          likes: data.likes || 0,
+          lastViewed: data.lastViewed?.toDate?.()?.toISOString() || data.lastViewed,
+          lastLiked: data.lastLiked?.toDate?.()?.toISOString() || data.lastLiked,
+        }
+      })
+
+      impressions.value = firestoreImpressions
+      console.log('Loaded announcement impressions from Firestore')
+    } catch (error) {
+      console.warn('Failed to load announcement impressions from Firestore:', error)
+      // Continue with local state if Firestore fails
+    }
+  }
+
+  // Initialize impressions from Firestore
+  await loadImpressionsFromFirestore()
 
   // Transform content announcements to match our interface
   const announcements = computed(() => {
     if (!contentAnnouncements.value) return []
 
-    return contentAnnouncements.value.map((announcement: any) => ({
-      id: announcement._path || announcement.title.toLowerCase().replace(/\s+/g, '-'),
+    return contentAnnouncements.value.map((announcement) => ({
+      id: btoa(`${announcement.date}::${announcement.title}`),
       title: announcement.title,
       description: announcement.description,
       date: announcement.date,
@@ -55,9 +107,13 @@ export const useAnnouncements = async () => {
   const newAnnouncements = computed(() => {
     if (dontShowAnnouncements.value) return []
 
-    return announcements.value.filter(
-      (announcement) => !dismissedAnnouncements.value.includes(announcement.id),
-    )
+    return announcements.value
+      .filter(
+        (announcement) =>
+          Date.now() >= new Date(announcement.date).getTime() &&
+          !dismissedAnnouncements.value.includes(announcement.id),
+      )
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   })
 
   // Check if there are new announcements to show
@@ -66,55 +122,128 @@ export const useAnnouncements = async () => {
   // Modal visibility state
   const isAnnouncementModalOpen = ref(false)
 
-  // Basic impression tracking functions (Firestore integration can be added later)
-  const trackView = (announcementId: string) => {
+  // Firestore impression tracking functions
+  const trackView = async (announcementId: string) => {
     try {
       // Use nextTick to prevent reactive loops during template rendering
-      nextTick(() => {
-        // Update local state
-        if (!impressions.value[announcementId]) {
-          impressions.value[announcementId] = { views: 0, likes: 0 }
-        }
-        impressions.value[announcementId].views++
-        impressions.value[announcementId].lastViewed = new Date().toISOString()
+      await nextTick()
 
-        // TODO: Add Firestore integration here when ready
-        console.log(`Tracked view for announcement: ${announcementId}`)
-      })
+      // Update local state immediately for responsive UI
+      if (!impressions.value[announcementId]) {
+        const [date, title] = atob(announcementId).split('::')
+        impressions.value[announcementId] = {
+          date,
+          title,
+          views: 0,
+          likes: 0,
+        }
+      }
+      impressions.value[announcementId].views++
+      impressions.value[announcementId].lastViewed = new Date().toISOString()
+
+      // Update Firestore
+      const db = getFirestore()
+      const impressionRef = doc(db, 'announcement_impressions', announcementId)
+
+      // Check if document exists
+      const docSnap = await getDoc(impressionRef)
+
+      if (docSnap.exists()) {
+        // Update existing document
+        await updateDoc(impressionRef, {
+          views: increment(1),
+          lastViewed: Timestamp.now(),
+          lastUpdated: Timestamp.now(),
+        })
+      } else {
+        // Create new document
+        const [date, title] = atob(announcementId).split('::')
+        await setDoc(impressionRef, {
+          title,
+          date,
+          views: 1,
+          likes: 0,
+          lastViewed: Timestamp.now(),
+          lastUpdated: Timestamp.now(),
+          createdAt: Timestamp.now(),
+        })
+      }
+
+      console.log(`Tracked view for announcement: ${announcementId}`)
     } catch (error) {
       console.warn('Failed to track announcement view:', error)
+      // Don't throw error - continue with local tracking only
     }
   }
 
-  const trackLike = (announcementId: string) => {
+  const trackLike = async (announcementId: string) => {
     try {
       const wasLiked = likedAnnouncements.value.includes(announcementId)
 
       // Use nextTick to prevent reactive loops
-      nextTick(() => {
-        // Update local state
-        if (!impressions.value[announcementId]) {
-          impressions.value[announcementId] = { views: 0, likes: 0 }
+      await nextTick()
+
+      // Update local state immediately for responsive UI
+      if (!impressions.value[announcementId]) {
+        const [date, title] = atob(announcementId).split('::')
+        impressions.value[announcementId] = {
+          date,
+          title,
+          views: 0,
+          likes: 0,
+        }
+      }
+
+      if (wasLiked) {
+        // Unlike
+        impressions.value[announcementId].likes--
+        likedAnnouncements.value = likedAnnouncements.value.filter((id) => id !== announcementId)
+      } else {
+        // Like
+        impressions.value[announcementId].likes++
+        impressions.value[announcementId].lastLiked = new Date().toISOString()
+        likedAnnouncements.value.push(announcementId)
+      }
+
+      // Update Firestore
+      const db = getFirestore()
+      const impressionRef = doc(db, 'announcement_impressions', announcementId)
+
+      // Check if document exists
+      const docSnap = await getDoc(impressionRef)
+
+      if (docSnap.exists()) {
+        // Update existing document
+        const updateData: any = {
+          likes: increment(wasLiked ? -1 : 1),
+          lastUpdated: Timestamp.now(),
         }
 
-        if (wasLiked) {
-          // Unlike
-          impressions.value[announcementId].likes--
-          likedAnnouncements.value = likedAnnouncements.value.filter((id) => id !== announcementId)
-        } else {
-          // Like
-          impressions.value[announcementId].likes++
-          impressions.value[announcementId].lastLiked = new Date().toISOString()
-          likedAnnouncements.value.push(announcementId)
+        if (!wasLiked) {
+          updateData.lastLiked = Timestamp.now()
         }
 
-        // TODO: Add Firestore integration here when ready
-        console.log(`Tracked ${wasLiked ? 'unlike' : 'like'} for announcement: ${announcementId}`)
-      })
+        await updateDoc(impressionRef, updateData)
+      } else {
+        // Create new document
+        const [date, title] = atob(announcementId).split('::')
+        await setDoc(impressionRef, {
+          announcementId,
+          title,
+          date,
+          views: 0,
+          likes: wasLiked ? 0 : 1,
+          lastLiked: wasLiked ? null : Timestamp.now(),
+          lastUpdated: Timestamp.now(),
+          createdAt: Timestamp.now(),
+        })
+      }
 
+      console.log(`Tracked ${wasLiked ? 'unlike' : 'like'} for announcement: ${announcementId}`)
       return !wasLiked // Return new like state
     } catch (error) {
       console.warn('Failed to track announcement like:', error)
+      // Don't throw error - continue with local tracking only
       return false
     }
   }
@@ -136,15 +265,27 @@ export const useAnnouncements = async () => {
 
   // Close the modal and mark current announcements as dismissed
   const dismissAnnouncements = () => {
-    isAnnouncementModalOpen.value = false
+    // Store the announcement IDs before closing the modal
     const newIds = newAnnouncements.value.map((a) => a.id)
-    dismissedAnnouncements.value = [...dismissedAnnouncements.value, ...newIds]
+
+    // Close the modal first
+    isAnnouncementModalOpen.value = false
+
+    // Delay marking announcements as dismissed to allow modal transition to complete
+    setTimeout(() => {
+      dismissedAnnouncements.value = [...dismissedAnnouncements.value, ...newIds]
+    }, 250) // Slightly longer than the modal's 200ms leave transition
   }
 
   // Permanently disable announcement notifications
   const dontShowAnnouncementsAgain = () => {
+    // Close the modal first
     isAnnouncementModalOpen.value = false
-    dontShowAnnouncements.value = true
+
+    // Delay setting the preference to allow modal transition to complete
+    setTimeout(() => {
+      dontShowAnnouncements.value = true
+    }, 250) // Slightly longer than the modal's 200ms leave transition
   }
 
   // Reset announcement preferences (useful for testing or user preference reset)
