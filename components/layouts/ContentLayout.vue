@@ -4,6 +4,7 @@
       <GameBackground />
     </div>
     <button
+      v-if="!isSignIn"
       :class="[
         'fixed w-10 h-10 transition-all duration-300 rounded-md top-4 left-4 place-content-center z-20',
         'bg-black/20 hover:bg-black/30 hover:scale-105',
@@ -20,3 +21,8 @@
     <slot />
   </div>
 </template>
+
+<script setup lang="ts">
+const route = useRoute()
+const isSignIn = computed(() => route.path === '/sign-in')
+</script>
