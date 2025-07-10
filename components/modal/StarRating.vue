@@ -21,7 +21,7 @@
       >
       <span
         v-for="n in getRange(5 - modelValue)"
-        class="text-text-secondary"
+        class="opacity-50 text-text-secondary"
         >&star;</span
       >
     </label>

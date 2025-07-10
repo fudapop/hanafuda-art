@@ -1,18 +1,17 @@
 <template>
   <Modal :open="open">
-    <template #title> Thank you for playing! </template>
-    <template #image>
+    <template #title>
+      <ChatBubbleLeftEllipsisIcon
+        class="inline-flex w-6 h-6 mr-2 text-primary"
+        aria-hidden="true"
+      />
+      <h1 class="text-2xl font-bold">Thank you for playing!</h1>
+    </template>
+    <template
+      v-if="submitted"
+      #image
+    >
       <div
-        v-if="!submitted"
-        class="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-primary/10"
-      >
-        <ChatBubbleLeftEllipsisIcon
-          class="w-6 h-6 text-primary"
-          aria-hidden="true"
-        />
-      </div>
-      <div
-        v-else
         class="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-hanafuda-green/10"
       >
         <CheckIcon
@@ -66,6 +65,14 @@
               v-model.number="ratings['image']"
             />
           </div>
+          <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
+            <p>Sound Quality</p>
+            <StarRating
+              class="max-sm:mt-4 max-sm:-translate-x-2"
+              ratingId="audio"
+              v-model.number="ratings['audio']"
+            />
+          </div>
         </fieldset>
         <fieldset class="grid mt-5 gap-y-1">
           <label for="comment-box">Comments</label>
@@ -78,13 +85,14 @@
           >
             <span class="sr-only">Comment Type</span>
           </OptionsRadioGroup>
+          <p>{{ commentBoxDescription }}</p>
           <textarea
             id="comment-box"
             rows="3"
             v-model="comments.message"
-            class="w-full p-2 border rounded-sm text-text bg-surface border-border placeholder:text-text-secondary placeholder:opacity-80"
-            placeholder="Please enter any comments here. Your feedback is greatly appreciated! 🙏🏽"
+            class="w-full p-2 border rounded-sm text-text bg-background border-border placeholder:text-text-secondary placeholder:opacity-50"
             :disabled="submitted"
+            placeholder="Enter your comment here..."
           />
         </fieldset>
         <div class="flex float-right mt-4 w-max gap-x-4">
@@ -154,6 +162,7 @@ interface Feedback {
   animation: number
   controls: number
   image: number
+  audio: number
   [x: string]: number
 }
 
@@ -163,11 +172,23 @@ const ratings: Feedback = reactive({
   animation: 0,
   controls: 0,
   image: 0,
+  audio: 0,
 })
 
 const comments = reactive({
   tag: 'other',
   message: '',
+})
+
+const commentBoxDescription = computed(() => {
+  switch (comments.tag) {
+    case 'idea':
+      return 'How can we improve the game, or what would you like to see next?'
+    case 'error':
+      return 'Did you encounter any bugs?  Please describe the issue.'
+    default:
+      return 'Your feedback is greatly appreciated!  🙏🏽'
+  }
 })
 
 const submitted = computed({
@@ -180,7 +201,7 @@ const submitted = computed({
 })
 
 const incomplete = computed(() =>
-  [ratings['animation'], ratings['controls'], ratings['image']].some((fb) => !fb),
+  [ratings['animation'], ratings['controls'], ratings['image'], ratings['audio']].some((fb) => !fb),
 )
 
 defineEmits(['close'])

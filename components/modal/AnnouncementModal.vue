@@ -2,29 +2,26 @@
   <Modal
     :open="isAnnouncementModalOpen"
     class="announcement-modal"
+    :padded="false"
   >
     <template #title>
-      <div class="flex flex-col items-center justify-between sm:flex-row">
-        <div class="flex items-center gap-x-2">
-          <div
+      <div class="flex flex-col items-center justify-between px-8 sm:flex-row">
+        <div class="flex flex-col items-center sm:flex-row gap-x-2">
+          <Icon
+            name="heroicons:megaphone"
+            class="w-6 h-6 text-primary"
             aria-hidden
-            class="items-center hidden w-8 h-8 mx-auto rounded-full sm:justify-center sm:flex bg-gradient-to-br from-yellow-400 to-orange-500"
-          >
-            <Icon
-              name="heroicons:megaphone"
-              class="w-4 h-4 text-white"
-            />
-          </div>
+          />
           <h1 class="text-lg sm:text-xl">What's New in Hanafuda Koi-Koi!</h1>
         </div>
-        <div
+        <!-- <div
           v-if="newAnnouncements.length > 1"
           class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
         >
           <span class="text-sm sm:text-base"
             >{{ currentPage + 1 }} of {{ newAnnouncements.length }}</span
           >
-        </div>
+        </div> -->
       </div>
     </template>
 
@@ -33,7 +30,7 @@
         <!-- Current announcement -->
         <div
           v-if="currentAnnouncement"
-          class="text-sm text-gray-600 dark:text-gray-300"
+          class="text-sm text-gray-600 dark:text-gray-300 overflow-y-auto h-[60dvh] px-8"
         >
           <!-- Use ContentRenderer for markdown body if available -->
           <section
@@ -81,13 +78,10 @@
         <!-- Impression tracking -->
         <div
           v-if="currentAnnouncement"
-          class="flex items-center justify-between pt-3 mt-3"
+          class="flex items-center justify-between px-8 py-4"
         >
           <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-            <span
-              v-if="isDev"
-              class="flex items-center gap-1"
-            >
+            <span class="flex items-center gap-1">
               <Icon
                 name="heroicons:eye"
                 class="w-4 h-4"
@@ -95,10 +89,7 @@
               {{ impressions[currentAnnouncement.id]?.views || 0 }}
               <span class="sr-only">views</span>
             </span>
-            <span
-              v-if="isDev"
-              class="flex items-center gap-1"
-            >
+            <span class="flex items-center gap-1">
               <Icon
                 name="heroicons:heart"
                 class="w-4 h-4"
@@ -112,6 +103,8 @@
             type="button"
             :class="[
               'flex items-center gap-2 px-2 py-1 text-sm rounded-md transition-colors',
+              'focus:outline-none focus-visible:outline-none',
+              'focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-2',
               isLiked(currentAnnouncement.id)
                 ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
                 : 'text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400',
@@ -129,7 +122,7 @@
         <!-- Pagination controls -->
         <div
           v-if="newAnnouncements.length > 1"
-          class="flex items-center justify-between pt-4 mt-6 border-t border-gray-200 dark:border-gray-600"
+          class="flex items-center justify-between px-4 py-4 border-t border-gray-200 dark:border-gray-600"
         >
           <button
             type="button"
@@ -158,7 +151,7 @@
               :class="[
                 'w-2 h-2 rounded-full transition-colors',
                 index === currentPage
-                  ? 'bg-orange-500'
+                  ? 'bg-primary'
                   : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500',
               ]"
               @click="currentPage = index"
@@ -187,17 +180,17 @@
     </template>
 
     <template #actions>
-      <div class="flex flex-col gap-3 mt-5 sm:mt-6 sm:flex-row">
+      <div class="flex flex-col gap-3 px-8 mb-4 sm:flex-row">
         <button
           type="button"
-          class="w-full rounded-md sec-btn"
+          class="w-full sec-btn"
           @click="handleDontShowAgain"
         >
           Don't show again
         </button>
         <button
           type="button"
-          class="w-full rounded-md pri-btn"
+          class="w-full pri-btn"
           @click="handleDismiss"
         >
           Got it!
@@ -240,7 +233,8 @@ const {
 // Pagination state
 const currentPage = ref(0)
 
-const isDev = ref(process.env.NUXT_PUBLIC_NODE_ENV === 'development')
+const config = useRuntimeConfig()
+const isDev = config.public.nodeEnv === 'development'
 
 // Current announcement computed property
 const currentAnnouncement = computed(() => {
