@@ -35,8 +35,9 @@
           >
             <HeadlessDialogPanel
               :class="[
-                'relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform rounded-md shadow-xl bg-surface dark:bg-hanafuda-cream sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl sm:p-6 lg:p-8',
+                'relative pt-5 pb-4 overflow-hidden text-left transition-all transform rounded-md shadow-xl bg-surface dark:bg-hanafuda-cream sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl',
                 isMobile && 'portrait:w-screen',
+                padded && 'px-4 sm:p-6 lg:p-8',
               ]"
             >
               <!-- rounded blur in the background -->
@@ -68,9 +69,14 @@
 </template>
 
 <script setup lang="ts">
-const { open, modalRef } = defineProps<{
+const {
+  open,
+  modalRef,
+  padded = true,
+} = defineProps<{
   open: boolean
   modalRef?: string
+  padded?: boolean
 }>()
 const { isMobile } = useDevice()
 </script>
