@@ -28,7 +28,7 @@ const { logout, error } = useAuth()
 const user = useCurrentUser()
 
 const login = () => {
-  navigateTo('/login')
+  navigateTo('/sign-in')
 }
 
 const logoutUser = () => {
@@ -37,7 +37,7 @@ const logoutUser = () => {
 
 watch(user, () => {
   if (!user.value && useRoute().meta.requiresAuth) {
-    navigateTo('/login?exit=true')
+    navigateTo('/sign-in?exit=true')
   }
 })
 </script>

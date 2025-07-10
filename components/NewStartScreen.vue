@@ -121,12 +121,12 @@ const testGame = () => {
 }
 
 const goToLogin = () => {
-  navigateTo({ path: '/login', query: { signup: 'true' } })
+  navigateTo({ path: '/sign-in', query: { signup: 'true' } })
 }
 
 const handleSignin = () => {
   logout()
-  navigateTo({ path: '/login', query: { exit: 'true' } })
+  navigateTo({ path: '/sign-in', query: { exit: 'true' } })
 }
 
 watch(gameStart, () => {
