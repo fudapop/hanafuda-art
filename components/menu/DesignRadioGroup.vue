@@ -84,7 +84,7 @@
                     alt="coin"
                     class="inline w-4 h-4 align-middle drop-shadow-sm"
                   />
-                  {{ computedCost }}
+                  {{ isNew(design) ? 0 : UNLOCK_COST }}
                 </div>
               </button>
             </div>
@@ -259,7 +259,7 @@ let timeoutId: string | number | NodeJS.Timeout | undefined
 let toastId: any
 
 const computedCost = computed(() => {
-  if (!newUnlock.value || isNew(newUnlock.value)) return 0
+  if (newUnlock.value && isNew(newUnlock.value)) return 0
   return UNLOCK_COST
 })
 
