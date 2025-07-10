@@ -1,5 +1,18 @@
 import { useStorage } from '@vueuse/core'
 
+const BGM = {
+  main: '/audio/bgm/PerituneMaterial_Awayuki.ogg',
+  koikoi1: '/audio/bgm/PerituneMaterial_EpicBattle_J_loop.ogg',
+  koikoi2: '/audio/bgm/PerituneMaterial_Kengeki_loop.ogg',
+} as const
+
+const SFX = {
+  card1: '/audio/sfx/card1.m4a',
+  card2: '/audio/sfx/card2.m4a',
+  coin: '/audio/sfx/coins-counting.m4a',
+  slash: '/audio/sfx/sword-slash-and-swing-185432.mp3',
+} as const
+
 export const useAudio = () => {
   const audioRefA = ref<HTMLAudioElement>()
   const audioRefB = ref<HTMLAudioElement>()
@@ -334,6 +347,10 @@ export const useAudio = () => {
   }
 
   return {
+    // Constants
+    BGM,
+    SFX,
+
     // State
     isPlaying: readonly(isPlaying),
     currentVolume: readonly(currentVolume),

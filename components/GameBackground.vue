@@ -100,14 +100,6 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import mainTheme from '~/assets/audio/bgm/PerituneMaterial_Awayuki.ogg'
-import koikoiTheme2 from '~/assets/audio/bgm/PerituneMaterial_EpicBattle_J_loop.ogg'
-import koikoiTheme from '~/assets/audio/bgm/PerituneMaterial_Kengeki_loop.ogg'
-import cardSound1 from '~/assets/audio/sfx/card1.m4a'
-import cardSound2 from '~/assets/audio/sfx/card2.m4a'
-import coinSound from '~/assets/audio/sfx/coins-counting.m4a'
-import slashSound from '~/assets/audio/sfx/sword-slash-and-swing-185432.mp3'
-
 import { useGameDataStore } from '~/stores/gameDataStore'
 
 const { koikoiIsCalled } = useDecisionHandler()
@@ -140,9 +132,11 @@ const cleanupPreload = watch(currentDesign, () => {
 
 const audio = inject('audio') as ReturnType<typeof useAudio>
 
+const { BGM, SFX } = audio
+
 const cleanupCoinSfx = watch(roundOver, (newRoundOver) => {
   if (newRoundOver && getCurrent.value.result.winner === 'p1') {
-    audio.playSfx(coinSound)
+    audio.playSfx(SFX.coin)
   }
 })
 
@@ -150,9 +144,9 @@ const cleanupCardSfx = watch(
   () => getCurrent.value.phase,
   (newPhase) => {
     if (newPhase === 'draw') {
-      audio.playSfx(cardSound1)
+      audio.playSfx(SFX.card1)
     } else if (newPhase === 'collect') {
-      audio.playSfx(cardSound2)
+      audio.playSfx(SFX.card2)
     }
   },
 )
@@ -161,14 +155,14 @@ const cleanupBgm = watch(
   ([newCall, newRound], [_, oldRound]) => {
     if (newCall) {
       // Play SFX, then crossfade to theme
-      audio.playSfx(slashSound)
+      audio.playSfx(SFX.slash)
       if (getCurrent.value.player === 'p1') {
-        audio.crossfadeTo(koikoiTheme, 1.2)
+        audio.crossfadeTo(BGM.koikoi1, 1.2)
       } else {
-        audio.crossfadeTo(koikoiTheme2, 1.2)
+        audio.crossfadeTo(BGM.koikoi2, 1.2)
       }
     } else if (newRound > oldRound) {
-      audio.crossfadeTo(mainTheme, 2)
+      audio.crossfadeTo(BGM.main, 2)
     }
   },
 )
@@ -179,7 +173,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   // Left the game screen
-  audio.crossfadeTo?.(mainTheme, 3)
+  audio.crossfadeTo?.(BGM.main, 3)
   cleanupBgm()
   cleanupCardSfx()
   cleanupCoinSfx()

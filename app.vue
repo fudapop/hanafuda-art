@@ -21,7 +21,6 @@
 <script setup lang="ts">
 import Toast, { POSITION } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
-import mainTheme from '~/assets/audio/bgm/PerituneMaterial_Awayuki.ogg'
 import { vClickDisabled } from '~/utils/directives/vClickDisabled'
 import { vHide } from '~/utils/directives/vHide'
 
@@ -65,7 +64,7 @@ onMounted(() => {
   window.dispatchEvent(new CustomEvent('ptupdate'))
 
   // Initialize audio with background music
-  audio.initAudio(mainTheme)
+  audio.initAudio(audio.BGM.main)
 
   // Setup autoplay after user interaction
   audio.setupAutoplay()
