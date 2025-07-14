@@ -22,7 +22,12 @@
       </div>
 
       <!-- FIELD -->
-      <div class="absolute inset-x-0 max-w-5xl -translate-y-3/4 top-1/2">
+      <div
+        :class="[
+          'absolute inset-x-0 max-w-5xl top-1/2 -translate-y-3/4',
+          isMobile ? 'landscape:-translate-y-1/2' : '',
+        ]"
+      >
         <div
           v-click-disabled:unless="players.p1.isActive && !!selectedCard"
           class="max-sm:[--card-height:85px] max-lg:[--card-height:100px] place-content-center grid grid-cols-[80px_1fr] sm:grid-cols-[160px_1fr] sm:translate-y-4 origin-left sm:origin-center"
@@ -36,16 +41,16 @@
 
       <!-- PLAYER COLLECTION -->
       <!-- ARTIST CREDIT -->
-      <!-- <a
-          v-if="getDesignInfo().creator"
-          class="absolute right-4 text-xs italic underline opacity-40 !pointer-events-auto -top-8 underline-offset-4 whitespace-nowrap dark:text-white"
-          :title="getDesignInfo().urlDescription"
-          :href="getDesignInfo().url"
-          target="_blank"
-        >
-          Card designs by {{ getDesignInfo().creator }} &rarr;
-        </a> -->
-      <div class="absolute inset-x-0 -translate-y-full lg:inset-x-auto lg:right-0 top-3/4">
+      <a
+        v-if="getDesignInfo().creator"
+        class="absolute left-4 text-xs italic underline opacity-40 !pointer-events-auto top-32 underline-offset-4 whitespace-nowrap dark:text-white"
+        :title="getDesignInfo().urlDescription"
+        :href="getDesignInfo().url"
+        target="_blank"
+      >
+        Cards by {{ getDesignInfo().creator }} &rarr;
+      </a>
+      <div class="absolute inset-x-0 lg:inset-x-auto lg:right-0 bottom-1/4">
         <LazyCollectionArea
           player="p1"
           @completed="handleCompletion"
@@ -56,7 +61,7 @@
       <div
         v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
         :class="{
-          'transition-all duration-200 absolute bottom-1/4 inset-x-0 pb-8': true,
+          'transition-all duration-200 absolute top-3/4 inset-x-0 pb-8': true,
           'opacity-80 sm:translate-y-1/2': players.p2.isActive,
         }"
       >
@@ -110,6 +115,8 @@ import { useCardStore } from '~/stores/cardStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
 import { checkForWin } from '~/utils/yaku'
+
+const { isMobile } = useDevice()
 
 definePageMeta({
   requiresAuth: true,

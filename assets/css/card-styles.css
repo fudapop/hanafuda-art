@@ -70,7 +70,7 @@
   --card-radius: 0.1rem;
   --card-aspect: 3/5;
   --card-bg-color: linear-gradient(15deg, #f8f2c3, #309d71 60%);
-  --card-border-color: #55666675;
+  --card-border-color: transparent;
 
   & .card img {
     padding-top: 0.5px;
@@ -211,8 +211,8 @@
   }
 
   & .down {
-    --card-bg-color: url('/cards/post-card/jp-post-symbol.png'),
-      linear-gradient(45deg, #60a27f, #035989);
+    --card-bg-color:
+      url('/cards/post-card/jp-post-symbol.png'), linear-gradient(45deg, #60a27f, #035989);
     background-blend-mode: screen;
     background-size: contain !important;
     background-repeat: no-repeat !important;

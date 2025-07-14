@@ -5,43 +5,10 @@ import { resolve } from 'path'
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
-  components: [
-    {
-      path: '~/components',
-      pathPrefix: false,
-    },
-    {
-      path: '~/components/buttons',
-      pathPrefix: false,
-    },
-    {
-      path: '~/components/cards',
-      pathPrefix: false,
-    },
-    {
-      path: '~/components/modal',
-      pathPrefix: false,
-    },
-    {
-      path: '~/components/menu',
-      pathPrefix: false,
-    },
-    {
-      path: '~/components/play-area',
-      pathPrefix: false,
-    },
-    {
-      path: '~/components/side-panel',
-      pathPrefix: false,
-    },
-  ],
-  css: ['~/assets/css/card-styles.css', '~/assets/css/global.css'],
-  devtools: { enabled: false },
   app: {
     head: {
       bodyAttrs: {
-        class: 'dark:bg-gray-800',
+        class: 'dark:bg-gray-900',
       },
       htmlAttrs: {
         lang: 'en',
@@ -49,7 +16,15 @@ export default defineNuxtConfig({
       link: [
         {
           rel: 'icon',
-          href: '/sakura.png',
+          href: '/images/sakura.png',
+        },
+        {
+          rel: 'dns-prefetch',
+          href: process.env.NUXT_PUBLIC_SUPABASE_URL,
+        },
+        {
+          rel: 'preconnect',
+          href: process.env.NUXT_PUBLIC_SUPABASE_URL,
         },
         {
           rel: 'preconnect',
@@ -84,11 +59,42 @@ export default defineNuxtConfig({
     },
     pageTransition: { name: 'page', mode: 'out-in' },
   },
-  image: {
-    cloudinary: {
-      baseURL: 'https://res.cloudinary.com/dap2o5kiu/image/upload',
+  compatibilityDate: '2024-11-01',
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
     },
+    {
+      path: '~/components/buttons',
+      pathPrefix: false,
+    },
+    {
+      path: '~/components/cards',
+      pathPrefix: false,
+    },
+    {
+      path: '~/components/modal',
+      pathPrefix: false,
+    },
+    {
+      path: '~/components/menu',
+      pathPrefix: false,
+    },
+    {
+      path: '~/components/play-area',
+      pathPrefix: false,
+    },
+    {
+      path: '~/components/side-panel',
+      pathPrefix: false,
+    },
+  ],
+  css: ['~/assets/css/card-styles.css', '~/assets/css/global.css'],
+  devServer: {
+    port: 8888,
   },
+  devtools: { enabled: false },
   i18n: {
     bundle: {
       optimizeTranslationDirective: false,
@@ -113,20 +119,6 @@ export default defineNuxtConfig({
       'autoprefixer': {},
     },
   },
-  routeRules: {
-    // Set custom headers matching paths
-    '/_nuxt/**': {
-      headers: {
-        'Cache-Control': 'public, maxage=86400, stale-while-revalidate=86400',
-      },
-    },
-    '/(_ipx|cards|images|bg|avatars)/**': {
-      headers: {
-        'Cache-Control':
-          'public, maxage=604800, stale-while-revalidate=86400, stale-if-error=86400',
-      },
-    },
-  },
   router: {
     options: {
       scrollBehaviorType: 'auto',
@@ -136,6 +128,11 @@ export default defineNuxtConfig({
     public: {
       nodeEnv: process.env.NODE_ENV,
       version: pkg.version,
+      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
+      supabasePublishableKey: process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    },
+    private: {
+      supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
     },
   },
   ssr: false,

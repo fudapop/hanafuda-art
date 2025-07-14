@@ -1,8 +1,7 @@
-import { useStorage } from '@vueuse/core'
-import { getDownloadURL, getStorage, ref as storageRef, updateMetadata } from 'firebase/storage'
 import CARD_DESIGNS from '~/assets/designInfo.json'
 import { useConfigStore } from '~/stores/configStore'
 import { type CardName, DECK } from '~/utils/cards'
+import { useSupabase } from './useSupabase'
 
 export type DesignInfo = {
   name: string
@@ -28,9 +27,14 @@ const DESIGNS = Object.keys(CARD_DESIGNS) as CardDesign[]
 
 type CardMap = Map<CardName, string>
 
-const CARD_MAP: Ref<CardMap | undefined> = ref()
+const supabase = ref<ReturnType<typeof useSupabase> | null>(null)
 
 export const useCardDesign = () => {
+  if (!supabase.value) {
+    supabase.value = useSupabase()
+  }
+  const currentDesign: Ref<CardDesign> = useState('design', () => 'cherry-version')
+
   /**
    *
    * @param designName (optional) Name of design to get info for. Defaults to current design.
@@ -39,45 +43,27 @@ export const useCardDesign = () => {
    *
    */
   const getDesignInfo = (designName?: CardDesign) =>
-    CARD_DESIGNS[designName ?? useDesign().value] as DesignInfo
+    CARD_DESIGNS[designName ?? currentDesign.value] as DesignInfo
 
-  const getImage = async (designPath: string) => {
-    const storage = getStorage()
-    const imageFileRef = storageRef(storage, designPath)
-    const newMetadata = {
-      contentType: `image/${designPath.split('.').pop() || 'webp'}`,
-      cacheControl: 'public, max-age=31536000',
+  const getCardUrl = (cardName: CardName, design?: CardDesign): string => {
+    if (!supabase.value) {
+      throw new Error('Supabase not initialized')
     }
-    updateMetadata(imageFileRef, newMetadata).catch((error) => {
-      console.error({ error })
-    })
-    const url = await getDownloadURL(imageFileRef)
-    return url
-  }
-
-  const getFromSession = (cardDesign: CardDesign) => {
-    try {
-      const map = localStorage.getItem('new-hanafuda')
-      if (!map) return null
-      const store = JSON.parse(map)
-      if (!store[cardDesign]) return null
-      const urlMap = new Map(Object.entries(store[cardDesign])) as CardMap
-      return urlMap
-    } catch (e) {
-      console.error(e)
-      return null
-    }
-  }
-
-  const saveToSession = (cardDesign: CardDesign, urlMap: CardMap) => {
-    useStorage(
-      'new-hanafuda',
-      {
-        [cardDesign]: Object.fromEntries([...urlMap.entries()]),
+    const designName = design ?? currentDesign.value
+    const path = `cards/${designName}/${cardName}.${getDesignInfo(designName).formatExt || 'webp'}`
+    const {
+      data: { publicUrl },
+    } = supabase.value.storage.from('static').getPublicUrl(path, {
+      transform: {
+        width: 120,
+        resize: 'contain',
       },
-      localStorage,
-      { mergeDefaults: true },
-    )
+    })
+    if (!publicUrl) {
+      console.error(`Card URL not found for ${cardName} in ${designName}`)
+      return ''
+    }
+    return publicUrl
   }
 
   /**
@@ -87,53 +73,21 @@ export const useCardDesign = () => {
    * @param cardDesign Design to get card URLs for.
    * @returns Map of card names to URLs for the specified design.
    */
-  const getCardMap = async (cardDesign: CardDesign) => {
+  const fetchCardUrlMap = async (design: CardDesign) => {
     // Check if the URLs are already in the cache
-    let urlMap: CardMap = getFromSession(cardDesign) as any
-    if (urlMap) return urlMap
+    let urlMap: CardMap = new Map()
 
-    // Check if the URLs are in Firestore
-    // urlMap = await getFromStore(cardDesign) as any;
-    // if (urlMap) {
-    // 	saveToSession(cardDesign, urlMap);
-    // 	return urlMap;
-    // }
+    // Generate URLs for Supabase (service worker will handle caching)
+    // urlMap = new Map()
+    if (!supabase.value) {
+      throw new Error('Supabase not initialized')
+    }
+    for (const cardName of DECK) {
+      const url = getCardUrl(cardName, design)
+      urlMap.set(cardName, url)
+    }
 
-    // Fetch the URLs from storage
-    urlMap = new Map()
-    const urls = await Promise.all(
-      DECK.map(
-        async (cardName) =>
-          await getImage(
-            `cards/${cardDesign}/${cardName}.${getDesignInfo(cardDesign).formatExt || 'webp'}`,
-          ),
-      ),
-    )
-    urls.forEach((url, index) => {
-      urlMap.set(DECK[index], url)
-    })
-
-    // Save the URLs to Firestore and cache
-    // saveToStore(cardDesign, urlMap);
-    saveToSession(cardDesign, urlMap)
     return urlMap
-  }
-
-  const useDesign = (): Ref<CardDesign> => useState('design', () => 'cherry-version')
-
-  const useDesignPath = computed(
-    () => (cardName: CardName) => `cards/${useDesign().value}/${cardName}.webp`,
-  )
-  const getCardUrl = (cardName: CardName) => {
-    const url = CARD_MAP.value?.get(cardName)
-    return url
-  }
-
-  const fetchCardUrls = async () => {
-    // Clear the current CARD_MAP before fetching new URLs to prevent stale images
-    CARD_MAP.value = undefined
-    CARD_MAP.value = await getCardMap(useDesign().value)
-    return CARD_MAP.value
   }
 
   /**
@@ -156,9 +110,8 @@ export const useCardDesign = () => {
   }
 
   return {
-    fetchCardUrls,
-    useDesign,
-    useDesignPath,
+    fetchCardUrlMap,
+    currentDesign,
     getCardUrl,
     getDesignInfo,
     applyCardSizeMultiplier,

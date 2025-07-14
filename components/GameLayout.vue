@@ -181,8 +181,7 @@ import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { usePlayerStore } from '~/stores/playerStore'
 
-const { useDesign } = useCardDesign()
-const currentDesign = useDesign()
+const { currentDesign } = useCardDesign()
 const { logout } = useAuth()
 
 const { players } = storeToRefs(usePlayerStore())

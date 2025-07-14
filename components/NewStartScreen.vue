@@ -26,6 +26,7 @@
         <img
           src="~/assets/images/flowers-landing1.png"
           class="object-contain w-full h-full transition-opacity duration-300 opacity-0 lg:opacity-100"
+          loading="lazy"
         />
       </div>
     </div>
@@ -39,6 +40,7 @@
         <img
           src="~/assets/images/flowers-landing2.png"
           class="object-contain w-full h-full transition-opacity duration-300 opacity-0 lg:opacity-100"
+          loading="lazy"
         />
       </div>
     </div>

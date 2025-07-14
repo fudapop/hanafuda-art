@@ -108,14 +108,15 @@ const { roundCounter, roundOver, getCurrent } = storeToRefs(useGameDataStore())
 
 const gameIsStarted = useState('start', () => false)
 
-const { fetchCardUrls, useDesign } = useCardDesign()
-const currentDesign = useDesign()
+const { fetchCardUrlMap, currentDesign } = useCardDesign()
+
+const { cacheDesignIfNeeded } = useCardCache()
 
 const preloadHead = useHead({})
 
-const preloadImages = () => {
-  fetchCardUrls().then((urlMap) => {
-    const preloadTags = [...urlMap.values()].map((url) => ({
+const addImagePreloadLinks = (design: CardDesign) => {
+  fetchCardUrlMap(design).then((urlMap) => {
+    const preloadTags = Array.from(urlMap.values()).map((url) => ({
       rel: 'preload',
       href: url,
       as: 'image' as const,
@@ -125,10 +126,6 @@ const preloadImages = () => {
     })
   })
 }
-
-const cleanupPreload = watch(currentDesign, () => {
-  preloadImages()
-})
 
 const audio = inject('audio') as ReturnType<typeof useAudio>
 
@@ -168,7 +165,8 @@ const cleanupBgm = watch(
 )
 
 onMounted(() => {
-  preloadImages()
+  cacheDesignIfNeeded(currentDesign.value)
+  addImagePreloadLinks(currentDesign.value)
 })
 
 onUnmounted(() => {
@@ -177,7 +175,6 @@ onUnmounted(() => {
   cleanupBgm()
   cleanupCardSfx()
   cleanupCoinSfx()
-  cleanupPreload()
 })
 </script>
 

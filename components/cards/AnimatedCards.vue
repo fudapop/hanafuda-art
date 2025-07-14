@@ -16,31 +16,31 @@
       <div class="drop-shadow-md animated-card card one">
         <CardImage
           card="matsu-ni-tsuru"
-          :src="getCardUrl('matsu-ni-tsuru')!"
+          :src="getCardUrl('matsu-ni-tsuru', selectedDesign)!"
         />
       </div>
       <div class="drop-shadow-md animated-card card two">
         <CardImage
           card="sakura-ni-maku"
-          :src="getCardUrl('sakura-ni-maku')!"
+          :src="getCardUrl('sakura-ni-maku', selectedDesign)!"
         />
       </div>
       <div class="drop-shadow-md animated-card card three">
         <CardImage
           card="susuki-ni-tsuki"
-          :src="getCardUrl('susuki-ni-tsuki')!"
+          :src="getCardUrl('susuki-ni-tsuki', selectedDesign)!"
         />
       </div>
       <div class="drop-shadow-md animated-card card four">
         <CardImage
           card="yanagi-ni-ono-no-toufuu"
-          :src="getCardUrl('yanagi-ni-ono-no-toufuu')!"
+          :src="getCardUrl('yanagi-ni-ono-no-toufuu', selectedDesign)!"
         />
       </div>
       <div class="drop-shadow-md animated-card card five">
         <CardImage
           card="kiri-ni-ho-oh"
-          :src="getCardUrl('kiri-ni-ho-oh')!"
+          :src="getCardUrl('kiri-ni-ho-oh', selectedDesign)!"
         />
       </div>
       <p
@@ -61,9 +61,8 @@
 <script setup lang="ts">
 import { useImage } from '@vueuse/core'
 import { type CardName } from '~/utils/cards'
-const { getCardUrl, useDesign } = useCardDesign()
+const { getCardUrl, currentDesign: selectedDesign } = useCardDesign()
 
-const selectedDesign = useDesign()
 const loaded = ref(false)
 
 const loadImages = async () => {
@@ -76,7 +75,7 @@ const loadImages = async () => {
       'yanagi-ni-ono-no-toufuu',
       'kiri-ni-ho-oh',
     ] as CardName[]
-  ).map((cardName) => useImage({ src: getCardUrl(cardName)! }))
+  ).map((cardName) => useImage({ src: getCardUrl(cardName, selectedDesign.value)! }))
   while (images.every((img) => img.isLoading.value)) {
     await sleep(500)
   }

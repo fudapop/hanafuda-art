@@ -1,6 +1,6 @@
 <template>
   <HeadlessRadioGroup
-    v-model="selectedDesign"
+    v-model="currentDesign"
     as="div"
     class="relative w-full @container"
   >
@@ -32,6 +32,7 @@
         ]"
         :value="design"
         :disabled="!unlocked?.includes(design)"
+        @pointerenter="cacheDesignOnHover(design, getDesignInfo(design).formatExt)"
       >
         <div
           :class="[
@@ -209,8 +210,8 @@ import DesignDescription from './DesignDescription.vue'
 
 type CardDesign = (typeof DESIGNS)[number]
 
-const { DESIGNS, useDesign, getDesignInfo } = useCardDesign()
-const selectedDesign = useDesign()
+const { DESIGNS, currentDesign, getDesignInfo } = useCardDesign()
+const { cacheDesignOnHover } = useCardCache()
 const toast = useToast()
 
 const isNew = (design: CardDesign) => {
@@ -264,15 +265,15 @@ const computedCost = computed(() => {
 })
 
 const handleUnlock = (design: CardDesign) => {
-  if (!initialDesign) initialDesign = selectedDesign.value
-  selectedDesign.value = design
+  if (!initialDesign) initialDesign = currentDesign.value
+  currentDesign.value = design
   if (coins.value === undefined || !unlocked.value) return
   if (coins.value < computedCost.value) {
     toast.dismiss(toastId)
     toastId = toast.info("You don't have enough coins yet...", { timeout: 9000 })
     clearTimeout(timeoutId)
     timeoutId = setTimeout(() => {
-      selectedDesign.value = initialDesign!
+      currentDesign.value = initialDesign!
       initialDesign = undefined
     }, 10000)
     return
@@ -282,7 +283,7 @@ const handleUnlock = (design: CardDesign) => {
 
 const cancelUnlock = () => {
   newUnlock.value = undefined
-  selectedDesign.value = initialDesign!
+  currentDesign.value = initialDesign!
 }
 
 const confirmUnlock = () => {
@@ -291,14 +292,13 @@ const confirmUnlock = () => {
   coins.value -= computedCost.value
   unlocked.value.push(newUnlock.value)
   toast.success("You've unlocked a new design!", { timeout: 5000 })
-  selectedDesign.value = newUnlock.value
+  currentDesign.value = newUnlock.value
   newUnlock.value = undefined
 }
 
 const userIsGuest = toValue(useAuth().userIsGuest)
 const userLiked = toValue(computed(() => currentUser?.value?.designs.liked))
 
-const currentDesign = useDesign()
 const coll = collection(getFirestore(), 'users')
 const likesCount = reactive<Map<CardDesign, number>>(new Map())
 const getLikesCount = async (design: CardDesign) => {

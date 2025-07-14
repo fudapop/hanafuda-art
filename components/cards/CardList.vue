@@ -44,13 +44,12 @@ const {
   stack?: boolean
   itemClass?: string
 }>()
-const { getCardUrl, useDesign } = useCardDesign()
-const currentDesign = useDesign()
+const { getCardUrl, currentDesign } = useCardDesign()
 
 const cardImages = computed(() =>
   [...cards].map((cardName) => ({
     name: cardName,
-    source: getCardUrl(cardName),
+    source: getCardUrl(cardName, currentDesign.value),
   })),
 )
 

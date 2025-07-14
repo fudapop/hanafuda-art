@@ -54,6 +54,9 @@ const audio = useAudio()
 // Provide audio controls globally
 provide('audio', audio)
 
+// Initialize card cache
+const { register: registerCardCache } = useCardCache()
+
 onMounted(() => {
   const googleScripts = [/.*\/www\.gstatic\.com\/.*/, /.*\/apis\.google\.com\/.*/]
   const scripts = ref(document.head.querySelectorAll('script'))
@@ -76,6 +79,9 @@ onMounted(() => {
     },
     { tagPriority: 'high' },
   )
+
+  // Initialize card caching service worker
+  registerCardCache()
 })
 </script>
 
