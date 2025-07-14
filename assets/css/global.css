@@ -75,6 +75,7 @@
   }
 
   body {
+    background-color: var(--color-background);
     --card-height: 140px;
     --card-aspect: 2/3;
     --table-grid-rows: calc(var(--card-height) / 1.5) 1fr calc(var(--card-height) * 2) 1fr
