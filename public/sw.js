@@ -1,22 +1,5 @@
 // Service Worker for Hanafuda Card Caching
 const CACHE_NAME = 'hanafuda-cards-v2'
-const CARD_DESIGNS = [
-  'cherry-version',
-  'sabling-art', 
-  'otwarte-karty',
-  'modern',
-  'hanami',
-  'moon-rabbit',
-  'koinobori',
-  'nishiki-fuda',
-  'vaporwave',
-  'hanamaki',
-  'hana-awase',
-  'kinbotan',
-  'post-card',
-  'flash-black',
-  'ramen-red'
-]
 
 const DECK = [
   'matsu-ni-tsuru', 'matsu-no-tan', 'matsu-no-kasu-1', 'matsu-no-kasu-2',
@@ -64,13 +47,14 @@ self.addEventListener('activate', (event) => {
 // Handle messages from the main thread
 self.addEventListener('message', async (event) => {
   const { type, data } = event.data
-
+  if (!type) {
+    // NOOP
+    // Do not handle messages with missing or unknown type
+    return;
+  }
   switch (type) {
     case 'CACHE_DESIGN':
       await handleCacheDesign(event.source, data)
-      break
-    case 'CACHE_ALL_DESIGNS':
-      await handleCacheAllDesigns(event.source, data)
       break
     case 'GET_CACHE_STATUS':
       await getCacheStatus(event.source, data)
@@ -79,7 +63,7 @@ self.addEventListener('message', async (event) => {
       await clearCache(event.source)
       break
     default:
-      console.warn('Unknown message type:', type)
+      // NOOP
   }
 })
 

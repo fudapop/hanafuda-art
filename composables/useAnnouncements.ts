@@ -78,9 +78,8 @@ export const useAnnouncements = async () => {
       })
 
       impressions.value = firestoreImpressions
-      console.log('Loaded announcement impressions from Firestore')
     } catch (error) {
-      console.warn('Failed to load announcement impressions from Firestore:', error)
+      console.warn('Failed to load announcement impressions:', error)
       // Continue with local state if Firestore fails
     }
   }
@@ -168,8 +167,6 @@ export const useAnnouncements = async () => {
           createdAt: Timestamp.now(),
         })
       }
-
-      console.log(`Tracked view for announcement: ${announcementId}`)
     } catch (error) {
       console.warn('Failed to track announcement view:', error)
       // Don't throw error - continue with local tracking only
@@ -239,7 +236,6 @@ export const useAnnouncements = async () => {
         })
       }
 
-      console.log(`Tracked ${wasLiked ? 'unlike' : 'like'} for announcement: ${announcementId}`)
       return !wasLiked // Return new like state
     } catch (error) {
       console.warn('Failed to track announcement like:', error)
