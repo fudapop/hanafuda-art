@@ -41,7 +41,7 @@
               >
                 <HeadlessDialogPanel
                   :unmount="false"
-                  class="w-screen h-screen max-w-2xl pointer-events-auto"
+                  class="w-screen h-[100dvh] max-w-2xl pointer-events-auto"
                 >
                   <div
                     class="flex flex-col h-full border-l shadow-xl bg-hanafuda-brown border-border"
