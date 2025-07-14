@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen">
     <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-      <GameBackground />
+      <GameBackgroundImages />
     </div>
     <button
       v-if="!isSignIn"
