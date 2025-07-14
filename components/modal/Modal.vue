@@ -21,7 +21,7 @@
 
       <div class="fixed inset-0 z-10 overflow-y-auto">
         <div
-          class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0"
+          class="flex items-end justify-center min-h-full p-0 text-center sm:items-center sm:p-0"
         >
           <HeadlessTransitionChild
             as="template"
@@ -33,7 +33,7 @@
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <HeadlessDialogPanel
-              class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+              class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white shadow-xl dark:bg-gray-800 w-full sm:my-8 sm:mx-0 sm:max-w-lg sm:p-6 sm:rounded-lg"
             >
               <div>
                 <slot name="image" />
