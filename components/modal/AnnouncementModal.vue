@@ -183,17 +183,17 @@
       <div class="flex flex-col gap-3 px-8 mb-4 sm:flex-row">
         <button
           type="button"
-          class="w-full sec-btn"
-          @click="handleDontShowAgain"
-        >
-          Don't show again
-        </button>
-        <button
-          type="button"
           class="w-full pri-btn"
           @click="handleDismiss"
         >
           Got it!
+        </button>
+        <button
+          type="button"
+          class="w-full sec-btn sm:order-first"
+          @click="handleDontShowAgain"
+        >
+          Don't show again
         </button>
       </div>
     </template>
