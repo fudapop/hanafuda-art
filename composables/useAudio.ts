@@ -23,7 +23,7 @@ export const useAudio = () => {
 
   // Load preferences from localStorage
   const systemPreferences = useStorage('hanafuda-system-preferences', {
-    volume: 0.5,
+    volume: 0.25,
     isMuted: false,
   })
 
