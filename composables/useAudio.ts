@@ -6,6 +6,13 @@ const BGM = {
   koikoi2: '/audio/bgm/PerituneMaterial_Kengeki_loop.ogg',
 } as const
 
+// Add track names mapping internally
+const trackNames = {
+  [BGM.main]: 'Awayuki - Peritune',
+  [BGM.koikoi1]: 'Epic Battle J - Peritune',
+  [BGM.koikoi2]: 'Kengeki - Peritune',
+} as const
+
 const SFX = {
   card1: '/audio/sfx/card1.m4a',
   card2: '/audio/sfx/card2.m4a',
@@ -20,6 +27,9 @@ export const useAudio = () => {
   const isPlaying = ref(false)
   const audioContext = ref<AudioContext | null>(null)
   const hasUserInteracted = ref(false)
+
+  // Add current track tracking
+  const currentTrack = ref<string | null>(null)
 
   // Load preferences from localStorage
   const systemPreferences = useStorage('hanafuda-system-preferences', {
@@ -81,6 +91,9 @@ export const useAudio = () => {
     // Add mobile-specific attributes
     ref.value.setAttribute('playsinline', 'true')
     ref.value.setAttribute('webkit-playsinline', 'true')
+
+    // Set current track
+    currentTrack.value = src
 
     // Handle mobile audio loading
     ref.value.addEventListener('canplaythrough', () => {
@@ -222,6 +235,9 @@ export const useAudio = () => {
 
       await toRef.value.play()
       isPlaying.value = true
+
+      // Update current track
+      currentTrack.value = src
     } catch (error) {
       console.warn('Audio crossfade failed:', error)
       return
@@ -346,6 +362,15 @@ export const useAudio = () => {
     })
   }
 
+  // Helper to get current track name
+  const getCurrentTrackName = () => {
+    if (!currentTrack.value) return null
+
+    const trackKey = Object.keys(trackNames).find((key) => currentTrack.value?.includes(key))
+
+    return trackKey ? trackNames[trackKey as keyof typeof trackNames] : null
+  }
+
   return {
     // Constants
     BGM,
@@ -356,6 +381,8 @@ export const useAudio = () => {
     currentVolume: readonly(currentVolume),
     isMuted: readonly(isMuted),
     hasUserInteracted: readonly(hasUserInteracted),
+    currentTrack: readonly(currentTrack),
+    currentTrackName: readonly(computed(getCurrentTrackName)), // Add this
 
     // Methods
     initAudio,
