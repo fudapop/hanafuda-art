@@ -1,6 +1,6 @@
 <template>
-  <div class="relative max-w-4xl min-h-screen px-4 py-8 mx-auto">
-    <div class="p-6 rounded-lg shadow-lg bg-background sm:p-8 lg:p-12 text-text">
+  <div class="relative max-w-4xl min-h-screen py-8 mx-auto">
+    <div class="py-6 rounded-lg shadow-lg bg-background sm:py-8 lg:py-12 text-text">
       <div class="max-w-3xl mx-auto">
         <div class="h-full prose prose-gray dark:prose-invert max-w-none">
           <slot />
@@ -14,6 +14,12 @@
             <div
               class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
             >
+              <NuxtLink
+                to="/changelog"
+                class="transition-colors hover:text-primary"
+                >Changelog</NuxtLink
+              >
+              <span>•</span>
               <NuxtLink
                 to="/attributions"
                 class="transition-colors hover:text-primary"

@@ -11,15 +11,21 @@ export default defineContentConfig({
         date: z.string(),
         features: z.array(z.string()).optional(),
         // Impression tracking
-        impressions: z.object({
-          views: z.number().default(0),
-          likes: z.number().default(0),
-        }).optional(),
+        impressions: z
+          .object({
+            views: z.number().default(0),
+            likes: z.number().default(0),
+          })
+          .optional(),
       }),
     }),
     policies: defineCollection({
       type: 'page',
       source: 'policies/**/*.md',
+    }),
+    changelog: defineCollection({
+      type: 'page',
+      source: 'changelog/**/*.md',
     }),
   },
 })

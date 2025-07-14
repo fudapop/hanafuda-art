@@ -1,0 +1,58 @@
+[
+  {
+    "name": "description",
+    "content": "Play Koi-Koi with your favorite Hanafuda designs!"
+  },
+  {
+    "property": "og:title",
+    "content": "New Hanafuda"
+  },
+  {
+    "property": "og:description",
+    "content": "Play Koi-Koi with your favorite Hanafuda designs!"
+  },
+  {
+    "property": "og:image",
+    "content": "/images/og-image-large.png"
+  },
+  {
+    "property": "og:url",
+    "content": "https://newhanafuda.art"
+  },
+  {
+    "property": "og:type",
+    "content": "website"
+  },
+  {
+    "property": "og:locale",
+    "content": "en_US"
+  },
+  {
+    "property": "og:site_name",
+    "content": "New Hanafuda"
+  },
+  {
+    "name": "twitter:card",
+    "content": "summary_large_image"
+  },
+  {
+    "name": "twitter:title",
+    "content": "New Hanafuda"
+  },
+  {
+    "name": "twitter:description",
+    "content": "Play Koi-Koi with your favorite Hanafuda designs!"
+  },
+  {
+    "name": "twitter:image",
+    "content": "/images/og-image-large.png"
+  },
+  {
+    "property": "twitter:domain",
+    "content": "newhanafuda.art"
+  },
+  {
+    "property": "twitter:url",
+    "content": "https://newhanafuda.art"
+  }
+]

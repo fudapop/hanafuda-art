@@ -14,8 +14,18 @@ definePageMeta({
   pageTransition: {
     mode: 'in-out',
   },
-  title: 'New Hanafuda | Attributions',
+  title: 'New Hanafuda | Artist Attributions',
 })
+
+useSeoMeta({
+  title: 'New Hanafuda | Artist Attributions',
+  description: 'Artist Attributions for New Hanafuda',
+  ogTitle: 'New Hanafuda | Artist Attributions',
+  ogDescription: 'Artist Attributions for New Hanafuda',
+  twitterTitle: 'New Hanafuda | Artist Attributions',
+  twitterDescription: 'Artist Attributions for New Hanafuda',
+})
+
 const { data: attributions } = useAsyncData(() =>
   queryCollection('policies').where('title', '=', 'Attributions').first(),
 )
