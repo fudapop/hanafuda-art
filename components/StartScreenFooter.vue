@@ -37,27 +37,34 @@
 
     <!-- Right side: Version -->
     <div class="text-center sm:text-right">
-      <span class="block text-xs tracking-widest select-none text-text-secondary">
+      <NuxtLink
+        to="/changelog"
+        title="View changelog"
+        class="block text-xs tracking-widest transition-colors select-none hover:text-primary text-text-secondary"
+      >
         {{ $config.public.version }}
-      </span>
+      </NuxtLink>
       <!-- LEGAL LINKS -->
       <div
         class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
       >
         <NuxtLink
           to="/attributions"
+          title="View attributions"
           class="transition-colors hover:text-primary"
           >Attributions</NuxtLink
         >
         <span>•</span>
         <NuxtLink
           to="/terms"
+          title="View terms of use"
           class="transition-colors hover:text-primary"
           >Term of Use</NuxtLink
         >
         <span>•</span>
         <NuxtLink
           to="/privacy"
+          title="View privacy policy"
           class="transition-colors hover:text-primary"
           >Privacy Policy</NuxtLink
         >
