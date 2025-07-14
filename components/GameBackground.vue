@@ -9,7 +9,7 @@
 import { storeToRefs } from 'pinia'
 import { useGameDataStore } from '~/stores/gameDataStore'
 
-const { koikoiIsCalled } = useDecisionHandler()
+const { koikoiIsCalled, getCaller } = useDecisionHandler()
 
 const { roundCounter, roundOver, getCurrent } = storeToRefs(useGameDataStore())
 
@@ -56,13 +56,15 @@ const cleanupCardSfx = watch(
 )
 const cleanupBgm = watch(
   [koikoiIsCalled, roundCounter, gameIsStarted],
-  ([newCall, newRound], [_, oldRound]) => {
-    if (newCall) {
-      // Play SFX, then crossfade to theme
+  ([newCall, newRound], [oldCall, oldRound]) => {
+    // Only trigger when koikoiIsCalled transitions from false to true
+    if (!oldCall && newCall) {
+      // Use the player who just called koikoi
+      const caller = getCaller.value
       audio.playSfx(SFX.slash)
-      if (getCurrent.value.player === 'p1') {
+      if (caller === 'p2') {
         audio.crossfadeTo(BGM.koikoi1, 1.2)
-      } else {
+      } else if (caller === 'p1') {
         audio.crossfadeTo(BGM.koikoi2, 1.2)
       }
     } else if (newRound > oldRound) {
