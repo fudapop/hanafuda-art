@@ -2,7 +2,7 @@
   <HeadlessRadioGroup
     v-model="currentDesign"
     as="div"
-    class="relative w-full @container"
+    class="relative w-full @container px-4"
   >
     <div class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-sm bg-surface">
       <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-text">
