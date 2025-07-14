@@ -121,10 +121,7 @@ const emits = defineEmits<{
 
 const { isMobile } = useDevice()
 const { orientation } = useScreenOrientation()
-const isMobileLandscape = computed(() => {
-  console.log(isMobile, orientation.value)
-  return isMobile && orientation.value?.includes('landscape')
-})
+const isMobileLandscape = computed(() => isMobile && orientation.value?.includes('landscape'))
 
 const { roundOver, roundCounter: month } = storeToRefs(useGameDataStore())
 const cs = useCardStore()
