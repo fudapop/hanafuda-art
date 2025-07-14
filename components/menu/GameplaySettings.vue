@@ -151,16 +151,6 @@
           <template #description>Include card corner labels to assist with matching.</template>
         </ToggleSwitch>
 
-        <ToggleSwitch
-          :callback="toggleFullscreen"
-          :init-value="config.allowFullscreen"
-        >
-          <template #label>Allow Fullscreen</template>
-          <template #description
-            >Enable to hide/show toggle button to enter/exit fullscreen mode.</template
-          >
-        </ToggleSwitch>
-
         <OptionsRadioGroup
           :model-value="config.cardSizeMultiplier"
           :update-callback="(option) => (config.cardSizeMultiplier = option as CardSizeOptions)"
@@ -201,10 +191,6 @@ const toggleDouble = (enabled: boolean) => {
 
 const toggleLabels = (enabled: boolean) => {
   config.cardLabels = enabled
-}
-
-const toggleFullscreen = (enabled: boolean) => {
-  config.allowFullscreen = enabled
 }
 
 const getCardSizeLabel = (size: CardSizeOptions) => {

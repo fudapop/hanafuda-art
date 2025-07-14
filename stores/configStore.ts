@@ -19,7 +19,6 @@ export interface GameSettings {
   double: boolean
   wild: boolean
   labels: boolean
-  fullscreen: boolean
   cardSize: CardSizeOptions
 }
 
@@ -34,8 +33,6 @@ const useConfigStore = defineStore('config', () => {
 
   const cardLabels = ref(false)
 
-  const allowFullscreen = ref(false)
-
   const cardSizeMultiplier = ref(1.0) as Ref<CardSizeOptions>
 
   const settingsLoaded = ref(false)
@@ -47,7 +44,6 @@ const useConfigStore = defineStore('config', () => {
       double: doubleScoreOverSeven.value,
       wild: sakeIsWildCard.value,
       labels: cardLabels.value,
-      fullscreen: allowFullscreen.value,
       cardSize: cardSizeMultiplier.value,
     }),
   )
@@ -58,7 +54,6 @@ const useConfigStore = defineStore('config', () => {
     doubleScoreOverSeven.value = userSettings.double
     sakeIsWildCard.value = userSettings.wild
     cardLabels.value = userSettings.labels
-    allowFullscreen.value = userSettings.fullscreen
     cardSizeMultiplier.value = userSettings.cardSize ?? 1.0
     settingsLoaded.value = true
   }
@@ -117,7 +112,6 @@ const useConfigStore = defineStore('config', () => {
     maxRounds,
     sakeIsWildCard,
     cardLabels,
-    allowFullscreen,
     cardSizeMultiplier,
     settingsLoaded,
     getCurrentSettings,
