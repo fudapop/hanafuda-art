@@ -62,7 +62,7 @@ const createCardCache = () => {
       })
 
       isRegistered.value = true
-      console.log('Card Cache Service Worker registered successfully')
+      console.debug('Card Cache Service Worker registered successfully')
 
       // Set up message listener
       navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage)
@@ -103,7 +103,7 @@ const createCardCache = () => {
             isComplete: true,
           }
         }
-        console.log(`Cached ${data.cached}/${data.total} cards for ${data.design}`)
+        console.debug(`Cached ${data.cached}/${data.total} cards for ${data.design}`)
         break
 
       case 'CACHE_STATUS':
@@ -111,6 +111,10 @@ const createCardCache = () => {
           ...data,
           isComplete: data.progress === 100 && data.cached === data.total,
         }
+        break
+
+      case 'CACHE_STATUS_ERROR':
+        console.error('Failed to get cache status:', data.error)
         break
 
       case 'CACHE_ERROR':
@@ -121,6 +125,16 @@ const createCardCache = () => {
           pendingRequests.value.delete(data.design)
         }
         console.error('Cache error:', data.error)
+        break
+
+      case 'CACHE_CLEARED':
+        console.debug('Cache cleared successfully')
+        // Reset cache status since cache was cleared
+        cacheStatus.value = {}
+        break
+
+      case 'CACHE_CLEAR_ERROR':
+        console.error('Failed to clear cache:', data.error)
         break
     }
   }
@@ -151,7 +165,7 @@ const createCardCache = () => {
 
     // Check if already in progress
     if (pendingRequests.value.has(design)) {
-      console.log(`Cache request for ${design} already in progress`)
+      console.debug(`Cache request for ${design} already in progress`)
       return false
     }
 
@@ -190,13 +204,13 @@ const createCardCache = () => {
   const cacheDesignIfNeeded = async (design: string, formatExt = 'webp') => {
     // First check if already cached
     if (isDesignCached(design)) {
-      console.log(`Design ${design} already cached, skipping`)
+      console.debug(`Design ${design} already cached, skipping`)
       return { wasCached: true, started: false }
     }
 
     // Check if currently being cached
     if (isDesignCaching(design) || pendingRequests.value.has(design)) {
-      console.log(`Design ${design} currently being cached, skipping`)
+      console.debug(`Design ${design} currently being cached, skipping`)
       return { wasCached: false, started: false }
     }
 

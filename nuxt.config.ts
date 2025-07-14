@@ -5,6 +5,16 @@ import { resolve } from 'path'
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 const seoMeta = JSON.parse(readFileSync(resolve('./seo-meta.json'), 'utf-8'))
 
+const headScripts = []
+
+if (process.env.NODE_ENV === 'production') {
+  headScripts.push({
+    id: 'cookieyes',
+    type: 'text/javascript',
+    src: 'https://cdn-cookieyes.com/client_data/0d8331e0442d66223912def6/script.js',
+  })
+}
+
 export default defineNuxtConfig({
   app: {
     head: {
@@ -50,13 +60,7 @@ export default defineNuxtConfig({
         },
       ],
       meta: seoMeta,
-      script: [
-        {
-          id: 'cookieyes',
-          type: 'text/javascript',
-          src: 'https://cdn-cookieyes.com/client_data/0d8331e0442d66223912def6/script.js',
-        },
-      ],
+      script: headScripts,
       title: 'New Hanafuda | Play Hanafuda Koi-Koi',
     },
     pageTransition: { name: 'page', mode: 'out-in' },
@@ -109,7 +113,6 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/test-utils/module',
     'nuxt-vuefire',
-    '@nuxtjs/partytown',
     '@nuxtjs/i18n',
     '@nuxt/content',
     '@nuxtjs/device',
