@@ -18,9 +18,6 @@ if (process.env.NODE_ENV === 'production') {
 export default defineNuxtConfig({
   app: {
     head: {
-      bodyAttrs: {
-        class: 'dark:bg-gray-900',
-      },
       htmlAttrs: {
         lang: 'en',
       },
