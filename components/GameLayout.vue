@@ -8,7 +8,6 @@
       class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10"
     >
       <GameBackground />
-      <AnimatedBackground />
     </div>
 
     <!-- Allows interaction when game not started -->
