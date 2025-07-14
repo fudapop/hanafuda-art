@@ -33,7 +33,7 @@
         ref="panelRef"
         :class="[
           'mt-0 p-4 rounded-lg rounded-tr-none',
-          'bg-black/20 dark:bg-white/10 backdrop-blur-sm border border-white/20',
+          'bg-black/30 dark:bg-white/10 backdrop-blur-sm border border-white/20',
           'group shadow-lg min-w-[200px]',
           'absolute right-0',
         ]"
@@ -104,23 +104,6 @@
         <div>
           <label class="block mb-2 text-xs font-medium text-white sr-only">Music</label>
 
-          <!-- Play/Pause Button -->
-          <!-- <button
-            @click="toggleMusic"
-            :class="[
-              'flex items-center gap-2 w-full px-3 py-2 rounded-md transition-all duration-200 mb-2',
-              'bg-white/10 hover:bg-white/20 border border-white/20',
-              'text-white hover:text-green-300',
-            ]"
-            title="Toggle Music"
-          >
-            <Icon
-              :name="isPlaying ? 'ic:round-pause' : 'ic:round-play-arrow'"
-              class="w-4 h-4"
-            />
-            <span class="text-sm">{{ isPlaying ? 'Pause' : 'Play' }}</span>
-          </button> -->
-
           <!-- Volume Controls -->
           <div class="flex items-center gap-2">
             <button
@@ -155,6 +138,27 @@
                 ]"
                 title="Volume"
               />
+            </div>
+          </div>
+
+          <!-- Current Track Display -->
+          <div
+            v-if="currentTrackName"
+            class="px-3 py-2 mt-2 overflow-hidden border rounded-md bg-black/5 dark:bg-white/5 border-white/10"
+          >
+            <div class="flex items-center gap-2">
+              <Icon
+                name="ic:round-music-note"
+                class="flex-shrink-0 w-3 h-3 text-white/70"
+              />
+              <div class="overflow-hidden">
+                <span
+                  class="text-xs text-white/80 whitespace-nowrap"
+                  :class="{ 'track-scroll': shouldScroll }"
+                >
+                  {{ currentTrackName }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -233,7 +237,18 @@ const {
   pauseAudio,
   setVolume,
   toggleMute: audioToggleMute,
+  currentTrackName, // Just use this directly
 } = audio
+
+// No need for trackNames mapping or currentTrackName computed here!
+
+// Determine if text should scroll (if it's longer than container)
+const shouldScroll = computed(() => {
+  if (!currentTrackName.value) return false
+
+  // You can adjust this threshold based on your container width
+  return currentTrackName.value.length > 20
+})
 
 onMounted(() => {
   if (!isSupported.value) {
@@ -302,4 +317,27 @@ input[type='range']:hover::-webkit-slider-thumb {
 input[type='range']:hover::-moz-range-thumb {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
+
+/* Track scrolling animation */
+.track-scroll:hover {
+  animation: track-scroll 8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes track-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(-100% + 100px));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Pause animation on hover */
+/* .track-scroll:hover {
+  animation-play-state: paused;
+} */
 </style>
