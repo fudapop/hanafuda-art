@@ -207,10 +207,6 @@ const toggleFullscreen = (enabled: boolean) => {
   config.allowFullscreen = enabled
 }
 
-const updateCardSize = (size: CardSizeOptions) => {
-  config.cardSizeMultiplier = size
-}
-
 const getCardSizeLabel = (size: CardSizeOptions) => {
   // TODO: Create an enum
   switch (size) {
@@ -238,27 +234,6 @@ const getOptionDescription = (option: ViewingsOptions) => {
 
 const user = toValue(useProfile().current)
 
-/**
- * Load game settings from local storage or
- * from user profile in database
- */
-const loadSettings = async () => {
-  // const userSettings = getLocalData() ?? (await getProfileData())?.settings
-  if (user && user.settings) {
-    config.loadUserSettings(user.settings as GameSettings)
-  }
-}
-
-// const getLocalData = () => {
-//   const localSettings = localStorage.getItem("hanafuda-settings");
-//   if (!localSettings) return;
-//   console.info("Settings loaded from local storage.");
-//   return JSON.parse(localSettings);
-// };
-
-/**
- * Save selection in local storage and database if settings were changed
- */
 const saveSettings = () => {
   if (!settingsUpdated.value || !user) return
   if (!user.settings) {
@@ -273,7 +248,9 @@ const saveSettings = () => {
 
 onMounted(async () => {
   // Database reads/writes minimized by using local storage.
-  await loadSettings()
+  if (!config.settingsLoaded && user?.settings) {
+    config.loadUserSettings(user.settings as GameSettings)
+  }
   watch(config, () => {
     settingsUpdated.value = true
     // Register listener to save settings when the panel is closed.

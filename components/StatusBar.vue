@@ -22,7 +22,12 @@
           >
             Round {{ ds.roundCounter }} / {{ config.maxRounds }}
           </p>
-          <div class="flex text-lg gap-x-4 sm:text-2xl text-white/90">
+          <div
+            :class="[
+              'flex text-lg gap-x-4  text-white/90',
+              isMobileLandscape ? 'flex-col text-sm gap-y-1' : 'sm:text-2xl',
+            ]"
+          >
             <p class="font-bold">
               {{ user?.username || `Player ${playerNum}` }}
             </p>
@@ -55,11 +60,17 @@
 </template>
 
 <script setup lang="ts">
+import { useScreenOrientation } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import NumberAnimation from 'vue-number-animation'
 import { useConfigStore } from '~/stores/configStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
+
+const { isMobile } = useDevice()
+
+const { orientation } = useScreenOrientation()
+const isMobileLandscape = computed(() => isMobile && orientation.value?.includes('landscape'))
 
 const { user, playerNum } = defineProps(['user', 'playerNum'])
 const ds = useGameDataStore()

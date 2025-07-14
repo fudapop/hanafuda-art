@@ -2,6 +2,7 @@ import { useStorage } from '@vueuse/core'
 import { type User, getAuth, onAuthStateChanged } from 'firebase/auth'
 import { type DocumentData, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { type CardDesign } from '~/composables/useCardDesign'
+import { type GameSettings, useConfigStore } from '~/stores/configStore'
 
 interface UserProfile {
   uid: string
@@ -105,6 +106,11 @@ export const useProfile = () => {
         isNewPlayer: true,
         hasSubmittedFeedback: false,
       },
+    }
+
+    if (userData.settings) {
+      const config = useConfigStore()
+      config.loadUserSettings(userData.settings as GameSettings)
     }
   }
 

@@ -96,7 +96,7 @@
               >
                 <CardImage
                   :card="card"
-                  :src="cardDesign.getCardUrl(card)!"
+                  :src="getCardUrl(card, currentDesign)"
                 />
                 <CheckCircleIcon
                   v-if="playerHas(card)"
@@ -144,8 +144,7 @@ const config = useConfigStore()
 
 const openAll = ref(false)
 
-const cardDesign = useCardDesign()
-const currentDesign = cardDesign.useDesign()
+const { currentDesign, getCardUrl } = useCardDesign()
 
 const playerHas = toValue(computed(() => (card: CardName) => cs.collection.p1.has(card)))
 const opponentHas = toValue(computed(() => (card: CardName) => cs.collection.p2.has(card)))

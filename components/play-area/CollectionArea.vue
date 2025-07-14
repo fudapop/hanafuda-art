@@ -1,22 +1,15 @@
 <template>
-  <div class="w-full px-4 opacity-90">
-    <button
-      v-if="hasCards"
-      :title="`View ${modalTitle}`"
-      :class="['absolute right-4 my-2', player === 'p1' ? 'bottom-full' : 'top-full']"
-      @click="modalOpen = true"
+  <div class="w-full px-4 opacity-90 isolate">
+    <div
+      :class="[
+        'collection-area',
+        isMobileLandscape ? 'w-1/4 h-[50px] !grid !grid-rows-2 !grid-cols-2 absolute right-12' : '',
+      ]"
     >
-      <span class="sr-only">View {{ modalTitle }}</span>
-      <MagnifyingGlassPlusIcon
-        class="w-6 h-6 stroke-2 stroke-text"
-        aria-hidden
-      />
-    </button>
-    <div class="collection-area">
       <ul
         v-for="type in cardTypes"
         :key="type"
-        class="relative inline-flex flex-wrap justify-end w-full max-w-[200px] -gap-2"
+        :class="['relative inline-flex flex-wrap justify-end w-full max-w-[200px] -gap-2']"
         @dblclick="modalOpen = true"
         @dbltap="modalOpen = true"
       >
@@ -29,12 +22,28 @@
           </span>
           {{ type }}
         </span>
-        <CardList
-          :cards="coll[type]"
-          :stack="true"
-        />
+        <template v-if="!isMobileLandscape">
+          <CardList
+            :cards="coll[type]"
+            :stack="true"
+          />
+        </template>
       </ul>
     </div>
+    <!-- <div class="flex justify-end"> -->
+    <button
+      v-if="hasCards"
+      :title="`View ${modalTitle}`"
+      :class="['my-2 z-10 absolute right-0', player === 'p1' ? 'bottom-full' : '']"
+      @click="modalOpen = true"
+    >
+      <span class="sr-only">View {{ modalTitle }}</span>
+      <MagnifyingGlassPlusIcon
+        class="w-6 h-6 stroke-2 stroke-text"
+        aria-hidden
+      />
+    </button>
+    <!-- </div> -->
   </div>
 
   <LazyModal
@@ -82,7 +91,7 @@
 
 <script setup lang="ts">
 import { MagnifyingGlassPlusIcon } from '@heroicons/vue/24/outline'
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside, useScreenOrientation } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { useCardStore } from '~/stores/cardStore'
 import { useConfigStore } from '~/stores/configStore'
@@ -109,6 +118,13 @@ const { player } = defineProps<{ player: PlayerKey }>()
 const emits = defineEmits<{
   (event: 'completed', data: CompletionEvent): void
 }>()
+
+const { isMobile } = useDevice()
+const { orientation } = useScreenOrientation()
+const isMobileLandscape = computed(() => {
+  console.log(isMobile, orientation.value)
+  return isMobile && orientation.value?.includes('landscape')
+})
 
 const { roundOver, roundCounter: month } = storeToRefs(useGameDataStore())
 const cs = useCardStore()

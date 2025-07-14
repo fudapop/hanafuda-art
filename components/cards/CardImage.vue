@@ -5,12 +5,12 @@
       class="w-full h-full down animate-pulse bg-black/30"
     />
     <template v-else>
-      <NuxtImg
+      <img
         :key="`${card}-${src}`"
-        :src="img(src, { height: 100, quality: 80, format: 'webp' })"
+        :src="src"
         :alt="card"
         loading="eager"
-        class="object-cover pointer-events-none user-select-none"
+        class="pointer-events-none user-select-none"
         sizes="100vw"
       />
     </template>
@@ -21,6 +21,4 @@
 import { type CardName } from '~/utils/cards'
 
 const { card, src } = defineProps<{ card: CardName; src: string | undefined }>()
-
-const img = useImage()
 </script>

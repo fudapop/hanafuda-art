@@ -38,6 +38,8 @@ const useConfigStore = defineStore('config', () => {
 
   const cardSizeMultiplier = ref(1.0) as Ref<CardSizeOptions>
 
+  const settingsLoaded = ref(false)
+
   const getCurrentSettings = computed(
     (): GameSettings => ({
       rounds: maxRounds.value,
@@ -58,6 +60,7 @@ const useConfigStore = defineStore('config', () => {
     cardLabels.value = userSettings.labels
     allowFullscreen.value = userSettings.fullscreen
     cardSizeMultiplier.value = userSettings.cardSize ?? 1.0
+    settingsLoaded.value = true
   }
 
   /**
@@ -116,6 +119,7 @@ const useConfigStore = defineStore('config', () => {
     cardLabels,
     allowFullscreen,
     cardSizeMultiplier,
+    settingsLoaded,
     getCurrentSettings,
     loadUserSettings,
     applyViewingsOption,

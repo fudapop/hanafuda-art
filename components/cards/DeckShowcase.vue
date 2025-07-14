@@ -1,5 +1,5 @@
 <template>
-  <div :class="['relative w-24 mx-auto h-36', currentDesign]">
+  <div :class="['relative w-24 mx-auto h-36', design]">
     <!-- Card Back (base layer) -->
     <div
       class="absolute inset-0 z-0 object-cover w-full h-full card down -translate-x-1/4"
@@ -39,20 +39,18 @@ const {
   design,
   autoReveal = true,
   intervalInMs = 3000,
-  resetOnUnmount = true,
 } = defineProps<{
-  design?: CardDesign
+  design: CardDesign
   autoReveal?: boolean
   intervalInMs?: number
-  resetOnUnmount?: boolean
 }>()
 
-const { getCardUrl, useDesign, fetchCardUrls } = useCardDesign()
-const currentDesign = useDesign()
-const initialDesign = currentDesign.value
+const { getCardUrl } = useCardDesign()
 
 const revealedCard = ref<CardName | null>(null)
-const revealedCardImg = computed(() => (revealedCard.value ? getCardUrl(revealedCard.value) : null))
+const revealedCardImg = computed(() =>
+  revealedCard.value ? getCardUrl(revealedCard.value, design) : null,
+)
 
 const timeout = ref<NodeJS.Timeout | null>(null)
 
@@ -75,10 +73,6 @@ const revealRandomCard = () => {
 }
 
 onMounted(() => {
-  if (design) {
-    currentDesign.value = design
-    fetchCardUrls()
-  }
   if (autoReveal) {
     revealRandomCard()
     scheduleNextReveal()
@@ -88,9 +82,6 @@ onMounted(() => {
 onUnmounted(() => {
   if (timeout.value) {
     clearTimeout(timeout.value)
-  }
-  if (resetOnUnmount && currentDesign.value !== initialDesign) {
-    currentDesign.value = initialDesign
   }
 })
 </script>
