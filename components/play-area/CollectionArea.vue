@@ -2,31 +2,35 @@
   <div class="w-full px-4 opacity-90 isolate">
     <div
       :class="[
-        'collection-area',
-        isMobileLandscape ? 'w-1/4 h-[50px] !grid !grid-rows-2 !grid-cols-2 absolute right-12' : '',
+        'grid grid-rows-1 grid-cols-[repeat(4,max-content)] gap-x-8 [--card-height:60px] w-max mx-auto',
+        isMobileLandscape && 'w-36 !gap-x-0 !grid-rows-2 !grid-cols-2 absolute right-12',
       ]"
     >
       <ul
         v-for="type in cardTypes"
         :key="type"
-        :class="['relative inline-flex flex-wrap justify-end w-full max-w-[200px] -gap-2']"
+        :class="[
+          'relative inline-flex flex-wrap justify-end w-full -gap-2',
+          isMobileLandscape && 'max-w-16 h-8',
+        ]"
         @dblclick="modalOpen = true"
         @dbltap="modalOpen = true"
       >
-        <span
-          v-show="coll[type].size > 0"
-          class="uppercase absolute top-1 right-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
-        >
-          <span class="mr-1 text-xs align-middle">
-            {{ coll[type].size }}
+        <template v-if="coll[type].size > 0">
+          <span
+            class="uppercase absolute top-1 left-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
+          >
+            <span class="mr-1 text-xs align-middle">
+              {{ coll[type].size }}
+            </span>
+            {{ type }}
           </span>
-          {{ type }}
-        </span>
-        <template v-if="!isMobileLandscape">
-          <CardList
-            :cards="coll[type]"
-            :stack="true"
-          />
+          <template v-if="!isMobileLandscape">
+            <CardList
+              :cards="coll[type]"
+              :stack="true"
+            />
+          </template>
         </template>
       </ul>
     </div>
@@ -34,7 +38,7 @@
     <button
       v-if="hasCards"
       :title="`View ${modalTitle}`"
-      :class="['my-2 z-10 absolute right-0', player === 'p1' ? 'bottom-full' : '']"
+      :class="['my-2 z-30 absolute right-4', player === 'p1' && 'bottom-full']"
       @click="modalOpen = true"
     >
       <span class="sr-only">View {{ modalTitle }}</span>
@@ -229,32 +233,26 @@ watch(
 
 <style scoped>
 .collection-area {
-  --card-height: 50px;
+  --card-height: 60px;
+  width: max-content;
   display: grid;
-  grid-template-columns: 45% 55%;
+  /* grid-template-columns: 45% 55%;
   grid-template-rows: repeat(2, minmax(var(--card-height), 1fr));
 }
 
 @media (min-width: 640px) or (max-height: 720px) {
-  .collection-area {
-    /* grid-template-columns: 15% 22% 23% 40%; */
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: minmax(var(--card-height), 1fr);
-  }
+  .collection-area { */
+  /* grid-template-columns: 15% 22% 23% 40%; */
+  grid-template-columns: repeat(4, max-content);
+  grid-template-rows: 1fr;
+  gap: 2rem;
+  /* } */
 }
-/* 
-@media (min-width: 640px) and (min-height: 720px) {
-  .collection-area {
-    --card-height: 75px;
-  }
-} */
-
-@media (min-width: 1024px) {
+/* @media (min-width: 1024px) {
   .collection-area {
     justify-content: flex-end;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    /* grid-template-rows: repeat(4, minmax(var(--card-height), 1fr)); */
   }
-}
+} */
 </style>

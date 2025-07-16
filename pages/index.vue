@@ -7,65 +7,73 @@
       >
         <CardsLoader />
       </div>
-      <!-- <CircularLoader :show="showLoader"> Starting the next round... </CircularLoader> -->
+
       <!-- OPPONENT HAND -->
       <div class="absolute inset-x-0 top-0 h-28">
         <LazyOpponentArea />
       </div>
 
       <!-- OPPONENT COLLECTION -->
-      <div class="absolute inset-x-0 -translate-y-1/2 top-1/4 lg:inset-x-auto lg:right-0">
-        <LazyCollectionArea
-          player="p2"
-          @completed="handleCompletion"
-        />
+      <div
+        :class="[
+          'absolute inset-x-0 -translate-y-3/4 top-1/4 max-w-3xl w-max mx-auto',
+          // 'lg:inset-x-auto lg:right-0'
+        ]"
+      >
+        <div class="w-screen overflow-x-auto touch-pan-x no-scrollbar">
+          <LazyCollectionArea
+            player="p2"
+            @completed="handleCompletion"
+          />
+        </div>
       </div>
 
       <!-- FIELD -->
-      <div
-        :class="[
-          'absolute inset-x-0 max-w-5xl top-1/2 -translate-y-3/4',
-          isMobile ? 'landscape:-translate-y-1/2' : '',
-        ]"
-      >
-        <div
-          v-click-disabled:unless="players.p1.isActive && !!selectedCard"
-          class="max-sm:[--card-height:85px] max-lg:[--card-height:100px] place-content-center grid grid-cols-[80px_1fr] sm:grid-cols-[160px_1fr] sm:translate-y-4 origin-left sm:origin-center"
-        >
-          <LazyDeck />
-          <!-- <LazyListGrid :cols="6" :rows="2" flow="column" gap="4px"> -->
-          <LazyFieldDisplay />
-          <!-- </LazyListGrid> -->
+      <div :class="['absolute inset-x-0 max-w-2xl top-1/4 w-max mx-auto isolate -z-10']">
+        <div class="w-screen overflow-x-auto touch-pan-x no-scrollbar">
+          <div
+            v-click-disabled:unless="players.p1.isActive && !!selectedCard"
+            :class="[
+              'grid grid-cols-[80px_1fr] gap-2',
+              'py-8 px-4 sm:px-8 lg:px-12',
+              'transition-transform duration-200 origin-left scale-75 sm:scale-100',
+            ]"
+          >
+            <LazyDeck />
+            <LazyFieldDisplay />
+          </div>
         </div>
       </div>
 
       <!-- PLAYER COLLECTION -->
-      <!-- ARTIST CREDIT -->
-      <a
-        v-if="getDesignInfo().creator"
-        class="absolute left-4 text-xs italic underline opacity-40 !pointer-events-auto top-32 underline-offset-4 whitespace-nowrap dark:text-white"
-        :title="getDesignInfo().urlDescription"
-        :href="getDesignInfo().url"
-        target="_blank"
+      <div
+        :class="[
+          'absolute inset-x-0 bottom-1/4 max-w-3xl w-max mx-auto',
+          // 'lg:inset-x-auto lg:right-0'
+        ]"
       >
-        Cards by {{ getDesignInfo().creator }} &rarr;
-      </a>
-      <div class="absolute inset-x-0 lg:inset-x-auto lg:right-0 bottom-1/4">
-        <LazyCollectionArea
-          player="p1"
-          @completed="handleCompletion"
-        />
+        <div class="w-screen overflow-x-auto touch-pan-x no-scrollbar">
+          <LazyCollectionArea
+            player="p1"
+            @completed="handleCompletion"
+          />
+        </div>
       </div>
 
       <!-- PLAYER HAND -->
       <div
-        v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')"
-        :class="{
-          'transition-all duration-200 absolute top-3/4 inset-x-0 pb-8': true,
-          'opacity-80 sm:translate-y-1/2': players.p2.isActive,
-        }"
+        :class="[
+          'absolute -bottom-4 inset-x-0 pb-8',
+          'transition-all duration-200 origin-left [&_ul]:scale-90 [&_ul]:sm:scale-100',
+          players.p2.isActive && 'opacity-80',
+          isMobile && 'landscape:translate-y-8',
+        ]"
       >
-        <LazyHandDisplay id="p1" />
+        <div class="w-screen py-8 overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x">
+          <div v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')">
+            <LazyHandDisplay id="p1" />
+          </div>
+        </div>
       </div>
 
       <LazyResultsModal :show="showModal">
@@ -79,30 +87,6 @@
           @next="handleNext"
         />
       </LazyResultsModal>
-
-      <!-- DEV BUTTONS -->
-      <!-- <div
-      v-if="gameTest"
-      v-hide="showLoader"
-      class="absolute inset-y-0 z-10 flex flex-col gap-1 my-auto right-4 w-max h-max"
-    >
-      <button
-        v-show="cs.deck.size === 48"
-        type="button"
-        class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
-        @click="startAuto"
-      >
-        Autoplay
-      </button>
-      <button
-        v-show="!roundOver"
-        type="button"
-        class="rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-        @click="stopAuto"
-      >
-        Stop test
-      </button>
-    </div> -->
     </div>
   </GameLayout>
 </template>
@@ -207,20 +191,6 @@ const handleClose = () => {
   // Return to the start screen
   gameStart.value = false
 }
-
-// const startAuto = async () => {
-//   autoOpponent.value = false;
-//   roundOver.value = false;
-//   // Instant win conditions are not checked during autoplay
-//   autoPlay({ speed: 3, rounds: Infinity });
-// };
-
-// const stopAuto = async () => {
-//   console.log("Stopping autoplay...");
-//   roundOver.value = true;
-//   gameOver.value = true;
-//   ds.reset();
-// };
 
 const startRound = async () => {
   // FIX: Opponent played twice on starting new round

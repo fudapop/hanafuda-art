@@ -1,11 +1,12 @@
 <template>
   <ul
     :class="{
-      'transition-all duration-500 ease-out max-sm:flex max-sm:flex-wrap max-sm:w-[320px] sm:w-max sm:grid sm:grid-cols-7 gap-1': true,
-      'sm:[&>:nth-child(n+8)]:-translate-y-8 sm:[&>:nth-child(n+8):nth-child(-n+14)]:translate-x-1/2': true,
-      'max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:-translate-y-4 max-sm:[&>:nth-child(n+10)]:-translate-y-8 max-sm:[&>:nth-child(n+6):nth-child(-n+10)]:translate-x-1/2':
-        thirdRowIsOccupied,
-      'origin-left max-xs:scale-90': thirdRowIsOccupied,
+      // 'transition-all duration-500 ease-out w-max grid grid-cols-4 grid-rows-2 gap-1 grid-flow-row': true,
+      // '[&>:nth-child(n+5)]:-translate-y-4 [&>:nth-child(n+5):nth-child(-n+8)]:translate-x-1/2': true,
+      // '[&>:nth-child(n+9)]:-translate-y-12': true,
+      // 'origin-left max-xs:scale-90': thirdRowIsOccupied,
+      'transition-all duration-500 ease-out w-max grid grid-cols-auto grid-rows-2 gap-1 grid-flow-col': true,
+      '[&>:nth-child(even)]:-translate-y-4 [&>:nth-child(even)]:translate-x-1/2 [&>:nth-child(even)]:z-10': true,
     }"
   >
     <li
@@ -28,9 +29,9 @@
           :key="`${index}-${card}`"
           :class="{
             'card drop-shadow-md overflow-hidden cursor-pointer transition-all relative': true,
-            'drop-shadow-xl -translate-y-2 z-10 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse':
+            'drop-shadow-xl -translate-y-1 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse':
               matchedCards?.includes(card),
-            '-translate-y-2 drop-shadow-xl': selectedCard === card,
+            '-translate-y-1 drop-shadow-xl': selectedCard === card,
             'pointer-events-none staged': cs.staged.has(card),
           }"
           :title="card.replace(/-\d?/g, ' ')"
@@ -49,7 +50,7 @@
         <template v-else>
           <div
             v-show="isThirdRow(index) ? thirdRowIsOccupied : true"
-            class="h-[--card-height] aspect-[--card-aspect] rounded-[--card-radius] border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
+            class="z-0 h-[--card-height] aspect-[--card-aspect] rounded-[--card-radius] border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
           >
             <span class="sr-only">empty field slot</span>
 
