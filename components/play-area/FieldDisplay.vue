@@ -1,9 +1,19 @@
 <template>
   <ul
-    :class="{
-      'transition-all duration-500 ease-out w-max grid grid-cols-auto grid-rows-2 gap-1 grid-flow-col': true,
-      '[&>:nth-child(even)]:-translate-y-4 [&>:nth-child(even)]:translate-x-1/2 [&>:nth-child(even)]:z-10': true,
-    }"
+    :class="[
+      'transition-all duration-500 ease-out w-max grid gap-1',
+      !thirdRowIsOccupied
+        ? `
+      grid-cols-auto grid-rows-2 grid-flow-col
+      [&>:nth-child(even)]:-translate-y-4 [&>:nth-child(even)]:translate-x-1/2 [&>:nth-child(even)]:z-10
+      `
+        : `
+      origin-left scale-75
+      grid-rows-auto grid-cols-5 grid-flow-row
+      [&>:nth-child(n+6)]:-translate-y-8 [&>:nth-child(n+6):nth-child(-n+10)]:translate-x-1/2
+      [&>:nth-child(n+11):nth-child(-n+15)]:-translate-y-20
+      `,
+    ]"
   >
     <li
       v-for="(card, index) in displayedCards"
@@ -80,6 +90,11 @@ const thirdRowIsOccupied = computed(
     !!displayedCards.slice(10).filter((card) => !!card).length ||
     displayedCards.filter((card) => !!card).length > 9,
 )
+
+const gridStyle = computed(() => {
+  if (thirdRowIsOccupied) {
+  }
+})
 
 const cs = useCardStore()
 const { field } = storeToRefs(cs)
