@@ -81,6 +81,14 @@
           OPTIONS
         </button>
 
+        <!-- Leaderboard Button - Show for all users -->
+        <button
+          class="mt-2 ring-inset action-button"
+          @click="goToLeaderboard"
+        >
+          LEADERBOARD
+        </button>
+
         <!-- Authentication buttons -->
         <div class="flex gap-4">
           <button
@@ -124,6 +132,10 @@ const testGame = () => {
 
 const goToLogin = () => {
   navigateTo({ path: '/sign-in', query: { signup: 'true' } })
+}
+
+const goToLeaderboard = () => {
+  navigateTo('/leaderboard')
 }
 
 const handleSignin = () => {

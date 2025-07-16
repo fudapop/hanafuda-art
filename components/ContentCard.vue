@@ -15,6 +15,12 @@
               class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
             >
               <NuxtLink
+                to="/leaderboard"
+                class="transition-colors hover:text-primary"
+                >Leaderboard</NuxtLink
+              >
+              <span>•</span>
+              <NuxtLink
                 to="/changelog"
                 class="transition-colors hover:text-primary"
                 >Changelog</NuxtLink
