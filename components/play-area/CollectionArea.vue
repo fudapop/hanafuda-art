@@ -57,7 +57,7 @@
   >
     <template #title> {{ modalTitle }} </template>
     <template #description>
-      <div class="grid gap-1 [--card-height:140px] px-8 py-4">
+      <div class="grid gap-1 [--card-height:140px] px-8 py-4 w-screen">
         <ul
           v-for="type in cardTypes"
           :key="type"

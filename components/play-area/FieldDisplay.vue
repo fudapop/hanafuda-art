@@ -1,10 +1,6 @@
 <template>
   <ul
     :class="{
-      // 'transition-all duration-500 ease-out w-max grid grid-cols-4 grid-rows-2 gap-1 grid-flow-row': true,
-      // '[&>:nth-child(n+5)]:-translate-y-4 [&>:nth-child(n+5):nth-child(-n+8)]:translate-x-1/2': true,
-      // '[&>:nth-child(n+9)]:-translate-y-12': true,
-      // 'origin-left max-xs:scale-90': thirdRowIsOccupied,
       'transition-all duration-500 ease-out w-max grid grid-cols-auto grid-rows-2 gap-1 grid-flow-col': true,
       '[&>:nth-child(even)]:-translate-y-4 [&>:nth-child(even)]:translate-x-1/2 [&>:nth-child(even)]:z-10': true,
     }"
