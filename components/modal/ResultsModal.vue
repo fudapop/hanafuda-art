@@ -51,7 +51,7 @@
       <div class="absolute inset-x-0 z-50 mx-auto w-max text-white bottom-[5%]">
         <button
           class="game-ui-btn"
-          :action="toggleOpacity"
+          @click="toggleOpacity"
         >
           <span class="mr-1 animate-pulse">
             <EyeSlashIcon
