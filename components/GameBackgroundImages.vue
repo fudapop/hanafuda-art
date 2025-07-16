@@ -24,7 +24,7 @@
         v-if="showPlayerBars"
         class="fixed top-0 left-0 right-0 z-10"
       >
-        <div class="static h-28">
+        <div class="static h-16">
           <img
             src="~/assets/images/player_bar.png"
             class="w-full h-full"
@@ -49,7 +49,7 @@
         v-if="showPlayerBars"
         class="fixed bottom-0 left-0 right-0 z-10"
       >
-        <div class="static h-28">
+        <div class="static h-16">
           <img
             src="~/assets/images/player_bar_bottom.png"
             class="flex-shrink-0 w-full h-full"

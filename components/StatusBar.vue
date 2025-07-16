@@ -1,21 +1,21 @@
 <template>
-  <div class="relative w-full p-4 h-28">
+  <div class="relative w-full h-16 px-4 py-2">
     <div :class="['w-full h-full mx-auto flex', isPlayer1 ? 'items-end' : 'items-start']">
       <div class="flex space-x-2 sm:space-x-4">
         <div class="flex-shrink-0">
           <img
             v-if="user"
-            class="w-20 h-20 mx-auto border-2 rounded-full border-border"
+            class="w-12 h-12 mx-auto border-2 rounded-full border-border"
             :src="user.avatar"
             :alt="user.username"
           />
           <img
             v-else
             :src="avatar2"
-            class="w-20 h-20 mx-auto border-2 rounded-full border-border"
+            class="w-12 h-12 mx-auto border-2 rounded-full border-border"
           />
         </div>
-        <div :class="['flex flex-col gap-y-2', isPlayer1 ? 'justify-end' : 'justify-start']">
+        <div :class="['flex flex-col', isPlayer1 ? 'justify-end' : 'justify-start']">
           <p
             v-if="isPlayer1"
             class="text-sm font-normal text-white/80"
@@ -25,7 +25,7 @@
           <div
             :class="[
               'flex text-lg gap-x-4  text-white/90',
-              isMobileLandscape ? 'flex-col text-sm gap-y-1' : 'sm:text-2xl',
+              isMobileLandscape && 'flex-col text-sm gap-y-1',
             ]"
           >
             <p class="font-bold">
@@ -39,7 +39,7 @@
                 <img
                   src="~/assets/images/coin.webp"
                   alt="coin"
-                  class="w-5 h-5 mx-1 drop-shadow-sm"
+                  class="w-4 h-4 mx-1 drop-shadow-sm"
                 />
                 <NumberAnimation
                   ref="number1"

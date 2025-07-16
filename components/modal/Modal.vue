@@ -22,7 +22,7 @@
 
       <div class="fixed inset-0 z-10 overflow-y-auto">
         <div
-          class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0"
+          class="flex items-end justify-center min-h-full pt-8 text-center sm:items-center sm:px-8"
           :class="isMobile ? 'portrait:h-screen portrait:p-0' : ''"
         >
           <HeadlessTransitionChild
