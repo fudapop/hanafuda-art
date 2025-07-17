@@ -5,7 +5,7 @@
         <div class="w-full border-t border-border" />
       </div>
       <div class="flex justify-center text-sm font-medium leading-6 w-max">
-        <span class="px-6 text-text">or continue with</span>
+        <span class="px-6 text-text">{{ $t('auth.links.orContinueWith') }}</span>
       </div>
       <div aria-hidden="true">
         <div class="w-full border-t border-border" />

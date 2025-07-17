@@ -149,7 +149,7 @@
       >
         <SakuraLoader class="mx-auto opacity-80 w-max" />
         <p class="font-semibold tracking-wide text-center text-white drop-shadow-md animate-pulse">
-          Just a moment...
+          {{ $t('common.labels.justAMoment') }}
         </p>
       </div>
     </Transition>

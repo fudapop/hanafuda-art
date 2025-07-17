@@ -5,14 +5,14 @@
       class="action-button"
       @click="login"
     >
-      SIGN IN
+      {{ $t('common.actions.signIn') }}
     </button>
     <button
       v-else
       class="action-button"
       @click="logoutUser"
     >
-      SIGN OUT
+      {{ $t('common.actions.signOut') }}
     </button>
     <div
       v-if="error"

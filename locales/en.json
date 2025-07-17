@@ -21,6 +21,7 @@
     },
     "labels": {
       "loading": "Loading...",
+      "justAMoment": "Just a moment...",
       "coin": "coin",
       "coins": "coins",
       "points": "points",

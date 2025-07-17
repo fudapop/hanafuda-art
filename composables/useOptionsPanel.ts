@@ -1,4 +1,4 @@
-export const GAME_OPTIONS_TABS = ['Design', 'Yaku List', 'Gameplay', 'Profile'] as const
+export const GAME_OPTIONS_TABS = ['Design', 'Collection', 'Gameplay', 'Profile'] as const
 export type GameOptionsTab = (typeof GAME_OPTIONS_TABS)[number]
 
 export const useOptionsPanel = () => {

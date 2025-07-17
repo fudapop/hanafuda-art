@@ -30,7 +30,7 @@
         >
           <SakuraLoader class="scale-[2] ml-4 origin-bottom opacity-80" />
           <div class="font-semibold tracking-wide text-center text-gray-900 animate-pulse">
-            Just a moment...
+            {{ $t('common.labels.justAMoment') }}
           </div>
         </div>
         <div
@@ -66,7 +66,7 @@
                 to="/"
                 class="text-text-secondary hover:underline hover:text-primary"
               >
-                Continue as guest
+                {{ $t('navigation.continueAsGuest') }}
               </NuxtLink>
             </div>
 
@@ -75,15 +75,15 @@
               <NuxtLink
                 to="/terms"
                 class="underline hover:text-text-secondary/80"
-              >
-                Terms of Use
-              </NuxtLink>
+                              >
+                  {{ $t('footer.links.termsOfUse') }}
+                </NuxtLink>
               <NuxtLink
                 to="/privacy"
                 class="underline hover:text-text-secondary/80"
-              >
-                Privacy Policy
-              </NuxtLink>
+                              >
+                  {{ $t('footer.links.privacyPolicy') }}
+                </NuxtLink>
             </div>
           </div>
         </div>
@@ -105,16 +105,17 @@ const isLandscape = computed(() => orientation.value?.includes('landscape'))
 
 const { loginAsGuest } = useAuth()
 const { upgradeGuestProfile, current: currentUser } = useProfile()
+const { t } = useI18n()
 const toast = useToast()
 const loggingIn = ref<boolean>(true)
 
 const handleLinked = () => {
   if (!currentUser.value) {
-    toast.error('Failed to link account. Please try again.', { timeout: 8000 })
+    toast.error(t('auth.messages.failedToLinkAccount'), { timeout: 8000 })
     return
   }
   loggingIn.value = true
-  toast.success('Account linked! You may need to refresh your browser to update your profile.', {
+  toast.success(t('auth.messages.accountLinked'), {
     timeout: 8000,
   })
   upgradeGuestProfile(currentUser.value!)
@@ -123,7 +124,7 @@ const handleLinked = () => {
 
 const handleLoginSuccess = () => {
   loggingIn.value = true
-  toast.success("You're signed in! Have fun!", { timeout: 2000 })
+  toast.success(t('auth.messages.youreSignedIn'), { timeout: 2000 })
   navigateTo('/')
 }
 

@@ -69,7 +69,7 @@
             src="~/assets/images/button-play-now.png"
             class="w-full h-full cover"
           />
-          <span class="sr-only"> PLAY NOW </span>
+          <span class="sr-only"> {{ $t('common.actions.playNow') }} </span>
         </button>
 
         <!-- Options Button - Only show when logged in -->
@@ -78,7 +78,7 @@
           class="mt-2 ring-inset action-button"
           @click="() => openOptions()"
         >
-          OPTIONS
+          {{ $t('common.actions.options') }}
         </button>
 
         <!-- Authentication buttons -->
@@ -88,7 +88,7 @@
             class="action-button"
             @click="goToLogin"
           >
-            SIGN UP
+            {{ $t('common.actions.signUp') }}
           </button>
         </div>
         <span
@@ -97,7 +97,7 @@
           @click="handleSignin"
           class="block text-sm text-center transition-colors duration-200 cursor-pointer text-text-secondary hover:underline hover:text-primary"
         >
-          Sign in to an existing account &rarr;
+          {{ $t('navigation.signInToExistingAccount') }}
         </span>
       </div>
     </div>
