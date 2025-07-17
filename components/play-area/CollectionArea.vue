@@ -80,7 +80,7 @@
       </div>
     </template>
     <template #actions>
-      <div class="flex justify-center w-full mt-6">
+      <div class="flex justify-center w-full py-8">
         <button
           type="button"
           class="sec-btn"

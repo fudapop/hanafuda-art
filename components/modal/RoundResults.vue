@@ -6,7 +6,7 @@
     <div class="grid grid-cols-[1fr_max-content] items-end -mt-2 -ml-4">
       <HeadlessDialogTitle
         as="h3"
-        class="mb-2 text-lg font-semibold leading-6 text-text dark:text-text"
+        class="mb-2 text-base font-semibold leading-6 sm:text-lg text-text dark:text-text"
       >
         <span v-if="recordedWinner">
           <span v-if="decisionIsPending">
@@ -80,7 +80,9 @@
   <!-- END HEADER -->
   <h4 class="my-4 text-text-secondary dark:text-text-secondary">
     Total:
-    <span class="text-lg font-semibold text-text">{{ lastRoundResult.score }} points</span>
+    <span class="text-base font-semibold sm:text-lg text-text"
+      >{{ lastRoundResult.score }} points</span
+    >
     <span
       v-if="lastRoundResult.score && bonusMultiplier > 1"
       class="max-sm:block sm:ml-8"
