@@ -1,12 +1,12 @@
 ---
 title: Attributions
 description: Credits and attributions for music, artwork, and other assets used in Hanafuda Koi-Koi.
-date: 2025-07-06
+date: 2025-07-17
 ---
 
 # Attributions
 
-_Last updated: 2025-07-06_
+_Last updated: 2025-07-17_
 
 ## Card Artwork
 
@@ -18,7 +18,7 @@ The hanafuda card designs featured in this game are created by various talented 
 |---|---|---|
 | **Cherry Version** | Parish Cherry | [Portfolio](https://www.pulpograph.studio/parishcherry){target="_blank" rel="noopener noreferrer"} |
 | **Sabling Art** | Sabling | [Ko-fi Shop](https://ko-fi.com/sabling){target="_blank" rel="noopener noreferrer"} |
-| **Otwarte Karty** | Kooperatywa Otwarte Karty & Luiza Kwiatkowska | [Instagram](https://www.instagram.com/otwartekarty.pl/){target="_blank" rel="noopener noreferrer"} |
+| **OpenCards Hanafuda** | Kooperatywa Otwarte Karty & Luiza Kwiatkowska | [Instagram](https://www.instagram.com/otwartekarty.pl/){target="_blank" rel="noopener noreferrer"} |
 | **Modern Hanafuda** | Sarah Thomas | [Modern Hanafuda](https://www.modernhanafuda.net){target="_blank" rel="noopener noreferrer"} |
 | **Moon Rabbit Original** | Kelsey Cretcher | [DeviantArt](https://www.deviantart.com/kcretcher){target="_blank" rel="noopener noreferrer"} |
 | **Koinobori** | IndianWolf Studios | [Shop](https://indianwolfstudios.com/shop/){target="_blank" rel="noopener noreferrer"} |
