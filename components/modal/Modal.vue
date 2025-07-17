@@ -37,7 +37,7 @@
             <HeadlessDialogPanel
               :class="[
                 'relative pt-5 pb-4 overflow-hidden text-left transition-all transform rounded-md shadow-xl bg-surface dark:bg-hanafuda-cream sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl',
-                isMobile && 'portrait:w-screen',
+                isMobile && 'fixed inset-x-0 top-4 overflow-y-auto touch-pan-y',
                 padded && 'px-4 sm:p-6 lg:p-8',
               ]"
             >
@@ -45,7 +45,7 @@
               <div
                 class="absolute rounded-full inset-8 -z-10 bg-hanafuda-purple/20 dark:bg-hanafuda-purple/10 blur-xl"
               ></div>
-              <div>
+              <div :class="isMobile && 'h-max'">
                 <slot name="image" />
 
                 <div class="mt-3 text-center sm:mt-5">
