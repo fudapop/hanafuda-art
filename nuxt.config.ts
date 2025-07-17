@@ -99,6 +99,24 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: false },
   i18n: {
+    locales: [
+      {
+        code: 'en',
+        file: 'en.json',
+        name: 'English',
+        dir: 'ltr'
+      }
+    ],
+    defaultLocale: 'en',
+    langDir: 'locales',
+    strategy: 'prefix_and_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+      alwaysRedirect: false,
+      fallbackLocale: 'en'
+    },
     bundle: {
       optimizeTranslationDirective: false,
     },
