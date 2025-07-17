@@ -53,11 +53,11 @@
                         <!-- Tab content -->
                         <div class="flex-1 min-h-0 overflow-hidden bg-surface">
                           <div
-                            v-for="(category, index) in tabCategories"
-                            :key="category"
+                            v-for="(tab, index) in tabs"
+                            :key="tab"
                             :class="[
                               'h-full overflow-y-auto touch-pan-y',
-                              currentTab === index ? 'block' : 'hidden',
+                              currentTabIndex === index ? 'block' : 'hidden',
                             ]"
                           >
                             <slot :name="`tab-panel-${index + 1}`" />
@@ -67,21 +67,21 @@
                         <!-- Simple tab navigation -->
                         <div class="flex flex-shrink-0">
                           <button
-                            v-for="(category, index) in tabCategories"
-                            :key="category"
+                            v-for="(tab, index) in tabs"
+                            :key="tab"
                             :class="{
                               'flex items-center justify-center gap-2 w-full py-4 px-4 text-sm font-medium leading-5 transition-colors': true,
                               'border-r border-surface': true,
-                              'bg-accent/20 text-primary bg-surface': currentTab === index,
+                              'bg-accent/20 text-primary bg-surface': currentTabIndex === index,
                               'text-surface hover:text-white hover:bg-accent/10 border-t':
-                                currentTab !== index,
+                                currentTabIndex !== index,
                             }"
-                            @click="currentTab = index"
+                            @click="() => openOptions(tab)"
                           >
                             <slot :name="`tab-icon-${index + 1}`">
                               <!-- Fallback content if no icon slot is provided -->
                             </slot>
-                            <span class="sr-only sm:not-sr-only">{{ category }}</span>
+                            <span class="sr-only sm:not-sr-only">{{ tab }}</span>
                           </button>
                           <button
                             type="button"
@@ -110,14 +110,19 @@
 
 <script setup lang="ts">
 import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { type GameOptionsTab } from '~/composables/useOptionsPanel'
 
-const { tabCategories } = defineProps<{
-  tabCategories: string[]
+const { tabs } = defineProps<{
+  tabs: GameOptionsTab[]
 }>()
 
 // Global options modal state
-const { isOpen: isOpenGlobal, closeOptions, toggleOptions } = useOptionsPanel()
+const {
+  isOpen: isOpenGlobal,
+  openOptions,
+  closeOptions,
+  toggleOptions,
+  currentTabIndex,
+} = useOptionsPanel()
 const gameIsStarted = useState('start')
-
-const currentTab = ref(0)
 </script>

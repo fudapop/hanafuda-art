@@ -76,7 +76,7 @@
         <button
           v-if="!userIsGuest"
           class="mt-2 ring-inset action-button"
-          @click="openOptions"
+          @click="() => openOptions()"
         >
           OPTIONS
         </button>

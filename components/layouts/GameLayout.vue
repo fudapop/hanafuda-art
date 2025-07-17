@@ -31,7 +31,7 @@
 
       <!-- OPTIONS MENU -->
       <div class="fixed flex bottom-4 right-4 gap-x-4">
-        <GameOptionsPanel :tab-categories="['Design', 'Yaku List', 'Gameplay', 'Profile']">
+        <GameOptionsPanel :tabs="Array.from(GAME_OPTIONS_TABS)">
           <template #tab-panel-1>
             <DesignRadioGroup />
           </template>
@@ -178,6 +178,7 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
+import { GAME_OPTIONS_TABS } from '~/composables/useOptionsPanel'
 import { usePlayerStore } from '~/stores/playerStore'
 
 const { currentDesign } = useCardDesign()

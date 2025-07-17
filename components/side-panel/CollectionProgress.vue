@@ -9,7 +9,9 @@
       <ChevronDownIcon :class="['w-8 h-8', openAll ? 'rotate-180' : '']" />
       <span class="sr-only">Expand/Collapse</span>
     </button>
-    <div class="w-full max-w-lg px-2 py-8 mx-auto space-y-2 overflow-y-auto rounded-2xl">
+    <div
+      class="w-full max-w-lg px-2 py-8 mx-auto space-y-2 overflow-y-auto touch-pan-y rounded-2xl"
+    >
       <HeadlessDisclosure
         as="div"
         v-for="yaku in allowedYaku"
