@@ -2,6 +2,21 @@
 
 All notable changes to Hanafuda Koi-Koi will be documented in this file.
 
+## [2.1.0] - 2025-07-17
+
+### UI & Layout Improvements
+- **Simplified Layout**: The main game layout has been streamlined for a cleaner and more intuitive presentation.
+- **Improved Scrollbars**: Scrollbar styles have been updated for better consistency and a more modern look.
+- **Adjusted Padding**: Padding has been fine-tuned across various components to enhance visual balance.
+- **Wider Collection Modal**: The modal for viewing card collections is now wider, making it easier to see your cards.
+- **Artist Credit**: A dedicated component has been added to properly credit the artists of the card designs.
+
+### Gameplay Improvements
+- **Yaku List Access**: Players can now open the Yaku list during the "koi-koi" call decision to review potential hands.
+
+### Bug Fixes
+- **"Show Board" Button**: Fixed an issue where the "Show Board" button in the game was not functioning correctly.
+
 ## [2.0.0] - 2025-07-10
 
 ### Announcements & Social

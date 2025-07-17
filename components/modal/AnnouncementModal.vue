@@ -89,34 +89,27 @@
               {{ impressions[currentAnnouncement.id]?.views || 0 }}
               <span class="sr-only">views</span>
             </span>
-            <span class="flex items-center gap-1">
+            <button
+              type="button"
+              :class="[
+                'flex items-center gap-2 px-2 py-1 text-sm rounded-md transition-colors',
+                'focus:outline-none focus-visible:outline-none',
+                'focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-2',
+                isLiked(currentAnnouncement.id)
+                  ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400',
+              ]"
+              @click="handleLike"
+            >
               <Icon
-                name="heroicons:heart"
+                :name="
+                  isLiked(currentAnnouncement.id) ? 'heroicons:heart-solid' : 'heroicons:heart'
+                "
                 class="w-4 h-4"
               />
-              {{ impressions[currentAnnouncement.id]?.likes || 0 }}
-              <span class="sr-only"> likes </span>
-            </span>
+              <span class="sr-only">{{ isLiked(currentAnnouncement.id) ? 'Unlike' : 'Like' }}</span>
+            </button>
           </div>
-
-          <button
-            type="button"
-            :class="[
-              'flex items-center gap-2 px-2 py-1 text-sm rounded-md transition-colors',
-              'focus:outline-none focus-visible:outline-none',
-              'focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-2',
-              isLiked(currentAnnouncement.id)
-                ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
-                : 'text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400',
-            ]"
-            @click="handleLike"
-          >
-            <Icon
-              :name="isLiked(currentAnnouncement.id) ? 'heroicons:heart-solid' : 'heroicons:heart'"
-              class="w-4 h-4"
-            />
-            <span class="sr-only">{{ isLiked(currentAnnouncement.id) ? 'Unlike' : 'Like' }}</span>
-          </button>
         </div>
 
         <!-- Pagination controls -->
