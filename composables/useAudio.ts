@@ -1,26 +1,30 @@
 import { useStorage } from '@vueuse/core'
 
-const BGM = {
-  main: '/audio/bgm/PerituneMaterial_Awayuki.ogg',
-  koikoi1: '/audio/bgm/PerituneMaterial_EpicBattle_J_loop.ogg',
-  koikoi2: '/audio/bgm/PerituneMaterial_Kengeki_loop.ogg',
-} as const
-
-// Add track names mapping internally
-const trackNames = {
-  [BGM.main]: 'Awayuki - Peritune',
-  [BGM.koikoi1]: 'Epic Battle J - Peritune',
-  [BGM.koikoi2]: 'Kengeki - Peritune',
-} as const
-
-const SFX = {
-  card1: '/audio/sfx/card1.m4a',
-  card2: '/audio/sfx/card2.m4a',
-  coin: '/audio/sfx/coins-counting.m4a',
-  slash: '/audio/sfx/sword-slash-and-swing-185432.mp3',
-} as const
-
 export const useAudio = () => {
+  const config = useRuntimeConfig()
+
+  const bucketUrl = `${config.public.supabaseUrl}/storage/v1/object/public/static/audio`
+
+  const BGM = {
+    main: `${bucketUrl}/bgm/PerituneMaterial_Awayuki.ogg`,
+    koikoi1: `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.ogg`,
+    koikoi2: `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.ogg`,
+  } as const
+
+  // Add track names mapping internally
+  const trackNames = {
+    [BGM.main]: 'Awayuki - Peritune',
+    [BGM.koikoi1]: 'Epic Battle J - Peritune',
+    [BGM.koikoi2]: 'Kengeki - Peritune',
+  } as const
+
+  const SFX = {
+    card1: `${bucketUrl}/sfx/card1.m4a`,
+    card2: `${bucketUrl}/sfx/card2.m4a`,
+    coin: `${bucketUrl}/sfx/coins-counting.m4a`,
+    slash: `${bucketUrl}/sfx/sword-slash-and-swing-185432.mp3`,
+  } as const
+
   const audioRefA = ref<HTMLAudioElement>()
   const audioRefB = ref<HTMLAudioElement>()
   const isUsingA = ref(true)
