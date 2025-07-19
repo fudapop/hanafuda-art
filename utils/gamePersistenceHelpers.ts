@@ -167,18 +167,17 @@ export const handleLoadGameFlow = async (saveId: string) => {
 }
 
 /**
- * Checks if there are any saved games available
+ * Checks if there are any saved games available for current profile
  */
 export const hasSavedGames = async (): Promise<boolean> => {
-  const { getSavedGames, isSupported } = useGamePersistence()
+  const { hasCurrentProfileSave, isSupported } = useGamePersistence()
   
   if (!isSupported.value) {
     return false
   }
 
   try {
-    const saves = await getSavedGames()
-    return saves.length > 0
+    return await hasCurrentProfileSave()
   } catch (error) {
     console.warn('Failed to check for saved games:', error)
     return false
@@ -186,20 +185,19 @@ export const hasSavedGames = async (): Promise<boolean> => {
 }
 
 /**
- * Gets the most recent save for quick resume functionality
+ * Gets the current profile's save for quick resume functionality
  */
 export const getMostRecentSave = async () => {
-  const { getSavedGames, isSupported } = useGamePersistence()
+  const { getCurrentProfileSave, isSupported } = useGamePersistence()
   
   if (!isSupported.value) {
     return null
   }
 
   try {
-    const saves = await getSavedGames()
-    return saves.length > 0 ? saves[0] : null // Saves are already sorted by timestamp (newest first)
+    return await getCurrentProfileSave()
   } catch (error) {
-    console.warn('Failed to get recent save:', error)
+    console.warn('Failed to get profile save:', error)
     return null
   }
 }

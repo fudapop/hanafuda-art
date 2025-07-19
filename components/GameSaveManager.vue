@@ -32,46 +32,42 @@
       <h3 class="text-lg font-semibold mb-4">Load Game</h3>
       
       <div v-if="loading" class="text-center py-4">
-        Loading saved games...
+        Loading saved game...
       </div>
       
-      <div v-else-if="savedGames.length === 0" class="text-gray-500 text-center py-4">
-        No saved games found
+      <div v-else-if="!currentSave" class="text-gray-500 text-center py-4">
+        No saved game found for this profile
       </div>
       
       <div v-else class="space-y-2">
-        <div
-          v-for="save in savedGames"
-          :key="save.id"
-          class="save-slot flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50"
-        >
+        <div class="save-slot flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50">
           <div class="save-info flex-1">
-            <div class="font-medium">{{ save.name }}</div>
+            <div class="font-medium">Current Profile Save</div>
             <div class="text-sm text-gray-500">
-              Round {{ save.preview.round }}, Turn {{ save.preview.turn }} ({{ save.preview.phase }})
+              Round {{ currentSave.preview.round }}, Turn {{ currentSave.preview.turn }} ({{ currentSave.preview.phase }})
             </div>
             <div class="text-xs text-gray-400">
-              Score: P1: {{ save.preview.score.p1 }} | P2: {{ save.preview.score.p2 }}
+              Score: P1: {{ currentSave.preview.score.p1 }} | P2: {{ currentSave.preview.score.p2 }}
             </div>
             <div class="text-xs text-gray-400">
-              {{ formatDate(save.timestamp) }}
+              {{ formatDate(currentSave.timestamp) }}
             </div>
           </div>
           
           <div class="save-actions flex gap-2">
             <button
-              @click="handleLoadGame(save.id)"
+              @click="handleLoadGame"
               :disabled="loadingGame"
               class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
             >
-              {{ loadingGame === save.id ? 'Loading...' : 'Load' }}
+              {{ loadingGame ? 'Loading...' : 'Load' }}
             </button>
             <button
-              @click="handleDeleteSave(save.id)"
+              @click="handleDeleteSave"
               :disabled="deletingGame"
               class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
             >
-              {{ deletingGame === save.id ? 'Deleting...' : 'Delete' }}
+              {{ deletingGame ? 'Deleting...' : 'Delete' }}
             </button>
           </div>
         </div>
@@ -110,20 +106,21 @@ const {
   isInitialized,
   error,
   saveGame,
-  loadGame,
-  getSavedGames,
-  deleteSave,
+  loadCurrentProfileGame,
+  hasCurrentProfileSave,
+  getCurrentProfileSave,
+  deleteCurrentProfileSave,
   autoSave
 } = useGamePersistence()
 
 // Reactive state
 const saveSlotName = ref('')
-const savedGames = ref<SaveSlot[]>([])
+const currentSave = ref<SaveSlot | null>(null)
 const saving = ref(false)
 const autoSaving = ref(false)
 const loading = ref(false)
-const loadingGame = ref<string | null>(null)
-const deletingGame = ref<string | null>(null)
+const loadingGame = ref(false)
+const deletingGame = ref(false)
 
 // Computed
 const autoSaveAvailable = computed(() => {
@@ -138,7 +135,7 @@ const handleSaveGame = async () => {
     const saveName = saveSlotName.value.trim() || `Manual Save ${new Date().toLocaleString()}`
     await saveGame(saveName)
     saveSlotName.value = ''
-    await refreshSavedGames()
+    await refreshCurrentSave()
   } catch (err) {
     console.error('Failed to save game:', err)
   } finally {
@@ -150,7 +147,7 @@ const handleAutoSave = async () => {
   try {
     autoSaving.value = true
     await autoSave()
-    await refreshSavedGames()
+    await refreshCurrentSave()
   } catch (err) {
     console.error('Auto-save failed:', err)
   } finally {
@@ -158,41 +155,47 @@ const handleAutoSave = async () => {
   }
 }
 
-const handleLoadGame = async (saveId: string) => {
+const handleLoadGame = async () => {
   try {
-    loadingGame.value = saveId
-    await loadGame(saveId)
+    loadingGame.value = true
+    await loadCurrentProfileGame()
     // Optionally emit an event or navigate to game screen
-    await refreshSavedGames()
+    await refreshCurrentSave()
   } catch (err) {
     console.error('Failed to load game:', err)
   } finally {
-    loadingGame.value = null
+    loadingGame.value = false
   }
 }
 
-const handleDeleteSave = async (saveId: string) => {
+const handleDeleteSave = async () => {
   if (!confirm('Are you sure you want to delete this save?')) {
     return
   }
   
   try {
-    deletingGame.value = saveId
-    await deleteSave(saveId)
-    await refreshSavedGames()
+    deletingGame.value = true
+    await deleteCurrentProfileSave()
+    await refreshCurrentSave()
   } catch (err) {
     console.error('Failed to delete save:', err)
   } finally {
-    deletingGame.value = null
+    deletingGame.value = false
   }
 }
 
-const refreshSavedGames = async () => {
+const refreshCurrentSave = async () => {
   try {
     loading.value = true
-    savedGames.value = await getSavedGames()
+    const hasSave = await hasCurrentProfileSave()
+    if (hasSave) {
+      currentSave.value = await getCurrentProfileSave()
+    } else {
+      currentSave.value = null
+    }
   } catch (err) {
-    console.error('Failed to load saved games:', err)
+    console.error('Failed to load current save:', err)
+    currentSave.value = null
   } finally {
     loading.value = false
   }
@@ -205,16 +208,22 @@ const formatDate = (timestamp: number) => {
 // Initialize
 onMounted(async () => {
   if (isSupported.value) {
-    await refreshSavedGames()
+    await refreshCurrentSave()
   }
 })
 
 // Watch for initialization
 watch(isInitialized, async (initialized) => {
   if (initialized) {
-    await refreshSavedGames()
+    await refreshCurrentSave()
   }
 })
+
+// Watch for profile changes
+const { current: currentProfile } = useProfile()
+watch(currentProfile, async () => {
+  await refreshCurrentSave()
+}, { immediate: true })
 </script>
 
 <style scoped>

@@ -33,6 +33,7 @@ interface SaveSlot {
   id: string
   name: string
   timestamp: number
+  profileId: string
   preview: {
     round: number
     turn: number
@@ -53,6 +54,12 @@ export const useGamePersistence = () => {
   const error = ref<Error | null>(null)
   
   let db: IDBDatabase | null = null
+  
+  // Get current profile for save association
+  const getCurrentProfileId = (): string => {
+    const { current } = useProfile()
+    return current.value?.uid || 'anonymous'
+  }
 
   // Initialize IndexedDB
   const initDB = async (): Promise<IDBDatabase> => {
@@ -103,7 +110,7 @@ export const useGamePersistence = () => {
     })
   }
 
-  // Save current game state
+  // Save current game state (one save per profile)
   const saveGame = async (slotName: string = 'auto-save'): Promise<string> => {
     try {
       const database = await initDB()
@@ -112,7 +119,8 @@ export const useGamePersistence = () => {
       const gameDataStore = useGameDataStore()
       const configStore = useConfigStore()
 
-      const saveId = `save_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const profileId = getCurrentProfileId()
+      const saveId = `save_${profileId}` // Single save slot per profile
       
       // Convert Sets to Arrays for JSON serialization
       const cardState: CardStoreState = {
@@ -195,6 +203,7 @@ export const useGamePersistence = () => {
         id: saveId,
         name: slotName,
         timestamp: Date.now(),
+        profileId: profileId,
         preview: {
           round: toRaw(gameDataStore.roundCounter),
           turn: toRaw(gameDataStore.turnCounter),
@@ -280,25 +289,71 @@ export const useGamePersistence = () => {
     }
   }
 
-  // Get all saved games
+  // Get saved games for current profile
   const getSavedGames = async (): Promise<SaveSlot[]> => {
     try {
       const database = await initDB()
       const transaction = database.transaction([SAVE_STORE], 'readonly')
       const store = transaction.objectStore(SAVE_STORE)
-      const index = store.index('timestamp')
+      const profileId = getCurrentProfileId()
 
       return new Promise((resolve, reject) => {
-        const request = index.getAll()
+        const request = store.getAll()
         request.onsuccess = () => {
           const saves = request.result
             .map((save: any) => save.slot)
-            .filter(Boolean)
+            .filter((slot: SaveSlot) => slot?.profileId === profileId)
             .sort((a: SaveSlot, b: SaveSlot) => b.timestamp - a.timestamp)
           resolve(saves)
         }
         request.onerror = () => reject(request.error)
       })
+    } catch (err) {
+      error.value = err as Error
+      throw err
+    }
+  }
+
+  // Check if current profile has a saved game
+  const hasCurrentProfileSave = async (): Promise<boolean> => {
+    try {
+      const saves = await getSavedGames()
+      return saves.length > 0
+    } catch (err) {
+      console.warn('Failed to check for profile save:', err)
+      return false
+    }
+  }
+
+  // Get save for current profile
+  const getCurrentProfileSave = async (): Promise<SaveSlot | null> => {
+    try {
+      const saves = await getSavedGames()
+      return saves[0] || null
+    } catch (err) {
+      console.warn('Failed to get profile save:', err)
+      return null
+    }
+  }
+
+  // Delete save for current profile
+  const deleteCurrentProfileSave = async (): Promise<void> => {
+    try {
+      const profileId = getCurrentProfileId()
+      const saveId = `save_${profileId}`
+      await deleteSave(saveId)
+    } catch (err) {
+      error.value = err as Error
+      throw err
+    }
+  }
+
+  // Load game for current profile
+  const loadCurrentProfileGame = async (): Promise<void> => {
+    try {
+      const profileId = getCurrentProfileId()
+      const saveId = `save_${profileId}`
+      await loadGame(saveId)
     } catch (err) {
       error.value = err as Error
       throw err
@@ -422,6 +477,12 @@ export const useGamePersistence = () => {
     deleteSave,
     autoSave,
     clearAllSaves,
+    
+    // Profile-specific methods
+    hasCurrentProfileSave,
+    getCurrentProfileSave,
+    deleteCurrentProfileSave,
+    loadCurrentProfileGame,
     
     // Future extensibility
     saveProfile,

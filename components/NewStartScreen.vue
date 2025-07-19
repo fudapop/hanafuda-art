@@ -58,19 +58,50 @@
       />
       <h1 class="sr-only">Hanafuda Koi-Koi</h1>
       <div class="flex flex-col items-center gap-4">
-        <button
-          :class="[
-            'rounded-sm overflow-hidden mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[150px]',
-            isMobile ? 'landscape:mt-0' : 'sm:mt-24',
-          ]"
-          @click="$emit('start-game')"
-        >
-          <img
-            src="~/assets/images/button-play-now.png"
-            class="w-full h-full cover"
-          />
-          <span class="sr-only"> PLAY NOW </span>
-        </button>
+        <!-- Resume Game Button (shown when save exists) -->
+        <div v-if="hasSave" class="flex flex-col items-center gap-2">
+          <button
+            :class="[
+              'rounded-sm overflow-hidden mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[150px]',
+              isMobile ? 'landscape:mt-0' : 'sm:mt-24',
+            ]"
+            @click="handleResumeGame"
+          >
+            <img
+              src="~/assets/images/button-play-now.png"
+              class="w-full h-full cover"
+            />
+            <span class="sr-only"> RESUME GAME </span>
+          </button>
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">RESUME GAME</span>
+        </div>
+
+        <!-- Play Now Button -->
+        <div class="flex flex-col items-center gap-2">
+          <button
+            :class="[
+              'rounded-sm overflow-hidden',
+              hasSave ? 'mt-2' : 'mt-12',
+              'border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[150px]',
+              isMobile ? (hasSave ? '' : 'landscape:mt-0') : (hasSave ? '' : 'sm:mt-24'),
+            ]"
+            @click="handlePlayNow"
+          >
+            <img
+              src="~/assets/images/button-play-now.png"
+              class="w-full h-full cover"
+            />
+            <span class="sr-only"> PLAY NOW </span>
+          </button>
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ hasSave ? 'NEW GAME' : 'PLAY NOW' }}
+          </span>
+        </div>
+        
+        <!-- Save info text -->
+        <p v-if="hasSave && currentSave" class="text-xs text-gray-500 text-center">
+          Saved game: Round {{ currentSave.preview.round }}, Turn {{ currentSave.preview.turn }}
+        </p>
 
         <!-- Options Button - Only show when logged in -->
         <button
@@ -117,6 +148,73 @@ const { userIsGuest, logout } = useAuth()
 const { isMobile } = useDevice()
 const { openOptions } = useOptionsPanel()
 
+// Game persistence
+const { 
+  hasCurrentProfileSave, 
+  getCurrentProfileSave, 
+  deleteCurrentProfileSave,
+  loadCurrentProfileGame,
+  isSupported 
+} = useGamePersistence()
+
+// Reactive state for saves
+const hasSave = ref(false)
+const currentSave = ref(null)
+
+// Check for existing save on mount and profile changes
+const checkForSave = async () => {
+  if (!isSupported.value) {
+    hasSave.value = false
+    return
+  }
+  
+  try {
+    hasSave.value = await hasCurrentProfileSave()
+    if (hasSave.value) {
+      currentSave.value = await getCurrentProfileSave()
+    }
+  } catch (error) {
+    console.warn('Failed to check for saves:', error)
+    hasSave.value = false
+  }
+}
+
+const handleResumeGame = async () => {
+  try {
+    await loadCurrentProfileGame()
+    emit('start-game')
+  } catch (error) {
+    console.error('Failed to load saved game:', error)
+    // Could show error message here
+    alert('Failed to load saved game. Please try again.')
+  }
+}
+
+const handlePlayNow = async () => {
+  if (hasSave.value) {
+    // Warn user about discarding save
+    const shouldDiscard = confirm(
+      'You have a saved game. Starting a new game will discard your saved progress. Continue?'
+    )
+    
+    if (!shouldDiscard) {
+      return
+    }
+    
+    // Delete the save
+    try {
+      await deleteCurrentProfileSave()
+      hasSave.value = false
+      currentSave.value = null
+    } catch (error) {
+      console.error('Failed to delete save:', error)
+      // Continue anyway
+    }
+  }
+  
+  emit('start-game')
+}
+
 const testGame = () => {
   testPlay.value = true
   emit('start-game')
@@ -131,11 +229,25 @@ const handleSignin = () => {
   navigateTo({ path: '/sign-in', query: { exit: 'true' } })
 }
 
+// Watch for game start/end to refresh save state
 watch(gameStart, () => {
   if (!gameStart.value) {
     testPlay.value = false
+    // Refresh save state when returning to start screen
+    checkForSave()
   }
 })
+
+// Check for saves on mount
+onMounted(() => {
+  checkForSave()
+})
+
+// Watch for profile changes to refresh save state
+const { current: currentProfile } = useProfile()
+watch(currentProfile, () => {
+  checkForSave()
+}, { immediate: true })
 </script>
 
 <style scoped>
