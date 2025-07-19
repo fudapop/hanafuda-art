@@ -205,9 +205,16 @@ const handlePressExit = () => {
   }
 }
 
-const handleConfirmExit = () => {
+const handleConfirmExit = (data: { action: 'save' | 'discard' }) => {
   leavingGame.value = false
   gameStart.value = false
+  
+  // Could show different feedback based on action
+  if (data.action === 'save') {
+    console.log('Game saved successfully')
+  } else {
+    console.log('Game discarded')
+  }
 }
 
 const handleSignupCancel = async () => {
