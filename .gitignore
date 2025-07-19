@@ -21,7 +21,6 @@ logs
 wip
 .firebase
 assets/HNFD*
-*.sh
 .cursorrules
 /notes
 
