@@ -49,13 +49,6 @@
         class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
       >
         <NuxtLink
-          to="/leaderboard"
-          title="View leaderboard"
-          class="transition-colors hover:text-primary"
-          >Leaderboard</NuxtLink
-        >
-        <span>•</span>
-        <NuxtLink
           to="/attributions"
           title="View attributions"
           class="transition-colors hover:text-primary"

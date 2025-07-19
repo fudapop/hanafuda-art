@@ -83,10 +83,10 @@
 
         <!-- Leaderboard Button - Show for all users -->
         <button
-          class="mt-2 ring-inset action-button"
-          @click="goToLeaderboard"
+          class="mt-2 ring-inset action-button max-w-none"
+          @click="goToRankings"
         >
-          LEADERBOARD
+          RANKINGS
         </button>
 
         <!-- Authentication buttons -->
@@ -134,8 +134,8 @@ const goToLogin = () => {
   navigateTo({ path: '/sign-in', query: { signup: 'true' } })
 }
 
-const goToLeaderboard = () => {
-  navigateTo('/leaderboard')
+const goToRankings = () => {
+  navigateTo('/rankings')
 }
 
 const handleSignin = () => {
