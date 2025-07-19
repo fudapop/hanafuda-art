@@ -3,17 +3,18 @@
     <div class="min-h-screen">
       <!-- Header -->
       <header
-        class="px-4 py-8 bg-[url('/images/player_bar.webp')] bg-cover bg-bottom from-primary to-accent sm:px-6 lg:px-8"
+        :class="[
+          'sticky top-0',
+          'px-4 py-6 min-h-20 lg:py-8 bg-[url(\'/images/player_bar.webp\')] bg-cover bg-bottom from-primary to-accent lg:px-8',
+        ]"
       >
-        <div class="max-w-4xl mx-auto">
-          <div class="text-center text-white">
-            <h1 class="mb-2 text-4xl font-bold">🏆 Rankings</h1>
-            <p>Top players ranked by performance and activity</p>
-          </div>
-        </div>
+        <h1 class="text-lg font-bold text-center text-white lg:text-3xl">
+          🏆 Rankings -
+          <span class="capitalize">{{ selectedFilter }}</span>
+        </h1>
       </header>
 
-      <main>
+      <main class="mx-auto overflow-x-auto max-w-screen lg:px-8 touch-pan-x">
         <!-- Loading State -->
         <div
           v-if="loading"
@@ -45,7 +46,7 @@
         <!-- Leaderboard Content -->
         <div
           v-else
-          class="max-w-5xl px-4 py-8 mx-auto sm:px-6 lg:px-8"
+          class="max-w-4xl px-4 py-8 mx-auto"
         >
           <!-- Filter Options -->
           <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -58,64 +59,32 @@
                   'px-4 py-2 rounded-md text-sm font-medium transition-colors',
                   selectedFilter === filter.value
                     ? 'bg-primary text-white'
-                    : 'bg-surface dark:bg-surface-variant text-text hover:bg-primary hover:bg-opacity-10',
+                    : 'text-text hover:bg-primary/50',
                 ]"
               >
                 {{ filter.label }}
               </button>
             </div>
-            <div class="text-sm text-text-secondary">{{ filteredLeaderboard.length }} players</div>
+            <!-- <div class="text-sm text-text-secondary">{{ filteredLeaderboard.length }} players</div> -->
           </div>
 
           <!-- Leaderboard Table -->
           <div
-            class="px-8 mx-auto overflow-hidden rounded-md shadow-lg bg-background w-max dark:bg-surface-variant"
+            class="mx-auto overflow-hidden rounded-md shadow-lg w-max bg-background dark:bg-surface"
           >
             <div class="hidden sm:block">
               <!-- Desktop Table -->
               <table class="w-full">
                 <thead class="border-b bg-surface-variant dark:bg-surface border-border">
-                  <tr>
-                    <th
-                      class="px-6 py-4 text-sm font-medium tracking-wider text-left uppercase text-text"
-                    >
-                      Rank
-                    </th>
-                    <th
-                      class="px-6 py-4 text-sm font-medium tracking-wider text-left uppercase text-text"
-                    >
-                      Player
-                    </th>
-                    <th
-                      class="px-6 py-4 text-sm font-medium tracking-wider text-center uppercase text-text"
-                    >
-                      Games
-                    </th>
-                    <th
-                      class="px-6 py-4 text-sm font-medium tracking-wider text-center uppercase text-text"
-                    >
-                      Wins
-                    </th>
-                    <th
-                      class="px-6 py-4 text-sm font-medium tracking-wider text-center uppercase text-text"
-                    >
-                      Losses
-                    </th>
-                    <th
-                      class="px-6 py-4 text-sm font-medium tracking-wider text-center uppercase text-text"
-                    >
-                      Draws
-                    </th>
-                    <th
-                      class="px-6 py-4 text-sm font-medium tracking-wider text-center uppercase text-text"
-                    >
-                      Win Rate
-                    </th>
-                    <th
-                      class="px-6 py-4 text-sm font-medium tracking-wider text-center uppercase text-text"
-                    >
-                      Coins
-                    </th>
+                  <tr class="*:px-6 *:py-4 text-sm font-medium tracking-wider uppercase text-text">
+                    <th class="text-left">Rank</th>
+                    <th class="text-left">Player</th>
+                    <th class="text-center">Games</th>
+                    <th class="text-center">Wins</th>
+                    <th class="text-center">Losses</th>
+                    <th class="text-center">Draws</th>
+                    <th class="text-center">Win Rate</th>
+                    <th class="text-center">Coins</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
@@ -191,7 +160,7 @@
                             'px-2 py-1 rounded-full text-xs font-medium',
                             player.winRate >= 70
                               ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                              : player.winRate >= 50
+                              : player.winRate >= 40
                                 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                                 : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
                           ]"
@@ -220,7 +189,7 @@
             <!-- Mobile Cards -->
             <div
               v-if="filteredLeaderboard.length > 0"
-              class="py-8 space-y-4 sm:hidden"
+              class="py-8 mx-4 space-y-4 sm:hidden"
             >
               <div
                 v-for="(player, index) in filteredLeaderboard"
@@ -269,7 +238,7 @@
                       'px-2 py-1 rounded-full text-xs font-medium',
                       player.winRate >= 70
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                        : player.winRate >= 30
+                        : player.winRate >= 40
                           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                           : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
                     ]"
@@ -279,6 +248,17 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div class="text-center">
+                    <div class="text-text-secondary">Coins</div>
+                    <div class="flex items-center justify-center font-medium text-text">
+                      {{ player.record.coins.toLocaleString() }}
+                      <img
+                        src="/images/coin.webp"
+                        alt="coin"
+                        class="w-3 h-3 ml-1"
+                      />
+                    </div>
+                  </div>
                   <div class="text-center">
                     <div class="text-text-secondary">Games</div>
                     <div class="font-medium text-text">{{ player.totalGames }}</div>
@@ -293,17 +273,6 @@
                     <div class="text-text-secondary">Losses</div>
                     <div class="font-medium text-red-600 dark:text-red-400">
                       {{ player.record.loss }}
-                    </div>
-                  </div>
-                  <div class="text-center">
-                    <div class="text-text-secondary">Coins</div>
-                    <div class="flex items-center justify-center font-medium text-text">
-                      {{ player.record.coins.toLocaleString() }}
-                      <img
-                        src="/images/coin.webp"
-                        alt="coin"
-                        class="w-3 h-3 ml-1"
-                      />
                     </div>
                   </div>
                 </div>
