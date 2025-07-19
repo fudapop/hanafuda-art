@@ -84,19 +84,10 @@ const opponent: PlayerKey = player === 'p1' ? 'p2' : 'p1'
 const score = computed(() => ds.scoreboard[player])
 const isPlayer1 = computed(() => playerNum === 1)
 
-const avatars = [
-  '/avatars/origami-crane.webp',
-  '/avatars/origami-warbler.webp',
-  '/avatars/origami-curtain.webp',
-  '/avatars/origami-cuckoo.webp',
-  '/avatars/origami-bridge.webp',
-  '/avatars/origami-butterflies.webp',
-  '/avatars/origami-boar.webp',
-  '/avatars/origami-deer.webp',
-  '/avatars/origami-rainman.webp',
-  '/avatars/origami-phoenix.webp',
-]
-const avatar2 = getRandom(avatars)
+const { getRandomAvatar } = useAvatar()
+const avatar2 = computed(
+  () => getRandomAvatar((a) => a.style === 'gamblers' && a.url !== user?.avatar).url,
+)
 
 const getResult = () => {
   const result =

@@ -24,29 +24,6 @@ interface UserProfile {
   isGuest?: boolean
 }
 
-const avatars = [
-  '/avatars/flat-crane.webp',
-  '/avatars/flat-warbler.webp',
-  '/avatars/flat-curtain.webp',
-  '/avatars/flat-bridge.webp',
-  '/avatars/flat-butterflies.webp',
-  '/avatars/flat-boar.webp',
-  '/avatars/flat-moon.webp',
-  '/avatars/flat-deer.webp',
-  '/avatars/flat-phoenix.webp',
-  '/avatars/origami-crane.webp',
-  '/avatars/origami-warbler.webp',
-  '/avatars/origami-curtain.webp',
-  '/avatars/origami-cuckoo.webp',
-  '/avatars/origami-bridge.webp',
-  '/avatars/origami-butterflies.webp',
-  '/avatars/origami-boar.webp',
-  '/avatars/origami-moon.webp',
-  '/avatars/origami-deer.webp',
-  '/avatars/origami-rainman.webp',
-  '/avatars/origami-phoenix.webp',
-]
-
 const defaultDesigns: CardDesign[] = ['cherry-version', 'ramen-red', 'flash-black']
 
 export const useProfile = () => {
@@ -92,10 +69,12 @@ export const useProfile = () => {
     }
   }
 
+  const { getRandomAvatarUrl } = useAvatar()
+
   const loadUserData = (user: User, userData: DocumentData) => {
     profile.value = {
       uid: user.uid,
-      avatar: userData.avatar || user.photoURL || getRandom(avatars),
+      avatar: userData.avatar || user.photoURL || getRandomAvatarUrl(),
       username:
         userData.username || user.displayName?.split(' ')[0] || `User_${user.uid.slice(0, 5)}`,
       lastUpdated: userData.lastUpdated?.toDate() || new Date(),
@@ -117,7 +96,7 @@ export const useProfile = () => {
   const loadGuestData = (user: User) => {
     const guest = useGuestProfile({
       uid: user.uid,
-      avatar: user.photoURL || getRandom(avatars),
+      avatar: user.photoURL || getRandomAvatarUrl(),
       username: user.displayName?.split(' ')[0] || `User #${user.uid.slice(0, 5)}`,
       lastUpdated: new Date(),
       record: { coins: 0, win: 0, draw: 0, loss: 0 },
@@ -134,7 +113,7 @@ export const useProfile = () => {
   const createNewProfile = (user: User) => {
     profile.value = {
       uid: user.uid,
-      avatar: user.photoURL || getRandom(avatars),
+      avatar: user.photoURL || getRandomAvatarUrl(),
       username: user.displayName?.split(' ')[0] || `User #${user.uid.slice(0, 5)}`,
       lastUpdated: new Date(),
       record: { coins: 500, win: 0, draw: 0, loss: 0 },

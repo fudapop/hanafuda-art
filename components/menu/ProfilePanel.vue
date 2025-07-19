@@ -10,12 +10,12 @@
           v-if="user"
           class="relative mx-auto w-max group"
         >
-          <PencilSquareIcon
-            class="absolute right-0 w-5 h-auto opacity-50 text-text-secondary bottom-4 group-hover:opacity-100"
-          />
           <AvatarSelect v-model="avatar">
+            <PencilSquareIcon
+              class="absolute right-0 w-5 h-auto opacity-50 text-text-secondary bottom-4 group-hover:opacity-100"
+            />
             <img
-              class="w-32 h-auto mx-auto my-2 rounded-full sm:my-4 sm:w-36"
+              class="w-32 h-auto mx-auto my-2 border rounded-full sm:my-4 sm:w-36 border-border drop-shadow-sm"
               :src="user.avatar"
               :alt="user.username"
             />
@@ -25,24 +25,19 @@
         <!-- START User Info Panel-->
         <div class="flex flex-col justify-center text-center sm:text-left sm:items-start gap-y-2">
           <!-- Username -->
-          <input
-            ref="usernameInputRef"
-            class="w-full h-10 text-lg rounded-md text-text bg-surface ring-1 ring-primary"
-            v-if="editUsername"
-            type="text"
-            v-model="usernameInputVal"
-            @keyup.enter="handleInputEnter"
-          />
-          <p
-            v-else
-            class="relative w-full h-10 px-4 py-2 overflow-hidden text-lg font-semibold rounded-md text-text group cursor-text hover:ring-2 hover:ring-border"
-            @click="handleEdit"
-          >
-            {{ user?.username }}
-            <PencilSquareIcon
-              class="absolute inset-y-0 w-4 h-auto my-auto opacity-50 text-text-secondary right-4 group-hover:opacity-100"
+          <div class="relative h-10">
+            <input
+              ref="usernameInputRef"
+              class="w-full h-full text-lg font-semibold border-none rounded-sm peer text-text bg-surface focus:bg-background focus:outline-none focus-visible:outline-none ring-1 ring-border focus-visible:ring-primary"
+              type="text"
+              v-model="usernameInputVal"
+              @keyup.enter="handleInputEnter"
+              autofocus
             />
-          </p>
+            <PencilSquareIcon
+              class="pointer-events-none absolute bottom-0 right-0 w-5 h-5 mr-1 mb-2.5 opacity-50 text-text-secondary peer-hover:opacity-100 peer-focus:hidden"
+            />
+          </div>
 
           <!-- Player Coins -->
           <div
@@ -145,26 +140,13 @@ const record = computed(() => ({
 
 const usernameInputRef: Ref<HTMLInputElement | null> = ref(null)
 const usernameInputVal = ref(username.value)
-const editUsername = ref(false)
 
 const handleInputEnter = () => {
   username.value = usernameInputVal.value
-  editUsername.value = false
 }
-
-const handleEdit = () => {
-  editUsername.value = true
-  const cleanup = onClickOutside(usernameInputRef, () => {
-    username.value = usernameInputVal.value
-    editUsername.value = false
-  })
-  const unwatch = watch(editUsername, () => {
-    if (!editUsername.value) {
-      cleanup?.()
-      unwatch()
-    }
-  })
-}
+onClickOutside(usernameInputRef, () => {
+  username.value = usernameInputVal.value
+})
 
 const handleSignIn = () => {
   navigateTo({ path: '/sign-in', query: { signup: 'true' } })
