@@ -23,7 +23,7 @@
         }"
       >
         <img
-          src="~/assets/images/sakura.webp"
+          src="/images/sakura.webp"
           class="animate-spin [animation-duration:20s] drop-shadow-md"
         />
       </div>

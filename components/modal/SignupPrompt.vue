@@ -5,7 +5,7 @@
     >
     <template #image>
       <img
-        src="~/assets/images/coin.webp"
+        src="/images/coin.webp"
         alt="coin"
         class="w-8 h-8 mx-auto drop-shadow-sm"
       />

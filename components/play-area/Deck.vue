@@ -23,7 +23,7 @@
               :style="{ marginLeft: `${(n - 1) * 15}px` }"
             >
               <img
-                src="~/assets/images/coin.webp"
+                src="/images/coin.webp"
                 alt="koi-koi bonus"
                 class="object-cover object-center drop-shadow-sm"
               />

@@ -9,7 +9,7 @@
         ]"
       >
         <img
-          src="~/assets/images/logo-title.png"
+          src="/images/logo-title.webp"
           class="landscape:max-h-[20vw] max-h-[120px] h-[40vh]"
           alt="Hanafuda Koi-Koi"
         />

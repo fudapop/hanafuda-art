@@ -15,7 +15,7 @@
         class="flex items-center font-semibold tracking-wide text-text gap-x-2 whitespace-nowrap"
       >
         <img
-          src="~/assets/images/coin.webp"
+          src="/images/coin.webp"
           alt="coin"
           class="w-5 h-5 drop-shadow-sm"
         />
@@ -81,7 +81,7 @@
                   class="absolute inset-x-0 mx-auto text-sm font-semibold tracking-wide transition-all opacity-0 text-text w-max bottom-4 group-hover:opacity-100 group-hover:-translate-y-2"
                 >
                   <img
-                    src="~/assets/images/coin.webp"
+                    src="/images/coin.webp"
                     alt="coin"
                     class="inline w-4 h-4 align-middle drop-shadow-sm"
                   />
@@ -154,7 +154,7 @@
       <template #image>
         <div :class="[newUnlock?.design, 'flex items-center text-text justify-center']">
           <img
-            src="~/assets/images/coin.webp"
+            src="/images/coin.webp"
             alt="coin"
             class="inline w-8 h-8 drop-shadow-sm"
           />

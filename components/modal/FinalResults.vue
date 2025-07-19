@@ -23,7 +23,7 @@
               easing="linear"
             />
             <img
-              src="~/assets/images/coin.webp"
+              src="/images/coin.webp"
               alt="coin"
               class="inline w-5 h-5 mb-1 ml-1 drop-shadow-sm"
             />
@@ -55,8 +55,8 @@
         result.winner === 'p1'
           ? 'text-text bg-hanafuda-green'
           : !result.winner
-          ? 'text-text bg-surface'
-          : 'text-text bg-primary'
+            ? 'text-text bg-surface'
+            : 'text-text bg-primary'
       } px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring focus-visible:ring-primary dark:focus-visible:ring-accent focus-visible:ring-opacity-75`"
     >
       <span

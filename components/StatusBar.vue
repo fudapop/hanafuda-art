@@ -37,7 +37,7 @@
                 v-memo="[ds.roundOver, gameStart]"
               >
                 <img
-                  src="~/assets/images/coin.webp"
+                  src="/images/coin.webp"
                   alt="coin"
                   class="w-4 h-4 mx-1 drop-shadow-sm"
                 />

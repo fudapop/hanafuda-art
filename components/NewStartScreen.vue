@@ -8,11 +8,11 @@
     />
     <div class="fixed inset-0 -z-20">
       <img
-        src="~/assets/images/bg-landing.png"
+        src="/images/bg-landing.webp"
         class="absolute z-5 object-cover w-full h-full dark:invert animate-ping [animation-duration:10s] motion-reduce:animate-none"
       />
       <img
-        src="~/assets/images/bg-landing.png"
+        src="/images/bg-landing.webp"
         class="object-cover w-full h-full dark:invert"
       />
     </div>
@@ -24,7 +24,7 @@
         class="static bg-transparent rounded-full aspect-[3/4] w-full h-full flex items-center justify-center overflow-hidden inert"
       >
         <img
-          src="~/assets/images/flowers-landing1.png"
+          src="/images/flowers-landing1.webp"
           class="object-contain w-full h-full transition-opacity duration-300 opacity-0 lg:opacity-100"
           loading="lazy"
         />
@@ -38,7 +38,7 @@
         class="bg-transparent rounded-full aspect-[3/4] w-full h-full flex items-center justify-center overflow-hidden inert"
       >
         <img
-          src="~/assets/images/flowers-landing2.png"
+          src="/images/flowers-landing2.webp"
           class="object-contain w-full h-full transition-opacity duration-300 opacity-0 lg:opacity-100"
           loading="lazy"
         />
@@ -52,7 +52,7 @@
       ]"
     >
       <img
-        src="~/assets/images/logo-title.png"
+        src="/images/logo-title.webp"
         :class="['w-[120px] mb-2', isMobile ? 'landscape:w-[30dvh]' : 'sm:w-[180px]']"
         alt="Hanafuda Koi-Koi"
       />
@@ -66,7 +66,7 @@
           @click="$emit('start-game')"
         >
           <img
-            src="~/assets/images/button-play-now.png"
+            src="/images/button-play-now.webp"
             class="w-full h-full cover"
           />
           <span class="sr-only"> PLAY NOW </span>
