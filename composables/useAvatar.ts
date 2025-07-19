@@ -85,6 +85,9 @@ export const useAvatar = () => {
     return getAvatar(name)
   }
 
+  const p1Avatar = useState('p1Avatar', () => getRandomAvatarUrl((a) => !a.includes('gamblers')))
+  const p2Avatar = useState('p2Avatar', () => getRandomAvatarUrl((a) => a.includes('gamblers')))
+
   return {
     getAvatarUrl,
     listAvatarUrls,
@@ -92,5 +95,7 @@ export const useAvatar = () => {
     getAvatar,
     listAvatars,
     getRandomAvatar,
+    p1Avatar,
+    p2Avatar,
   }
 }

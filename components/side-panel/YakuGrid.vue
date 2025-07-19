@@ -60,7 +60,7 @@
         <!-- CARD IMAGES -->
         <div
           v-if="showCards"
-          class="[--card-height:60px] w-full pointer-events-none"
+          class="[--card-height:65px] w-full pointer-events-none"
         >
           <ul className="list-none flex items-center justify-start flex-wrap max-w-full">
             <CardList

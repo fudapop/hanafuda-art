@@ -1,19 +1,30 @@
 <template>
   <!-- HEADER -->
-  <div
-    class="px-4 py-5 border-b bg-surface border-border dark:bg-surface dark:border-border sm:px-6"
-  >
-    <div class="grid grid-cols-[1fr_max-content] items-end -mt-2 -ml-4">
+  <div class="py-5 border-b bg-surface border-border dark:bg-surface dark:border-border">
+    <div class="grid grid-cols-[1fr_max-content] items-center">
       <HeadlessDialogTitle
         as="h3"
-        class="mb-2 text-base font-semibold leading-6 sm:text-lg text-text dark:text-text"
+        class="text-base font-semibold leading-6 lg:text-xl text-text dark:text-text"
       >
+        <div class="hidden sm:inline">
+          <img
+            v-if="recordedWinner === 'p1'"
+            :src="p1Avatar"
+            alt="p1 avatar"
+            class="inline w-16 h-16 mr-4 border rounded-full shadow-sm lg:w-24 lg:h-24 border-border"
+          />
+          <img
+            v-else
+            :src="p2Avatar"
+            alt="p2 avatar"
+            class="inline w-16 h-16 mr-4 border rounded-full shadow-sm lg:w-24 lg:h-24 border-border"
+          />
+        </div>
         <span v-if="recordedWinner">
           <span v-if="decisionIsPending">
             <span v-if="recordedWinner === 'p1'"> Make your call... </span>
             <span v-else> Your opponent is deciding... </span>
           </span>
-
           <span v-if="!decisionIsPending">
             {{ recordedWinner === 'p1' ? 'You' : 'Your opponent' }}
           </span>
@@ -50,14 +61,14 @@
           class="flex justify-end flex-shrink-0 gap-2 ml-4"
         >
           <button
-            class="sec-btn"
+            class="text-base lg:text-xl sec-btn"
             @click="callStop"
           >
             STOP
           </button>
           <button
             v-show="handNotEmpty(activePlayer.id)"
-            class="pri-btn"
+            class="text-base lg:text-xl pri-btn"
             @click="callKoikoi"
           >
             KOI-KOI
@@ -66,10 +77,10 @@
       </div>
       <div
         v-show="stopIsCalled"
-        class="flex justify-end flex-shrink-0 gap-2 ml-4"
+        class="flex justify-end flex-shrink-0 gap-2 my-auto ml-4"
       >
         <button
-          class="pri-btn"
+          class="text-base lg:text-xl pri-btn"
           @click="() => $emit('next')"
         >
           NEXT
@@ -78,9 +89,9 @@
     </div>
   </div>
   <!-- END HEADER -->
-  <h4 class="my-4 text-text-secondary dark:text-text-secondary">
+  <h4 class="my-4 text-base text-text-secondary dark:text-text-secondary lg:text-xl">
     Total:
-    <span class="text-base font-semibold sm:text-lg text-text"
+    <span class="text-base font-semibold lg:text-xl sm:text-lg text-text"
       >{{ lastRoundResult.score }} points</span
     >
     <span
@@ -88,7 +99,7 @@
       class="max-sm:block sm:ml-8"
     >
       Koi-Koi Bonus:
-      <span class="text-lg font-semibold text-text">x{{ bonusMultiplier }}</span>
+      <span class="text-base font-semibold lg:text-xl text-text">x{{ bonusMultiplier }}</span>
     </span>
   </h4>
   <YakuGrid
@@ -108,6 +119,8 @@ import { usePlayerStore } from '~/stores/playerStore'
 import { type CompletedYaku } from '~/utils/yaku'
 
 defineEmits(['next'])
+
+const { p1Avatar, p2Avatar } = useAvatar()
 
 const { decisionIsPending, callKoikoi, callStop, stopIsCalled } = useDecisionHandler()
 

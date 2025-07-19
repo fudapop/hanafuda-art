@@ -84,9 +84,17 @@ const opponent: PlayerKey = player === 'p1' ? 'p2' : 'p1'
 const score = computed(() => ds.scoreboard[player])
 const isPlayer1 = computed(() => playerNum === 1)
 
-const { getRandomAvatar } = useAvatar()
-const avatar2 = computed(
-  () => getRandomAvatar((a) => a.style === 'gamblers' && a.url !== user?.avatar).url,
+const { p1Avatar, p2Avatar } = useAvatar()
+const avatar2 = computed(() => p2Avatar.value)
+
+watch(
+  () => user?.avatar,
+  (avatarUrl) => {
+    if (avatarUrl) {
+      p1Avatar.value = avatarUrl
+    }
+  },
+  { immediate: true },
 )
 
 const getResult = () => {
