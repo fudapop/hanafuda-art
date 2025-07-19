@@ -16,44 +16,53 @@
     >
       <HeadlessPopoverPanel
         v-slot="{ close }"
-        class="fixed z-50 p-4 inset-x-3 mx-auto max-w-[640px] rounded-lg [@media(max-height:_500px)]:inset-y-3 my-auto shadow-lg bg-surface ring-1 ring-border ring-opacity-5 focus:outline-none"
+        class="fixed z-50 overflow-hidden inset-x-3 mx-auto max-w-[640px] rounded-lg [@media(max-height:_500px)]:inset-y-3 top-12 shadow-lg bg-background ring-1 ring-border ring-opacity-5 focus:outline-none"
       >
         <div
-          class="flex items-center justify-center px-3 py-4 bg-primary/20 dark:bg-primary/30 rounded-[inherit]"
+          class="flex items-center justify-between px-6 py-4 border-b shadow-sm bg-border border-border"
         >
-          <h3 class="text-lg font-semibold tracking-wide text-text">Choose Your Avatar</h3>
-        </div>
-        <div class="flex flex-wrap justify-center gap-4 px-4 py-8">
-          <div
-            v-for="a in premiumAvatars"
-            :key="a.url"
-            class="relative w-16 overflow-hidden [@media(min-height:500px)]:sm:w-24 aspect-square drop-shadow-sm cursor-pointer rounded-full"
-          >
-            <img
-              :src="a.url"
-              alt="user avatar"
-              :class="['grayscale', a.url === modelValue && 'ring-2 ring-offset-2 ring-primary']"
+          <h3 class="text-lg font-semibold tracking-wide text-text w-max">Choose Your Avatar</h3>
+          <button @click="close">
+            <Icon
+              name="mdi:close"
+              class="w-4 h-4 text-text"
             />
-            <div class="absolute inset-0 z-10 place-content-center bg-black/50">
-              <LockClosedIcon
-                aria-label="locked"
-                class="w-8 h-8 mx-auto text-white/80"
+            <span class="sr-only">Close</span>
+          </button>
+        </div>
+        <div class="max-h-[500px] overflow-y-auto">
+          <div class="grid justify-center grid-cols-4 gap-4 px-4 py-8 place-items-center">
+            <div
+              v-for="a in premiumAvatars"
+              :key="a.url"
+              class="relative w-16 overflow-hidden [@media(min-height:500px)]:sm:w-24 aspect-square drop-shadow-sm cursor-pointer rounded-full"
+            >
+              <img
+                :src="a.url"
+                alt="user avatar"
+                :class="['grayscale', a.url === modelValue && 'ring-2 ring-offset-2 ring-primary']"
               />
+              <div class="absolute inset-0 z-10 place-content-center bg-black/50">
+                <LockClosedIcon
+                  aria-label="locked"
+                  class="w-8 h-8 mx-auto text-white/80"
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div class="h-0 mx-8 my-4 border-b border-border opacity-80"></div>
-        <div class="flex flex-wrap justify-center gap-4 px-4 py-8">
-          <img
-            v-for="url in avatars"
-            :key="url"
-            :src="url"
-            alt="user avatar"
-            :class="`w-16 h-auto [@media(min-height:500px)]:sm:w-24 rounded-full drop-shadow-sm cursor-pointer ${
-              url === modelValue ? 'ring-2 ring-offset-2 ring-primary' : ''
-            }`"
-            @click="() => handleClick(url, close)"
-          />
+          <div class="h-0 mx-8 my-4 border-b border-border opacity-80"></div>
+          <div class="grid justify-center grid-cols-4 gap-4 px-4 py-8 place-items-center">
+            <img
+              v-for="url in avatars"
+              :key="url"
+              :src="url"
+              alt="user avatar"
+              :class="`w-16 h-auto [@media(min-height:500px)]:sm:w-24 rounded-full drop-shadow-sm cursor-pointer ${
+                url === modelValue ? 'ring-2 ring-offset-2 ring-primary' : ''
+              }`"
+              @click="() => handleClick(url, close)"
+            />
+          </div>
         </div>
       </HeadlessPopoverPanel>
     </Transition>
