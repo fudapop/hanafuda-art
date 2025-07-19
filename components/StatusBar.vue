@@ -5,27 +5,27 @@
         <div class="flex-shrink-0">
           <img
             v-if="user"
-            class="w-12 h-12 mx-auto border-2 rounded-full border-border"
+            class="w-12 h-12 mx-auto transition-all border-2 rounded-full sm:w-24 sm:h-24 border-border"
             :src="user.avatar"
             :alt="user.username"
           />
           <img
             v-else
             :src="avatar2"
-            class="w-12 h-12 mx-auto border-2 rounded-full border-border"
+            class="w-12 h-12 mx-auto transition-all border-2 rounded-full sm:w-24 sm:h-24 border-border"
           />
         </div>
         <div :class="['flex flex-col', isPlayer1 ? 'justify-end' : 'justify-start']">
           <p
             v-if="isPlayer1"
-            class="text-sm font-normal text-white/80"
+            class="text-sm font-normal lg:text-2xl lg:mb-2 text-white/80"
           >
             Round {{ ds.roundCounter }} / {{ config.maxRounds }}
           </p>
           <div
             :class="[
               'flex text-lg gap-x-4  text-white/90',
-              isMobileLandscape && 'flex-col text-sm gap-y-1',
+              isMobileLandscape ? 'flex-col text-sm gap-y-1' : 'lg:text-3xl ',
             ]"
           >
             <p class="font-bold">
@@ -39,7 +39,7 @@
                 <img
                   src="/images/coin.webp"
                   alt="coin"
-                  class="w-4 h-4 mx-1 drop-shadow-sm"
+                  class="w-4 h-4 mx-1 lg:w-8 lg:h-8 drop-shadow-sm"
                 />
                 <NumberAnimation
                   ref="number1"

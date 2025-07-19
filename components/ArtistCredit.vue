@@ -1,7 +1,7 @@
 <template>
   <span
     v-if="!!designInfo.creator"
-    class="text-xs italic opacity-40 !pointer-events-auto dark:text-white"
+    class="text-xs italic !pointer-events-auto dark:text-white sm:text-white opacity-50"
   >
     <span class="cursor-default"> Cards by </span>
     <a
