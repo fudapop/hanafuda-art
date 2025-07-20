@@ -203,7 +203,12 @@
       "doubleOverSeven": "7点以上で倍",
       "doubleOverSevenDescription": "役の合計値が7点以上の場合、得点が倍になります。",
       "otherVariations": "その他のバリエーション",
-      "readAboutThisRule": "fudawiki.orgでこのルールについて読む"
+      "readAboutThisRule": "fudawiki.orgでこのルールについて読む",
+      "viewingOptions": {
+        "allow": "完成時は通常通り得点されます。",
+        "limited": "得点するには他の完成した役が必要です。",
+        "none": "完成しても得点されません。"
+      }
     },
     "interface": {
       "title": "インターフェース",

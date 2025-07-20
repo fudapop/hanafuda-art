@@ -25,7 +25,7 @@
           :model-value="config.allowViewingsYaku"
           :update-callback="(option) => (config.allowViewingsYaku = option as ViewingsOptions)"
           :value-options="config.OPTIONS.VIEWINGS"
-          :description-template="(option) => getOptionDescription(option as ViewingsOptions)"
+          :description-template="(option) => t(`settings.gameplay.viewingOptions.${option}`)"
         >
           <template #group-label>
             <a

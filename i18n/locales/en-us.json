@@ -203,7 +203,12 @@
       "doubleOverSeven": "Double Over Seven",
       "doubleOverSevenDescription": "Double the score if the combined yaku value is 7 points or greater.",
       "otherVariations": "Other Variations",
-      "readAboutThisRule": "Read about this rule on fudawiki.org"
+      "readAboutThisRule": "Read about this rule on fudawiki.org",
+      "viewingOptions": {
+        "allow": "Completion is scored normally.",
+        "limited": "Requires another completed yaku to score points.",
+        "none": "No points are scored for completion."
+      }
     },
     "interface": {
       "title": "Interface",
