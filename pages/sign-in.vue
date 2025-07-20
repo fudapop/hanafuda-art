@@ -42,11 +42,12 @@
             'portrait:bottom-1/4 portrait:inset-x-0 portrait:top-32 portrait:w-screen',
           ]"
         >
-          <div class="max-w-md mx-auto min-w-[300px] pt-8 w-full">
+          <div class="max-w-md mx-auto min-w-[300px] pt-8 w-full space-y-8">
             <EmailLoginForm
               @success="handleLoginSuccess"
               @linked="handleLinked"
               @error="handleLoginError"
+              class="mb-4"
             />
 
             <OAuthSignupForm
@@ -60,7 +61,7 @@
               @error="handleLoginError"
             />
 
-            <div class="w-full my-8 text-sm text-center">
+            <div class="w-full text-sm text-center">
               <NuxtLink
                 :external="!currentUser"
                 :to="localeRoute('/')"
@@ -71,16 +72,17 @@
             </div>
 
             <!-- Legal Links -->
-            <div class="w-full space-x-4 text-xs text-center text-text-secondary">
+            <div class="w-full space-x-2 text-xs text-center text-text-secondary">
               <NuxtLink
                 :to="localeRoute('/terms')"
-                class="underline hover:text-text-secondary/80"
+                class="hover:text-text-secondary/80"
               >
                 {{ $t('footer.links.termsOfUse') }}
               </NuxtLink>
+              <span class="text-text-secondary/80">•</span>
               <NuxtLink
                 :to="localeRoute('/privacy')"
-                class="underline hover:text-text-secondary/80"
+                class="hover:text-text-secondary/80"
               >
                 {{ $t('footer.links.privacyPolicy') }}
               </NuxtLink>

@@ -40,8 +40,8 @@
             <HeadlessDialogPanel
               :class="[
                 'relative pt-5 pb-4 overflow-hidden text-left transition-all transform rounded-md shadow-xl bg-surface dark:bg-hanafuda-cream sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl',
-                isMobile && 'fixed inset-x-0 h-max my-auto w-[90%]',
-                padded && 'px-4 sm:p-6 lg:p-8',
+                isMobile && 'fixed inset-x-0 h-max my-auto',
+                padded && 'px-4 sm:p-6 lg:p-8 w-[90%]',
               ]"
             >
               <!-- rounded blur in the background -->

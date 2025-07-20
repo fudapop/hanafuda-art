@@ -98,15 +98,15 @@
   </div>
   <!-- END HEADER -->
   <h4 class="my-4 text-text-secondary dark:text-text-secondary">
-    Total:
+    {{ $t('common.labels.total') }}:
     <span class="text-base font-semibold sm:text-lg text-text"
-      >{{ lastRoundResult.score }} points</span
+      >{{ lastRoundResult.score }} {{ $t('common.labels.points') }}</span
     >
     <span
       v-if="lastRoundResult.score && bonusMultiplier > 1"
       class="max-sm:block sm:ml-8"
     >
-      Koi-Koi Bonus:
+      {{ $t('game.results.koiKoiBonus') }}:
       <span class="text-lg font-semibold text-text">x{{ bonusMultiplier }}</span>
     </span>
   </h4>

@@ -193,7 +193,7 @@
         </button>
         <button
           type="button"
-          class="w-full text-sm underline appearance-none"
+          class="w-full text-sm underline appearance-none text-text"
           @click="handleDontShowAgain"
         >
           {{ $t('announcements.dontShowAgain') }}
@@ -309,11 +309,6 @@ const handleLike = () => {
 
 <style scoped>
 :deep(.announcement-modal) {
-  /* Override the modal max-width for announcements */
-  .sm\:max-w-lg {
-    max-width: 42rem; /* sm:max-w-2xl equivalent */
-  }
-
   /* Override text centering */
   .text-center {
     text-align: left;

@@ -1,5 +1,8 @@
 <template>
-  <Modal :open="open">
+  <Modal
+    :open="open"
+    :padded="false"
+  >
     <template #title>
       <ChatBubbleLeftEllipsisIcon
         class="inline-flex w-6 h-6 mr-2 text-primary"
@@ -36,10 +39,10 @@
       <form
         v-show="!submitted"
         @submit="handleSubmit"
-        class="text-text"
+        class="px-6 mt-4 text-text"
       >
         <fieldset
-          class="pt-4 pb-8 mt-4 border-t border-b rounded-sm border-t-border border-b-border sm:pb-2"
+          class="pt-4 pb-8 border-t border-b rounded-sm border-t-border border-b-border sm:pb-2"
         >
           <div class="grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>{{ $t('feedback.categories.animationSmoothness') }}</p>

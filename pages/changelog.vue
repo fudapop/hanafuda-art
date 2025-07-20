@@ -1,6 +1,6 @@
 <template>
   <ContentLayout>
-    <ContentCard>
+    <ContentCard :padded="false">
       <!-- Header with navigation info -->
       <div
         v-if="hasMultipleChangelogs"
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Current changelog content -->
-      <div class="overflow-y-auto max-h-[70vh] px-4">
+      <div class="overflow-y-auto max-h-[70vh] px-6">
         <ContentRenderer
           v-if="currentChangelog"
           :value="currentChangelog"
@@ -123,7 +123,7 @@ const currentPage = ref(0)
 // Sort changelogs by publishedAt in descending order (most recent first)
 const sortedChangelogs = computed(() => {
   if (!allChangelogs.value || !Array.isArray(allChangelogs.value)) return []
-  return [...allChangelogs.value].sort((a: any, b: any) => {
+  return [...allChangelogs.value].sort((a, b) => {
     const dateA = new Date(a.publishedAt || 0).getTime()
     const dateB = new Date(b.publishedAt || 0).getTime()
     return dateB - dateA

@@ -51,7 +51,7 @@
       >
         <section
           v-if="newAccount"
-          class="space-y-4 text-xs text-text-secondary min-h-40"
+          class="text-xs text-text-secondary min-h-40"
         >
           <div class="space-y-2">
             <p>{{ $t('auth.passwordRequirements.title') }}</p>
@@ -80,7 +80,7 @@
             type="submit"
             :disabled="!isValidPassword.value || !values.email"
             :class="{
-              'w-full text-gray-900 dark:text-white action-button bg-border': true,
+              'mt-4 w-full text-gray-900 dark:text-white action-button bg-border': true,
               'opacity-50 cursor-not-allowed': !isValidPassword.value || !values.email,
             }"
           >

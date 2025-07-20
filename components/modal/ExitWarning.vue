@@ -1,6 +1,8 @@
 <template>
   <Modal :open="open">
-    <template #title> {{ $t('game.warnings.leavingGame') }} </template>
+    <template #title>
+      <span class="text-lg">{{ $t('game.warnings.leavingGame') }}</span>
+    </template>
     <template #image>
       <div
         class="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 border rounded-full border-border"
@@ -12,7 +14,7 @@
       </div>
     </template>
     <template #description>
-      <p class="text-text">
+      <p class="my-8 text-text">
         {{ $t('game.warnings.gameWillBeForfeited') }}
       </p>
     </template>

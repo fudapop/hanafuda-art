@@ -65,6 +65,9 @@
         "settings": "Settings",
         "profile": "Profile"
       }
+    },
+    "avatarSelect": {
+      "title": "Choose Your Avatar"
     }
   },
   "navigation": {
@@ -83,7 +86,7 @@
     },
     "links": {
       "iDontHaveAccount": "I don't have an account",
-      "iAlreadyHaveAccount": "I already have an account →",
+      "iAlreadyHaveAccount": "I already have an account",
       "orContinueWith": "or continue with"
     },
     "providers": {

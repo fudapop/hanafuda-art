@@ -26,6 +26,12 @@ export default defineContentConfig({
     changelog: defineCollection({
       type: 'page',
       source: 'changelog/**/*.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        version: z.string(),
+        publishedAt: z.string().date(),
+      }),
     }),
   },
 })

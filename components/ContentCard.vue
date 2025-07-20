@@ -2,7 +2,7 @@
   <div class="relative max-w-4xl min-h-screen py-8 mx-auto">
     <div class="py-6 rounded-lg shadow-lg bg-background sm:py-8 lg:py-12 text-text">
       <div class="max-w-3xl mx-auto">
-        <div class="h-full prose prose-gray dark:prose-invert max-w-none">
+        <div :class="['h-full prose prose-gray dark:prose-invert max-w-none', padded && 'px-6']">
           <slot />
         </div>
         <div class="pt-8 mt-12 border-t border-border">
@@ -44,3 +44,9 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+const { padded = true } = defineProps<{
+  padded?: boolean
+}>()
+</script>

@@ -106,13 +106,11 @@ export const useAnnouncements = async () => {
   const newAnnouncements = computed(() => {
     if (dontShowAnnouncements.value) return []
 
-    return announcements.value
-      .filter(
-        (announcement) =>
-          Date.now() >= new Date(announcement.date).getTime() &&
-          !dismissedAnnouncements.value.includes(announcement.id),
-      )
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    return announcements.value.filter(
+      (announcement) =>
+        Date.now() >= new Date(announcement.date).getTime() &&
+        !dismissedAnnouncements.value.includes(announcement.id),
+    )
   })
 
   // Check if there are new announcements to show

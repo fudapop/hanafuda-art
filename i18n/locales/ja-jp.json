@@ -65,6 +65,9 @@
         "settings": "設定",
         "profile": "プロフィール"
       }
+    },
+    "avatarSelect": {
+      "title": "アバターを選択"
     }
   },
   "navigation": {
@@ -83,7 +86,7 @@
     },
     "links": {
       "iDontHaveAccount": "アカウントをお持ちでない場合",
-      "iAlreadyHaveAccount": "すでにアカウントをお持ちです →",
+      "iAlreadyHaveAccount": "すでにアカウントをお持ちです",
       "orContinueWith": "または以下で続行"
     },
     "providers": {
