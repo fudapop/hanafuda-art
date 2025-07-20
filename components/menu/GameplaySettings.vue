@@ -13,9 +13,11 @@
           :model-value="config.maxRounds"
           :update-callback="(option) => (config.maxRounds = option as GameLengthOptions)"
           :value-options="config.OPTIONS.GAME_LENGTH"
-          :label-template="(option) => `${option} ${t('common.labels.rounds')}`"
+          class-name="grid grid-cols-3 gap-2 py-2"
         >
-          <template #group-label> {{ $t('settings.gameplay.gameLength') }} </template>
+          <template #group-label>
+            <span class="capitalize">{{ $t('common.labels.rounds') }}</span>
+          </template>
         </OptionsRadioGroup>
 
         <!-- Set allowance of TSUKIMI-/HANAMI-ZAKE -->
@@ -47,7 +49,9 @@
 
         <div class="space-y-4">
           <div class="flex">
-            <p class="text-base font-semibold leading-6 text-text">{{ $t('settings.gameplay.otherVariations') }}</p>
+            <p class="text-base font-semibold leading-6 text-text">
+              {{ $t('settings.gameplay.otherVariations') }}
+            </p>
             <a
               href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
               title="Read about scoring on fudawiki.org"
@@ -66,9 +70,9 @@
               :init-value="config.sakeIsWildCard"
             >
               <template #label>{{ $t('settings.gameplay.wildCardSakeCup') }}</template>
-              <template #description
-                >{{ $t('settings.gameplay.wildCardSakeCupDescription') }}</template
-              >
+              <template #description>{{
+                $t('settings.gameplay.wildCardSakeCupDescription')
+              }}</template>
             </ToggleSwitch>
 
             <!-- Set additional scoring rule -->
@@ -77,9 +81,9 @@
               :init-value="config.doubleScoreOverSeven"
             >
               <template #label>{{ $t('settings.gameplay.doubleOverSeven') }}</template>
-              <template #description
-                >{{ $t('settings.gameplay.doubleOverSevenDescription') }}</template
-              >
+              <template #description>{{
+                $t('settings.gameplay.doubleOverSevenDescription')
+              }}</template>
             </ToggleSwitch>
           </div>
         </div>
@@ -97,7 +101,9 @@
         <ul class="grid w-full mx-auto gap-y-4">
           <li class="flex justify-between leading-6 text-text">
             <span class="font-semibold"> {{ $t('settings.gameplay.gameLength') }} </span>
-            <span class="capitalize text-primary"> {{ config.maxRounds }} {{ $t('common.labels.rounds') }} </span>
+            <span class="capitalize text-primary">
+              {{ config.maxRounds }} {{ $t('common.labels.rounds') }}
+            </span>
           </li>
           <li class="flex justify-between leading-6 text-text">
             <div>
@@ -118,7 +124,9 @@
               </span>
             </div>
             <span class="self-center capitalize text-primary">
-              {{ config.sakeIsWildCard ? $t('common.states.enabled') : $t('common.states.disabled') }}
+              {{
+                config.sakeIsWildCard ? $t('common.states.enabled') : $t('common.states.disabled')
+              }}
             </span>
           </li>
           <li class="flex justify-between leading-6 text-text">
@@ -129,14 +137,20 @@
               </span>
             </div>
             <span class="self-center capitalize text-primary">
-              {{ config.doubleScoreOverSeven ? $t('common.states.enabled') : $t('common.states.disabled') }}
+              {{
+                config.doubleScoreOverSeven
+                  ? $t('common.states.enabled')
+                  : $t('common.states.disabled')
+              }}
             </span>
           </li>
         </ul>
       </div>
 
       <div :class="['space-y-4 pb-4 pt-8']">
-        <p class="text-base font-semibold leading-6 text-text">{{ $t('settings.interface.title') }}</p>
+        <p class="text-base font-semibold leading-6 text-text">
+          {{ $t('settings.interface.title') }}
+        </p>
         <ToggleSwitch
           :callback="toggleLabels"
           :init-value="config.cardLabels"
@@ -150,6 +164,7 @@
           :update-callback="(option) => (config.cardSizeMultiplier = option as CardSizeOptions)"
           :value-options="config.OPTIONS.CARD_SIZE"
           :label-template="(option) => getCardSizeLabel(option as CardSizeOptions)"
+          class-name="grid grid-cols-3 gap-2 py-2"
         >
           <template #group-label>{{ $t('settings.interface.cardSize') }}</template>
           <template #group-description>{{ $t('settings.interface.cardSizeDescription') }}</template>
