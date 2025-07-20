@@ -76,7 +76,7 @@
           </button>
           <button
             v-show="handNotEmpty(activePlayer.id)"
-            class="pri-btn"
+            class="text-base uppercase pri-btn lg:text-xl"
             @click="callKoikoi"
           >
             {{ t('game.actions.koikoi') }}
@@ -88,7 +88,7 @@
         class="flex justify-end flex-shrink-0 gap-2 my-auto ml-4"
       >
         <button
-          class="pri-btn"
+          class="text-base uppercase pri-btn lg:text-xl"
           @click="() => $emit('next')"
         >
           {{ t('common.actions.next') }}

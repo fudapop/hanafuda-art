@@ -49,7 +49,7 @@
     </HeadlessTransitionRoot>
     <Teleport to="body">
       <div
-        v-show="!isOptionsOpen"
+        v-show="!isOptionsOpen && !ds.gameOver && !ds.roundOver"
         class="absolute inset-x-0 z-50 mx-auto w-max text-white bottom-[5%] flex flex-col items-center sm:flex-row sm:justify-center gap-2"
       >
         <button
@@ -87,12 +87,14 @@
 
 <script setup lang="ts">
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
+import { useGameDataStore } from '~/stores/gameDataStore'
 
 const { t } = useI18n()
 const { show } = defineProps<{ show: boolean }>()
 const modalHidden = ref(false)
 
 const { openOptions, isOpen: isOptionsOpen } = useOptionsPanel()
+const ds = useGameDataStore()
 
 const toggleModal = () => {
   modalHidden.value = !modalHidden.value

@@ -65,8 +65,8 @@
             : 'text-text bg-primary'
       } px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring focus-visible:ring-primary dark:focus-visible:ring-accent focus-visible:ring-opacity-75`"
     >
-      <span
-        >Round {{ result.round }}:
+      <span class="capitalize"
+        >{{ t('common.labels.round') }} {{ result.round }}:
         <span
           v-if="result.winner"
           class="font-semibold tracking-wide uppercase"
