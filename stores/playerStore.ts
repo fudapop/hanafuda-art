@@ -4,6 +4,7 @@ export type PlayerKey = 'p1' | 'p2'
 
 export type Player = {
   readonly id: PlayerKey
+  name: string
   isActive: boolean
   isDealer: boolean
   // score: number;
@@ -16,12 +17,14 @@ export const usePlayerStore = defineStore('players', () => {
   const players: Record<PlayerKey, Player> = reactive({
     p1: {
       id: 'p1',
+      name: 'Player 1',
       isActive: true,
       isDealer: true,
       // score: INITIAL_SCORE,
     },
     p2: {
       id: 'p2',
+      name: 'Player 2',
       isActive: false,
       isDealer: false,
       // score: INITIAL_SCORE,
@@ -60,6 +63,14 @@ export const usePlayerStore = defineStore('players', () => {
   // })
 
   // Actions
+  function getPlayerName(player: PlayerKey) {
+    return players[player].name
+  }
+
+  function setPlayerName(player: PlayerKey, name: string) {
+    players[player].name = name
+  }
+
   function toggleActivePlayer() {
     playerList.value.forEach((p) => (p.isActive = !p.isActive))
     // console.debug("SWITCHED PLAYERS", players.p1.isActive ? "<<< P1" : ">>> P2");
@@ -108,6 +119,8 @@ export const usePlayerStore = defineStore('players', () => {
     toggleActivePlayer,
     toggleDealer,
     incrementBonus,
+    getPlayerName,
+    setPlayerName,
     // updateScore,
     reset,
   }

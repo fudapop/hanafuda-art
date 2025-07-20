@@ -54,14 +54,14 @@
       >
         <button
           class="w-48 game-ui-btn place-content-center"
-          @click="() => openOptions('Yaku List')"
+          @click="() => openOptions('yaku')"
         >
           <span class="mr-1">
             <Icon
               class="inline w-8 h-8 pb-1"
               name="mdi:cards-outline"
             />
-            Open Yaku List
+            {{ $t('menu.options.tabs.yaku') }}
           </span>
         </button>
         <button
@@ -77,7 +77,7 @@
               class="inline w-8 h-8 pb-1"
               v-else
             />
-            Show Board
+            {{ $t('common.actions.showTable') }}
           </span>
         </button>
       </div>

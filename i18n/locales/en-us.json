@@ -1,0 +1,378 @@
+{
+  "common": {
+    "actions": {
+      "playNow": "PLAY NOW",
+      "options": "OPTIONS",
+      "signUp": "SIGN UP",
+      "signIn": "SIGN IN",
+      "signOut": "SIGN OUT",
+      "close": "Close",
+      "cancel": "Cancel",
+      "back": "Back",
+      "previous": "Previous",
+      "next": "Next",
+      "submit": "Submit",
+      "send": "Send",
+      "save": "Save",
+      "confirm": "Confirm",
+      "continue": "Continue",
+      "gotIt": "Got it!",
+      "yes": "Yes",
+      "no": "No",
+      "like": "Like",
+      "unlike": "Unlike",
+      "showTable": "Show Table"
+    },
+    "labels": {
+      "loading": "Loading...",
+      "justAMoment": "Just a moment...",
+      "coin": "coin",
+      "coins": "coins",
+      "points": "points",
+      "round": "Round",
+      "rounds": "rounds",
+      "player": "Player",
+      "collection": "Collection",
+      "settings": "Settings",
+      "theme": "Theme",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit Fullscreen",
+      "language": "Language",
+      "music": "Music",
+      "total": "Total",
+      "win": "Win",
+      "lose": "Lose",
+      "draw": "Draw"
+    },
+    "states": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "new": "New",
+      "current": "Current",
+      "active": "Active",
+      "inactive": "Inactive",
+      "selected": "Selected"
+    }
+  },
+  "menu": {
+    "options": {
+      "title": "Options",
+      "tabs": {
+        "deck": "Deck",
+        "yaku": "Yaku List",
+        "settings": "Settings",
+        "profile": "Profile"
+      }
+    }
+  },
+  "navigation": {
+    "backToTitleScreen": "Back to title screen",
+    "continueAsGuest": "Continue as guest",
+    "signInToExistingAccount": "Sign in to an existing account →"
+  },
+  "auth": {
+    "fields": {
+      "emailAddress": "Email address",
+      "password": "Password"
+    },
+    "options": {
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?"
+    },
+    "links": {
+      "iDontHaveAccount": "I don't have an account",
+      "iAlreadyHaveAccount": "I already have an account →",
+      "orContinueWith": "or continue with"
+    },
+    "providers": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "passwordReset": {
+      "title": "Reset your password?",
+      "description": "A link to change your password will be sent if an associated account exists."
+    },
+    "passwordRequirements": {
+      "title": "Password must contain at least:",
+      "sixCharacters": "6 characters",
+      "oneNumber": "1 number",
+      "oneUppercase": "1 uppercase letter",
+      "oneLowercase": "1 lowercase letter",
+      "oneSpecialCharacter": "1 special character"
+    },
+    "notices": {
+      "signInRequired": "Sign in is required to save your profile."
+    },
+    "messages": {
+      "unableToCreateAccount": "Unable to create an account.",
+      "invalidEmailOrPassword": "Invalid email or password. Please try again.",
+      "unableToLinkAccount": "Unable to link your account.",
+      "unableToSignIn": "Unable to sign in. Please try again later.",
+      "passwordResetSent": "Password reset email has been sent to {email}.",
+      "unableToSendPasswordReset": "Unable to send password reset email.",
+      "accountLinked": "Account linked! You may need to refresh your browser to update your profile.",
+      "youreSignedIn": "You're signed in! Have fun!",
+      "failedToLinkAccount": "Failed to link account. Please try again.",
+      "youHaveBeenSignedOut": "You have been signed out."
+    }
+  },
+  "profile": {
+    "info": {
+      "lastUpdated": "Last updated:",
+      "playerRecord": "Player Record"
+    },
+    "stats": {
+      "wins": "wins",
+      "losses": "losses",
+      "draws": "draws"
+    }
+  },
+  "game": {
+    "title": "Hanafuda Koi-Koi",
+    "ui": {
+      "statusBar": {
+        "roundCounter": "Round {current} / {max}"
+      }
+    },
+    "actions": {
+      "makeYourCall": "Make your call...",
+      "opponentDeciding": "Your opponent is deciding...",
+      "calledStop": "called stop.",
+      "koikoiWasCalled": "Koi-Koi was called!",
+      "koikoi": "Koi-Koi",
+      "stop": "Stop"
+    },
+    "results": {
+      "theRoundIsADraw": "The round is a draw.",
+      "youWin": "YOU WIN!",
+      "youLose": "YOU LOSE...",
+      "draw": "DRAW",
+      "luckyHand": "Lucky Hand",
+      "fourOfAKindFourPairs": "Four-of-a-Kind / Four-Pairs",
+      "gotDealtA": "got dealt a",
+      "koiKoiBonus": "Koi-Koi Bonus"
+    },
+    "cardTypes": {
+      "bright": "bright",
+      "animal": "animal",
+      "ribbon": "ribbon",
+      "plain": "plain"
+    },
+    "yaku": {
+      "gokou": "Five Brights",
+      "shikou": "Four Brights",
+      "ame-shikou": "Rainy Four Brights (Any 3 + Rain Man)",
+      "sankou": "Three Brights (Any 3 except Rain-Man)",
+      "hanami-zake": "Flower Viewing",
+      "tsukimi-zake": "Moon Viewing",
+      "ino-shika-chou": "Boar, Deer & Butterfly",
+      "aka-tan": "Red Poetry Ribbons",
+      "ao-tan": "Blue Ribbons",
+      "tan-zaku": "Any 5 Ribbons (+1pt / extra)",
+      "tane-zaku": "Any 5 Animals (+1pt / extra)",
+      "kasu": "Any 10 Plains (+1pt / extra)",
+      "kuttsuki": "4 pairs in hand",
+      "teshi": "4 of a kind in hand",
+      "tsuki-fuda": "Cards of the Month"
+    },
+    "warnings": {
+      "leavingGame": "Leaving the game...",
+      "gameWillBeForfeited": "The game will be forfeited and progress will not be saved. Are you sure you want to leave?",
+      "yesLeaveGame": "Yes, leave the game",
+      "noKeepPlaying": "No, keep playing"
+    }
+  },
+  "settings": {
+    "actions": {
+      "toggleColorMode": "Toggle Color Mode",
+      "toggleFullscreen": "Toggle Fullscreen",
+      "selectLanguage": "Select Language",
+      "toggleMute": "Toggle Mute"
+    },
+    "gameplay": {
+      "title": "Gameplay Rules",
+      "gameLength": "Game Length",
+      "moonFlowerViewing": "Moon/Flower Viewing",
+      "wildCardSakeCup": "Wild Card Sake Cup",
+      "wildCardSakeCupDescription": "The sake cup counts as both animal and plain types.",
+      "doubleOverSeven": "Double Over Seven",
+      "doubleOverSevenDescription": "Double the score if the combined yaku value is 7 points or greater.",
+      "otherVariations": "Other Variations",
+      "readAboutThisRule": "Read about this rule on fudawiki.org"
+    },
+    "interface": {
+      "title": "Interface",
+      "cardLabels": "Card Labels",
+      "cardLabelsDescription": "Include card corner labels to assist with matching.",
+      "cardSize": "Card Size",
+      "cardSizeDescription": "Select the size that best suits your screen.",
+      "sizes": {
+        "small": "Small",
+        "normal": "Normal",
+        "large": "Large"
+      }
+    },
+    "audio": {
+      "bgmVolume": "BGM Volume",
+      "sfxVolume": "SFX Volume",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "volume": "Volume"
+    },
+    "colorMode": {
+      "dark": "Dark",
+      "light": "Light",
+      "auto": "Auto"
+    },
+    "notices": {
+      "settingsLocked": "Some settings are locked while a game is in progress.",
+      "languageChangeNotice": "Language can only be changed at the title screen."
+    }
+  },
+  "deck": {
+    "selectADeck": "Select a deck",
+    "tradeCoins": "Trade in {cost} coins to use this deck?",
+    "noKeepCoins": "No, keep my coins.",
+    "yesUnlockIt": "Yes, unlock it!",
+    "limitedTimeOffer": "✨ LIMITED TIME OFFER ✨",
+    "artBy": "Art by {creator} →",
+    "notices": {
+      "youDontHaveEnoughCoins": "You don't have enough coins yet...",
+      "youHaveUnlocked": "You've unlocked a new deck!"
+    }
+  },
+  "feedback": {
+    "thankYouForPlaying": "Thank you for playing!",
+    "howWasExperience": "How was your experience?",
+    "feedbackSubmitted": "Your feedback has been submitted. Thank you!",
+    "categories": {
+      "animationSmoothness": "Animation Smoothness",
+      "easeOfControls": "Ease of Controls",
+      "imageQuality": "Image Quality",
+      "soundQuality": "Sound Quality"
+    },
+    "comments": {
+      "title": "Comments",
+      "type": "Comment Type",
+      "types": {
+        "idea": "💡 idea",
+        "error": "🪲 error",
+        "other": "💬 other"
+      },
+      "descriptions": {
+        "idea": "How can we improve the game, or what would you like to see next?",
+        "error": "Did you encounter any bugs? Please describe the issue.",
+        "other": "Your feedback is greatly appreciated! 🙏🏽"
+      },
+      "placeholder": "Enter your comment here..."
+    }
+  },
+  "announcements": {
+    "whatsNewTitle": "What's New in Hanafuda Koi-Koi!",
+    "dismiss": "Got it!",
+    "dontShowAgain": "Don't show again",
+    "resetAnnouncements": "Reset Announcements",
+    "metrics": {
+      "views": "views",
+      "likes": "likes"
+    }
+  },
+  "collection": {
+    "viewCollection": "View {title}",
+    "yourCollection": "Your Collection",
+    "opponentCollection": "Opponent Collection",
+    "viewCards": "View Cards"
+  },
+  "signup": {
+    "prompt": {
+      "title": "You've got coins! How about 500 more?",
+      "description": "Your coins can be used to unlock new card designs and avatars. However, guest profiles cannot be saved.",
+      "question": "Sign in to save your profile and receive an extra 500 coins?"
+    },
+    "actions": {
+      "noThanksDeleteMe": "No thanks, delete me",
+      "yesGimmeCoins": "Yes, gimme coins!"
+    }
+  },
+  "footer": {
+    "links": {
+      "attributions": "Attributions",
+      "termsOfUse": "Terms of Use",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "actions": {
+      "viewChangelog": "View changelog",
+      "viewAttributions": "View attributions",
+      "viewTermsOfUse": "View terms of use",
+      "viewPrivacyPolicy": "View privacy policy"
+    },
+    "credits": {
+      "backgroundArtBy": "Background art and design by",
+      "developedBy": "Developed by"
+    }
+  },
+  "errors": {
+    "http": {
+      "badRequest": "Bad request",
+      "internalServerError": "Internal server error"
+    },
+    "browser": {
+      "fullscreenNotSupported": "Fullscreen is not supported in this browser."
+    },
+    "timeout": {
+      "functionCallTimedOut": "Function call ({name}) has timed out."
+    }
+  },
+  "cache": {
+    "status": {
+      "caching": "Caching {design}: {progress}%",
+      "completedCaching": "Completed caching {design}",
+      "cachingCards": "Caching cards..."
+    },
+    "error": "Error: {error}"
+  },
+  "datetime": {
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
+  },
+  "hanafuda": {
+    "flowers": {
+      "pine": "Pine",
+      "plum": "Plum",
+      "cherry": "Cherry",
+      "wisteria": "Wisteria",
+      "iris": "Iris",
+      "peony": "Peony",
+      "bushClover": "Bush Clover",
+      "susuki": "Susuki Grass",
+      "chrysanthemum": "Chrysanthemum",
+      "maple": "Maple",
+      "willow": "Willow",
+      "paulownia": "Paulownia"
+    }
+  },
+  "accessibility": {
+    "navigation": {
+      "skipToContent": "Skip to content",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "actions": {
+      "closePanel": "Close panel"
+    }
+  }
+}

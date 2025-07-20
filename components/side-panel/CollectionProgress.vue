@@ -42,11 +42,12 @@
             class="absolute bottom-0 inline-flex mb-1 ml-4"
           >
             <span
-              v-for="_ in yaku.cards.filter((card) => playerHas(card))"
+              v-for="_ in yaku.cards.filter((card: CardName) => playerHas(card))"
               class="self-center w-3 h-1 ml-1 bg-green-400 rounded-full ring-1 ring-inset ring-green-500"
             ></span>
             <span
-              v-for="_ in yaku.numRequired - yaku.cards.filter((card) => playerHas(card)).length"
+              v-for="_ in yaku.numRequired -
+              yaku.cards.filter((card: CardName) => playerHas(card)).length"
               class="self-center w-3 h-1 ml-1 rounded-full bg-surface ring-1 ring-inset ring-border"
             ></span>
           </span>
@@ -58,7 +59,7 @@
               class="font-semibold align-top"
               >+</span
             >
-            points
+            {{ $t('common.labels.points') }}
           </span>
           <ChevronDownIcon
             :class="[
@@ -83,7 +84,7 @@
             :class="['px-4 pt-2 pb-6 text-sm text-text', open || openAll ? '' : 'hidden']"
           >
             <p class="mb-2">
-              {{ yaku.description.toString() }}
+              {{ $t(`game.yaku.${yaku.name}`) }}
             </p>
 
             <div :class="['grid grid-cols-10 gap-1']">

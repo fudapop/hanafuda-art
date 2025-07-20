@@ -2,20 +2,21 @@
   <div class="fixed z-10 top-4 right-4">
     <!-- Settings Tab Button -->
     <button
+      ref="triggerRef"
       @click="toggleExpanded"
       :class="[
         'game-ui-btn',
         isExpanded && 'rounded-b-none border-b-0',
-        !isExpanded && gameIsStarted && 'opacity-30 hover:opacity-100',
+        !isExpanded && gameIsStarted && 'opacity-50 hover:opacity-100',
       ]"
-      title="Settings"
+      :title="$t('common.labels.settings')"
     >
       <Icon
         name="ic:round-settings"
         class="w-5 h-5 text-white transition-transform duration-300"
         :class="{ 'rotate-90': isExpanded }"
       />
-      <span class="text-sm font-medium text-white sr-only">Settings</span>
+      <span class="text-sm font-medium text-white sr-only">{{ $t('common.labels.settings') }}</span>
     </button>
 
     <!-- Settings Panel -->
@@ -40,7 +41,9 @@
       >
         <!-- Color Mode Toggle -->
         <div class="mb-3">
-          <label class="block mb-2 text-xs font-medium text-white sr-only">Theme</label>
+          <label class="block mb-2 text-xs font-medium text-white sr-only">{{
+            $t('common.labels.theme')
+          }}</label>
           <button
             @click="handleColorModeClick"
             :class="[
@@ -48,7 +51,7 @@
               'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
               'text-white hover:text-yellow-300',
             ]"
-            title="Toggle Color Mode"
+            :title="$t('settings.actions.toggleColorMode')"
           >
             <Icon
               v-if="colorModeState === 'dark'"
@@ -65,7 +68,7 @@
               name="ic:round-monitor"
               class="w-4 h-4"
             />
-            <span class="text-sm capitalize">{{ colorModeState }}</span>
+            <span class="text-sm capitalize">{{ $t(`settings.colorMode.${colorModeState}`) }}</span>
           </button>
         </div>
 
@@ -74,7 +77,9 @@
           class="mb-3"
           v-if="isSupported"
         >
-          <label class="block mb-2 text-xs font-medium text-white sr-only">Fullscreen</label>
+          <label class="block mb-2 text-xs font-medium text-white sr-only">{{
+            $t('common.labels.fullscreen')
+          }}</label>
           <button
             @click="toggle"
             :class="[
@@ -82,7 +87,7 @@
               'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
               'text-white hover:text-yellow-300',
             ]"
-            title="Toggle Fullscreen"
+            :title="$t('settings.actions.toggleFullscreen')"
           >
             <Icon
               v-if="isFullscreen"
@@ -95,14 +100,60 @@
               class="w-4 h-4"
             />
             <span class="text-sm capitalize">{{
-              isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'
+              isFullscreen ? $t('common.labels.exitFullscreen') : $t('common.labels.fullscreen')
             }}</span>
           </button>
         </div>
 
+        <!-- Language Switcher -->
+        <div class="relative mb-3">
+          <label class="block mb-2 text-xs font-medium text-white sr-only">{{
+            $t('common.labels.language')
+          }}</label>
+          <div class="relative peer">
+            <select
+              :disabled="gameIsStarted"
+              :value="locale"
+              @change="handleLocaleChange"
+              :class="[
+                'w-full px-3 py-2 pl-8 rounded-md transition-all duration-200 appearance-none',
+                'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
+                'text-white text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+                'focus:outline-none focus-visible:outline-none focus-visible:border-white focus-visible:ring-inset focus-visible:ring-primary',
+              ]"
+              :title="$t('settings.actions.selectLanguage')"
+            >
+              <option
+                v-for="availableLocale in locales"
+                :key="availableLocale.code"
+                :value="availableLocale.code"
+                :class="['bg-black/90 dark:bg-white/90 text-white dark:text-black']"
+              >
+                {{ availableLocale.name }}
+              </option>
+            </select>
+            <Icon
+              name="ic:round-language"
+              class="absolute w-4 h-4 transform -translate-y-1/2 pointer-events-none left-2 top-1/2 text-white/70"
+            />
+          </div>
+          <div
+            class="absolute z-10 items-center hidden p-2 mb-1 text-xs bg-black rounded-md peer-hover:flex bottom-full text-white/70"
+            v-if="gameIsStarted"
+          >
+            <Icon
+              name="ic:round-info"
+              class="flex-shrink-0 inline w-4 h-4 mr-1"
+            />
+            <p>{{ $t('settings.notices.languageChangeNotice') }}</p>
+          </div>
+        </div>
+
         <!-- Music Controls -->
         <div>
-          <label class="block mb-2 text-xs font-medium text-white sr-only">Music</label>
+          <label class="block mb-2 text-xs font-medium text-white sr-only">{{
+            $t('common.labels.music')
+          }}</label>
 
           <!-- Volume Controls -->
           <div class="flex items-center gap-2">
@@ -113,7 +164,7 @@
                 'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
                 'text-white hover:text-yellow-300',
               ]"
-              title="Toggle Mute"
+              :title="$t('settings.actions.toggleMute')"
             >
               <Icon
                 :name="isMuted ? 'ic:round-volume-off' : 'ic:round-volume-up'"
@@ -136,7 +187,7 @@
                   'slider-thumb:rounded-full slider-thumb:bg-white slider-thumb:cursor-pointer',
                   'disabled:opacity-50 disabled:cursor-not-allowed',
                 ]"
-                title="Volume"
+                :title="$t('settings.audio.volume')"
               />
             </div>
           </div>
@@ -174,7 +225,15 @@ import { useAudio } from '~/composables/useAudio'
 
 type ColorMode = 'auto' | 'dark' | 'light'
 
-const { isFullscreen, toggle, enter, exit, isSupported } = useFullscreen(undefined, {
+const { locale, locales, setLocale } = useI18n()
+
+const handleLocaleChange = (event: Event) => {
+  const target = event.target as HTMLSelectElement
+  const selectedLocale = target.value as typeof locale.value
+  setLocale(selectedLocale)
+}
+
+const { isFullscreen, toggle, enter, isSupported } = useFullscreen(undefined, {
   autoExit: true,
 })
 
@@ -184,8 +243,12 @@ const gameIsStarted = useState('start', () => false)
 // Settings panel state
 const isExpanded = ref(false)
 const panelRef = ref<HTMLDivElement | null>(null)
+const triggerRef = ref<HTMLButtonElement | null>(null)
 
-onClickOutside(panelRef, () => {
+onClickOutside(panelRef, (e) => {
+  if (triggerRef.value && triggerRef.value.contains(e.target as Node)) {
+    return
+  }
   isExpanded.value = false
 })
 
@@ -252,7 +315,7 @@ const shouldScroll = computed(() => {
 
 onMounted(() => {
   if (!isSupported.value) {
-    console.warn('Fullscreen is not supported in this browser.')
+    console.warn($t('errors.browser.fullscreenNotSupported'))
   } else {
     if (systemPreferences.value.fullscreen) {
       enter()

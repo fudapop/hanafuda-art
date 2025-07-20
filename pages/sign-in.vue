@@ -11,9 +11,9 @@
         <img
           src="/images/logo-title.webp"
           class="landscape:max-h-[20vw] max-h-[120px] h-[40vh]"
-          alt="Hanafuda Koi-Koi"
+          :alt="$t('game.title')"
         />
-        <h1 class="sr-only">Hanafuda Koi-Koi</h1>
+        <h1 class="sr-only">{{ $t('game.title') }}</h1>
       </div>
       <Transition
         appear
@@ -30,7 +30,7 @@
         >
           <SakuraLoader class="scale-[2] ml-4 origin-bottom opacity-80" />
           <div class="font-semibold tracking-wide text-center text-gray-900 animate-pulse">
-            Just a moment...
+            {{ $t('common.labels.justAMoment') }}
           </div>
         </div>
         <div
@@ -63,26 +63,26 @@
             <div class="w-full my-8 text-sm text-center">
               <NuxtLink
                 :external="!currentUser"
-                to="/"
+                :to="localeRoute('/')"
                 class="text-text-secondary hover:underline hover:text-primary"
               >
-                Continue as guest
+                {{ $t('navigation.continueAsGuest') }}
               </NuxtLink>
             </div>
 
             <!-- Legal Links -->
             <div class="w-full space-x-4 text-xs text-center text-text-secondary">
               <NuxtLink
-                to="/terms"
+                :to="localeRoute('/terms')"
                 class="underline hover:text-text-secondary/80"
               >
-                Terms of Use
+                {{ $t('footer.links.termsOfUse') }}
               </NuxtLink>
               <NuxtLink
-                to="/privacy"
+                :to="localeRoute('/privacy')"
                 class="underline hover:text-text-secondary/80"
               >
-                Privacy Policy
+                {{ $t('footer.links.privacyPolicy') }}
               </NuxtLink>
             </div>
           </div>
@@ -92,39 +92,39 @@
   </ContentLayout>
 </template>
 <script setup lang="ts">
-import { useScreenOrientation } from '@vueuse/core'
 import { useToast } from 'vue-toastification'
 
 definePageMeta({
   title: 'New Hanafuda | Sign In',
 })
 
+const localeRoute = useLocaleRoute()
+
 const { isMobile } = useDevice()
-const { orientation } = useScreenOrientation()
-const isLandscape = computed(() => orientation.value?.includes('landscape'))
 
 const { loginAsGuest } = useAuth()
 const { upgradeGuestProfile, current: currentUser } = useProfile()
+const { t } = useI18n()
 const toast = useToast()
 const loggingIn = ref<boolean>(true)
 
 const handleLinked = () => {
   if (!currentUser.value) {
-    toast.error('Failed to link account. Please try again.', { timeout: 8000 })
+    toast.error(t('auth.messages.failedToLinkAccount'), { timeout: 8000 })
     return
   }
   loggingIn.value = true
-  toast.success('Account linked! You may need to refresh your browser to update your profile.', {
+  toast.success(t('auth.messages.accountLinked'), {
     timeout: 8000,
   })
   upgradeGuestProfile(currentUser.value!)
-  navigateTo('/')
+  navigateTo(localeRoute('/'))
 }
 
 const handleLoginSuccess = () => {
   loggingIn.value = true
-  toast.success("You're signed in! Have fun!", { timeout: 2000 })
-  navigateTo('/')
+  toast.success(t('auth.messages.youreSignedIn'), { timeout: 2000 })
+  navigateTo(localeRoute('/'))
 }
 
 const handleLoginError = () => {
@@ -138,12 +138,12 @@ onBeforeMount(async () => {
     return
   }
   if (await getCurrentUser()) {
-    navigateTo('/')
+    navigateTo(localeRoute('/'))
   } else {
     const guest = await loginAsGuest('Player 1')
     if (guest) {
       await useProfile().getProfile(guest)
-      navigateTo('/')
+      navigateTo(localeRoute('/'))
     } else {
       loggingIn.value = false
     }

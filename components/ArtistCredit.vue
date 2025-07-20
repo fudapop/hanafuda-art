@@ -1,19 +1,13 @@
 <template>
-  <span
+  <a
     v-if="!!designInfo.creator"
-    class="text-xs italic !pointer-events-auto dark:text-white sm:text-white opacity-50"
+    :title="designInfo.urlDescription"
+    :href="designInfo.url"
+    target="_blank"
+    class="text-xs italic opacity-50 !pointer-events-auto sm:text-white underline underline-offset-4 whitespace-nowrap"
   >
-    <span class="cursor-default"> Cards by </span>
-    <a
-      v-if="designInfo.creator"
-      :title="designInfo.urlDescription"
-      :href="designInfo.url"
-      target="_blank"
-      class="underline underline-offset-4 whitespace-nowrap"
-    >
-      {{ designInfo.creator }}
-    </a>
-  </span>
+    {{ $t('deck.artBy', { creator: designInfo.creator }) }}
+  </a>
 </template>
 
 <script setup lang="ts">

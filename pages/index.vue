@@ -16,11 +16,11 @@
       <!-- OPPONENT COLLECTION -->
       <div
         :class="[
-          'absolute inset-x-0 -translate-y-3/4 top-1/4 max-w-3xl w-max mx-auto',
+          'absolute inset-x-0 -translate-y-3/4 top-1/4',
           // 'lg:inset-x-auto lg:right-0'
         ]"
       >
-        <div class="w-screen overflow-x-auto touch-pan-x no-scrollbar">
+        <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
           <LazyCollectionArea
             player="p2"
             @completed="handleCompletion"
@@ -48,11 +48,11 @@
       <!-- PLAYER COLLECTION -->
       <div
         :class="[
-          'absolute inset-x-0 bottom-1/4 max-w-3xl w-max mx-auto',
+          'absolute inset-x-0 bottom-1/4',
           // 'lg:inset-x-auto lg:right-0'
         ]"
       >
-        <div class="w-screen overflow-x-auto touch-pan-x no-scrollbar">
+        <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
           <LazyCollectionArea
             player="p1"
             @completed="handleCompletion"
@@ -69,7 +69,9 @@
           isMobile && 'landscape:translate-y-8',
         ]"
       >
-        <div class="w-screen py-8 overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x">
+        <div
+          class="w-screen max-w-3xl py-8 mx-auto overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x"
+        >
           <div v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')">
             <LazyHandDisplay id="p1" />
           </div>
@@ -100,12 +102,12 @@ import { useGameDataStore } from '~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
 import { checkForWin } from '~/utils/yaku'
 
-const { isMobile } = useDevice()
-
 definePageMeta({
   requiresAuth: true,
   middleware: ['auth'],
 })
+
+const { isMobile } = useDevice()
 
 const cs = useCardStore()
 const ps = usePlayerStore()
@@ -116,9 +118,9 @@ const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
 
 const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
-const { getDesignInfo, applyCardSizeMultiplier } = useCardDesign()
+const { applyCardSizeMultiplier } = useCardDesign()
 
-const { autoPlay, opponentPlay, useOpponent } = useAutoplay()
+const { opponentPlay, useOpponent } = useAutoplay()
 const autoOpponent: Ref<boolean> = useOpponent()
 
 const showModal = ref(false)
@@ -168,7 +170,7 @@ const handleKoikoi = () => {
   console.debug('>>> Called KOI-KOI')
   ps.incrementBonus()
   showModal.value = false
-  toast('Koi-koi was called!', {
+  toast($t('game.actions.koikoiWasCalled'), {
     timeout: 2000,
     position: POSITION.TOP_CENTER,
   })
@@ -235,7 +237,7 @@ const checkDeal = () => {
       }
       // Game round is reset if win condition exists on the field
       if (result?.player === 'field') {
-        console.log(`Revealed ${result.completedYaku[0].name.toUpperCase()}. Resetting...`)
+        console.debug(`Revealed ${result.completedYaku[0].name.toUpperCase()}. Resetting...`)
         cs.reset()
         startRound()
         return
@@ -289,7 +291,7 @@ watch(gameStart, () => {
   if (gameStart.value) {
     if (!gameTest.value) startRound()
   } else {
-    console.info('Resetting game...')
+    console.debug('Resetting game...')
     if (!roundOver.value) ds.endRound()
     if (!gameOver.value) handleClose()
   }

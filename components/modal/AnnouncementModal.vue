@@ -12,7 +12,7 @@
             class="w-6 h-6 text-primary"
             aria-hidden
           />
-          <h1 class="text-lg sm:text-xl">What's New in Hanafuda Koi-Koi!</h1>
+          <h1 class="text-lg sm:text-xl">{{ $t('announcements.whatsNewTitle') }}</h1>
         </div>
         <!-- <div
           v-if="newAnnouncements.length > 1"
@@ -30,7 +30,7 @@
         <!-- Current announcement -->
         <div
           v-if="currentAnnouncement"
-          class="text-sm text-gray-600 dark:text-gray-300 overflow-y-auto h-[60dvh] px-8"
+          :class="['text-sm overflow-y-auto h-[60dvh] px-8', isMobile && 'h-max']"
         >
           <!-- Use ContentRenderer for markdown body if available -->
           <section
@@ -51,11 +51,11 @@
             v-else
             class="text-left"
           >
-            <div class="pl-3 border-l-2 border-orange-400">
-              <h4 class="font-semibold text-left text-gray-900 dark:text-white">
+            <div class="pl-3 border-l-2 border-primary">
+              <h4 class="font-semibold text-left">
                 {{ currentAnnouncement.title }}
               </h4>
-              <p class="mb-2 text-xs text-left text-gray-500 dark:text-gray-400">
+              <p class="mb-2 text-xs text-left">
                 {{ currentAnnouncement.date }}
               </p>
               <p class="mb-3 text-sm text-left">{{ currentAnnouncement.description }}</p>
@@ -74,119 +74,129 @@
             </div>
           </section>
         </div>
-
-        <!-- Impression tracking -->
-        <div
-          v-if="currentAnnouncement"
-          class="flex items-center justify-between px-8 py-4"
-        >
-          <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-            <span class="flex items-center gap-1">
-              <Icon
-                name="heroicons:eye"
-                class="w-4 h-4"
-              />
-              {{ impressions[currentAnnouncement.id]?.views || 0 }}
-              <span class="sr-only">views</span>
-            </span>
-            <button
-              type="button"
-              :class="[
-                'flex items-center gap-2 px-2 py-1 text-sm rounded-md transition-colors',
-                'focus:outline-none focus-visible:outline-none',
-                'focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-2',
-                isLiked(currentAnnouncement.id)
-                  ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400',
-              ]"
-              @click="handleLike"
-            >
-              <Icon
-                :name="
-                  isLiked(currentAnnouncement.id) ? 'heroicons:heart-solid' : 'heroicons:heart'
-                "
-                class="w-4 h-4"
-              />
-              <span class="sr-only">{{ isLiked(currentAnnouncement.id) ? 'Unlike' : 'Like' }}</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Pagination controls -->
-        <div
-          v-if="newAnnouncements.length > 1"
-          class="flex items-center justify-between px-4 py-4 border-t border-gray-200 dark:border-gray-600"
-        >
-          <button
-            type="button"
-            :disabled="currentPage === 0"
-            :class="[
-              'flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors',
-              currentPage === 0
-                ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
-            ]"
-            @click="previousAnnouncement"
-          >
-            <Icon
-              name="heroicons:chevron-left"
-              class="w-4 h-4"
-            />
-            Previous
-          </button>
-
-          <!-- Page indicators -->
-          <div class="flex gap-2">
-            <button
-              v-for="(announcement, index) in newAnnouncements"
-              :key="announcement.id"
-              type="button"
-              :class="[
-                'w-2 h-2 rounded-full transition-colors',
-                index === currentPage
-                  ? 'bg-primary'
-                  : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500',
-              ]"
-              @click="currentPage = index"
-            />
-          </div>
-
-          <button
-            type="button"
-            :disabled="currentPage === newAnnouncements.length - 1"
-            :class="[
-              'flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors',
-              currentPage === newAnnouncements.length - 1
-                ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
-            ]"
-            @click="nextAnnouncement"
-          >
-            Next
-            <Icon
-              name="heroicons:chevron-right"
-              class="w-4 h-4"
-            />
-          </button>
-        </div>
       </div>
     </template>
 
-    <template #actions>
-      <div class="flex flex-col gap-3 px-8 mb-4 sm:flex-row">
+    <template #actions="{ scrollToTop }">
+      <!-- Impression tracking -->
+      <div
+        v-if="currentAnnouncement"
+        class="flex items-center justify-between px-8 py-4"
+      >
+        <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+          <span class="flex items-center gap-1">
+            <Icon
+              name="heroicons:eye"
+              class="w-4 h-4"
+            />
+            {{ impressions[currentAnnouncement.id]?.views || 0 }}
+            <span class="sr-only">{{ $t('announcements.metrics.views') }}</span>
+          </span>
+          <button
+            type="button"
+            :class="[
+              'flex items-center gap-2 px-2 py-1 text-sm rounded-md transition-colors',
+              'focus:outline-none focus-visible:outline-none',
+              'focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-2',
+              isLiked(currentAnnouncement.id)
+                ? 'text-primary hover:text-primary/80'
+                : 'text-text-secondary hover:text-primary/80',
+            ]"
+            @click="handleLike"
+          >
+            <Icon
+              :name="isLiked(currentAnnouncement.id) ? 'heroicons:heart-solid' : 'heroicons:heart'"
+              class="w-4 h-4"
+            />
+            <span class="sr-only">{{
+              isLiked(currentAnnouncement.id)
+                ? $t('common.actions.unlike')
+                : $t('common.actions.like')
+            }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pagination controls -->
+      <div
+        v-if="newAnnouncements.length > 1"
+        class="flex items-center justify-between px-4 py-4 border-t border-border"
+      >
+        <button
+          type="button"
+          :disabled="currentPage === 0"
+          :class="[
+            'flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors',
+            currentPage === 0
+              ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              : 'text-text focus-visible:ring-1 focus-visible:ring-primary',
+          ]"
+          @click="
+            () => {
+              previousAnnouncement()
+              scrollToTop()
+            }
+          "
+        >
+          <Icon
+            name="heroicons:chevron-left"
+            class="w-4 h-4"
+          />
+          {{ $t('common.actions.previous') }}
+        </button>
+
+        <!-- Page indicators -->
+        <div class="flex gap-2">
+          <button
+            v-for="(announcement, index) in newAnnouncements"
+            :key="announcement.id"
+            type="button"
+            :class="[
+              'w-2 h-2 rounded-full transition-colors',
+              index === currentPage ? 'bg-primary' : 'border border-border',
+            ]"
+            @click="currentPage = index"
+          />
+        </div>
+
+        <button
+          type="button"
+          :disabled="currentPage === newAnnouncements.length - 1"
+          :class="[
+            'flex items-center gap-2 px-3 py-1.5 text-sm rounded-sm transition-colors',
+            currentPage === newAnnouncements.length - 1
+              ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              : 'text-text focus-visible:ring-1 focus-visible:ring-primary',
+          ]"
+          @click="
+            () => {
+              nextAnnouncement()
+              scrollToTop()
+            }
+          "
+        >
+          {{ $t('common.actions.next') }}
+          <Icon
+            name="heroicons:chevron-right"
+            class="w-4 h-4"
+          />
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3 px-8 mb-4">
         <button
           type="button"
           class="w-full pri-btn"
           @click="handleDismiss"
         >
-          Got it!
+          {{ $t('announcements.dismiss') }}
         </button>
         <button
           type="button"
-          class="w-full sec-btn sm:order-first"
+          class="w-full text-sm underline appearance-none"
           @click="handleDontShowAgain"
         >
-          Don't show again
+          {{ $t('announcements.dontShowAgain') }}
         </button>
       </div>
     </template>
@@ -209,6 +219,8 @@
 
 <script setup lang="ts">
 import { useAnnouncements } from '~/composables/useAnnouncements'
+
+const { isMobile } = useDevice()
 
 // Use the announcements composable directly
 const {

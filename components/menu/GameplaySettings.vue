@@ -13,9 +13,9 @@
           :model-value="config.maxRounds"
           :update-callback="(option) => (config.maxRounds = option as GameLengthOptions)"
           :value-options="config.OPTIONS.GAME_LENGTH"
-          :label-template="(option) => `${option} rounds`"
+          :label-template="(option) => `${option} ${t('common.labels.rounds')}`"
         >
-          <template #group-label> Game Length </template>
+          <template #group-label> {{ $t('settings.gameplay.gameLength') }} </template>
         </OptionsRadioGroup>
 
         <!-- Set allowance of TSUKIMI-/HANAMI-ZAKE -->
@@ -30,7 +30,7 @@
               title="Tsukimi-/Hanami-zake"
               class="underline decoration-dotted underline-offset-4 cursor-help"
             >
-              Moon/Flower Viewing
+              {{ $t('settings.gameplay.moonFlowerViewing') }}
             </a>
             <a
               href="https://fudawiki.org/en/hanafuda/games/koi-koi#taming-the-sake-cup"
@@ -40,14 +40,14 @@
               <QuestionMarkCircleIcon
                 class="inline w-5 h-5 mb-1 cursor-pointer text-text-secondary hover:text-primary"
               />
-              <span class="sr-only">Read about this rule on fudawiki.org</span>
+              <span class="sr-only">{{ $t('settings.gameplay.readAboutThisRule') }}</span>
             </a>
           </template>
         </OptionsRadioGroup>
 
         <div class="space-y-4">
           <div class="flex">
-            <p class="text-base font-semibold leading-6 text-text">Other Variations</p>
+            <p class="text-base font-semibold leading-6 text-text">{{ $t('settings.gameplay.otherVariations') }}</p>
             <a
               href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
               title="Read about scoring on fudawiki.org"
@@ -65,15 +65,9 @@
               :callback="toggleSake"
               :init-value="config.sakeIsWildCard"
             >
-              <template #label>Wild Card Sake Cup</template>
+              <template #label>{{ $t('settings.gameplay.wildCardSakeCup') }}</template>
               <template #description
-                >The
-                <a
-                  title="Kiku ni sakazuki"
-                  class="underline cursor-help underline-offset-4 decoration-dotted"
-                  >sake cup</a
-                >
-                counts as both animal and plain types.</template
+                >{{ $t('settings.gameplay.wildCardSakeCupDescription') }}</template
               >
             </ToggleSwitch>
 
@@ -82,9 +76,9 @@
               :callback="toggleDouble"
               :init-value="config.doubleScoreOverSeven"
             >
-              <template #label>Double Over Seven</template>
+              <template #label>{{ $t('settings.gameplay.doubleOverSeven') }}</template>
               <template #description
-                >Double the score if the combined yaku value is 7 points or greater.</template
+                >{{ $t('settings.gameplay.doubleOverSevenDescription') }}</template
               >
             </ToggleSwitch>
           </div>
@@ -98,16 +92,16 @@
       >
         <p class="my-4 text-text-secondary">
           <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
-          Some settings are locked while a game is in progress.
+          {{ $t('settings.notices.settingsLocked') }}
         </p>
         <ul class="grid w-full mx-auto gap-y-4">
           <li class="flex justify-between leading-6 text-text">
-            <span class="font-semibold"> Game Length </span>
-            <span class="capitalize text-primary"> {{ config.maxRounds }} rounds </span>
+            <span class="font-semibold"> {{ $t('settings.gameplay.gameLength') }} </span>
+            <span class="capitalize text-primary"> {{ config.maxRounds }} {{ $t('common.labels.rounds') }} </span>
           </li>
           <li class="flex justify-between leading-6 text-text">
             <div>
-              <span class="font-semibold"> Moon/Flower Viewings </span>
+              <span class="font-semibold"> {{ $t('settings.gameplay.moonFlowerViewing') }} </span>
               <span class="block w-3/4 pl-2 text-sm text-text-secondary">
                 {{ getOptionDescription(config.allowViewingsYaku) }}
               </span>
@@ -118,37 +112,37 @@
           </li>
           <li class="flex justify-between leading-6 text-text">
             <div>
-              <span class="font-semibold"> Wild Card Sake Cup </span>
+              <span class="font-semibold"> {{ $t('settings.gameplay.wildCardSakeCup') }} </span>
               <span class="block w-3/4 pl-2 text-sm text-text-secondary">
-                The sake cup counts as both animal and plain types.
+                {{ $t('settings.gameplay.wildCardSakeCupDescription') }}
               </span>
             </div>
             <span class="self-center capitalize text-primary">
-              {{ config.sakeIsWildCard ? 'Enabled' : 'Disabled' }}
+              {{ config.sakeIsWildCard ? $t('common.states.enabled') : $t('common.states.disabled') }}
             </span>
           </li>
           <li class="flex justify-between leading-6 text-text">
             <div>
-              <span class="font-semibold"> Double Over Seven </span>
+              <span class="font-semibold"> {{ $t('settings.gameplay.doubleOverSeven') }} </span>
               <span class="block w-3/4 pl-2 text-sm text-text-secondary">
-                Double the score if the combined yaku value is 7 points or greater.
+                {{ $t('settings.gameplay.doubleOverSevenDescription') }}
               </span>
             </div>
             <span class="self-center capitalize text-primary">
-              {{ config.doubleScoreOverSeven ? 'Enabled' : 'Disabled' }}
+              {{ config.doubleScoreOverSeven ? $t('common.states.enabled') : $t('common.states.disabled') }}
             </span>
           </li>
         </ul>
       </div>
 
       <div :class="['space-y-4 pb-4 pt-8']">
-        <p class="text-base font-semibold leading-6 text-text">Interface</p>
+        <p class="text-base font-semibold leading-6 text-text">{{ $t('settings.interface.title') }}</p>
         <ToggleSwitch
           :callback="toggleLabels"
           :init-value="config.cardLabels"
         >
-          <template #label>Card Labels</template>
-          <template #description>Include card corner labels to assist with matching.</template>
+          <template #label>{{ $t('settings.interface.cardLabels') }}</template>
+          <template #description>{{ $t('settings.interface.cardLabelsDescription') }}</template>
         </ToggleSwitch>
 
         <OptionsRadioGroup
@@ -157,8 +151,8 @@
           :value-options="config.OPTIONS.CARD_SIZE"
           :label-template="(option) => getCardSizeLabel(option as CardSizeOptions)"
         >
-          <template #group-label>Card Size</template>
-          <template #group-description>Select the size that best suits your screen.</template>
+          <template #group-label>{{ $t('settings.interface.cardSize') }}</template>
+          <template #group-description>{{ $t('settings.interface.cardSizeDescription') }}</template>
         </OptionsRadioGroup>
       </div>
     </ClientOnly>
@@ -176,6 +170,7 @@ import {
   type ViewingsOptions,
 } from '~/stores/configStore'
 
+const { t } = useI18n()
 const config = useConfigStore()
 const settingsPanel: Ref<HTMLElement | null> = ref(null)
 const settingsUpdated = ref(false)
@@ -194,16 +189,15 @@ const toggleLabels = (enabled: boolean) => {
 }
 
 const getCardSizeLabel = (size: CardSizeOptions) => {
-  // TODO: Create an enum
   switch (size) {
     case 0.8:
-      return 'Small'
+      return t('settings.interface.sizes.small')
     case 1.0:
-      return 'Normal'
+      return t('settings.interface.sizes.normal')
     case 1.2:
-      return 'Large'
+      return t('settings.interface.sizes.large')
     default:
-      return 'Normal'
+      return t('settings.interface.sizes.normal')
   }
 }
 

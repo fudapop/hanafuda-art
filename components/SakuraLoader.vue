@@ -22,13 +22,6 @@
           alt="cherry blossom"
         />
       </div>
-      <!-- <div class="absolute inset-x-0 top-0 text-center text-gray-500">
-                Loading...
-            </div> -->
     </div>
   </div>
 </template>
-
-<script setup lang="ts"></script>
-
-<style scoped></style>

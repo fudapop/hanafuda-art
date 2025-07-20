@@ -1,8 +1,10 @@
 <template>
   <Modal :open="open">
-    <template #title> Leaving the game... </template>
+    <template #title> {{ $t('game.warnings.leavingGame') }} </template>
     <template #image>
-      <div class="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 rounded-full">
+      <div
+        class="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 border rounded-full border-border"
+      >
         <ExclamationTriangleIcon
           class="w-6 h-6 text-yellow-600"
           aria-hidden="true"
@@ -10,8 +12,8 @@
       </div>
     </template>
     <template #description>
-      <p class="text-sm text-gray-500 dark:text-gray-300">
-        The game will be forfeited and progress will not be saved. Are you sure you want to leave?
+      <p class="text-text">
+        {{ $t('game.warnings.gameWillBeForfeited') }}
       </p>
     </template>
     <template #actions>
@@ -21,14 +23,14 @@
           class="sec-btn"
           @click="$emit('confirm')"
         >
-          Yes, leave the game
+          {{ $t('game.warnings.yesLeaveGame') }}
         </button>
         <button
           type="button"
           class="pri-btn"
           @click="$emit('cancel')"
         >
-          No, keep playing
+          {{ $t('game.warnings.noKeepPlaying') }}
         </button>
       </div>
     </template>

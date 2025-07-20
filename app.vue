@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <NuxtLayout>
     <div class="absolute inset-x-0 z-50 mx-auto pointer-events-none top-1/3 w-max">
       <Transition
         appear
@@ -15,7 +15,7 @@
     </div>
     <SystemOptionsPopover />
     <NuxtPage />
-  </div>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -62,14 +62,6 @@ onMounted(() => {
 
   // Setup autoplay after user interaction
   audio.setupAutoplay()
-
-  // Initialize design selector
-  useHead(
-    {
-      link: [{ rel: 'preconnect', href: 'https://firebasestorage.googleapis.com' }],
-    },
-    { tagPriority: 'high' },
-  )
 
   // Initialize card caching service worker
   registerCardCache()

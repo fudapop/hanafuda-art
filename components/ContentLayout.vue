@@ -10,12 +10,12 @@
         'bg-black/20 hover:bg-black/30 hover:scale-105',
       ]"
     >
-      <NuxtLink to="/">
+      <NuxtLink :to="localeRoute('/')">
         <Icon
           name="mdi:arrow-left"
           class="w-5 h-5 text-white transition-transform duration-300"
         />
-        <span class="sr-only">Back to title screen</span>
+        <span class="sr-only">{{ $t('navigation.backToTitleScreen') }}</span>
       </NuxtLink>
     </button>
     <slot />
@@ -24,5 +24,6 @@
 
 <script setup lang="ts">
 const route = useRoute()
-const isSignIn = computed(() => route.path === '/sign-in')
+const localeRoute = useLocaleRoute()
+const isSignIn = computed(() => route.path.includes('/sign-in'))
 </script>

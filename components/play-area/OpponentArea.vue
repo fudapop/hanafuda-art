@@ -39,6 +39,13 @@
                 v-if="selectedCard && players.p2.isActive && checkCurrentPhase('select')"
                 class="relative z-50 overflow-hidden card"
               >
+                <!-- Accessibility announcement for opponent's selected card -->
+                <div
+                  aria-live="polite"
+                  class="sr-only"
+                >
+                  {{ $t('collection.opponentCollection') + ': ' + selectedCard.name }}
+                </div>
                 <CardImage
                   class="drop-shadow-md"
                   :src="getCardUrl(selectedCard)!"

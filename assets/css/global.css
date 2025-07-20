@@ -143,7 +143,7 @@
   }
 
   .action-button {
-    @apply px-6 py-2 block mx-auto mt-2 text-xl text-text font-bold bg-background ring-2 ring-border shadow-md hover:ring-primary transition-all duration-200 rounded-sm w-[150px];
+    @apply px-6 py-2 block mx-auto mt-2 text-xl text-text font-bold bg-background ring-2 ring-border shadow-md hover:ring-primary transition-all duration-200 rounded-sm min-w-[150px];
   }
 
   [disabled]:is(.pri-btn, .sec-btn, .action-button) {

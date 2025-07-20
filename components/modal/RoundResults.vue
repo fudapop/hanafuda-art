@@ -22,19 +22,23 @@
         </div>
         <span v-if="recordedWinner">
           <span v-if="decisionIsPending">
-            <span v-if="recordedWinner === 'p1'"> Make your call... </span>
-            <span v-else> Your opponent is deciding... </span>
+            <span v-if="recordedWinner === 'p1'">
+              {{ $t('game.actions.makeYourCall') }}
+            </span>
+            <span v-else>
+              {{ $t('game.actions.opponentDeciding') }}
+            </span>
           </span>
           <span v-if="!decisionIsPending">
-            {{ recordedWinner === 'p1' ? 'You' : 'Your opponent' }}
+            {{ ps.getPlayerName(recordedWinner) }}
           </span>
           <span v-if="teshiOrKuttsuki">
-            got dealt a
+            {{ $t('game.results.gotDealtA') }}
             <a
               title="Four-of-a-Kind / Four-Pairs"
               class="underline decoration-dotted underline-offset-4 cursor-help"
             >
-              Lucky Hand </a
+              {{ $t('game.results.luckyHand') }} </a
             >!
             <a
               href="https://fudawiki.org/en/hanafuda/games/koi-koi#checking-for-lucky-hands"
@@ -47,9 +51,13 @@
               <span class="sr-only">Read about this rule on fudawiki.org</span>
             </a>
           </span>
-          <span v-else-if="stopIsCalled"> called stop. </span>
+          <span v-else-if="stopIsCalled">
+            {{ ` ${$t('game.actions.calledStop')}` }}
+          </span>
         </span>
-        <span v-else>The round is a draw.</span>
+        <span v-else>
+          {{ $t('game.results.theRoundIsADraw') }}
+        </span>
       </HeadlessDialogTitle>
 
       <!-- BUTTONS -->
@@ -61,17 +69,17 @@
           class="flex justify-end flex-shrink-0 gap-2 ml-4"
         >
           <button
-            class="text-base lg:text-xl sec-btn"
+            class="text-base uppercase lg:text-xl sec-btn"
             @click="callStop"
           >
-            STOP
+            {{ $t('game.actions.stop') }}
           </button>
           <button
             v-show="handNotEmpty(activePlayer.id)"
-            class="text-base lg:text-xl pri-btn"
+            class="pri-btn"
             @click="callKoikoi"
           >
-            KOI-KOI
+            {{ $t('game.actions.koikoi') }}
           </button>
         </div>
       </div>
@@ -80,18 +88,18 @@
         class="flex justify-end flex-shrink-0 gap-2 my-auto ml-4"
       >
         <button
-          class="text-base lg:text-xl pri-btn"
+          class="pri-btn"
           @click="() => $emit('next')"
         >
-          NEXT
+          {{ $t('common.actions.next') }}
         </button>
       </div>
     </div>
   </div>
   <!-- END HEADER -->
-  <h4 class="my-4 text-base text-text-secondary dark:text-text-secondary lg:text-xl">
+  <h4 class="my-4 text-text-secondary dark:text-text-secondary">
     Total:
-    <span class="text-base font-semibold lg:text-xl sm:text-lg text-text"
+    <span class="text-base font-semibold sm:text-lg text-text"
       >{{ lastRoundResult.score }} points</span
     >
     <span
@@ -99,7 +107,7 @@
       class="max-sm:block sm:ml-8"
     >
       Koi-Koi Bonus:
-      <span class="text-base font-semibold lg:text-xl text-text">x{{ bonusMultiplier }}</span>
+      <span class="text-lg font-semibold text-text">x{{ bonusMultiplier }}</span>
     </span>
   </h4>
   <YakuGrid
@@ -126,7 +134,8 @@ const { decisionIsPending, callKoikoi, callStop, stopIsCalled } = useDecisionHan
 
 const { handNotEmpty } = storeToRefs(useCardStore())
 
-const { activePlayer, bonusMultiplier, players } = storeToRefs(usePlayerStore())
+const ps = usePlayerStore()
+const { activePlayer, bonusMultiplier, players } = storeToRefs(ps)
 
 const lastRoundResult = computed(() => useGameDataStore().getCurrent.result)
 

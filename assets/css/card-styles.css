@@ -191,6 +191,7 @@
 
 .otwarte-karty {
   --card-aspect: 16/25;
+  --card-border-color: transparent;
 
   & .down {
     --card-bg-color: url('/cards/otwarte-karty/card-back.png');

@@ -1,7 +1,7 @@
 <template>
   <Modal :open="open">
     <template #title
-      ><span class="[text-wrap:balance] text-xl"> Reset your password? </span></template
+      ><span class="[text-wrap:balance] text-xl"> {{ $t('auth.passwordReset.title') }} </span></template
     >
     <template #actions>
       <Transition
@@ -15,7 +15,7 @@
       >
         <div class="h-[250px] xs:h-40 my-8">
           <p class="my-5 text-base text-center text-text-secondary text-balance">
-            A link to change your password will be sent if an associated account exists.
+            {{ $t('auth.passwordReset.description') }}
           </p>
           <form @submit.prevent="handlePressSend">
             <input
@@ -31,14 +31,14 @@
                 class="w-full action-button"
                 @click="$emit('cancel')"
               >
-                Cancel
+                {{ $t('common.actions.cancel') }}
               </button>
               <button
                 type="submit"
                 class="w-full action-button bg-border"
                 :disabled="!email"
               >
-                Send
+                {{ $t('common.actions.send') }}
               </button>
             </div>
           </form>

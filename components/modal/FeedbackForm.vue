@@ -5,7 +5,7 @@
         class="inline-flex w-6 h-6 mr-2 text-primary"
         aria-hidden="true"
       />
-      <h1 class="text-2xl font-bold">Thank you for playing!</h1>
+      <h1 class="text-2xl font-bold text-balance">{{ $t('feedback.thankYouForPlaying') }}</h1>
     </template>
     <template
       v-if="submitted"
@@ -24,13 +24,13 @@
       v-if="submitted"
       #description
     >
-      <p class="text-center text-text">Your feedback has been submitted. Thank you!</p>
+      <p class="text-center text-text">{{ $t('feedback.feedbackSubmitted') }}</p>
     </template>
     <template
       v-else
       #description
     >
-      <p class="text-center text-text">How was your experience?</p>
+      <p class="text-center text-text">{{ $t('feedback.howWasExperience') }}</p>
     </template>
     <template #actions>
       <form
@@ -39,10 +39,10 @@
         class="text-text"
       >
         <fieldset
-          class="px-4 pt-4 pb-8 mt-4 border-t border-b rounded-sm border-t-border border-b-border sm:pb-2"
+          class="pt-4 pb-8 mt-4 border-t border-b rounded-sm border-t-border border-b-border sm:pb-2"
         >
           <div class="grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
-            <p>Animation Smoothness</p>
+            <p>{{ $t('feedback.categories.animationSmoothness') }}</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
               ratingId="animation"
@@ -50,7 +50,7 @@
             />
           </div>
           <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
-            <p>Ease of Controls</p>
+            <p>{{ $t('feedback.categories.easeOfControls') }}</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
               ratingId="controls"
@@ -58,7 +58,7 @@
             />
           </div>
           <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
-            <p>Image Quality</p>
+            <p>{{ $t('feedback.categories.imageQuality') }}</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
               ratingId="image"
@@ -66,7 +66,7 @@
             />
           </div>
           <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
-            <p>Sound Quality</p>
+            <p>{{ $t('feedback.categories.soundQuality') }}</p>
             <StarRating
               class="max-sm:mt-4 max-sm:-translate-x-2"
               ratingId="audio"
@@ -75,24 +75,24 @@
           </div>
         </fieldset>
         <fieldset class="grid mt-5 gap-y-1">
-          <label for="comment-box">Comments</label>
+          <label for="comment-box">{{ $t('feedback.comments.title') }}</label>
           <OptionsRadioGroup
             :model-value="comments.tag"
             :value-options="tags"
-            :update-callback="(option) => (comments.tag = option as CommentTag)"
-            :label-template="(option) => includeTagEmoji(option as CommentTag)"
+            :update-callback="(option: CommentTag) => (comments.tag = option)"
+            :label-template="(option: CommentTag) => $t(`feedback.comments.types.${option}`)"
             class-name="mt-2 mb-4 grid grid-cols-3 gap-y-1 gap-x-1 text-xs"
           >
-            <span class="sr-only">Comment Type</span>
+            <span class="sr-only">{{ $t('feedback.comments.type') }}</span>
           </OptionsRadioGroup>
-          <p>{{ commentBoxDescription }}</p>
+          <p>{{ $t(`feedback.comments.descriptions.${comments.tag}`) }}</p>
           <textarea
             id="comment-box"
             rows="3"
             v-model="comments.message"
             class="w-full p-2 border rounded-sm text-text bg-background border-border placeholder:text-text-secondary placeholder:opacity-50"
             :disabled="submitted"
-            placeholder="Enter your comment here..."
+            :placeholder="$t('feedback.comments.placeholder')"
           />
         </fieldset>
         <div class="flex float-right mt-4 w-max gap-x-4">
@@ -101,7 +101,7 @@
             class="sec-btn"
             @click="() => $emit('close')"
           >
-            Close
+            {{ $t('common.actions.close') }}
           </button>
           <button
             type="submit"
@@ -110,7 +110,7 @@
             :disabled="incomplete"
             :aria-disabled="incomplete"
           >
-            Submit
+            {{ $t('common.actions.submit') }}
           </button>
         </div>
       </form>
@@ -123,7 +123,7 @@
           class="pri-btn"
           @click="() => $emit('close')"
         >
-          Close
+          {{ $t('common.actions.close') }}
         </button>
       </div>
     </template>
@@ -139,24 +139,6 @@ const { open } = defineProps<{ open: boolean }>()
 
 const tags = ['idea', 'error', 'other'] as const
 type CommentTag = (typeof tags)[number]
-
-const includeTagEmoji = (option: CommentTag) => {
-  let emoji = ''
-  switch (option) {
-    case 'idea':
-      emoji = '💡'
-      break
-
-    case 'error':
-      emoji = '🪲'
-      break
-
-    case 'other':
-    default:
-      emoji = '💬'
-  }
-  return `${emoji} ${option}`
-}
 
 interface Feedback {
   animation: number

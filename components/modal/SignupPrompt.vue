@@ -1,7 +1,7 @@
 <template>
   <Modal :open="open">
     <template #title
-      ><span class="[text-wrap:balance]"> You've got coins! How about 500 more? </span></template
+      ><span class="[text-wrap:balance]"> {{ $t('signup.prompt.title') }} </span></template
     >
     <template #image>
       <img
@@ -22,27 +22,26 @@
       >
         <div class="h-[250px] xs:h-40 mt-5">
           <p class="text-sm text-center text-gray-600 dark:text-gray-300">
-            Your coins can be used to unlock new card designs and avatars. However, guest profiles
-            cannot be saved.
+            {{ $t('signup.prompt.description') }}
           </p>
           <p class="mt-5 text-sm text-center text-gray-600 dark:text-gray-300">
-            Sign in to save your profile and receive an extra 500 coins?
+            {{ $t('signup.prompt.question') }}
           </p>
           <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-2">
             <button
               type="button"
               class="sec-btn"
               @click="$emit('cancel')"
-            >
-              No thanks, delete me
-            </button>
+                          >
+                {{ $t('signup.actions.noThanksDeleteMe') }}
+              </button>
             <button
               type="button"
               class="pri-btn"
               @click="gotoSignIn"
-            >
-              Yes, gimme coins!
-            </button>
+                          >
+                {{ $t('signup.actions.yesGimmeCoins') }}
+              </button>
           </div>
         </div>
       </Transition>

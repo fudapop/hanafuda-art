@@ -9,7 +9,7 @@
         <label
           for="email"
           class="block text-sm font-medium leading-6 text-text"
-          >Email address</label
+          >{{ $t('auth.fields.emailAddress') }}</label
         >
         <div class="mt-1">
           <input
@@ -29,7 +29,7 @@
         <label
           for="password"
           class="block text-sm font-medium leading-6 text-text"
-          >Password</label
+          >{{ $t('auth.fields.password') }}</label
         >
         <div class="mt-1">
           <input
@@ -54,7 +54,7 @@
           class="space-y-4 text-xs text-text-secondary min-h-40"
         >
           <div class="space-y-2">
-            <p>Password must contain at least:</p>
+            <p>{{ $t('auth.passwordRequirements.title') }}</p>
             <ul class="grid grid-cols-2 list-none list-inside">
               <li
                 v-for="requirement in requirements"
@@ -84,7 +84,7 @@
               'opacity-50 cursor-not-allowed': !isValidPassword.value || !values.email,
             }"
           >
-            Sign Up
+            {{ $t('common.actions.signUp') }}
           </button>
 
           <a
@@ -93,7 +93,7 @@
             class="block w-full mt-2 text-sm text-center text-text-secondary hover:underline hover:text-primary"
             @click="newAccount = false"
           >
-            I already have an account &rarr;
+            {{ $t('auth.links.iAlreadyHaveAccount') }}
           </a>
         </section>
 
@@ -115,7 +115,7 @@
               <label
                 for="remember-me"
                 class="block ml-3 text-sm leading-6 cursor-pointer text-text"
-                >Remember me</label
+                >{{ $t('auth.options.rememberMe') }}</label
               >
             </div>
 
@@ -124,7 +124,7 @@
                 href="#"
                 class="text-text-secondary hover:underline hover:text-primary"
                 @click="handleForgotPassword"
-                >Forgot password?</a
+                >{{ $t('auth.options.forgotPassword') }}</a
               >
             </div>
           </div>
@@ -133,7 +133,7 @@
               type="submit"
               class="w-full text-gray-900 dark:text-white action-button bg-border"
             >
-              Sign In
+              {{ $t('common.actions.signIn') }}
             </button>
 
             <a
@@ -141,7 +141,7 @@
               class="block w-full mt-2 text-sm text-center text-text-secondary hover:underline hover:text-primary"
               @click="newAccount = true"
             >
-              I don&apos;t have an account
+              {{ $t('auth.links.iDontHaveAccount') }}
             </a>
           </div>
         </section>
@@ -201,12 +201,14 @@ const hasLower = computed(() => /[a-z]/.test(values.password))
 const hasSpecial = computed(() => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(values.password))
 const hasSufficientLength = computed(() => values.password.length >= 6)
 
+const { t } = useI18n()
+
 const requirements = computed(() => [
-  { valid: hasSufficientLength.value, text: '6 characters' },
-  { valid: hasNumber.value, text: '1 number' },
-  { valid: hasUpper.value, text: '1 uppercase letter' },
-  { valid: hasLower.value, text: '1 lowercase letter' },
-  { valid: hasSpecial.value, text: '1 special character' },
+  { valid: hasSufficientLength.value, text: t('auth.passwordRequirements.sixCharacters') },
+  { valid: hasNumber.value, text: t('auth.passwordRequirements.oneNumber') },
+  { valid: hasUpper.value, text: t('auth.passwordRequirements.oneUppercase') },
+  { valid: hasLower.value, text: t('auth.passwordRequirements.oneLowercase') },
+  { valid: hasSpecial.value, text: t('auth.passwordRequirements.oneSpecialCharacter') },
 ])
 
 const isValidPassword = computed(() => {

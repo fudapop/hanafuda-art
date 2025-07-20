@@ -11,7 +11,7 @@
           />
           <img
             v-else
-            :src="avatar2"
+            :src="p2Avatar"
             class="w-12 h-12 mx-auto transition-all border-2 rounded-full lg:w-24 lg:h-24 border-border"
           />
         </div>
@@ -20,7 +20,7 @@
             v-if="isPlayer1"
             class="text-sm font-normal lg:text-2xl lg:mb-2 text-white/80"
           >
-            Round {{ ds.roundCounter }} / {{ config.maxRounds }}
+            {{ $t('common.labels.round') }} {{ ds.roundCounter }} / {{ config.maxRounds }}
           </p>
           <div
             :class="[
@@ -30,7 +30,7 @@
           >
           <p class="flex items-center font-bold gap-x-2">
               <p>
-            </p>
+                {{ user?.username || `${$t('common.labels.player')} ${playerNum}` }}
               </p>
               <span
                 class="flex items-center"
@@ -85,17 +85,6 @@ const score = computed(() => ds.scoreboard[player])
 const isPlayer1 = computed(() => playerNum === 1)
 
 const { p1Avatar, p2Avatar } = useAvatar()
-const avatar2 = computed(() => p2Avatar.value)
-
-watch(
-  () => user?.avatar,
-  (avatarUrl) => {
-    if (avatarUrl) {
-      p1Avatar.value = avatarUrl
-    }
-  },
-  { immediate: true },
-)
 
 const getResult = () => {
   const result =
@@ -107,16 +96,25 @@ const getResult = () => {
   if (result === 'win') ps.reset(player)
   return result
 }
-if (user) {
-  watch(gameOver, async () => {
-    if (!gameOver.value) return
-    const result = getResult()
-    const currentUser = toValue(useProfile().current)
-    if (currentUser) {
-      currentUser.record[result]++
-      currentUser.record.coins += ds.scoreboard.p1
+
+watch(
+  () => user,
+  () => {
+    ps.setPlayerName(player, user?.username || `${$t('common.labels.player')} ${playerNum}`)
+    if (user?.avatar) {
+      p1Avatar.value = user.avatar
     }
-    ds.generateGameId()
-  })
-}
+  },
+  { immediate: true },
+)
+watch(gameOver, async () => {
+  if (!gameOver.value) return
+  const result = getResult()
+  const currentUser = toValue(useProfile().current)
+  if (currentUser) {
+    currentUser.record[result]++
+    currentUser.record.coins += ds.scoreboard.p1
+  }
+  ds.generateGameId()
+})
 </script>

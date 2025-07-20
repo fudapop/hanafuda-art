@@ -54,9 +54,9 @@
       <img
         src="/images/logo-title.webp"
         :class="['w-[120px] mb-2', isMobile ? 'landscape:w-[30dvh]' : 'sm:w-[180px]']"
-        alt="Hanafuda Koi-Koi"
+        :alt="$t('game.title')"
       />
-      <h1 class="sr-only">Hanafuda Koi-Koi</h1>
+      <h1 class="sr-only">{{ $t('game.title') }}</h1>
       <div class="flex flex-col items-center gap-4">
         <button
           :class="[
@@ -69,7 +69,7 @@
             src="/images/button-play-now.webp"
             class="w-full h-full cover"
           />
-          <span class="sr-only"> PLAY NOW </span>
+          <span class="sr-only"> {{ $t('common.actions.playNow') }} </span>
         </button>
 
         <!-- Options Button - Only show when logged in -->
@@ -78,7 +78,7 @@
           class="mt-2 ring-inset action-button"
           @click="() => openOptions()"
         >
-          OPTIONS
+          {{ $t('common.actions.options') }}
         </button>
 
         <!-- Authentication buttons -->
@@ -88,7 +88,7 @@
             class="action-button"
             @click="goToLogin"
           >
-            SIGN UP
+            {{ $t('common.actions.signUp') }}
           </button>
         </div>
         <span
@@ -97,7 +97,7 @@
           @click="handleSignin"
           class="block text-sm text-center transition-colors duration-200 cursor-pointer text-text-secondary hover:underline hover:text-primary"
         >
-          Sign in to an existing account &rarr;
+          {{ $t('navigation.signInToExistingAccount') }}
         </span>
       </div>
     </div>
@@ -111,31 +111,26 @@
 
 <script setup lang="ts">
 const emit = defineEmits(['start-game'])
-const testPlay = useState('test', () => false)
-const gameStart = useState('gameStart')
 const { userIsGuest, logout } = useAuth()
 const { isMobile } = useDevice()
 const { openOptions } = useOptionsPanel()
 
-const testGame = () => {
-  testPlay.value = true
-  emit('start-game')
-}
+const localeRoute = useLocaleRoute()
 
 const goToLogin = () => {
-  navigateTo({ path: '/sign-in', query: { signup: 'true' } })
+  const route = localeRoute({ name: 'sign-in', query: { signup: 'true' } })
+  if (route) {
+    navigateTo(route.fullPath)
+  }
 }
 
 const handleSignin = () => {
   logout()
-  navigateTo({ path: '/sign-in', query: { exit: 'true' } })
-}
-
-watch(gameStart, () => {
-  if (!gameStart.value) {
-    testPlay.value = false
+  const route = localeRoute({ name: 'sign-in', query: { exit: 'true' } })
+  if (route) {
+    navigateTo(route.fullPath)
   }
-})
+}
 </script>
 
 <style scoped>

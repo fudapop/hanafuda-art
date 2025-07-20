@@ -6,9 +6,9 @@
   >
     <div class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-sm bg-surface">
       <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-text">
-        Select a design
+        {{ $t('deck.selectADeck') }}
         <p class="ml-2 text-sm font-medium text-text-secondary whitespace-nowrap">
-          {{ `Current: ${getDesignInfo().title}` }}
+          {{ $t('common.states.current') }}: {{ getDesignInfo().title }}
         </p>
       </HeadlessRadioGroupLabel>
       <div
@@ -98,10 +98,10 @@
               <!-- SELECTION INDICATOR -->
               <span
                 v-if="checked"
-                aria-label="Selected"
+                aria-label="{{ $t('common.states.selected') }}"
                 class="w-6 h-6"
               >
-                <span class="sr-only">Selected</span>
+                <span class="sr-only">{{ $t('common.states.selected') }}</span>
                 <CheckCircleIcon
                   aria-hidden
                   class="w-full h-full text-primary"
@@ -110,20 +110,24 @@
               <!-- LIKE BUTTON -->
               <button
                 type="button"
-                aria-label="Like this design"
+                aria-label="{{ $t('common.actions.like') }}"
                 @click="() => handleLike(design)"
-                class="pointer-events-auto focus-visible:ring-1 focus-visible:ring-primary"
+                :class="[
+                  'flex items-center gap-2 px-2 text-sm rounded-md transition-colors pointer-events-auto',
+                  'focus:outline-none focus-visible:outline-none',
+                  'focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-2',
+                  isLiked(design)
+                    ? 'text-primary hover:text-primary/80'
+                    : 'text-text-secondary hover:text-primary/80',
+                ]"
               >
                 <!-- <span
             class="absolute pt-1 m-auto text-sm opacity-50 text-text -left-3"
             >{{ likesCount.get(design) }}</span
             > -->
-                <HeartIcon
-                  aria-hidden
-                  :class="[
-                    'ml-2 w-6 h-6 stroke-text-secondary stroke-1',
-                    isLiked(design) ? 'fill-primary stroke-0' : '',
-                  ]"
+                <Icon
+                  :name="isLiked(design) ? 'heroicons:heart-solid' : 'heroicons:heart'"
+                  class="w-6 h-6"
                 />
               </button>
             </div>
@@ -164,31 +168,34 @@
       </template>
 
       <template #description>
-        <template v-if="newUnlock?.cost === 0">
-          <strong class="block text-xl tracking-wide text-text">✨ LIMITED TIME OFFER ✨</strong>
-          <br />
-        </template>
-        <span class="text-lg text-text">
-          Trade in <strong class="tracking-wide">{{ newUnlock?.cost }}</strong> coins to use this
-          design?</span
-        >
+        <div class="p-4">
+          <template v-if="newUnlock?.cost === 0">
+            <strong class="block text-xl tracking-wide text-text">
+              {{ $t('deck.limitedTimeOffer') }}
+            </strong>
+            <br />
+          </template>
+          <span class="text-lg text-text">
+            {{ $t('deck.tradeCoins', { cost: newUnlock?.cost }) }}
+          </span>
+        </div>
       </template>
 
       <template #actions>
-        <div class="grid grid-flow-row-dense grid-cols-2 gap-3 mt-6">
-          <button
-            type="button"
-            class="text-base sec-btn"
-            @click="cancelUnlock"
-          >
-            No, keep my coins.
-          </button>
+        <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-2">
           <button
             type="button"
             class="text-base pri-btn"
             @click="confirmUnlock"
           >
-            Yes, unlock it!
+            {{ $t('deck.yesUnlockIt') }}
+          </button>
+          <button
+            type="button"
+            class="text-base sec-btn sm:order-first"
+            @click="cancelUnlock"
+          >
+            {{ $t('deck.noKeepCoins') }}
           </button>
         </div>
       </template>
@@ -203,8 +210,6 @@ import {
   LockClosedIcon,
   LockOpenIcon,
 } from '@heroicons/vue/20/solid'
-import { HeartIcon } from '@heroicons/vue/24/outline'
-import { collection, getCountFromServer, getFirestore, query, where } from 'firebase/firestore'
 import { useToast } from 'vue-toastification'
 import DesignDescription from './DesignDescription.vue'
 
@@ -213,6 +218,7 @@ type CardDesign = (typeof DESIGNS)[number]
 const { DESIGNS, currentDesign, getDesignInfo } = useCardDesign()
 const { cacheDesignOnHover } = useCardCache()
 const toast = useToast()
+const { t } = useI18n()
 
 const isNew = (design: CardDesign) => {
   const { releaseDate } = getDesignInfo(design)
@@ -265,7 +271,7 @@ const handleUnlock = (design: CardDesign) => {
   if (coins.value === undefined || !unlocked.value) return
   if (!isNew(design) && coins.value < UNLOCK_COST) {
     toast.dismiss(toastId)
-    toastId = toast.info("You don't have enough coins yet...", { timeout: 6000 })
+    toastId = toast.info(t('deck.notices.youDontHaveEnoughCoins'), { timeout: 6000 })
     clearTimeout(timeoutId)
     timeoutId = setTimeout(() => {
       currentDesign.value = initialDesign!
@@ -286,7 +292,7 @@ const confirmUnlock = () => {
   if (!newUnlock.value) return
   coins.value -= newUnlock.value.cost
   unlocked.value.push(newUnlock.value.design)
-  toast.success("You've unlocked a new design!", { timeout: 5000 })
+  toast.success(t('deck.notices.youHaveUnlocked'), { timeout: 5000 })
   currentDesign.value = newUnlock.value.design
   newUnlock.value = null
   initialDesign = currentDesign.value
@@ -295,15 +301,15 @@ const confirmUnlock = () => {
 const userIsGuest = toValue(useAuth().userIsGuest)
 const userLiked = toValue(computed(() => currentUser?.value?.designs.liked))
 
-const coll = collection(getFirestore(), 'users')
+// const coll = collection(getFirestore(), 'users')
 const likesCount = reactive<Map<CardDesign, number>>(new Map())
-const getLikesCount = async (design: CardDesign) => {
-  if (likesCount.has(design)) return likesCount.get(design)
-  const q = query(coll, where('designs.liked', 'array-contains', design))
-  const count = (await getCountFromServer(q)).data().count
-  likesCount.set(design, count)
-  return count
-}
+// const getLikesCount = async (design: CardDesign) => {
+//   if (likesCount.has(design)) return likesCount.get(design)
+//   const q = query(coll, where('designs.liked', 'array-contains', design))
+//   const count = (await getCountFromServer(q)).data().count
+//   likesCount.set(design, count)
+//   return count
+// }
 
 const isLiked = (design: CardDesign) => userLiked?.includes(design)
 const handleLike = (design: CardDesign) => {

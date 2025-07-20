@@ -7,7 +7,7 @@
       <!-- Attribution text -->
       <div class="grid text-xs text-text-secondary">
         <p>
-          Background art and design by
+          {{ $t('footer.credits.backgroundArtBy') }}
           <a
             href="https://www.pulpograph.studio/parishcherry"
             title="View artist's website"
@@ -24,7 +24,7 @@
             class="hover:text-primary hover:underline"
             >FudaPop</a
           >
-          - Developed by
+          - {{ $t('footer.credits.developedBy') }}
           <a
             href="https://www.andrehammons.dev"
             target="_blank"
@@ -38,7 +38,7 @@
     <!-- Right side: Version -->
     <div class="text-center sm:text-right">
       <NuxtLink
-        to="/changelog"
+        :to="localeRoute('/changelog')"
         title="View changelog"
         class="block text-xs tracking-widest transition-colors select-none hover:text-primary text-text-secondary"
       >
@@ -49,24 +49,24 @@
         class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
       >
         <NuxtLink
-          to="/attributions"
+          :to="localeRoute('/attributions')"
           title="View attributions"
           class="transition-colors hover:text-primary"
-          >Attributions</NuxtLink
+          >{{ $t('footer.links.attributions') }}</NuxtLink
         >
         <span>•</span>
         <NuxtLink
-          to="/terms"
+          :to="localeRoute('/terms')"
           title="View terms of use"
           class="transition-colors hover:text-primary"
-          >Term of Use</NuxtLink
+          >{{ $t('footer.links.termsOfUse') }}</NuxtLink
         >
         <span>•</span>
         <NuxtLink
-          to="/privacy"
+          :to="localeRoute('/privacy')"
           title="View privacy policy"
           class="transition-colors hover:text-primary"
-          >Privacy Policy</NuxtLink
+          >{{ $t('footer.links.privacyPolicy') }}</NuxtLink
         >
       </div>
     </div>
@@ -75,6 +75,5 @@
 
 <script setup lang="ts">
 const { $config } = useNuxtApp()
-const { getDesignInfo } = useCardDesign()
-const design = computed(() => getDesignInfo())
+const localeRoute = useLocaleRoute()
 </script>

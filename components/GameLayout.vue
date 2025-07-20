@@ -18,14 +18,14 @@
           id="exit-button"
           type="button"
           @click="handlePressExit"
-          :class="['game-ui-btn', gameStart && 'opacity-30 hover:opacity-100']"
+          :class="['game-ui-btn', gameStart && 'opacity-50 hover:opacity-100']"
         >
           <Icon
             name="mdi:logout"
             class="w-5 h-5 text-white transition-transform duration-300"
             aria-hidden="true"
           />
-          <span class="sr-only">Return to homepage</span>
+          <span class="sr-only">{{ $t('navigation.backToTitleScreen') }}</span>
         </button>
       </div>
 
@@ -38,7 +38,7 @@
           <!-- DESIGN TAB -->
           <template #tab-icon-1>
             <Icon
-              name="heroicons:swatch"
+              name="mdi:cards-variant"
               class="w-5 h-5"
               aria-hidden="true"
             />
@@ -149,7 +149,7 @@
       >
         <SakuraLoader class="mx-auto opacity-80 w-max" />
         <p class="font-semibold tracking-wide text-center text-white drop-shadow-md animate-pulse">
-          Just a moment...
+          {{ $t('common.labels.justAMoment') }}
         </p>
       </div>
     </Transition>

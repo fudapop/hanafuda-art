@@ -57,7 +57,7 @@
           <!-- Last Played -->
           <div v-if="user">
             <p class="px-4 text-text">
-              Last updated:
+              {{ $t('profile.info.lastUpdated') }}
               <span class="block mt-1 text-sm text-text-secondary">{{
                 useDateFormat(user.lastUpdated, 'MMM-DD-YYYY HH:mm').value
               }}</span>
@@ -73,7 +73,7 @@
       v-if="user?.record"
       class="items-center px-8 mx-2 border-t border-b h-max bg-surface border-t-border border-b-border"
     >
-      <h3 class="sr-only">Player Record</h3>
+      <h3 class="sr-only">{{ $t('profile.info.playerRecord') }}</h3>
       <dl class="flex justify-around">
         <div
           v-for="(val, key) in record"
@@ -97,13 +97,13 @@
     >
       <div>
         <ExclamationCircleIcon class="inline w-6 h-6 align-top" />
-        <p class="inline ml-2 text-sm w-max">Sign in is required to save your profile.</p>
+        <p class="inline ml-2 text-sm w-max">{{ $t('auth.notices.signInRequired') }}</p>
       </div>
       <button
         class="action-button"
         @click="handleSignIn"
       >
-        SIGN IN
+        {{ $t('common.actions.signIn') }}
       </button>
     </div>
     <div
@@ -119,6 +119,7 @@
 import { ExclamationCircleIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { onClickOutside, useDateFormat } from '@vueuse/core'
 
+const { t } = useI18n()
 const user = useProfile().current
 const avatar = computed({
   get: () => user.value?.avatar ?? '',
@@ -133,9 +134,9 @@ const username = computed({
   },
 })
 const record = computed(() => ({
-  wins: Number(user.value?.record.win),
-  losses: Number(user.value?.record.loss),
-  draws: Number(user.value?.record.draw),
+  [t('profile.stats.wins')]: Number(user.value?.record.win),
+  [t('profile.stats.losses')]: Number(user.value?.record.loss),
+  [t('profile.stats.draws')]: Number(user.value?.record.draw),
 }))
 
 const usernameInputRef: Ref<HTMLInputElement | null> = ref(null)

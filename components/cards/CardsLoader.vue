@@ -7,9 +7,9 @@
     <div class="shadow-md animated-card down card five"></div>
     <p
       v-if="!noText"
-      class="tracking-wide animate-pulse [animation-duration:4s] text-gray-900 dark:text-white"
+      class="tracking-wide animate-pulse [animation-duration:4s] text-gray-900 dark:text-white whitespace-nowrap text-center"
     >
-      Loading...
+      {{ $t('common.labels.loading') }}
     </p>
   </div>
 </template>

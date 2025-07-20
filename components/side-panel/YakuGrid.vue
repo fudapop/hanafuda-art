@@ -23,16 +23,16 @@
     <!-- YAKU TITLE -->
     <div class="flex items-center justify-between mt-2">
       <div class="flex items-center gap-x-4">
-        <a
-          :title="YAKU[focusedYaku.name].description.toString()"
+        <span
+          :title="$t(`game.yaku.${focusedYaku.name}`)"
           class="block text-sm font-semibold tracking-wide truncate text-text cursor-help"
         >
           {{ focusedYaku.name.toUpperCase() }}
-        </a>
+        </span>
         <!-- YAKU POINTS -->
         <p class="block text-sm font-medium pointer-events-none text-text">
           {{ focusedYaku.points }}
-          points
+          {{ $t('common.labels.points') }}
         </p>
       </div>
 
@@ -40,7 +40,7 @@
         class="sec-btn"
         @click="focusedYaku = null"
       >
-        Back
+        {{ $t('common.actions.back') }}
       </button>
     </div>
   </div>
@@ -73,16 +73,16 @@
       <!-- YAKU TITLE -->
       <div class="flex items-center mt-2 gap-x-4">
         <div class="flex flex-col">
-          <a
-            :title="YAKU[yaku.name].description.toString()"
+          <span
+            :title="$t(`game.yaku.${yaku.name}`)"
             class="block text-sm font-semibold tracking-wide truncate text-text cursor-help"
           >
             {{ yaku.name.toUpperCase() }}
-          </a>
+          </span>
           <!-- YAKU POINTS -->
           <p class="block text-sm font-medium pointer-events-none text-text">
             {{ yaku.points }}
-            points
+            {{ $t('common.labels.points') }}
           </p>
         </div>
         <button
@@ -90,7 +90,7 @@
           @click="focusedYaku = yaku"
         >
           <MagnifyingGlassIcon class="w-4 h-4" />
-          <span class="sr-only">View Cards</span>
+          <span class="sr-only">{{ $t('common.actions.viewCards') }}</span>
         </button>
       </div>
     </li>
@@ -99,7 +99,7 @@
 
 <script setup lang="ts">
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
-import { type CompletedYaku, YAKU } from '~/utils/yaku'
+import { type CompletedYaku } from '~/utils/yaku'
 
 const { completed, showCards } = defineProps<{
   completed: CompletedYaku[]

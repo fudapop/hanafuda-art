@@ -27,14 +27,6 @@ export default defineNuxtConfig({
           href: '/images/sakura.png',
         },
         {
-          rel: 'dns-prefetch',
-          href: process.env.NUXT_PUBLIC_SUPABASE_URL,
-        },
-        {
-          rel: 'preconnect',
-          href: process.env.NUXT_PUBLIC_SUPABASE_URL,
-        },
-        {
           rel: 'preconnect',
           href: 'https://fonts.googleapis.com',
         },
@@ -46,14 +38,16 @@ export default defineNuxtConfig({
         {
           rel: 'preload',
           as: 'style',
-          href: 'https://fonts.googleapis.com/css2?family=Potta+One&display=swap',
+          href: 'https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;700&display=swap',
           onload: "this.rel = 'stylesheet'",
         },
         {
-          rel: 'preload',
-          as: 'style',
-          href: 'https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;700&display=swap',
-          onload: "this.rel = 'stylesheet'",
+          rel: 'dns-prefetch',
+          href: process.env.NUXT_PUBLIC_SUPABASE_URL,
+        },
+        {
+          rel: 'preconnect',
+          href: process.env.NUXT_PUBLIC_SUPABASE_URL,
         },
       ],
       meta: seoMeta,
@@ -62,7 +56,7 @@ export default defineNuxtConfig({
     },
     pageTransition: { name: 'page', mode: 'out-in' },
   },
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-07-18',
   components: [
     {
       path: '~/components',
@@ -99,9 +93,34 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: false },
   i18n: {
-    bundle: {
-      optimizeTranslationDirective: false,
+    autoDeclare: true,
+    baseUrl: 'https://newhanafuda.art',
+    defaultLocale: 'en',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+      alwaysRedirect: true,
+      fallbackLocale: 'en',
     },
+    langDir: 'locales/',
+    locales: [
+      {
+        name: 'English',
+        code: 'en',
+        language: 'en-US',
+        file: 'en-us.json',
+        dir: 'ltr',
+      },
+      {
+        name: '日本語',
+        code: 'ja',
+        language: 'ja-JP',
+        file: 'ja-jp.json',
+        dir: 'ltr',
+      },
+    ],
+    strategy: 'prefix_and_default',
   },
   modules: [
     '@pinia/nuxt',
