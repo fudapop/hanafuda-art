@@ -2,6 +2,26 @@
 
 All notable changes to Hanafuda Koi-Koi will be documented in this file.
 
+## [2.2.0] - 2025-07-20
+
+### New Features
+- **Internationalization**: Full English and Japanese localization support with seamless language switching.
+- **Tsuki-fuda Enhancement**: Cards are now displayed in the artistic arrangement intended by the original designer.
+- **Translation System**: Comprehensive translation coverage for viewing options, yaku descriptions, and collection components.
+
+### UI & Experience Improvements
+- **Mobile Responsiveness**: Enhanced mobile experience with improved modal positioning, status bar scaling, and hand overflow handling.
+- **Interface Polish**: Updated fullscreen icons, refined modal layouts, and improved collection component presentation.
+
+### Bug Fixes
+- **Avatar System**: Fixed avatar selection and random assignment issues.
+- **Game Controls**: Resolved button visibility issues during end-game states.
+- **Layout Fixes**: Corrected various positioning and overflow issues across different screen sizes.
+
+### Performance & Technical
+- **Image Optimization**: Continued WebP conversion for improved loading performance.
+- **Code Quality**: Refactored avatar state management and updated dependencies.
+
 ## [2.1.1] - 2025-07-19
 
 ### Improvements
