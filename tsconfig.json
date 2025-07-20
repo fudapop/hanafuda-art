@@ -3,8 +3,5 @@
   "compilerOptions": {
     "types": ["vitest/importMeta", "vitest/globals"]
   },
-  "vueCompilerOptions": {
-    "globalTypesPath": "./node_modules/@vue/runtime-core/index.d.ts"
-  },
   "extends": "./.nuxt/tsconfig.json"
 }
