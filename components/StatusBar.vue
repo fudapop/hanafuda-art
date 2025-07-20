@@ -28,10 +28,8 @@
               isMobileLandscape ? 'flex-col text-sm gap-y-1' : 'lg:text-3xl ',
             ]"
           >
-          <p class="flex items-center font-bold gap-x-2">
-              <p>
-                {{ user?.username || `${$t('common.labels.player')} ${playerNum}` }}
-              </p>
+            <p class="flex items-center font-bold gap-x-2">
+              {{ user?.username || `${$t('common.labels.player')} ${playerNum}` }}
               <span
                 class="flex items-center"
                 v-memo="[ds.roundOver, gameStart]"
