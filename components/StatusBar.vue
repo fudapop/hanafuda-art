@@ -5,14 +5,14 @@
         <div class="flex-shrink-0">
           <img
             v-if="user"
-            class="w-12 h-12 mx-auto transition-all border-2 rounded-full sm:w-24 sm:h-24 border-border"
+            class="w-12 h-12 mx-auto transition-all border-2 rounded-full lg:w-24 lg:h-24 border-border"
             :src="user.avatar"
             :alt="user.username"
           />
           <img
             v-else
             :src="avatar2"
-            class="w-12 h-12 mx-auto transition-all border-2 rounded-full sm:w-24 sm:h-24 border-border"
+            class="w-12 h-12 mx-auto transition-all border-2 rounded-full lg:w-24 lg:h-24 border-border"
           />
         </div>
         <div :class="['flex flex-col', isPlayer1 ? 'justify-end' : 'justify-start']">
@@ -28,10 +28,10 @@
               isMobileLandscape ? 'flex-col text-sm gap-y-1' : 'lg:text-3xl ',
             ]"
           >
-            <p class="font-bold">
-              {{ user?.username || `Player ${playerNum}` }}
+          <p class="flex items-center font-bold gap-x-2">
+              <p>
             </p>
-            <p class="flex items-center font-bold">
+              </p>
               <span
                 class="flex items-center"
                 v-memo="[ds.roundOver, gameStart]"
