@@ -37,11 +37,11 @@
     <!-- <div class="flex justify-end"> -->
     <button
       v-if="hasCards"
-      :title="`View ${modalTitle}`"
+      :title="`View ${t('common.labels.collection')}`"
       :class="['my-2 z-30 absolute right-4', player === 'p1' && 'bottom-full']"
       @click="modalOpen = true"
     >
-      <span class="sr-only">View {{ modalTitle }}</span>
+      <span class="sr-only">{{ t('common.labels.collection') }}</span>
       <MagnifyingGlassPlusIcon
         class="w-6 h-6 stroke-2 stroke-text"
         aria-hidden
@@ -53,9 +53,20 @@
   <LazyModal
     :open="modalOpen"
     ref="modalRef"
-    title="Collection"
+    :title="t('common.labels.collection')"
   >
-    <template #title> {{ modalTitle }} </template>
+    <template #title>
+      <div class="flex flex-col items-center gap-2">
+        <img
+          :src="playerAvatar"
+          loading="lazy"
+          class="w-24 h-24 border rounded-full border-border drop-shadow-sm"
+        />
+        <span class="text-2xl font-bold">
+          {{ t('common.labels.collection') }}
+        </span>
+      </div>
+    </template>
     <template #description>
       <div class="grid gap-1 [--card-height:140px] px-8 py-4 w-screen">
         <ul
@@ -70,7 +81,7 @@
             <span class="mr-1 text-xs align-middle">
               {{ coll[type].size }}
             </span>
-            {{ type }}
+            {{ t(`game.cardTypes.${type}`) }}
           </span>
           <CardList
             :cards="coll[type]"
@@ -110,9 +121,10 @@ export type CompletionEvent = {
   completedYaku: CompletedYaku[]
 }
 
+const { t } = useI18n()
+
 const modalRef = ref(null)
 const modalOpen = ref(false)
-const modalTitle = computed(() => `${player === 'p1' ? 'My' : "Opponent's"} Collection`)
 
 onClickOutside(modalRef, () => {
   modalOpen.value = false
@@ -122,6 +134,9 @@ const { player } = defineProps<{ player: PlayerKey }>()
 const emits = defineEmits<{
   (event: 'completed', data: CompletionEvent): void
 }>()
+
+const { p1Avatar, p2Avatar } = useAvatar()
+const playerAvatar = computed(() => (player === 'p1' ? p1Avatar.value : p2Avatar.value))
 
 const { isMobile } = useDevice()
 const { orientation } = useScreenOrientation()

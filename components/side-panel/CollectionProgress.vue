@@ -87,15 +87,17 @@
               {{ t(`game.yaku.${yaku.name}`) }}
             </p>
 
-            <div :class="['grid grid-cols-10 gap-1']">
+            <div class="grid grid-cols-10 gap-1">
               <div
                 v-for="card in yaku.cards"
                 :key="card"
-                :class="{
-                  'card overflow-hidden drop-shadow-sm relative [&:nth-child(n+11)]:-mt-8 [&:nth-child(n+11):nth-child(-n+20)]:ml-4': true,
-                  'after:absolute after:inset-0 after:bg-black/60':
-                    opponentHas(card) || playerHas(card),
-                }"
+                :class="[
+                  'card overflow-hidden drop-shadow-sm relative',
+                  '[&:nth-child(n+11)]:-mt-4',
+                  '[&:nth-child(n+11):nth-child(-n+20)]:ml-4',
+                  (opponentHas(card) || playerHas(card)) &&
+                    'after:absolute after:inset-0 after:bg-black/60',
+                ]"
               >
                 <CardImage
                   :card="card"
@@ -112,17 +114,21 @@
               </div>
             </div>
 
-            <p
-              v-if="viewingsAllowed === 'limited' && viewingYaku.has(yaku.name)"
-              class="mt-4 text-xs max-w-prose whitespace-nowrap text-text-secondary"
-            >
-              <ExclamationCircleIcon class="inline w-4 h-auto mr-1 pointer-events-none" />
-              Requires at least one other
-              <span class="block pl-6"
-                >completed yaku ( not
-                {{ [...viewingYaku].filter((name) => name != yaku.name)[0].toUpperCase() }})
-              </span>
-            </p>
+            <div class="flex items-center mt-4 text-xs text-text-secondary">
+              <ExclamationCircleIcon
+                class="flex-shrink-0 inline w-4 h-auto mr-1 pointer-events-none"
+              />
+              <p
+                v-if="viewingsAllowed === 'limited' && viewingYaku.has(yaku.name)"
+                class="max-w-prose text-balance"
+              >
+                {{
+                  t('game.yaku.requiresAtLeastOneOther', {
+                    notYaku: [...viewingYaku].filter((name) => name != yaku.name)[0].toUpperCase(),
+                  })
+                }}
+              </p>
+            </div>
           </HeadlessDisclosurePanel>
         </Transition>
       </HeadlessDisclosure>

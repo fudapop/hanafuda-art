@@ -178,7 +178,8 @@
       "kasu": "カス (10枚以上、追加1枚ごとに+1点)",
       "kuttsuki": "くっつき (手札に4組のペア)",
       "teshi": "手四 (手札に同じ月の札が4枚)",
-      "tsuki-fuda": "月札"
+      "tsuki-fuda": "月札",
+      "requiresAtLeastOneOther": "他の完成した役が1つ以上必要です ({notYaku} は除く)"
     },
     "warnings": {
       "leavingGame": "ゲームを終了しています...",

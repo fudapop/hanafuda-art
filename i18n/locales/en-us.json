@@ -178,7 +178,8 @@
       "kasu": "Any 10 Plains (+1pt / extra)",
       "kuttsuki": "4 pairs in hand",
       "teshi": "4 of a kind in hand",
-      "tsuki-fuda": "Cards of the Month"
+      "tsuki-fuda": "Cards of the Month",
+      "requiresAtLeastOneOther": "Requires at least one other completed yaku (not {notYaku})"
     },
     "warnings": {
       "leavingGame": "Leaving the game...",
