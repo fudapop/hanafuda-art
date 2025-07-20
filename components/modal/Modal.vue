@@ -20,10 +20,13 @@
         <div class="fixed inset-0 transition-opacity opacity-50 bg-hanafuda-brown" />
       </HeadlessTransitionChild>
 
-      <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div
+        ref="modalScrollRef"
+        class="fixed inset-0 z-10 overflow-y-auto"
+      >
         <div
           class="flex items-end justify-center min-h-full pt-8 text-center sm:items-center sm:px-8"
-          :class="isMobile ? 'portrait:h-screen portrait:p-0' : ''"
+          :class="isMobile ? 'portrait:h-max portrait:my-auto portrait:p-0' : ''"
         >
           <HeadlessTransitionChild
             as="template"
@@ -37,7 +40,7 @@
             <HeadlessDialogPanel
               :class="[
                 'relative pt-5 pb-4 overflow-hidden text-left transition-all transform rounded-md shadow-xl bg-surface dark:bg-hanafuda-cream sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl',
-                isMobile && 'fixed inset-x-0 top-4 overflow-y-auto touch-pan-y',
+                isMobile && 'fixed inset-x-0 h-max my-auto',
                 padded && 'px-4 sm:p-6 lg:p-8',
               ]"
             >
@@ -60,7 +63,10 @@
                   </div>
                 </div>
               </div>
-              <slot name="actions" />
+              <slot
+                name="actions"
+                :scroll-to-top="scrollToTop"
+              />
             </HeadlessDialogPanel>
           </HeadlessTransitionChild>
         </div>
@@ -80,4 +86,11 @@ const {
   padded?: boolean
 }>()
 const { isMobile } = useDevice()
+
+const modalScrollRef = ref<HTMLDivElement | null>(null)
+const scrollToTop = () => {
+  if (modalScrollRef.value) {
+    modalScrollRef.value.scrollTo({ top: 0, behavior: 'instant' })
+  }
+}
 </script>
