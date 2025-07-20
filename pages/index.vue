@@ -70,7 +70,7 @@
         ]"
       >
         <div
-          class="w-screen max-w-3xl py-8 mx-auto overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x"
+          class="w-screen max-w-full px-8 py-8 mx-auto overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x"
         >
           <div v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')">
             <LazyHandDisplay id="p1" />
