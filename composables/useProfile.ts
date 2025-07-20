@@ -69,12 +69,12 @@ export const useProfile = () => {
     }
   }
 
-  const { getRandomAvatarUrl } = useAvatar()
+  const { p1Avatar } = useAvatar()
 
   const loadUserData = (user: User, userData: DocumentData) => {
     profile.value = {
       uid: user.uid,
-      avatar: userData.avatar || user.photoURL || getRandomAvatarUrl(),
+      avatar: userData.avatar || user.photoURL || p1Avatar.value,
       username:
         userData.username || user.displayName?.split(' ')[0] || `User_${user.uid.slice(0, 5)}`,
       lastUpdated: userData.lastUpdated?.toDate() || new Date(),
@@ -96,7 +96,7 @@ export const useProfile = () => {
   const loadGuestData = (user: User) => {
     const guest = useGuestProfile({
       uid: user.uid,
-      avatar: user.photoURL || getRandomAvatarUrl(),
+      avatar: user.photoURL || p1Avatar.value,
       username: user.displayName?.split(' ')[0] || `User #${user.uid.slice(0, 5)}`,
       lastUpdated: new Date(),
       record: { coins: 0, win: 0, draw: 0, loss: 0 },
@@ -113,7 +113,7 @@ export const useProfile = () => {
   const createNewProfile = (user: User) => {
     profile.value = {
       uid: user.uid,
-      avatar: user.photoURL || getRandomAvatarUrl(),
+      avatar: user.photoURL || p1Avatar.value,
       username: user.displayName?.split(' ')[0] || `User #${user.uid.slice(0, 5)}`,
       lastUpdated: new Date(),
       record: { coins: 500, win: 0, draw: 0, loss: 0 },
