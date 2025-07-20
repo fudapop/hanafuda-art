@@ -185,7 +185,23 @@ watchEffect(() => {
     consoleLogColor('TSUKI-FUDA not available for this game.', 'skyblue')
     return
   }
-  updateTsukiFuda(month.value)
+
+  // Display cards as arranged by artist
+  const { getDesignInfo } = useCardDesign()
+  const rearrange = (cards: CardName[]) => {
+    const { arrangement } = getDesignInfo()
+    if (arrangement?.reversed) {
+      return cards.toReversed()
+    }
+    if (arrangement?.orderByName) {
+      // Create a map for O(1) lookups
+      const cardSet = new Set(cards)
+      // Only iterate arrangement once, filter out non-existent cards
+      return arrangement.orderByName.filter((name) => cardSet.has(name as CardName)) as CardName[]
+    }
+    return cards
+  }
+  updateTsukiFuda(month.value, rearrange)
   consoleLogColor('TSUKI-FUDA: ' + YAKU['tsuki-fuda'].cards.join(', '), 'skyblue')
 })
 

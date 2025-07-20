@@ -482,21 +482,22 @@ function checkForTeyaku(cardArr: CardName[]): [YakuName | null, CardName[]] {
   return [null, [] as CardName[]]
 }
 
-function updateTsukiFuda(month: number) {
+function updateTsukiFuda(month: number, reorderFn?: (cards: CardName[]) => CardName[]) {
   YAKU['tsuki-fuda'].cards = getCardsOfMonth(Object.keys(CARDS) as CardName[], month)
+  if (reorderFn) YAKU['tsuki-fuda'].cards = reorderFn(YAKU['tsuki-fuda'].cards)
 }
 
 export {
-  YAKU,
-  type Yaku,
-  teyaku,
-  viewingYaku,
-  updateTsukiFuda,
-  type YakuName,
-  type CompletedYaku,
-  type YakuProgress,
-  getProgress,
   checkAll,
-  getCompleted,
   checkForWin,
+  getCompleted,
+  getProgress,
+  teyaku,
+  updateTsukiFuda,
+  viewingYaku,
+  YAKU,
+  type CompletedYaku,
+  type Yaku,
+  type YakuName,
+  type YakuProgress,
 }
