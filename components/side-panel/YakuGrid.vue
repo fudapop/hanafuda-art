@@ -24,7 +24,7 @@
     <div class="flex items-center justify-between mt-2">
       <div class="flex items-center gap-x-4">
         <span
-          :title="$t(`game.yaku.${focusedYaku.name}`)"
+          :title="t(`game.yaku.${focusedYaku.name}`)"
           class="block text-sm font-semibold tracking-wide truncate text-text cursor-help"
         >
           {{ focusedYaku.name.toUpperCase() }}
@@ -32,7 +32,7 @@
         <!-- YAKU POINTS -->
         <p class="block text-sm font-medium pointer-events-none text-text">
           {{ focusedYaku.points }}
-          {{ $t('common.labels.points') }}
+          {{ t('common.labels.points') }}
         </p>
       </div>
 
@@ -40,7 +40,7 @@
         class="sec-btn"
         @click="focusedYaku = null"
       >
-        {{ $t('common.actions.back') }}
+        {{ t('common.actions.back') }}
       </button>
     </div>
   </div>
@@ -74,7 +74,7 @@
       <div class="flex items-center mt-2 gap-x-4">
         <div class="flex flex-col">
           <span
-            :title="$t(`game.yaku.${yaku.name}`)"
+            :title="t(`game.yaku.${yaku.name}`)"
             class="block text-sm font-semibold tracking-wide truncate text-text cursor-help"
           >
             {{ yaku.name.toUpperCase() }}
@@ -82,7 +82,7 @@
           <!-- YAKU POINTS -->
           <p class="block text-sm font-medium pointer-events-none text-text">
             {{ yaku.points }}
-            {{ $t('common.labels.points') }}
+            {{ t('common.labels.points') }}
           </p>
         </div>
         <button
@@ -90,7 +90,7 @@
           @click="focusedYaku = yaku"
         >
           <MagnifyingGlassIcon class="w-4 h-4" />
-          <span class="sr-only">{{ $t('common.actions.viewCards') }}</span>
+          <span class="sr-only">{{ t('common.actions.viewCards') }}</span>
         </button>
       </div>
     </li>
@@ -107,4 +107,5 @@ const { completed, showCards } = defineProps<{
 }>()
 
 const focusedYaku: Ref<CompletedYaku | null> = ref(null)
+const { t } = useI18n()
 </script>

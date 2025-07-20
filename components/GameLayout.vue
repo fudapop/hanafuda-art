@@ -25,7 +25,7 @@
             class="w-5 h-5 text-white transition-transform duration-300"
             aria-hidden="true"
           />
-          <span class="sr-only">{{ $t('navigation.backToTitleScreen') }}</span>
+          <span class="sr-only">{{ t('navigation.backToTitleScreen') }}</span>
         </button>
       </div>
 
@@ -149,7 +149,7 @@
       >
         <SakuraLoader class="mx-auto opacity-80 w-max" />
         <p class="font-semibold tracking-wide text-center text-white drop-shadow-md animate-pulse">
-          {{ $t('common.labels.justAMoment') }}
+          {{ t('common.labels.justAMoment') }}
         </p>
       </div>
     </Transition>
@@ -183,6 +183,7 @@ import { usePlayerStore } from '~/stores/playerStore'
 
 const { currentDesign } = useCardDesign()
 const { logout } = useAuth()
+const { t } = useI18n()
 
 const { players } = storeToRefs(usePlayerStore())
 const user = toValue(useProfile().current)

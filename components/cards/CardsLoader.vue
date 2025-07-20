@@ -9,13 +9,14 @@
       v-if="!noText"
       class="tracking-wide animate-pulse [animation-duration:4s] text-gray-900 dark:text-white whitespace-nowrap text-center"
     >
-      {{ $t('common.labels.loading') }}
+      {{ t('common.labels.loading') }}
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
 const { noText } = defineProps<{ noText?: boolean }>()
+const { t } = useI18n()
 </script>
 <style scoped>
 .cards {

@@ -20,7 +20,7 @@
             v-if="isPlayer1"
             class="text-sm font-normal lg:text-2xl lg:mb-2 text-white/80"
           >
-            {{ $t('common.labels.round') }} {{ ds.roundCounter }} / {{ config.maxRounds }}
+            {{ t('common.labels.round') }} {{ ds.roundCounter }} / {{ config.maxRounds }}
           </p>
           <div
             :class="[
@@ -29,7 +29,7 @@
             ]"
           >
             <p class="flex items-center font-bold gap-x-2">
-              {{ user?.username || `${$t('common.labels.player')} ${playerNum}` }}
+              {{ user?.username || `${t('common.labels.player')} ${playerNum}` }}
               <span
                 class="flex items-center"
                 v-memo="[ds.roundOver, gameStart]"
@@ -74,6 +74,7 @@ const { user, playerNum } = defineProps(['user', 'playerNum'])
 const ds = useGameDataStore()
 const ps = usePlayerStore()
 const config = useConfigStore()
+const { t } = useI18n()
 
 const gameStart = useState('start')
 const { gameOver } = storeToRefs(ds)
@@ -98,7 +99,7 @@ const getResult = () => {
 watch(
   () => user,
   () => {
-    ps.setPlayerName(player, user?.username || `${$t('common.labels.player')} ${playerNum}`)
+    ps.setPlayerName(player, user?.username || `${t('common.labels.player')} ${playerNum}`)
     if (user?.avatar) {
       p1Avatar.value = user.avatar
     }

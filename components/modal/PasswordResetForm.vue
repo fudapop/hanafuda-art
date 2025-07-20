@@ -1,7 +1,9 @@
 <template>
   <Modal :open="open">
     <template #title
-      ><span class="[text-wrap:balance] text-xl"> {{ $t('auth.passwordReset.title') }} </span></template
+      ><span class="[text-wrap:balance] text-xl">
+        {{ t('auth.passwordReset.title') }}
+      </span></template
     >
     <template #actions>
       <Transition
@@ -15,7 +17,7 @@
       >
         <div class="h-[250px] xs:h-40 my-8">
           <p class="my-5 text-base text-center text-text-secondary text-balance">
-            {{ $t('auth.passwordReset.description') }}
+            {{ t('auth.passwordReset.description') }}
           </p>
           <form @submit.prevent="handlePressSend">
             <input
@@ -31,14 +33,14 @@
                 class="w-full action-button"
                 @click="$emit('cancel')"
               >
-                {{ $t('common.actions.cancel') }}
+                {{ t('common.actions.cancel') }}
               </button>
               <button
                 type="submit"
                 class="w-full action-button bg-border"
                 :disabled="!email"
               >
-                {{ $t('common.actions.send') }}
+                {{ t('common.actions.send') }}
               </button>
             </div>
           </form>
@@ -50,8 +52,10 @@
 
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
+
 const { open } = defineProps<{ open: boolean }>()
 const emit = defineEmits(['cancel'])
+const { t } = useI18n()
 
 const { resetPassword } = useAuth()
 const rememberedEmail = useStorage('hanafuda-email', '', localStorage, { mergeDefaults: true })

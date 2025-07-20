@@ -1,7 +1,7 @@
 <template>
   <Modal :open="open">
     <template #title>
-      <span class="text-lg">{{ $t('game.warnings.leavingGame') }}</span>
+      <span class="text-lg">{{ t('game.warnings.leavingGame') }}</span>
     </template>
     <template #image>
       <div
@@ -15,7 +15,7 @@
     </template>
     <template #description>
       <p class="my-8 text-text">
-        {{ $t('game.warnings.gameWillBeForfeited') }}
+        {{ t('game.warnings.gameWillBeForfeited') }}
       </p>
     </template>
     <template #actions>
@@ -25,14 +25,14 @@
           class="sec-btn"
           @click="$emit('confirm')"
         >
-          {{ $t('game.warnings.yesLeaveGame') }}
+          {{ t('game.warnings.yesLeaveGame') }}
         </button>
         <button
           type="button"
           class="pri-btn"
           @click="$emit('cancel')"
         >
-          {{ $t('game.warnings.noKeepPlaying') }}
+          {{ t('game.warnings.noKeepPlaying') }}
         </button>
       </div>
     </template>
@@ -43,6 +43,7 @@
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 
 const { open } = defineProps<{ open: boolean }>()
+const { t } = useI18n()
 
 defineEmits(['confirm', 'cancel'])
 </script>

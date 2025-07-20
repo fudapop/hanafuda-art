@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
-import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
 import { useCardStore } from '~/stores/cardStore'
 import { useConfigStore } from '~/stores/configStore'
-import { useStorage } from '@vueuse/core'
+import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
 import { getRandomString } from '~/utils/myUtils'
+import type { Yaku } from '~/utils/yaku'
 
 export type RoundResult = {
   [x: string]: unknown
+  completedYaku?: Yaku[]
   round?: number
   winner: PlayerKey | null
   score: number

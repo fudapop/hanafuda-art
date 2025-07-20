@@ -16,7 +16,7 @@
           class-name="grid grid-cols-3 gap-2 py-2"
         >
           <template #group-label>
-            <span class="capitalize">{{ $t('common.labels.rounds') }}</span>
+            <span class="capitalize">{{ t('common.labels.rounds') }}</span>
           </template>
         </OptionsRadioGroup>
 
@@ -32,7 +32,7 @@
               title="Tsukimi-/Hanami-zake"
               class="underline decoration-dotted underline-offset-4 cursor-help"
             >
-              {{ $t('settings.gameplay.moonFlowerViewing') }}
+              {{ t('settings.gameplay.moonFlowerViewing') }}
             </a>
             <a
               href="https://fudawiki.org/en/hanafuda/games/koi-koi#taming-the-sake-cup"
@@ -42,7 +42,7 @@
               <QuestionMarkCircleIcon
                 class="inline w-5 h-5 mb-1 cursor-pointer text-text-secondary hover:text-primary"
               />
-              <span class="sr-only">{{ $t('settings.gameplay.readAboutThisRule') }}</span>
+              <span class="sr-only">{{ t('settings.gameplay.readAboutThisRule') }}</span>
             </a>
           </template>
         </OptionsRadioGroup>
@@ -50,7 +50,7 @@
         <div class="space-y-4">
           <div class="flex">
             <p class="text-base font-semibold leading-6 text-text">
-              {{ $t('settings.gameplay.otherVariations') }}
+              {{ t('settings.gameplay.otherVariations') }}
             </p>
             <a
               href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
@@ -69,9 +69,9 @@
               :callback="toggleSake"
               :init-value="config.sakeIsWildCard"
             >
-              <template #label>{{ $t('settings.gameplay.wildCardSakeCup') }}</template>
+              <template #label>{{ t('settings.gameplay.wildCardSakeCup') }}</template>
               <template #description>{{
-                $t('settings.gameplay.wildCardSakeCupDescription')
+                t('settings.gameplay.wildCardSakeCupDescription')
               }}</template>
             </ToggleSwitch>
 
@@ -80,9 +80,9 @@
               :callback="toggleDouble"
               :init-value="config.doubleScoreOverSeven"
             >
-              <template #label>{{ $t('settings.gameplay.doubleOverSeven') }}</template>
+              <template #label>{{ t('settings.gameplay.doubleOverSeven') }}</template>
               <template #description>{{
-                $t('settings.gameplay.doubleOverSevenDescription')
+                t('settings.gameplay.doubleOverSevenDescription')
               }}</template>
             </ToggleSwitch>
           </div>
@@ -96,18 +96,18 @@
       >
         <p class="my-4 text-text-secondary">
           <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
-          {{ $t('settings.notices.settingsLocked') }}
+          {{ t('settings.notices.settingsLocked') }}
         </p>
         <ul class="grid w-full mx-auto gap-y-4">
           <li class="flex justify-between leading-6 text-text">
-            <span class="font-semibold"> {{ $t('settings.gameplay.gameLength') }} </span>
+            <span class="font-semibold"> {{ t('settings.gameplay.gameLength') }} </span>
             <span class="capitalize text-primary">
-              {{ config.maxRounds }} {{ $t('common.labels.rounds') }}
+              {{ config.maxRounds }} {{ t('common.labels.rounds') }}
             </span>
           </li>
           <li class="flex justify-between leading-6 text-text">
             <div>
-              <span class="font-semibold"> {{ $t('settings.gameplay.moonFlowerViewing') }} </span>
+              <span class="font-semibold"> {{ t('settings.gameplay.moonFlowerViewing') }} </span>
               <span class="block w-3/4 pl-2 text-sm text-text-secondary">
                 {{ getOptionDescription(config.allowViewingsYaku) }}
               </span>
@@ -118,29 +118,27 @@
           </li>
           <li class="flex justify-between leading-6 text-text">
             <div>
-              <span class="font-semibold"> {{ $t('settings.gameplay.wildCardSakeCup') }} </span>
+              <span class="font-semibold"> {{ t('settings.gameplay.wildCardSakeCup') }} </span>
               <span class="block w-3/4 pl-2 text-sm text-text-secondary">
-                {{ $t('settings.gameplay.wildCardSakeCupDescription') }}
+                {{ t('settings.gameplay.wildCardSakeCupDescription') }}
               </span>
             </div>
             <span class="self-center capitalize text-primary">
-              {{
-                config.sakeIsWildCard ? $t('common.states.enabled') : $t('common.states.disabled')
-              }}
+              {{ config.sakeIsWildCard ? t('common.states.enabled') : t('common.states.disabled') }}
             </span>
           </li>
           <li class="flex justify-between leading-6 text-text">
             <div>
-              <span class="font-semibold"> {{ $t('settings.gameplay.doubleOverSeven') }} </span>
+              <span class="font-semibold"> {{ t('settings.gameplay.doubleOverSeven') }} </span>
               <span class="block w-3/4 pl-2 text-sm text-text-secondary">
-                {{ $t('settings.gameplay.doubleOverSevenDescription') }}
+                {{ t('settings.gameplay.doubleOverSevenDescription') }}
               </span>
             </div>
             <span class="self-center capitalize text-primary">
               {{
                 config.doubleScoreOverSeven
-                  ? $t('common.states.enabled')
-                  : $t('common.states.disabled')
+                  ? t('common.states.enabled')
+                  : t('common.states.disabled')
               }}
             </span>
           </li>
@@ -149,14 +147,14 @@
 
       <div :class="['space-y-4 pb-4 pt-8']">
         <p class="text-base font-semibold leading-6 text-text">
-          {{ $t('settings.interface.title') }}
+          {{ t('settings.interface.title') }}
         </p>
         <ToggleSwitch
           :callback="toggleLabels"
           :init-value="config.cardLabels"
         >
-          <template #label>{{ $t('settings.interface.cardLabels') }}</template>
-          <template #description>{{ $t('settings.interface.cardLabelsDescription') }}</template>
+          <template #label>{{ t('settings.interface.cardLabels') }}</template>
+          <template #description>{{ t('settings.interface.cardLabelsDescription') }}</template>
         </ToggleSwitch>
 
         <OptionsRadioGroup
@@ -166,8 +164,8 @@
           :label-template="(option) => getCardSizeLabel(option as CardSizeOptions)"
           class-name="grid grid-cols-3 gap-2 py-2"
         >
-          <template #group-label>{{ $t('settings.interface.cardSize') }}</template>
-          <template #group-description>{{ $t('settings.interface.cardSizeDescription') }}</template>
+          <template #group-label>{{ t('settings.interface.cardSize') }}</template>
+          <template #group-description>{{ t('settings.interface.cardSizeDescription') }}</template>
         </OptionsRadioGroup>
       </div>
     </ClientOnly>

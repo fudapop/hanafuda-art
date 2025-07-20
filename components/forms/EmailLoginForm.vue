@@ -9,7 +9,7 @@
         <label
           for="email"
           class="block text-sm font-medium leading-6 text-text"
-          >{{ $t('auth.fields.emailAddress') }}</label
+          >{{ t('auth.fields.emailAddress') }}</label
         >
         <div class="mt-1">
           <input
@@ -29,7 +29,7 @@
         <label
           for="password"
           class="block text-sm font-medium leading-6 text-text"
-          >{{ $t('auth.fields.password') }}</label
+          >{{ t('auth.fields.password') }}</label
         >
         <div class="mt-1">
           <input
@@ -54,7 +54,7 @@
           class="text-xs text-text-secondary min-h-40"
         >
           <div class="space-y-2">
-            <p>{{ $t('auth.passwordRequirements.title') }}</p>
+            <p>{{ t('auth.passwordRequirements.title') }}</p>
             <ul class="grid grid-cols-2 list-none list-inside">
               <li
                 v-for="requirement in requirements"
@@ -84,7 +84,7 @@
               'opacity-50 cursor-not-allowed': !isValidPassword.value || !values.email,
             }"
           >
-            {{ $t('common.actions.signUp') }}
+            {{ t('common.actions.signUp') }}
           </button>
 
           <a
@@ -93,7 +93,7 @@
             class="block w-full mt-2 text-sm text-center text-text-secondary hover:underline hover:text-primary"
             @click="newAccount = false"
           >
-            {{ $t('auth.links.iAlreadyHaveAccount') }}
+            {{ t('auth.links.iAlreadyHaveAccount') }}
           </a>
         </section>
 
@@ -115,7 +115,7 @@
               <label
                 for="remember-me"
                 class="block ml-3 text-sm leading-6 cursor-pointer text-text"
-                >{{ $t('auth.options.rememberMe') }}</label
+                >{{ t('auth.options.rememberMe') }}</label
               >
             </div>
 
@@ -124,7 +124,7 @@
                 href="#"
                 class="text-text-secondary hover:underline hover:text-primary"
                 @click="handleForgotPassword"
-                >{{ $t('auth.options.forgotPassword') }}</a
+                >{{ t('auth.options.forgotPassword') }}</a
               >
             </div>
           </div>
@@ -133,7 +133,7 @@
               type="submit"
               class="w-full text-gray-900 dark:text-white action-button bg-border"
             >
-              {{ $t('common.actions.signIn') }}
+              {{ t('common.actions.signIn') }}
             </button>
 
             <a
@@ -141,7 +141,7 @@
               class="block w-full mt-2 text-sm text-center text-text-secondary hover:underline hover:text-primary"
               @click="newAccount = true"
             >
-              {{ $t('auth.links.iDontHaveAccount') }}
+              {{ t('auth.links.iDontHaveAccount') }}
             </a>
           </div>
         </section>
@@ -158,6 +158,7 @@
 import { CheckIcon } from '@heroicons/vue/20/solid'
 import { useStorage } from '@vueuse/core'
 
+const { t } = useI18n()
 const emit = defineEmits(['success', 'error', 'linked'])
 
 const { useGuest, linkWithEmail, loginWithEmail, signUpWithEmail } = useAuth()
@@ -200,8 +201,6 @@ const hasUpper = computed(() => /[A-Z]/.test(values.password))
 const hasLower = computed(() => /[a-z]/.test(values.password))
 const hasSpecial = computed(() => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(values.password))
 const hasSufficientLength = computed(() => values.password.length >= 6)
-
-const { t } = useI18n()
 
 const requirements = computed(() => [
   { valid: hasSufficientLength.value, text: t('auth.passwordRequirements.sixCharacters') },

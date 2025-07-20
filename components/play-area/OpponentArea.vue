@@ -44,7 +44,7 @@
                   aria-live="polite"
                   class="sr-only"
                 >
-                  {{ $t('collection.opponentCollection') + ': ' + selectedCard }}
+                  {{ t('collection.opponentCollection') + ': ' + selectedCard }}
                 </div>
                 <CardImage
                   class="drop-shadow-md"
@@ -92,6 +92,7 @@ const { players } = usePlayerStore()
 const { checkCurrentPhase } = useGameDataStore()
 const { getCardUrl } = useCardDesign()
 const selectedCard = useCardHandler().useSelectedCard()
+const { t } = useI18n()
 </script>
 
 <style scoped></style>

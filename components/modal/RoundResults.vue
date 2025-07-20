@@ -23,22 +23,22 @@
         <span v-if="recordedWinner">
           <span v-if="decisionIsPending">
             <span v-if="recordedWinner === 'p1'">
-              {{ $t('game.actions.makeYourCall') }}
+              {{ t('game.actions.makeYourCall') }}
             </span>
             <span v-else>
-              {{ $t('game.actions.opponentDeciding') }}
+              {{ t('game.actions.opponentDeciding') }}
             </span>
           </span>
           <span v-if="!decisionIsPending">
             {{ ps.getPlayerName(recordedWinner) }}
           </span>
           <span v-if="teshiOrKuttsuki">
-            {{ $t('game.results.gotDealtA') }}
+            {{ t('game.results.gotDealtA') }}
             <a
               title="Four-of-a-Kind / Four-Pairs"
               class="underline decoration-dotted underline-offset-4 cursor-help"
             >
-              {{ $t('game.results.luckyHand') }} </a
+              {{ t('game.results.luckyHand') }} </a
             >!
             <a
               href="https://fudawiki.org/en/hanafuda/games/koi-koi#checking-for-lucky-hands"
@@ -52,11 +52,11 @@
             </a>
           </span>
           <span v-else-if="stopIsCalled">
-            {{ ` ${$t('game.actions.calledStop')}` }}
+            {{ ` ${t('game.actions.calledStop')}` }}
           </span>
         </span>
         <span v-else>
-          {{ $t('game.results.theRoundIsADraw') }}
+          {{ t('game.results.theRoundIsADraw') }}
         </span>
       </HeadlessDialogTitle>
 
@@ -72,14 +72,14 @@
             class="text-base uppercase lg:text-xl sec-btn"
             @click="callStop"
           >
-            {{ $t('game.actions.stop') }}
+            {{ t('game.actions.stop') }}
           </button>
           <button
             v-show="handNotEmpty(activePlayer.id)"
             class="pri-btn"
             @click="callKoikoi"
           >
-            {{ $t('game.actions.koikoi') }}
+            {{ t('game.actions.koikoi') }}
           </button>
         </div>
       </div>
@@ -91,22 +91,22 @@
           class="pri-btn"
           @click="() => $emit('next')"
         >
-          {{ $t('common.actions.next') }}
+          {{ t('common.actions.next') }}
         </button>
       </div>
     </div>
   </div>
   <!-- END HEADER -->
   <h4 class="my-4 text-text-secondary dark:text-text-secondary">
-    {{ $t('common.labels.total') }}:
+    {{ t('common.labels.total') }}:
     <span class="text-base font-semibold sm:text-lg text-text"
-      >{{ lastRoundResult.score }} {{ $t('common.labels.points') }}</span
+      >{{ lastRoundResult.score }} {{ t('common.labels.points') }}</span
     >
     <span
       v-if="lastRoundResult.score && bonusMultiplier > 1"
       class="max-sm:block sm:ml-8"
     >
-      {{ $t('game.results.koiKoiBonus') }}:
+      {{ t('game.results.koiKoiBonus') }}:
       <span class="text-lg font-semibold text-text">x{{ bonusMultiplier }}</span>
     </span>
   </h4>
@@ -125,6 +125,8 @@ import { useCardStore } from '~/stores/cardStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { usePlayerStore } from '~/stores/playerStore'
 import { type CompletedYaku } from '~/utils/yaku'
+
+const { t } = useI18n()
 
 defineEmits(['next'])
 

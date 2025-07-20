@@ -108,6 +108,7 @@ definePageMeta({
 })
 
 const { isMobile } = useDevice()
+const { t } = useI18n()
 
 const cs = useCardStore()
 const ps = usePlayerStore()
@@ -170,7 +171,7 @@ const handleKoikoi = () => {
   console.debug('>>> Called KOI-KOI')
   ps.incrementBonus()
   showModal.value = false
-  toast($t('game.actions.koikoiWasCalled'), {
+  toast(t('game.actions.koikoiWasCalled'), {
     timeout: 2000,
     position: POSITION.TOP_CENTER,
   })

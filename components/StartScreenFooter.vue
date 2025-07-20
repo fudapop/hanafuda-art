@@ -7,7 +7,7 @@
       <!-- Attribution text -->
       <div class="grid text-xs text-text-secondary">
         <p>
-          {{ $t('footer.credits.backgroundArtBy') }}
+          {{ t('footer.credits.backgroundArtBy') }}
           <a
             href="https://www.pulpograph.studio/parishcherry"
             title="View artist's website"
@@ -24,7 +24,7 @@
             class="hover:text-primary hover:underline"
             >FudaPop</a
           >
-          - {{ $t('footer.credits.developedBy') }}
+          - {{ t('footer.credits.developedBy') }}
           <a
             href="https://www.andrehammons.dev"
             target="_blank"
@@ -52,21 +52,21 @@
           :to="localeRoute('/attributions')"
           title="View attributions"
           class="transition-colors hover:text-primary"
-          >{{ $t('footer.links.attributions') }}</NuxtLink
+          >{{ t('footer.links.attributions') }}</NuxtLink
         >
         <span>•</span>
         <NuxtLink
           :to="localeRoute('/terms')"
           title="View terms of use"
           class="transition-colors hover:text-primary"
-          >{{ $t('footer.links.termsOfUse') }}</NuxtLink
+          >{{ t('footer.links.termsOfUse') }}</NuxtLink
         >
         <span>•</span>
         <NuxtLink
           :to="localeRoute('/privacy')"
           title="View privacy policy"
           class="transition-colors hover:text-primary"
-          >{{ $t('footer.links.privacyPolicy') }}</NuxtLink
+          >{{ t('footer.links.privacyPolicy') }}</NuxtLink
         >
       </div>
     </div>
@@ -76,4 +76,5 @@
 <script setup lang="ts">
 const { $config } = useNuxtApp()
 const localeRoute = useLocaleRoute()
+const { t } = useI18n()
 </script>

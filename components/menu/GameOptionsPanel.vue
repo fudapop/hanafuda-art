@@ -47,7 +47,7 @@
                     class="flex flex-col h-full border-l shadow-xl bg-hanafuda-brown border-border"
                   >
                     <HeadlessDialogTitle class="sr-only">
-                      {{ $t('menu.options.title') }}
+                      {{ t('menu.options.title') }}
                     </HeadlessDialogTitle>
 
                     <div class="flex-1 min-h-0">
@@ -84,7 +84,7 @@
                               <!-- Fallback content if no icon slot is provided -->
                             </slot>
                             <span class="capitalize sr-only sm:not-sr-only">{{
-                              $t(`menu.options.tabs.${tab}`)
+                              t(`menu.options.tabs.${tab}`)
                             }}</span>
                           </button>
                           <button
@@ -92,7 +92,7 @@
                             class="p-4 border-t border-t-surface text-surface hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                             @click="closeOptions"
                           >
-                            <span class="sr-only">{{ $t('common.actions.close') }}</span>
+                            <span class="sr-only">{{ t('common.actions.close') }}</span>
                             <XMarkIcon
                               class="w-6 h-6"
                               aria-hidden="true"
@@ -119,6 +119,8 @@ import { type GameOptionsTab } from '~/composables/useOptionsPanel'
 const { tabs } = defineProps<{
   tabs: GameOptionsTab[]
 }>()
+
+const { t } = useI18n()
 
 // Global options modal state
 const {

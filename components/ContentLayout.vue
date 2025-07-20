@@ -15,7 +15,7 @@
           name="mdi:arrow-left"
           class="w-5 h-5 text-white transition-transform duration-300"
         />
-        <span class="sr-only">{{ $t('navigation.backToTitleScreen') }}</span>
+        <span class="sr-only">{{ t('navigation.backToTitleScreen') }}</span>
       </NuxtLink>
     </button>
     <slot />
@@ -26,4 +26,5 @@
 const route = useRoute()
 const localeRoute = useLocaleRoute()
 const isSignIn = computed(() => route.path.includes('/sign-in'))
+const { t } = useI18n()
 </script>

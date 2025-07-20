@@ -59,7 +59,7 @@
               class="font-semibold align-top"
               >+</span
             >
-            {{ $t('common.labels.points') }}
+            {{ t('common.labels.points') }}
           </span>
           <ChevronDownIcon
             :class="[
@@ -84,7 +84,7 @@
             :class="['px-4 pt-2 pb-6 text-sm text-text', open || openAll ? '' : 'hidden']"
           >
             <p class="mb-2">
-              {{ $t(`game.yaku.${yaku.name}`) }}
+              {{ t(`game.yaku.${yaku.name}`) }}
             </p>
 
             <div :class="['grid grid-cols-10 gap-1']">
@@ -144,6 +144,7 @@ import { type Yaku, teyaku, viewingYaku } from '~/utils/yaku'
 
 const cs = useCardStore()
 const config = useConfigStore()
+const { t } = useI18n()
 
 const openAll = ref(false)
 

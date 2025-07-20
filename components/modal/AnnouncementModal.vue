@@ -12,7 +12,7 @@
             class="w-6 h-6 text-primary"
             aria-hidden
           />
-          <h1 class="text-lg sm:text-xl">{{ $t('announcements.whatsNewTitle') }}</h1>
+          <h1 class="text-lg sm:text-xl">{{ t('announcements.whatsNewTitle') }}</h1>
         </div>
         <!-- <div
           v-if="newAnnouncements.length > 1"
@@ -90,7 +90,7 @@
               class="w-4 h-4"
             />
             {{ impressions[currentAnnouncement.id]?.views || 0 }}
-            <span class="sr-only">{{ $t('announcements.metrics.views') }}</span>
+            <span class="sr-only">{{ t('announcements.metrics.views') }}</span>
           </span>
           <button
             type="button"
@@ -110,8 +110,8 @@
             />
             <span class="sr-only">{{
               isLiked(currentAnnouncement.id)
-                ? $t('common.actions.unlike')
-                : $t('common.actions.like')
+                ? t('common.actions.unlike')
+                : t('common.actions.like')
             }}</span>
           </button>
         </div>
@@ -142,7 +142,7 @@
             name="heroicons:chevron-left"
             class="w-4 h-4"
           />
-          {{ $t('common.actions.previous') }}
+          {{ t('common.actions.previous') }}
         </button>
 
         <!-- Page indicators -->
@@ -175,7 +175,7 @@
             }
           "
         >
-          {{ $t('common.actions.next') }}
+          {{ t('common.actions.next') }}
           <Icon
             name="heroicons:chevron-right"
             class="w-4 h-4"
@@ -189,14 +189,14 @@
           class="w-full pri-btn"
           @click="handleDismiss"
         >
-          {{ $t('announcements.dismiss') }}
+          {{ t('announcements.dismiss') }}
         </button>
         <button
           type="button"
           class="w-full text-sm underline appearance-none text-text"
           @click="handleDontShowAgain"
         >
-          {{ $t('announcements.dontShowAgain') }}
+          {{ t('announcements.dontShowAgain') }}
         </button>
       </div>
     </template>
@@ -221,6 +221,7 @@
 import { useAnnouncements } from '~/composables/useAnnouncements'
 
 const { isMobile } = useDevice()
+const { t } = useI18n()
 
 // Use the announcements composable directly
 const {

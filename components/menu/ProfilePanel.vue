@@ -57,7 +57,7 @@
           <!-- Last Played -->
           <div v-if="user">
             <p class="px-4 text-text">
-              {{ $t('profile.info.lastUpdated') }}
+              {{ t('profile.info.lastUpdated') }}
               <span class="block mt-1 text-sm text-text-secondary">{{
                 useDateFormat(user.lastUpdated, 'MMM-DD-YYYY HH:mm').value
               }}</span>
@@ -73,7 +73,7 @@
       v-if="user?.record"
       class="items-center px-8 mx-2 border-t border-b h-max bg-surface border-t-border border-b-border"
     >
-      <h3 class="sr-only">{{ $t('profile.info.playerRecord') }}</h3>
+      <h3 class="sr-only">{{ t('profile.info.playerRecord') }}</h3>
       <dl class="flex justify-around">
         <div
           v-for="(val, key) in record"
@@ -97,13 +97,13 @@
     >
       <div>
         <ExclamationCircleIcon class="inline w-6 h-6 align-top" />
-        <p class="inline ml-2 text-sm w-max">{{ $t('auth.notices.signInRequired') }}</p>
+        <p class="inline ml-2 text-sm w-max">{{ t('auth.notices.signInRequired') }}</p>
       </div>
       <button
         class="action-button"
         @click="handleSignIn"
       >
-        {{ $t('common.actions.signIn') }}
+        {{ t('common.actions.signIn') }}
       </button>
     </div>
     <div
@@ -120,6 +120,7 @@ import { ExclamationCircleIcon, PencilSquareIcon } from '@heroicons/vue/24/outli
 import { onClickOutside, useDateFormat } from '@vueuse/core'
 
 const { t } = useI18n()
+
 const user = useProfile().current
 const avatar = computed({
   get: () => user.value?.avatar ?? '',

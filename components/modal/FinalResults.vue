@@ -10,13 +10,13 @@
       >
         <div class="flex items-center w-full gap-2">
           <span v-if="final.result === 'Win'">
-            {{ $t('game.results.youWin') }}
+            {{ t('game.results.youWin') }}
           </span>
           <span v-else-if="final.result === 'Lose'">
-            {{ $t('game.results.youLose') }}
+            {{ t('game.results.youLose') }}
           </span>
           <span v-else>
-            {{ $t('game.results.draw') }}
+            {{ t('game.results.draw') }}
           </span>
           <span class="ml-4 text-2xl text-text-secondary dark:text-text-secondary">
             <NumberAnimation
@@ -45,7 +45,7 @@
           class="sec-btn"
           @click="() => $emit('close')"
         >
-          {{ $t('common.actions.close') }}
+          {{ t('common.actions.close') }}
         </button>
       </div>
     </div>
@@ -71,17 +71,17 @@
           v-if="result.winner"
           class="font-semibold tracking-wide uppercase"
         >
-          {{ result.winner === 'p1' ? $t('common.labels.win') : $t('common.labels.lose') }}
+          {{ result.winner === 'p1' ? t('common.labels.win') : t('common.labels.lose') }}
         </span>
         <span
           v-else
           class="font-semibold tracking-wide uppercase"
         >
-          {{ $t('common.labels.draw') }}
+          {{ t('common.labels.draw') }}
         </span>
       </span>
       <span class="float-right font-semibold"
-        >{{ result.score }} {{ $t('common.labels.points') }}</span
+        >{{ result.score }} {{ t('common.labels.points') }}</span
       >
       <ChevronUpIcon
         :class="open ? '' : 'rotate-180 transform'"
@@ -94,7 +94,7 @@
       <YakuGrid
         v-if="result.winner"
         :winner="result.winner"
-        :completed="result.completedYaku"
+        :completed="result.completedYaku ?? []"
         :show-cards="true"
       />
     </HeadlessDisclosurePanel>
@@ -106,6 +106,7 @@ import { ChevronUpIcon } from '@heroicons/vue/20/solid'
 import NumberAnimation from 'vue-number-animation'
 import { type RoundResult, useGameDataStore } from '~/stores/gameDataStore'
 
+const { t } = useI18n()
 const { results } = defineProps<{
   results: RoundResult[]
 }>()

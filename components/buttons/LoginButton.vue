@@ -5,14 +5,14 @@
       class="action-button"
       @click="login"
     >
-      {{ $t('common.actions.signIn') }}
+      {{ t('common.actions.signIn') }}
     </button>
     <button
       v-else
       class="action-button"
       @click="logoutUser"
     >
-      {{ $t('common.actions.signOut') }}
+      {{ t('common.actions.signOut') }}
     </button>
     <div
       v-if="error"
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 const { logout, error } = useAuth()
 const user = useCurrentUser()
-
+const { t } = useI18n()
 const login = () => {
   navigateTo('/sign-in')
 }

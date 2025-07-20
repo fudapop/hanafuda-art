@@ -6,9 +6,9 @@
   >
     <div class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-sm bg-surface">
       <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-text">
-        {{ $t('deck.selectADeck') }}
+        {{ t('deck.selectADeck') }}
         <p class="ml-2 text-sm font-medium text-text-secondary whitespace-nowrap">
-          {{ $t('common.states.current') }}: {{ getDesignInfo().title }}
+          {{ t('common.states.current') }}: {{ getDesignInfo().title }}
         </p>
       </HeadlessRadioGroupLabel>
       <div
@@ -98,10 +98,10 @@
               <!-- SELECTION INDICATOR -->
               <span
                 v-if="checked"
-                aria-label="{{ $t('common.states.selected') }}"
+                aria-label="{{ t('common.states.selected') }}"
                 class="w-6 h-6"
               >
-                <span class="sr-only">{{ $t('common.states.selected') }}</span>
+                <span class="sr-only">{{ t('common.states.selected') }}</span>
                 <CheckCircleIcon
                   aria-hidden
                   class="w-full h-full text-primary"
@@ -110,7 +110,7 @@
               <!-- LIKE BUTTON -->
               <button
                 type="button"
-                aria-label="{{ $t('common.actions.like') }}"
+                aria-label="{{ t('common.actions.like') }}"
                 @click="() => handleLike(design)"
                 :class="[
                   'flex items-center gap-2 px-2 text-sm rounded-md transition-colors pointer-events-auto',
@@ -171,12 +171,12 @@
         <div class="p-4">
           <template v-if="newUnlock?.cost === 0">
             <strong class="block text-xl tracking-wide text-text">
-              {{ $t('deck.limitedTimeOffer') }}
+              {{ t('deck.limitedTimeOffer') }}
             </strong>
             <br />
           </template>
           <span class="text-lg text-text">
-            {{ $t('deck.tradeCoins', { cost: newUnlock?.cost }) }}
+            {{ t('deck.tradeCoins', { cost: newUnlock?.cost }) }}
           </span>
         </div>
       </template>
@@ -188,14 +188,14 @@
             class="text-base pri-btn"
             @click="confirmUnlock"
           >
-            {{ $t('deck.yesUnlockIt') }}
+            {{ t('deck.yesUnlockIt') }}
           </button>
           <button
             type="button"
             class="text-base sec-btn sm:order-first"
             @click="cancelUnlock"
           >
-            {{ $t('deck.noKeepCoins') }}
+            {{ t('deck.noKeepCoins') }}
           </button>
         </div>
       </template>

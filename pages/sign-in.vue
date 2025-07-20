@@ -11,9 +11,9 @@
         <img
           src="/images/logo-title.webp"
           class="landscape:max-h-[20vw] max-h-[120px] h-[40vh]"
-          :alt="$t('game.title')"
+          :alt="t('game.title')"
         />
-        <h1 class="sr-only">{{ $t('game.title') }}</h1>
+        <h1 class="sr-only">{{ t('game.title') }}</h1>
       </div>
       <Transition
         appear
@@ -30,7 +30,7 @@
         >
           <SakuraLoader class="scale-[2] ml-4 origin-bottom opacity-80" />
           <div class="font-semibold tracking-wide text-center text-gray-900 animate-pulse">
-            {{ $t('common.labels.justAMoment') }}
+            {{ t('common.labels.justAMoment') }}
           </div>
         </div>
         <div
@@ -67,7 +67,7 @@
                 :to="localeRoute('/')"
                 class="text-text-secondary hover:underline hover:text-primary"
               >
-                {{ $t('navigation.continueAsGuest') }}
+                {{ t('navigation.continueAsGuest') }}
               </NuxtLink>
             </div>
 
@@ -77,14 +77,14 @@
                 :to="localeRoute('/terms')"
                 class="hover:text-text-secondary/80"
               >
-                {{ $t('footer.links.termsOfUse') }}
+                {{ t('footer.links.termsOfUse') }}
               </NuxtLink>
               <span class="text-text-secondary/80">•</span>
               <NuxtLink
                 :to="localeRoute('/privacy')"
                 class="hover:text-text-secondary/80"
               >
-                {{ $t('footer.links.privacyPolicy') }}
+                {{ t('footer.links.privacyPolicy') }}
               </NuxtLink>
             </div>
           </div>

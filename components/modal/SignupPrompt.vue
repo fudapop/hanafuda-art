@@ -1,7 +1,7 @@
 <template>
   <Modal :open="open">
     <template #title
-      ><span class="text-lg text-balance"> {{ $t('signup.prompt.title') }} </span></template
+      ><span class="text-lg text-balance"> {{ t('signup.prompt.title') }} </span></template
     >
     <template #image>
       <img
@@ -22,10 +22,10 @@
       >
         <div class="mt-8 space-y-8">
           <p class="text-center text-text">
-            {{ $t('signup.prompt.description') }}
+            {{ t('signup.prompt.description') }}
           </p>
           <p class="text-center text-text">
-            {{ $t('signup.prompt.question') }}
+            {{ t('signup.prompt.question') }}
           </p>
           <div class="grid grid-flow-row-dense gap-3 sm:grid-cols-2">
             <button
@@ -33,14 +33,14 @@
               class="sec-btn"
               @click="$emit('cancel')"
             >
-              {{ $t('signup.actions.noThanksDeleteMe') }}
+              {{ t('signup.actions.noThanksDeleteMe') }}
             </button>
             <button
               type="button"
               class="pri-btn"
               @click="gotoSignIn"
             >
-              {{ $t('signup.actions.yesGimmeCoins') }}
+              {{ t('signup.actions.yesGimmeCoins') }}
             </button>
           </div>
         </div>
@@ -50,6 +50,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 const { open } = defineProps<{ open: boolean }>()
 defineEmits(['cancel'])
 

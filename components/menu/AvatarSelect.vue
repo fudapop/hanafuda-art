@@ -22,14 +22,14 @@
           class="flex items-center justify-between px-6 py-4 border-b shadow-sm bg-border border-border"
         >
           <h3 class="text-lg font-semibold tracking-wide text-text w-max">
-            {{ $t('menu.avatarSelect.title') }}
+            {{ t('menu.avatarSelect.title') }}
           </h3>
           <button @click="close">
             <Icon
               name="mdi:close"
               class="w-4 h-4 text-text"
             />
-            <span class="sr-only">{{ $t('common.actions.close') }}</span>
+            <span class="sr-only">{{ t('common.actions.close') }}</span>
           </button>
         </div>
         <div class="max-h-[500px] overflow-y-auto">
@@ -74,6 +74,7 @@
 <script setup lang="ts">
 import { LockClosedIcon } from '@heroicons/vue/20/solid'
 
+const { t } = useI18n()
 const { modelValue } = defineProps<{ modelValue: string }>()
 const emits = defineEmits(['update:modelValue'])
 

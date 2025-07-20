@@ -61,7 +61,7 @@
               class="inline w-8 h-8 pb-1"
               name="mdi:cards-outline"
             />
-            {{ $t('menu.options.tabs.yaku') }}
+            {{ t('menu.options.tabs.yaku') }}
           </span>
         </button>
         <button
@@ -77,7 +77,7 @@
               class="inline w-8 h-8 pb-1"
               v-else
             />
-            {{ $t('common.actions.showTable') }}
+            {{ t('common.actions.showTable') }}
           </span>
         </button>
       </div>
@@ -87,6 +87,8 @@
 
 <script setup lang="ts">
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
+
+const { t } = useI18n()
 const { show } = defineProps<{ show: boolean }>()
 const modalHidden = ref(false)
 
