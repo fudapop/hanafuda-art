@@ -86,12 +86,12 @@
           >
             <Icon
               v-if="isFullscreen"
-              name="ic:outline-fullscreen"
+              name="ic:outline-fullscreen-exit"
               class="w-4 h-4"
             />
             <Icon
               v-else
-              name="ic:outline-fullscreen-exit"
+              name="ic:outline-fullscreen"
               class="w-4 h-4"
             />
             <span class="text-sm capitalize">{{
