@@ -22,7 +22,7 @@
           <div
             :class="{
               'transition-transform duration-200 absolute bottom-0 left-1/2 -translate-x-1/2 w-max mx-auto': true,
-              'scale-[2] translate-y-1 z-10': selectedCard,
+              'scale-[2] translate-y-8 z-10': selectedCard,
             }"
           >
             <Transition
@@ -44,7 +44,7 @@
                   aria-live="polite"
                   class="sr-only"
                 >
-                  {{ $t('collection.opponentCollection') + ': ' + selectedCard.name }}
+                  {{ $t('collection.opponentCollection') + ': ' + selectedCard }}
                 </div>
                 <CardImage
                   class="drop-shadow-md"
