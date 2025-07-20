@@ -2,6 +2,19 @@
 
 All notable changes to Hanafuda Koi-Koi will be documented in this file.
 
+## [2.1.1] - 2025-07-19
+
+### Improvements
+- **Performance**: Optimized card and background images by converting them to WebP and moving assets to a static bucket for faster loading.
+- **Responsive UI**: The status bar now scales more effectively on different screen sizes.
+- **Avatar Management**: Refactored avatar state management for better consistency.
+
+### Bug Fixes
+- **Avatar Selection**: Restored the full range of avatar options.
+
+### Miscellaneous
+- **Tooling**: Added a utility script for uploading assets.
+
 ## [2.1.0] - 2025-07-17
 
 ### UI & Layout Improvements
