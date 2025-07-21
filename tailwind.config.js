@@ -16,29 +16,29 @@ module.exports = {
     extend: {
       colors: {
         // Hanafuda-inspired palette using CSS variables
-        primary: 'var(--color-primary)',
-        accent: 'var(--color-accent)',
+        primary: 'hsl(var(--color-primary))',
+        accent: 'hsl(var(--color-accent))',
         sakura: {
-          DEFAULT: 'var(--color-sakura)',
-          light: 'var(--color-sakura-light)',
-          dark: 'var(--color-sakura-dark)',
+          DEFAULT: 'hsl(var(--color-sakura))',
+          light: 'hsl(var(--color-sakura-light))',
+          dark: 'hsl(var(--color-sakura-dark))',
         },
         // Natural, warm backgrounds
-        background: 'var(--color-background)',
-        surface: 'var(--color-surface)',
-        border: 'var(--color-border)',
+        background: 'hsl(var(--color-background))',
+        surface: 'hsl(var(--color-surface))',
+        border: 'hsl(var(--color-border))',
         text: {
-          DEFAULT: 'var(--color-text)',
-          secondary: 'var(--color-text-secondary)',
+          DEFAULT: 'hsl(var(--color-text))',
+          secondary: 'hsl(var(--color-text-secondary))',
         },
         // Game-specific colors
         hanafuda: {
-          red: 'var(--color-hanafuda-red)',
-          gold: 'var(--color-hanafuda-gold)',
-          cream: 'var(--color-hanafuda-cream)',
-          brown: 'var(--color-hanafuda-brown)',
-          purple: 'var(--color-hanafuda-purple)',
-          green: 'var(--color-hanafuda-green)',
+          red: 'hsl(var(--color-hanafuda-red))',
+          gold: 'hsl(var(--color-hanafuda-gold))',
+          cream: 'hsl(var(--color-hanafuda-cream))',
+          brown: 'hsl(var(--color-hanafuda-brown))',
+          purple: 'hsl(var(--color-hanafuda-purple))',
+          green: 'hsl(var(--color-hanafuda-green))',
         },
       },
     },

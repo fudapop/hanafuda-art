@@ -133,7 +133,7 @@
     }
   },
   "game": {
-    "title": "花札こいこい",
+    "title": "新花札",
     "ui": {
       "statusBar": {
         "roundCounter": "ラウンド {current} / {max}"
@@ -382,6 +382,36 @@
     },
     "actions": {
       "closePanel": "パネルを閉じる"
+    }
+  },
+  "rankings": {
+    "title": "ランキング",
+    "pageTitle": "新花札 | ランキング",
+    "failedToLoad": "リーダーボードのデータの読み込みに失敗しました。後でもう一度お試しください。",
+    "retry": "再試行",
+    "filters": {
+      "overall": "総合",
+      "active": "最多プレイ",
+      "wins": "最多勝利",
+      "winrate": "最高勝率"
+    },
+    "table": {
+      "rank": "順位",
+      "player": "プレイヤー",
+      "games": "ゲーム数",
+      "wins": "勝利数",
+      "losses": "敗北数",
+      "draws": "引き分け数",
+      "winRate": "勝率",
+      "coins": "コイン"
+    },
+    "player": {
+      "guest": "ゲストプレイヤー",
+      "guestShort": "ゲスト"
+    },
+    "empty": {
+      "noPlayers": "プレイヤーが見つかりません",
+      "beTheFirst": "最初にプレイしてリーダーボードに表示されましょう！"
     }
   }
 }

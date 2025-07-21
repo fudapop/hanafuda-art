@@ -81,6 +81,14 @@
           {{ t('common.actions.options') }}
         </button>
 
+        <!-- Leaderboard Button - Show for all users -->
+        <button
+          class="mt-2 uppercase ring-inset action-button max-w-none"
+          @click="goToRankings"
+        >
+          {{ t('rankings.title') }}
+        </button>
+
         <!-- Authentication buttons -->
         <div class="flex gap-4">
           <button
@@ -122,6 +130,10 @@ const goToLogin = () => {
   if (route) {
     navigateTo(route.fullPath)
   }
+}
+
+const goToRankings = () => {
+  navigateTo(localeRoute('/rankings'))
 }
 
 const handleSignin = () => {

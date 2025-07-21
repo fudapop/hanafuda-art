@@ -383,5 +383,35 @@
     "actions": {
       "closePanel": "Close panel"
     }
+  },
+  "rankings": {
+    "title": "Rankings",
+    "pageTitle": "New Hanafuda | Rankings",
+    "failedToLoad": "Failed to load leaderboard data. Please try again later.",
+    "retry": "Retry",
+    "filters": {
+      "overall": "Overall",
+      "active": "Most Active",
+      "wins": "Most Wins",
+      "winrate": "Best Win Rate"
+    },
+    "table": {
+      "rank": "Rank",
+      "player": "Player",
+      "games": "Games",
+      "wins": "Wins",
+      "losses": "Losses",
+      "draws": "Draws",
+      "winRate": "Win Rate",
+      "coins": "Coins"
+    },
+    "player": {
+      "guest": "Guest Player",
+      "guestShort": "Guest"
+    },
+    "empty": {
+      "noPlayers": "No players found",
+      "beTheFirst": "Be the first to play and appear on the leaderboard!"
+    }
   }
 }

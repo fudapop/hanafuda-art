@@ -114,14 +114,14 @@
               </div>
             </div>
 
-            <div class="flex items-center mt-4 text-xs text-text-secondary">
+            <div
+              v-if="viewingsAllowed === 'limited' && viewingYaku.has(yaku.name)"
+              class="flex items-center mt-4 text-xs text-text-secondary"
+            >
               <ExclamationCircleIcon
                 class="flex-shrink-0 inline w-4 h-auto mr-1 pointer-events-none"
               />
-              <p
-                v-if="viewingsAllowed === 'limited' && viewingYaku.has(yaku.name)"
-                class="max-w-prose text-balance"
-              >
+              <p class="max-w-prose text-balance">
                 {{
                   t('game.yaku.requiresAtLeastOneOther', {
                     notYaku: [...viewingYaku].filter((name) => name != yaku.name)[0].toUpperCase(),
