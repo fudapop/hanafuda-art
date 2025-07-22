@@ -14,7 +14,7 @@
         </h1>
       </header>
 
-      <main class="mx-auto overflow-x-auto max-w-screen lg:px-8 touch-pan-x">
+      <main class="mx-auto overflow-auto max-w-screen lg:px-8 touch-pan-x touch-pan-y">
         <!-- Loading State -->
         <div
           v-if="loading"
@@ -69,9 +69,7 @@
           </div>
 
           <!-- Leaderboard Table -->
-          <div
-            class="mx-auto overflow-hidden rounded-md shadow-lg w-max bg-background dark:bg-surface"
-          >
+          <div class="mx-auto rounded-md shadow-lg h-max w-max bg-background dark:bg-surface">
             <div class="hidden sm:block">
               <!-- Desktop Table -->
               <table class="w-full">
