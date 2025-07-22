@@ -2,6 +2,14 @@
 
 All notable changes to Hanafuda Koi-Koi will be documented in this file.
 
+## [2.3.0] - 2025-07-22
+
+### New Features
+- **Player Rankings**: A new page has been added to display player rankings.
+
+### Bug Fixes
+- **Attributions**: Corrected a typo in a contributor's name on the attributions page.
+
 ## [2.2.0] - 2025-07-20
 
 ### New Features
