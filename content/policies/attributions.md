@@ -34,7 +34,7 @@ The hanafuda card designs featured in this game are created by various talented 
 
 ### Special Contributors
 
-- **Emiko Osagawara** - Digital restoration and contribution of historical designs
+- **Emiko Ogasawara** - Digital restoration and contribution of historical designs
   - Website: [emikoogasawara.com](https://emikoogasawara.com/){target="_blank" rel="noopener noreferrer"}
   - Contributed: Hanamaki, Hana-awase, Kin-botan, and Postcard designs
 
