@@ -161,7 +161,11 @@
       "bright": "光",
       "animal": "種",
       "ribbon": "短冊",
-      "plain": "カス"
+      "plain": "カス",
+      "brights": "光",
+      "animals": "種",
+      "ribbons": "短冊",
+      "plains": "カス"
     },
     "yaku": {
       "gokou": "五光",

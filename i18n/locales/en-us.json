@@ -161,7 +161,11 @@
       "bright": "bright",
       "animal": "animal",
       "ribbon": "ribbon",
-      "plain": "plain"
+      "plain": "plain",
+      "brights": "brights",
+      "animals": "animals",
+      "ribbons": "ribbons",
+      "plains": "plains"
     },
     "yaku": {
       "gokou": "Five Brights",

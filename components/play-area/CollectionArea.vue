@@ -23,7 +23,7 @@
             <span class="mr-1 text-xs align-middle">
               {{ coll[type].size }}
             </span>
-            {{ type }}
+            {{ t(`game.cardTypes.${type}`) }}
           </span>
           <template v-if="!isMobileLandscape">
             <CardList
