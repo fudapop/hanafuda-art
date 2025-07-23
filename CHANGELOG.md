@@ -2,6 +2,14 @@
 
 All notable changes to Hanafuda Koi-Koi will be documented in this file.
 
+## [2.3.1] - 2025-07-23
+
+### Bug Fixes
+- **Translations**: Added missing translations for card types.
+- **UI**: Improved spacing in the results modal message.
+- **UI**: Updated start screen buttons to minimize crowding.
+- **Leaderboard**: Fixed table scrolling on mobile devices.
+
 ## [2.3.0] - 2025-07-22
 
 ### New Features
