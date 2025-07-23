@@ -47,21 +47,26 @@
     <!-- Centered content -->
     <div
       :class="[
-        'relative z-20 flex flex-col items-center justify-center gap-4',
-        isMobile ? 'landscape:flex-row landscape:justify-around landscape:w-full' : '',
+        'relative z-20 flex flex-col items-center justify-center gap-3 pb-32 sm:pb-24 md:pb-16',
+        isMobile
+          ? 'landscape:flex-row landscape:justify-around landscape:w-full landscape:pb-16'
+          : '',
       ]"
     >
       <img
         src="/images/logo-title.webp"
-        :class="['w-[120px] mb-2', isMobile ? 'landscape:w-[30dvh]' : 'sm:w-[180px]']"
+        :class="[
+          'w-[100px] mb-1 sm:w-[120px] sm:mb-2',
+          isMobile ? 'landscape:w-[25dvh]' : 'md:w-[180px]',
+        ]"
         :alt="t('game.title')"
       />
       <h1 class="sr-only">{{ t('game.title') }}</h1>
-      <div class="flex flex-col items-center gap-4">
+      <div class="flex flex-col items-center gap-3 sm:gap-4">
         <button
           :class="[
-            'rounded-sm overflow-hidden mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[150px]',
-            isMobile ? 'landscape:mt-0' : 'sm:mt-24',
+            'rounded-sm overflow-hidden mt-6 sm:mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[140px] sm:w-[150px]',
+            isMobile ? 'landscape:mt-0' : 'md:mt-24',
           ]"
           @click="$emit('start-game')"
         >
@@ -75,7 +80,7 @@
         <!-- Options Button - Only show when logged in -->
         <button
           v-if="!userIsGuest"
-          class="mt-2 ring-inset action-button"
+          class="min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-sm sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
           @click="() => openOptions()"
         >
           {{ t('common.actions.options') }}
@@ -83,7 +88,8 @@
 
         <!-- Leaderboard Button - Show for all users -->
         <button
-          class="mt-2 uppercase ring-inset action-button max-w-none"
+          v-if="!userIsGuest"
+          class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-sm sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
           @click="goToRankings"
         >
           {{ t('rankings.title') }}
@@ -93,7 +99,7 @@
         <div class="flex gap-4">
           <button
             v-if="userIsGuest"
-            class="action-button"
+            class="min-w-[120px] px-6 py-2 text-sm font-semibold transition-all duration-200 border rounded-sm text-text bg-surface border-border hover:bg-surface/80 hover:border-primary/50"
             @click="goToLogin"
           >
             {{ t('common.actions.signUp') }}
@@ -103,7 +109,7 @@
           v-if="userIsGuest"
           role="link"
           @click="handleSignin"
-          class="block text-sm text-center transition-colors duration-200 cursor-pointer text-text-secondary hover:underline hover:text-primary"
+          class="block px-2 text-xs text-center transition-colors duration-200 cursor-pointer sm:text-sm text-text-secondary hover:underline hover:text-primary"
         >
           {{ t('navigation.signInToExistingAccount') }}
         </span>
