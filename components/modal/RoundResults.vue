@@ -33,7 +33,7 @@
             {{ ps.getPlayerName(recordedWinner) }}
           </span>
           <span v-if="teshiOrKuttsuki">
-            {{ t('game.results.gotDealtA') }}
+            {{ ` ${t('game.results.gotDealtA')}` }}
             <a
               title="Four-of-a-Kind / Four-Pairs"
               class="underline decoration-dotted underline-offset-4 cursor-help"
