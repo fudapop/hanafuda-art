@@ -82,6 +82,64 @@
       ]
     }
   },
+  "shou-suisaiga": {
+    "name": "shou-suisaiga",
+    "title": "Shou Suisaiga",
+    "creator": "Vulume",
+    "description": "Design by Discord user Vulume!",
+    "urlDescription": "Join the Hanafuda Discord!",
+    "url": "https://discord.gg/pMAPBMhqHH",
+    "releaseDate": "7-26-2025"
+  },
+  "vaporwave": {
+    "name": "vaporwave",
+    "title": "Vaporwave",
+    "creator": "Heavenlysome",
+    "description": "Design by Discord user Heavenlysome!",
+    "urlDescription": "Join the Hanafuda Discord!",
+    "url": "https://discord.gg/pMAPBMhqHH",
+    "releaseDate": "12-12-2023"
+  },
+  "hanamaki": {
+    "name": "hanamaki",
+    "title": "Hanamaki",
+    "creator": "Tsuruta",
+    "description": "Hanafuda design made by Tsuruta in the late Showa period.",
+    "urlDescription": "See more traditional designs at Japan Playing Card Museum.",
+    "url": "https://japanplayingcardmuseum.com/112-2-6-reproduction-localcards-kyotomakers/",
+    "contributor": "Emiko Ogasawara",
+    "contributorUrl": "https://emikoogasawara.com/",
+    "releaseDate": "12-14-2023"
+  },
+  "hana-awase": {
+    "name": "hana-awase",
+    "title": "Hana-awase",
+    "description": "Mid-Meiji period hanafuda found in Palmer's 'Hana-awase' (1891).",
+    "urlDescription": "View more of the collection on the Internet Archive.",
+    "url": "https://archive.org/details/hanaawase00palm/page/564/mode/2up",
+    "contributor": "Emiko Ogasawara",
+    "contributorUrl": "https://emikoogasawara.com/",
+    "releaseDate": "12-19-2023"
+  },
+  "kinbotan": {
+    "name": "kinbotan",
+    "title": "Kin-botan",
+    "description": "This 'Golden Peony' edition produced by Windmill is a replica of an original deck once belonging to Japan's first Prime Minister.",
+    "contributor": "Emiko Ogasawara",
+    "contributorUrl": "https://emikoogasawara.com/",
+    "releaseDate": "12-23-2023"
+  },
+  "post-card": {
+    "name": "postcard",
+    "title": "Postcard",
+    "description": "Postcards featuring this pattern by Tanaka Sansho were issued in 1906.",
+    "creator": "Tanaka Sansho",
+    "url": "https://japanplayingcardmuseum.com/112-1-3-postcard-designed-hanacarta/",
+    "urlDescription": "Read about this collection at Japan Playing Card Museum.",
+    "contributor": "Emiko Ogasawara",
+    "contributorUrl": "https://emikoogasawara.com/",
+    "releaseDate": "01-07-2024"
+  },
   "modern": {
     "name": "modern",
     "title": "2012 Modern",
@@ -141,6 +199,14 @@
         "kiri-no-kasu-1"
       ]
     }
+  },
+  "koinobori": {
+    "name": "koinobori",
+    "title": "Koinobori",
+    "creator": "IndianWolf Studios",
+    "description": "Koinobori Handafuda brought to you by IndianWolf Studios LLC!",
+    "urlDescription": "Back their project on Kickstarter!",
+    "url": "https://www.kickstarter.com/projects/iws/koinobori-playing-cards-hanafuda-poker-plastic"
   },
   "hanami": {
     "name": "hanami",
@@ -210,14 +276,6 @@
       ]
     }
   },
-  "koinobori": {
-    "name": "koinobori",
-    "title": "Koinobori",
-    "creator": "IndianWolf Studios",
-    "description": "Koinobori Handafuda brought to you by IndianWolf Studios LLC!",
-    "urlDescription": "Back their project on Kickstarter!",
-    "url": "https://www.kickstarter.com/projects/iws/koinobori-playing-cards-hanafuda-poker-plastic"
-  },
   "nishiki-fuda": {
     "name": "nishiki-fuda",
     "title": "Nishiki Fuda",
@@ -225,55 +283,6 @@
     "description": "Design by Hanako of Estudio Artes in Osaka, Japan!",
     "urlDescription": "Buy this deck and others from their online store!",
     "url": "https://nishikie.stores.jp"
-  },
-  "vaporwave": {
-    "name": "vaporwave",
-    "title": "Vaporwave",
-    "creator": "Heavenlysome",
-    "description": "Design by Discord user Heavenlysome!",
-    "urlDescription": "Join the Hanafuda Discord!",
-    "url": "https://discord.gg/pMAPBMhqHH",
-    "releaseDate": "12-12-2023"
-  },
-  "hanamaki": {
-    "name": "hanamaki",
-    "title": "Hanamaki",
-    "creator": "Tsuruta",
-    "description": "Hanafuda design made by Tsuruta in the late Showa period.",
-    "urlDescription": "See more traditional designs at Japan Playing Card Museum.",
-    "url": "https://japanplayingcardmuseum.com/112-2-6-reproduction-localcards-kyotomakers/",
-    "contributor": "Emiko Ogasawara",
-    "contributorUrl": "https://emikoogasawara.com/",
-    "releaseDate": "12-14-2023"
-  },
-  "hana-awase": {
-    "name": "hana-awase",
-    "title": "Hana-awase",
-    "description": "Mid-Meiji period hanafuda found in Palmer's 'Hana-awase' (1891).",
-    "urlDescription": "View more of the collection on the Internet Archive.",
-    "url": "https://archive.org/details/hanaawase00palm/page/564/mode/2up",
-    "contributor": "Emiko Ogasawara",
-    "contributorUrl": "https://emikoogasawara.com/",
-    "releaseDate": "12-19-2023"
-  },
-  "kinbotan": {
-    "name": "kinbotan",
-    "title": "Kin-botan",
-    "description": "This 'Golden Peony' edition produced by Windmill is a replica of an original deck once belonging to Japan's first Prime Minister.",
-    "contributor": "Emiko Ogasawara",
-    "contributorUrl": "https://emikoogasawara.com/",
-    "releaseDate": "12-23-2023"
-  },
-  "post-card": {
-    "name": "postcard",
-    "title": "Postcard",
-    "description": "Postcards featuring this pattern by Tanaka Sansho were issued in 1906.",
-    "creator": "Tanaka Sansho",
-    "url": "https://japanplayingcardmuseum.com/112-1-3-postcard-designed-hanacarta/",
-    "urlDescription": "Read about this collection at Japan Playing Card Museum.",
-    "contributor": "Emiko Ogasawara",
-    "contributorUrl": "https://emikoogasawara.com/",
-    "releaseDate": "01-07-2024"
   },
   "flash-black": {
     "name": "flash-black",

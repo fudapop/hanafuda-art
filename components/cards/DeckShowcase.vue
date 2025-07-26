@@ -1,5 +1,5 @@
 <template>
-  <div :class="['relative w-24 mx-auto h-36', design]">
+  <div :class="['relative w-24 mx-auto h-40', design]">
     <!-- Card Back (base layer) -->
     <div
       class="absolute inset-0 z-0 object-cover w-full h-full card down -translate-x-1/4"

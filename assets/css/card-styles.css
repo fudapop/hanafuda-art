@@ -239,6 +239,21 @@
   }
 }
 
+.shou-suisaiga {
+  --card-aspect: 120/187;
+  --card-radius: 0.1rem;
+  --card-border-color: transparent;
+
+  & .down {
+    box-shadow: inset 0 0 1px 1px #610000;
+    --card-border-color: #610000;
+    --card-bg-color: url('/cards/shou-suisaiga/card-back.webp');
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
+}
+
 .vaporwave {
   --card-aspect: 3/5;
   --card-radius: 0.2rem;
