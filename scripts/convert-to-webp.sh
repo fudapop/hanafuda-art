@@ -9,6 +9,10 @@ VERBOSE=false
 PRESET="default"
 WIDTH=""
 HEIGHT=""
+CROP_X=""
+CROP_Y=""
+CROP_WIDTH=""
+CROP_HEIGHT=""
 
 # Function to show usage
 show_usage() {
@@ -22,6 +26,10 @@ show_usage() {
     echo "  -p, --preset TYPE    Preset: default, photo, picture, drawing, icon, text (default: default)"
     echo "  -w, --width N        Target width in pixels"
     echo "  -h, --height N       Target height in pixels"
+    echo "  --crop-x N           X coordinate of crop area top-left corner"
+    echo "  --crop-y N           Y coordinate of crop area top-left corner"
+    echo "  --crop-width N       Width of crop area"
+    echo "  --crop-height N      Height of crop area"
     echo "  -v, --verbose        Verbose output"
     echo "  --help               Show this help message"
     echo ""
@@ -30,6 +38,10 @@ show_usage() {
     echo "  $0 -i ./photos -o ./compressed -l -p photo"
     echo "  $0 -i ./images -w 800 -h 600 -q 90"
     echo "  $0 -i ./images -w 1920 -q 85  # resize to 1920px width, auto height"
+    echo "  $0 -i ./images --crop-x 100 --crop-y 50 --crop-width 800 --crop-height 600"
+    echo "  $0 -i ./images --crop-x 0 --crop-y 0 --crop-width 1920 --crop-height 1080 -w 800"
+    echo ""
+    echo "Note: Cropping is applied before any scaling/resizing."
     echo ""
 }
 
@@ -78,6 +90,11 @@ convert_file() {
         local size_width="${WIDTH:-0}"
         local size_height="${HEIGHT:-0}"
         cmd="$cmd -resize ${size_width} ${size_height}"
+    fi
+
+    # Add crop parameters if specified
+    if [[ -n "$CROP_X" ]] || [[ -n "$CROP_Y" ]] || [[ -n "$CROP_WIDTH" ]] || [[ -n "$CROP_HEIGHT" ]]; then
+        cmd="$cmd -crop ${CROP_X:-0} ${CROP_Y:-0} ${CROP_WIDTH:-0} ${CROP_HEIGHT:-0}"
     fi
     
     # Add quality or lossless flag
@@ -140,6 +157,22 @@ while [[ $# -gt 0 ]]; do
             HEIGHT="$2"
             shift 2
             ;;
+        --crop-x)
+            CROP_X="$2"
+            shift 2
+            ;;
+        --crop-y)
+            CROP_Y="$2"
+            shift 2
+            ;;
+        --crop-width)
+            CROP_WIDTH="$2"
+            shift 2
+            ;;
+        --crop-height)
+            CROP_HEIGHT="$2"
+            shift 2
+            ;;
         -v|--verbose)
             VERBOSE=true
             shift
@@ -171,6 +204,24 @@ fi
 # Validate height
 if [[ -n "$HEIGHT" ]] && (! [[ "$HEIGHT" =~ ^[0-9]+$ ]] || [ "$HEIGHT" -lt 0 ]); then
     echo "Error: Height must be a positive number"
+    exit 1
+fi
+
+# Validate crop parameters
+if [[ -n "$CROP_X" ]] && (! [[ "$CROP_X" =~ ^[0-9]+$ ]] || [ "$CROP_X" -lt 0 ]); then
+    echo "Error: Crop X must be a positive number"
+    exit 1
+fi
+if [[ -n "$CROP_Y" ]] && (! [[ "$CROP_Y" =~ ^[0-9]+$ ]] || [ "$CROP_Y" -lt 0 ]); then
+    echo "Error: Crop Y must be a positive number"
+    exit 1
+fi
+if [[ -n "$CROP_WIDTH" ]] && (! [[ "$CROP_WIDTH" =~ ^[0-9]+$ ]] || [ "$CROP_WIDTH" -lt 0 ]); then
+    echo "Error: Crop Width must be a positive number"
+    exit 1
+fi
+if [[ -n "$CROP_HEIGHT" ]] && (! [[ "$CROP_HEIGHT" =~ ^[0-9]+$ ]] || [ "$CROP_HEIGHT" -lt 0 ]); then
+    echo "Error: Crop Height must be a positive number"
     exit 1
 fi
 
@@ -220,6 +271,9 @@ echo "Lossless: $LOSSESS"
 echo "Preset: $PRESET"
 if [[ -n "$WIDTH" ]] || [[ -n "$HEIGHT" ]]; then
     echo "Size: ${WIDTH:-auto} x ${HEIGHT:-auto}"
+fi
+if [[ -n "$CROP_X" ]] || [[ -n "$CROP_Y" ]] || [[ -n "$CROP_WIDTH" ]] || [[ -n "$CROP_HEIGHT" ]]; then
+    echo "Crop: ${CROP_X:-0},${CROP_Y:-0},${CROP_WIDTH:-0},${CROP_HEIGHT:-0}"
 fi
 echo ""
 

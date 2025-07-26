@@ -9,6 +9,7 @@
 
 import { load } from 'https://deno.land/std@0.220.1/dotenv/mod.ts'
 import { join } from 'https://deno.land/std@0.220.1/path/mod.ts'
+import { parseArgs } from 'jsr:@std/cli/parse-args'
 import { exists } from 'jsr:@std/fs/exists'
 import { createClient } from 'jsr:@supabase/supabase-js'
 
@@ -24,13 +25,19 @@ const env = await load({ envPath: join(import.meta.dirname, '../.env') })
 const supabase = createClient(env.NUXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SECRET_KEY)
 const bucket = supabase.storage.from('static')
 
+const args = parseArgs(Deno.args, {
+  boolean: ['upsert'],
+  string: ['dir', 'path'],
+})
+
 /**
  * Command line arguments
  * @type {string} path - Source file or directory path
  * @type {string} uploadPath - Optional destination path in storage bucket
  */
-const path = Deno.args[0]
-const uploadPath = Deno.args[1]?.replace(/^\/|\/$/, '').trim() || ''
+const path = args.dir || Deno.args[0]
+const uploadPath = args.path?.replace(/^\/|\/$/, '').trim() || ''
+const upsert = args.upsert
 
 /**
  * File system utility functions
@@ -69,6 +76,7 @@ const createUploadItem = (filename, filepath) => {
   const fileOptions = {
     contentType: `image/${filename.split('.').pop()}`,
     cacheControl: 'public, max-age=31536000',
+    upsert,
   }
   const finalPath = `${uploadPath}/${filename}`.replace(/^\/|\/$/, '').trim()
   return {
@@ -134,27 +142,31 @@ console.info(`\n✅ Successfully uploaded ${successCount} files!`)
 /**
  * @example
  * // Upload a single image file
- * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js ./public/images/logo.png
+ * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js --dir ./public/images/logo.png
  *
  * @example
  * // Upload a single image to a specific folder in storage
- * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js ./public/images/logo.png "branding"
+ * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js --dir ./public/images/logo.png --path "branding"
+ *
+ * @example
+ * // Upload a single image file with upsert
+ * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js --dir ./public/images/logo.png --path "branding" --upsert
  *
  * @example
  * // Upload all images from a directory
- * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js ./public/cards/
+ * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js --dir ./public/cards/
  *
  * @example
  * // Upload all images from a directory to a specific folder in storage
- * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js ./public/avatars/ "user-avatars"
+ * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js --dir ./public/avatars/ --path "user-avatars"
  *
  * @example
  * // Upload with custom environment file
- * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js ./public/images/ "static-assets"
+ * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js --dir ./public/images/ --path "static-assets"
  *
  * @usage
  * # Basic usage
- * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js <source-path> [destination-path]
+ * deno run --allow-read --allow-env --allow-net scripts/upload-to-static.js --dir <source-path> --path [destination-path]
  *
  * # Required permissions:
  * --allow-read: Read access to source files
