@@ -2,6 +2,11 @@
 
 All notable changes to Hanafuda Koi-Koi will be documented in this file.
 
+## [2.3.2] - 2025-07-27
+
+### New Features
+- **New Card Design**: Added the "Shou Suisaiga" card design by Discord user Vulume.
+
 ## [2.3.1] - 2025-07-23
 
 ### Bug Fixes
