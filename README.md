@@ -1,61 +1,113 @@
-# NewHanafuda.art
+# New Hanafuda
 
-This project is a web-based card game that allows you to play the Japanese card game Koi-Koi against an AI opponent. This game features beautiful artwork created by various artists, and the primary goal of the project is to share these designs by making them playable online.
+A modern Hanafuda Koi-Koi game built with Nuxt 3, Vue 3, and Firebase.
 
-**[Play now at https://newhanafuda.art!](https://newhanafuda.art)**
+## Features
 
-## How to Play
+- **Hanafuda Koi-Koi Game**: Traditional Japanese card game with beautiful animations
+- **Multiplayer Support**: Play with friends online
+- **User Profiles**: Track your game statistics and rankings
+- **Design Submissions**: Submit your artwork to be featured in the game
+- **Internationalization**: Available in English and Japanese
 
-### Overview
-Koi-Koi is a simple card game that is typically played with hanafuda (literally "flower cards"). In this web-based version, the game is played with a standard 48-card deck. The objective of the game is to score points by collecting sets of cards, called "yaku". Points are awarded based on the number of yaku collected, and the player with the most points at the end of the game wins.
+## Design Submissions
 
-### Gameplay
-To play, simply click on the "Play now" button on the homepage. You will be dealt a hand of cards, and the AI opponent will be dealt a hand as well. To collect sets of cards, you must match cards in your hand with cards on the table that share the same suit (flower). Once you have collected a yaku, you will be prompted to continue (and possibly collect more yaku) or end the round and score points.
+The application includes a design submission system where artists can:
 
-The game ends when all cards have been played, or when one player reaches a predetermined number of points. Coins obtained in game can be used to unlock different hanafuda designs!
+- Upload their artwork (PNG, JPEG, WebP up to 10MB)
+- Provide artist information and social media links
+- Get their designs reviewed by the admin team
+- Receive email notifications upon submission
 
-**[Try playing a round!](https://newhanafuda.art)**
+### Submission Process
 
-### Rule Variations
-Many different rules and game variants exist for Koi-Koi. This version offers some optional scoring rules with more to be added. More in-depth guides on rules and scoring can be found using the links below.
+1. Visit `/submissions` page
+2. Upload your design file using the drag-and-drop interface
+3. Fill in your artist information and description
+4. Optionally add social media links (Instagram, Twitter, website, portfolio)
+5. Submit for review
 
+All submissions are stored in Firebase Storage and metadata is saved in Firestore. Admins receive email notifications via Resend.
 
-## Artwork
-The artwork featured on this site was created by various artists. The history of Hanafuda reaches back quite far, but new reimaginations of the classic designs continue to surface to this day!
+## Environment Variables
 
-![Hanamaki hanafuda by Tsuruta](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fhanamaki%2Fmatsu-ni-tsuru.webp?alt=media&token=8a04c131-12d7-4b3c-8f1b-4076f3d67214) ![Design by Parish Cherry](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fcherry-version%2Fmatsu-ni-tsuru.webp?alt=media&token=411c5696-83dc-4f67-989d-c3e047112868) ![Design from Paul Spencer's 'Hana-awase'](https://firebasestorage.googleapis.com/v0/b/new-hanafuda.appspot.com/o/cards%2Fhana-awase%2Fmatsu-ni-tsuru.webp?alt=media&token=80c967e3-d6b4-4a40-8df6-31acf8ff5765)
+Create a `.env` file based on `.env.example`:
 
-### Attributions
-The currently available designs in the game are attributed to the following artists:
+```bash
+# Firebase Configuration
+API_KEY=your_firebase_api_key
+FIREBASE_PROJECT_ID=your_firebase_project_id
+FIREBASE_CLIENT_EMAIL=your_firebase_client_email
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nyour_firebase_private_key\n-----END PRIVATE KEY-----\n"
 
-|Design|Artist|
-|---|---|
-|[Modern Hanafuda](www.modernhanafuda.net)|Sarah Thomas|
-|Moon Rabbit Hanafuda|[Kelsey Cretcher](https://www.deviantart.com/kcretcher)|
-|[Nishiki Fuda](https://nishikie.stores.jp/)|Estudio Artes|
-|Pokemon Hanafuda|[Sabling](https://ko-fi.com/sabling/)|
-|[Koinobori & Hanami Hanafuda](https://indianwolfstudios.com/shop/)|IndianWolf Studios|
-|[Hanafuda](https://parishcherry.com/hanafuda)|Parish Cherry|
-|[Hanamaki Hanafuda](https://japanplayingcardmuseum.com/edo-showa-dentou-hanafuda/)|Tsuruta|
-|Vaporwave Hanafuda|Heavenlysome|
+# Resend Configuration
+RESEND_API_KEY=your_resend_api_key
 
+# Supabase Configuration
+NUXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+SUPABASE_SECRET_KEY=your_supabase_secret_key
 
-## Contribution
-Whether you're an artist, developer, or fellow hanafuda enthusiast, contributions are certainly welcome! Check our **[CONTRIBUTING](CONTRIBUTING.md)** page to see how you can contribute to this project!
+# ReCaptcha
+RECAPTCHA_KEY=your_recaptcha_key
+APPCHECK_DEBUG_TOKEN=your_appcheck_debug_token
+```
 
+## Firebase Setup
+
+### Storage Rules
+
+Deploy the storage rules for submissions:
+
+```bash
+firebase deploy --only storage
+```
+
+### Firestore Rules
+
+Deploy the Firestore rules:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+## Tech Stack
+
+- **Framework**: Nuxt 3
+- **UI**: Vue 3 + Composition API
+- **Styling**: Tailwind CSS
+- **Database**: Firebase Firestore + Supabase
+- **Storage**: Firebase Storage
+- **Email**: Resend
+- **Authentication**: Firebase Auth + VueFire
+- **Package Manager**: pnpm
 
 ## Development
-If you would like to run a local copy for development or testing purposes, follow these steps:
 
-1. Clone the repository to your local machine.
-2. Install the necessary dependencies by running npm install in the root directory of the project.
-3. Run the development server by running npm run dev.
-4. Navigate to http://localhost:3000 in your web browser.
+```bash
+# Install dependencies
+pnpm install
 
-### Technologies
-This project was built using the Nuxt.js, Vue.js, and TypeScript.
+# Start development server
+pnpm dev
 
+# Build for production
+pnpm build
 
-## Credits
-This project was created by our contributors and is licensed under the MIT License. All artworks used in the game are attributed to and are property of the respective artists.
+# Preview production build
+pnpm preview
+```
+
+## Deployment
+
+The application is configured for Firebase Hosting. Deploy with:
+
+```bash
+pnpm build
+firebase deploy
+```
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
