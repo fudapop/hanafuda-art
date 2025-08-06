@@ -1,24 +1,21 @@
 import { Resend } from 'resend'
-import { getFirestore, doc, setDoc, Timestamp } from 'firebase-admin/firestore'
-import { initializeApp, getApps, cert } from 'firebase-admin/app'
+import { createClient } from '@supabase/supabase-js'
 import { nanoid } from 'nanoid'
-import type { DesignSubmission, SubmissionFormData } from '~/types/submissions'
-
-// Initialize Firebase Admin if not already initialized
-if (!getApps().length) {
-  const serviceAccount = {
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-  }
-
-  initializeApp({
-    credential: cert(serviceAccount),
-    projectId: process.env.FIREBASE_PROJECT_ID,
-  })
-}
+import type { SubmissionInsert } from '~/types/submissions'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
+
+// Initialize Supabase client with service role key for server-side operations
+const supabase = createClient(
+  process.env.NUXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SECRET_KEY!, // service role key for server operations
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+)
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'POST') {
@@ -31,80 +28,91 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
     const { 
-      artistName, 
+      artist_name, 
       description, 
-      socialMediaLinks,
-      fileName,
-      fileUrl,
-      fileSize,
-      mimeType 
+      social_media_links,
+      file_name,
+      file_url,
+      file_size,
+      mime_type 
     } = body
 
     // Validate required fields
-    if (!artistName || !description || !fileName || !fileUrl) {
+    if (!artist_name || !description || !file_name || !file_url) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Missing required fields'
+        statusMessage: 'Missing required fields: artist_name, description, file_name, and file_url are required'
       })
     }
 
-    // Generate submission ID
-    const submissionId = `sub_${nanoid(15)}`
-
-    // Prepare submission data
-    const submission: DesignSubmission = {
-      id: submissionId,
-      artistName,
+    // Prepare submission data for Supabase
+    const submissionData: SubmissionInsert = {
+      artist_name,
       description,
-      socialMediaLinks: socialMediaLinks || {},
-      fileName,
-      fileUrl,
-      fileSize: fileSize || 0,
-      mimeType: mimeType || 'image/jpeg',
-      submittedAt: new Date(),
+      social_media_links: social_media_links || {},
+      file_name,
+      file_url,
+      file_size: file_size || 0,
+      mime_type: mime_type || 'image/jpeg',
       status: 'pending'
     }
 
-    // Save to Firestore
-    const db = getFirestore()
-    await setDoc(doc(db, 'submissions', submissionId), {
-      ...submission,
-      submittedAt: Timestamp.fromDate(submission.submittedAt)
-    })
+    // Insert into Supabase
+    const { data, error } = await supabase
+      .from('submissions')
+      .insert(submissionData)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Supabase error:', error)
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Database error: ${error.message}`
+      })
+    }
+
+    const submissionId = data.id
 
     // Send email notification to admin
-    const socialLinksText = Object.entries(socialMediaLinks || {})
+    const socialLinksText = Object.entries(social_media_links || {})
       .filter(([_, value]) => value)
       .map(([platform, url]) => `${platform}: ${url}`)
       .join('\n')
 
-    await resend.emails.send({
-      from: 'submissions@fudapop.com',
-      to: 'admin@fudapop.com',
-      subject: `New Design Submission from ${artistName}`,
-      html: `
-        <h2>New Design Submission</h2>
-        <p><strong>Artist:</strong> ${artistName}</p>
-        <p><strong>Description:</strong></p>
-        <p>${description}</p>
-        
-        ${socialLinksText ? `
-        <p><strong>Social Media Links:</strong></p>
-        <pre>${socialLinksText}</pre>
-        ` : ''}
-        
-        <p><strong>File Details:</strong></p>
-        <ul>
-          <li>Filename: ${fileName}</li>
-          <li>Size: ${Math.round(fileSize / 1024)} KB</li>
-          <li>Type: ${mimeType}</li>
-        </ul>
-        
-        <p><strong>View File:</strong> <a href="${fileUrl}" target="_blank">Open Image</a></p>
-        
-        <p><em>Submission ID: ${submissionId}</em></p>
-      `
-    })
+    try {
+      await resend.emails.send({
+        from: 'submissions@fudapop.com',
+        to: 'admin@fudapop.com',
+        subject: `New Design Submission from ${artist_name}`,
+        html: `
+          <h2>New Design Submission</h2>
+          <p><strong>Artist:</strong> ${artist_name}</p>
+          <p><strong>Description:</strong></p>
+          <p>${description}</p>
+          
+          ${socialLinksText ? `
+          <p><strong>Social Media Links:</strong></p>
+          <pre>${socialLinksText}</pre>
+          ` : ''}
+          
+          <p><strong>File Details:</strong></p>
+          <ul>
+            <li>Filename: ${file_name}</li>
+            <li>Size: ${Math.round(file_size / 1024)} KB</li>
+            <li>Type: ${mime_type}</li>
+          </ul>
+          
+          <p><strong>View File:</strong> <a href="${file_url}" target="_blank">Open Image</a></p>
+          
+          <p><em>Submission ID: ${submissionId}</em></p>
+          <p><em>Submitted at: ${new Date().toISOString()}</em></p>
+        `
+      })
+    } catch (emailError) {
+      // Log email error but don't fail the submission
+      console.error('Email notification failed:', emailError)
+    }
 
     return {
       success: true,
@@ -114,6 +122,11 @@ export default defineEventHandler(async (event) => {
 
   } catch (error) {
     console.error('Submission error:', error)
+    
+    // If it's already a createError, re-throw it
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      throw error
+    }
     
     throw createError({
       statusCode: 500,

@@ -27,57 +27,59 @@ The application includes a design submission system where artists can:
 4. Optionally add social media links (Instagram, Twitter, website, portfolio)
 5. Submit for review
 
-All submissions are stored in Firebase Storage and metadata is saved in Firestore. Admins receive email notifications via Resend.
+All submissions are stored in Supabase Storage and metadata is saved in the Supabase database. Admins receive email notifications via Resend.
 
 ## Environment Variables
 
 Create a `.env` file based on `.env.example`:
 
 ```bash
-# Firebase Configuration
-API_KEY=your_firebase_api_key
-FIREBASE_PROJECT_ID=your_firebase_project_id
-FIREBASE_CLIENT_EMAIL=your_firebase_client_email
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nyour_firebase_private_key\n-----END PRIVATE KEY-----\n"
+# Supabase Configuration
+NUXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+SUPABASE_SECRET_KEY=your_supabase_service_role_key
 
 # Resend Configuration
 RESEND_API_KEY=your_resend_api_key
 
-# Supabase Configuration
-NUXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
-SUPABASE_SECRET_KEY=your_supabase_secret_key
+# Firebase Configuration (existing game features)
+API_KEY=your_firebase_api_key
 
 # ReCaptcha
 RECAPTCHA_KEY=your_recaptcha_key
 APPCHECK_DEBUG_TOKEN=your_appcheck_debug_token
 ```
 
-## Firebase Setup
+## Database Setup
 
-### Storage Rules
+### Run Supabase Migrations
 
-Deploy the storage rules for submissions:
-
-```bash
-firebase deploy --only storage
-```
-
-### Firestore Rules
-
-Deploy the Firestore rules:
+Run the migrations to create the submissions table and storage bucket:
 
 ```bash
-firebase deploy --only firestore:rules
+npx supabase migration up
 ```
+
+Or apply them manually in your Supabase dashboard:
+
+1. Create the submissions table (see `supabase/migrations/20250806000001_create_submissions_table.sql`)
+2. Set up the storage bucket and policies (see `supabase/migrations/20250806000002_create_submissions_bucket.sql`)
+
+### Storage Bucket
+
+The submissions feature uses a Supabase storage bucket called `submissions` with:
+- 10MB file size limit
+- Allowed file types: PNG, JPEG, WebP
+- Public read access
+- Upload restrictions via RLS policies
 
 ## Tech Stack
 
 - **Framework**: Nuxt 3
 - **UI**: Vue 3 + Composition API
 - **Styling**: Tailwind CSS
-- **Database**: Firebase Firestore + Supabase
-- **Storage**: Firebase Storage
+- **Database**: Supabase + Firebase Firestore (legacy features)
+- **Storage**: Supabase Storage
 - **Email**: Resend
 - **Authentication**: Firebase Auth + VueFire
 - **Package Manager**: pnpm

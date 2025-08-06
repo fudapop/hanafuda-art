@@ -1,15 +1,9 @@
 import { ref, computed } from 'vue'
-import { 
-  getStorage, 
-  ref as storageRef, 
-  uploadBytesResumable, 
-  getDownloadURL,
-  type UploadTaskSnapshot 
-} from 'firebase/storage'
 import { nanoid } from 'nanoid'
 import type { FileUploadProgress } from '~/types/submissions'
 
 export const useFileUpload = () => {
+  const supabase = useSupabaseClient()
   const uploads = ref<Map<string, FileUploadProgress>>(new Map())
   const isUploading = computed(() => {
     return Array.from(uploads.value.values()).some(upload => upload.uploading)
@@ -17,13 +11,12 @@ export const useFileUpload = () => {
 
   const uploadFile = async (
     file: File,
-    folder: string = 'submissions'
+    bucket: string = 'submissions'
   ): Promise<{ url: string; fileName: string } | null> => {
     const uploadId = nanoid()
-    const storage = getStorage()
     const fileExtension = file.name.split('.').pop()
     const fileName = `${nanoid()}.${fileExtension}`
-    const fileRef = storageRef(storage, `${folder}/${fileName}`)
+    const filePath = `${fileName}`
 
     // Initialize upload progress
     uploads.value.set(uploadId, {
@@ -33,50 +26,49 @@ export const useFileUpload = () => {
     })
 
     try {
-      const uploadTask = uploadBytesResumable(fileRef, file)
+      // Upload file to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
 
-      return new Promise((resolve, reject) => {
-        uploadTask.on(
-          'state_changed',
-          (snapshot: UploadTaskSnapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            uploads.value.set(uploadId, {
-              fileName: file.name,
-              progress,
-              uploading: progress < 100
-            })
-          },
-          (error) => {
-            uploads.value.set(uploadId, {
-              fileName: file.name,
-              progress: 0,
-              uploading: false,
-              error: error.message
-            })
-            reject(error)
-          },
-          async () => {
-            try {
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
-              uploads.value.set(uploadId, {
-                fileName: file.name,
-                progress: 100,
-                uploading: false,
-                url: downloadURL
-              })
-              resolve({ url: downloadURL, fileName })
-            } catch (error) {
-              uploads.value.set(uploadId, {
-                fileName: file.name,
-                progress: 0,
-                uploading: false,
-                error: error instanceof Error ? error.message : 'Failed to get download URL'
-              })
-              reject(error)
-            }
-          }
-        )
+      if (error) {
+        uploads.value.set(uploadId, {
+          fileName: file.name,
+          progress: 0,
+          uploading: false,
+          error: error.message
+        })
+        throw error
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath)
+
+      if (!urlData.publicUrl) {
+        uploads.value.set(uploadId, {
+          fileName: file.name,
+          progress: 0,
+          uploading: false,
+          error: 'Failed to get public URL'
+        })
+        throw new Error('Failed to get public URL')
+      }
+
+      // Update progress to complete
+      uploads.value.set(uploadId, {
+        fileName: file.name,
+        progress: 100,
+        uploading: false,
+        url: urlData.publicUrl
       })
+
+      return { url: urlData.publicUrl, fileName }
+
     } catch (error) {
       uploads.value.set(uploadId, {
         fileName: file.name,

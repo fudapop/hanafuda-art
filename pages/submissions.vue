@@ -97,7 +97,7 @@
               </label>
               <input
                 id="artistName"
-                v-model="formData.artistName"
+                v-model="formData.artist_name"
                 type="text"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
@@ -130,7 +130,7 @@
                   </label>
                   <input
                     id="instagram"
-                    v-model="formData.socialMediaLinks.instagram"
+                    v-model="formData.social_media_links.instagram"
                     type="url"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                     placeholder="https://instagram.com/yourhandle"
@@ -143,7 +143,7 @@
                   </label>
                   <input
                     id="twitter"
-                    v-model="formData.socialMediaLinks.twitter"
+                    v-model="formData.social_media_links.twitter"
                     type="url"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                     placeholder="https://twitter.com/yourhandle"
@@ -156,7 +156,7 @@
                   </label>
                   <input
                     id="website"
-                    v-model="formData.socialMediaLinks.website"
+                    v-model="formData.social_media_links.website"
                     type="url"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                     placeholder="https://yourwebsite.com"
@@ -169,7 +169,7 @@
                   </label>
                   <input
                     id="portfolio"
-                    v-model="formData.socialMediaLinks.portfolio"
+                    v-model="formData.social_media_links.portfolio"
                     type="url"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                     placeholder="https://yourportfolio.com"
@@ -183,10 +183,10 @@
           <div class="pt-6">
             <button
               type="submit"
-              :disabled="!uploadedFile || !formData.artistName || !formData.description || isSubmitting"
+              :disabled="!uploadedFile || !formData.artist_name || !formData.description || isSubmitting"
               :class="[
                 'w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors',
-                (!uploadedFile || !formData.artistName || !formData.description || isSubmitting)
+                (!uploadedFile || !formData.artist_name || !formData.description || isSubmitting)
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
               ]"
@@ -233,9 +233,9 @@ const { uploads, isUploading, uploadFile, validateFile, clearUploads } = useFile
 
 // Form state
 const formData = reactive<SubmissionFormData>({
-  artistName: '',
+  artist_name: '',
   description: '',
-  socialMediaLinks: {
+  social_media_links: {
     instagram: '',
     twitter: '',
     website: '',
@@ -315,7 +315,7 @@ const formatFileSize = (bytes: number): string => {
 
 // Form submission
 const handleSubmit = async () => {
-  if (!uploadedFile.value || !formData.artistName || !formData.description) {
+  if (!uploadedFile.value || !formData.artist_name || !formData.description) {
     toast.error('Please fill in all required fields and upload a file')
     return
   }
@@ -326,13 +326,13 @@ const handleSubmit = async () => {
     const response = await $fetch('/api/submissions', {
       method: 'POST',
       body: {
-        artistName: formData.artistName,
+        artist_name: formData.artist_name,
         description: formData.description,
-        socialMediaLinks: formData.socialMediaLinks,
-        fileName: uploadedFile.value.fileName,
-        fileUrl: uploadedFile.value.url,
-        fileSize: selectedFile.value?.size || 0,
-        mimeType: selectedFile.value?.type || 'image/jpeg'
+        social_media_links: formData.social_media_links,
+        file_name: uploadedFile.value.fileName,
+        file_url: uploadedFile.value.url,
+        file_size: selectedFile.value?.size || 0,
+        mime_type: selectedFile.value?.type || 'image/jpeg'
       }
     })
 
@@ -342,9 +342,9 @@ const handleSubmit = async () => {
       
       // Reset form
       Object.assign(formData, {
-        artistName: '',
+        artist_name: '',
         description: '',
-        socialMediaLinks: {
+        social_media_links: {
           instagram: '',
           twitter: '',
           website: '',
