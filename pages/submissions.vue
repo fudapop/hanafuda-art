@@ -323,9 +323,18 @@ const handleSubmit = async () => {
   isSubmitting.value = true
 
   try {
-    const response = await $fetch('/api/submissions', {
+    const supabase = useSupabaseClient()
+    
+    // Get the Edge Function URL
+    const functionUrl = `${supabase.supabaseUrl}/functions/v1/submit-design`
+    
+    const response = await fetch(functionUrl, {
       method: 'POST',
-      body: {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabase.supabaseKey}`,
+      },
+      body: JSON.stringify({
         artist_name: formData.artist_name,
         description: formData.description,
         social_media_links: formData.social_media_links,
@@ -333,10 +342,12 @@ const handleSubmit = async () => {
         file_url: uploadedFile.value.url,
         file_size: selectedFile.value?.size || 0,
         mime_type: selectedFile.value?.type || 'image/jpeg'
-      }
+      })
     })
 
-    if (response.success) {
+    const data = await response.json()
+
+    if (response.ok && data.success) {
       submissionSuccess.value = true
       toast.success('Submission sent successfully!')
       
@@ -352,10 +363,12 @@ const handleSubmit = async () => {
         }
       })
       clearFile()
+    } else {
+      throw new Error(data.error || 'Submission failed')
     }
   } catch (error) {
     console.error('Submission error:', error)
-    toast.error('Failed to submit. Please try again.')
+    toast.error(error instanceof Error ? error.message : 'Failed to submit. Please try again.')
   } finally {
     isSubmitting.value = false
   }

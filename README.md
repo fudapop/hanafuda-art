@@ -73,6 +73,39 @@ The submissions feature uses a Supabase storage bucket called `submissions` with
 - Public read access
 - Upload restrictions via RLS policies
 
+## Edge Function Setup
+
+### Deploy the Supabase Edge Function
+
+1. Install Supabase CLI if you haven't already:
+   ```bash
+   npm install -g supabase
+   ```
+
+2. Link your project:
+   ```bash
+   supabase link --project-ref your-project-ref
+   ```
+
+3. Set the required secrets for the Edge Function:
+   ```bash
+   supabase secrets set RESEND_API_KEY=your_resend_api_key
+   ```
+
+4. Deploy the Edge Function:
+   ```bash
+   supabase functions deploy submit-design
+   ```
+
+### Edge Function Environment Variables
+
+The Edge Function automatically has access to:
+- `SUPABASE_URL` - Your Supabase project URL
+- `SUPABASE_SERVICE_ROLE_KEY` - Service role key for server-side operations
+
+You need to manually set:
+- `RESEND_API_KEY` - Your Resend API key for sending emails
+
 ## Tech Stack
 
 - **Framework**: Nuxt 3
@@ -81,6 +114,7 @@ The submissions feature uses a Supabase storage bucket called `submissions` with
 - **Database**: Supabase + Firebase Firestore (legacy features)
 - **Storage**: Supabase Storage
 - **Email**: Resend
+- **Edge Functions**: Supabase Edge Functions (Deno)
 - **Authentication**: Firebase Auth + VueFire
 - **Package Manager**: pnpm
 
@@ -100,6 +134,14 @@ pnpm build
 pnpm preview
 ```
 
+### Testing the Edge Function Locally
+
+To test the Edge Function locally:
+
+```bash
+supabase functions serve submit-design --env-file .env.local
+```
+
 ## Deployment
 
 The application is configured for Firebase Hosting. Deploy with:
@@ -108,6 +150,8 @@ The application is configured for Firebase Hosting. Deploy with:
 pnpm build
 firebase deploy
 ```
+
+Don't forget to deploy the Supabase Edge Function as described above.
 
 ## Contributing
 
