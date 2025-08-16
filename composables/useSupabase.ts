@@ -1,5 +1,5 @@
 import { createClient as _createClient } from '@supabase/supabase-js'
-import type { Database } from '~/lib/types'
+import type { Database } from '~/lib/supabase/types'
 
 export const useSupabase = () => {
   const { supabaseUrl, supabasePublishableKey } = useRuntimeConfig().public
