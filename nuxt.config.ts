@@ -119,6 +119,13 @@ export default defineNuxtConfig({
         file: 'ja-jp.json',
         dir: 'ltr',
       },
+      {
+        name: 'Polski',
+        code: 'pl',
+        language: 'pl-PL',
+        file: 'pl-pl.json',
+        dir: 'ltr',
+      },
     ],
     strategy: 'prefix_and_default',
   },
