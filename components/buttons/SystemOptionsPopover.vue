@@ -149,66 +149,115 @@
           </div>
         </div>
 
-        <!-- Music Controls -->
-        <div>
-          <label class="block mb-2 text-xs font-medium text-white sr-only">{{
-            t('common.labels.music')
-          }}</label>
+        <!-- Audio Controls -->
+        <div class="space-y-4">
+          <!-- BGM Controls -->
+          <div>
+            <label class="block mb-2 text-xs font-medium text-white/80">{{
+              t('settings.audio.bgm')
+            }}</label>
 
-          <!-- Volume Controls -->
-          <div class="flex items-center gap-2">
-            <button
-              @click="toggleMute"
-              :class="[
-                'flex items-center justify-center p-2 rounded-md transition-all duration-200',
-                'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
-                'text-white hover:text-yellow-300',
-              ]"
-              :title="t('settings.actions.toggleMute')"
-            >
-              <Icon
-                :name="isMuted ? 'ic:round-volume-off' : 'ic:round-volume-up'"
-                class="w-4 h-4"
-              />
-            </button>
-
-            <div class="flex-1">
-              <input
-                type="range"
-                :value="currentVolume * 100"
-                @input="handleVolumeChange"
-                :disabled="isMuted"
-                min="0"
-                max="100"
-                step="5"
+            <div class="flex items-center gap-2">
+              <button
+                @click="toggleBgmMuteHandler"
                 :class="[
-                  'w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer',
-                  'slider-thumb:appearance-none slider-thumb:h-3 slider-thumb:w-3',
-                  'slider-thumb:rounded-full slider-thumb:bg-white slider-thumb:cursor-pointer',
-                  'disabled:opacity-50 disabled:cursor-not-allowed',
+                  'flex items-center justify-center p-2 rounded-md transition-all duration-200',
+                  'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
+                  'text-white hover:text-yellow-300',
                 ]"
-                :title="t('settings.audio.volume')"
-              />
+                :title="
+                  bgmDisabled ? t('settings.actions.enableBgm') : t('settings.actions.disableBgm')
+                "
+              >
+                <Icon
+                  :name="bgmDisabled ? 'ic:round-volume-off' : 'ic:round-volume-up'"
+                  class="w-4 h-4"
+                />
+              </button>
+
+              <div class="flex-1">
+                <input
+                  type="range"
+                  :value="bgmVolume * 100"
+                  @input="handleBgmVolumeChange"
+                  :disabled="bgmDisabled"
+                  min="0"
+                  max="100"
+                  step="5"
+                  :class="[
+                    'w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer',
+                    'slider-thumb:appearance-none slider-thumb:h-3 slider-thumb:w-3',
+                    'slider-thumb:rounded-full slider-thumb:bg-white slider-thumb:cursor-pointer',
+                    'disabled:opacity-50 disabled:cursor-not-allowed',
+                  ]"
+                  :title="t('settings.audio.bgmVolume')"
+                />
+              </div>
+            </div>
+
+            <!-- Current Track Display -->
+            <div
+              v-if="currentTrackName"
+              class="px-3 py-2 mt-2 overflow-hidden border rounded-md bg-black/5 dark:bg-white/5 border-white/10"
+            >
+              <div class="flex items-center gap-2">
+                <Icon
+                  name="ic:round-music-note"
+                  class="flex-shrink-0 w-3 h-3 text-white/70"
+                />
+                <div class="overflow-hidden">
+                  <span
+                    class="text-xs text-white/80 whitespace-nowrap"
+                    :class="{ 'track-scroll': shouldScroll }"
+                  >
+                    {{ currentTrackName }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Current Track Display -->
-          <div
-            v-if="currentTrackName"
-            class="px-3 py-2 mt-2 overflow-hidden border rounded-md bg-black/5 dark:bg-white/5 border-white/10"
-          >
+          <!-- SFX Controls -->
+          <div>
+            <label class="block mb-2 text-xs font-medium text-white/80">{{
+              t('settings.audio.sfx')
+            }}</label>
+
             <div class="flex items-center gap-2">
-              <Icon
-                name="ic:round-music-note"
-                class="flex-shrink-0 w-3 h-3 text-white/70"
-              />
-              <div class="overflow-hidden">
-                <span
-                  class="text-xs text-white/80 whitespace-nowrap"
-                  :class="{ 'track-scroll': shouldScroll }"
-                >
-                  {{ currentTrackName }}
-                </span>
+              <button
+                @click="toggleSfxMuteHandler"
+                :class="[
+                  'flex items-center justify-center p-2 rounded-md transition-all duration-200',
+                  'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
+                  'text-white hover:text-yellow-300',
+                ]"
+                :title="
+                  sfxDisabled ? t('settings.actions.enableSfx') : t('settings.actions.disableSfx')
+                "
+              >
+                <Icon
+                  :name="sfxDisabled ? 'ic:round-volume-off' : 'ic:round-volume-up'"
+                  class="w-4 h-4"
+                />
+              </button>
+
+              <div class="flex-1">
+                <input
+                  type="range"
+                  :value="sfxVolume * 100"
+                  @input="handleSfxVolumeChange"
+                  :disabled="sfxDisabled"
+                  min="0"
+                  max="100"
+                  step="5"
+                  :class="[
+                    'w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer',
+                    'slider-thumb:appearance-none slider-thumb:h-3 slider-thumb:w-3',
+                    'slider-thumb:rounded-full slider-thumb:bg-white slider-thumb:cursor-pointer',
+                    'disabled:opacity-50 disabled:cursor-not-allowed',
+                  ]"
+                  :title="t('settings.audio.sfxVolume')"
+                />
               </div>
             </div>
           </div>
@@ -294,13 +343,27 @@ if (!audio) {
 
 const {
   isPlaying,
-  currentVolume,
-  isMuted,
   playAudio,
   pauseAudio,
+  currentTrackName,
+
+  // BGM controls
+  bgmVolume,
+  bgmDisabled,
+  setBgmVolume,
+  toggleBgmDisabled,
+
+  // SFX controls
+  sfxVolume,
+  sfxDisabled,
+  setSfxVolume,
+  toggleSfxDisabled,
+
+  // Legacy aliases for backward compatibility
+  currentVolume,
+  isMuted,
   setVolume,
   toggleMute: audioToggleMute,
-  currentTrackName, // Just use this directly
 } = audio
 
 // No need for trackNames mapping or currentTrackName computed here!
@@ -337,17 +400,33 @@ const toggleMusic = () => {
   }
 }
 
-// Handle volume change
-const handleVolumeChange = (event: Event) => {
+// Handle BGM volume change
+const handleBgmVolumeChange = (event: Event) => {
   const target = event.target as HTMLInputElement
   const volume = parseInt(target.value) / 100
-  setVolume(volume)
+  setBgmVolume(volume)
 }
 
-// Toggle mute
-const toggleMute = () => {
-  audioToggleMute()
+// Handle SFX volume change
+const handleSfxVolumeChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const volume = parseInt(target.value) / 100
+  setSfxVolume(volume)
 }
+
+// Toggle BGM disabled (using mute button UI)
+const toggleBgmMuteHandler = () => {
+  toggleBgmDisabled()
+}
+
+// Toggle SFX disabled (using mute button UI)
+const toggleSfxMuteHandler = () => {
+  toggleSfxDisabled()
+}
+
+// Legacy handlers for backward compatibility
+const handleVolumeChange = handleBgmVolumeChange
+const toggleMute = toggleBgmMuteHandler
 </script>
 
 <style scoped>

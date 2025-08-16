@@ -29,20 +29,52 @@ export const useAudio = () => {
   const audioRefB = ref<HTMLAudioElement>()
   const isUsingA = ref(true)
   const isPlaying = ref(false)
+  const shouldBePlaying = ref(false) // Track intended playing state
   const audioContext = ref<AudioContext | null>(null)
   const hasUserInteracted = ref(false)
 
   // Add current track tracking
   const currentTrack = ref<string | null>(null)
 
-  // Load preferences from localStorage
+  // Load preferences from localStorage with separate BGM and SFX controls
   const systemPreferences = useStorage('hanafuda-system-preferences', {
+    bgm: {
+      volume: 0.25,
+      isDisabled: false,
+    },
+    sfx: {
+      volume: 0.25,
+      isDisabled: false,
+    },
+    // Legacy fallback support
     volume: 0.25,
     isMuted: false,
   })
 
-  const currentVolume = ref(systemPreferences.value.volume)
-  const isMuted = ref(systemPreferences.value.isMuted)
+  // Migrate legacy settings if they exist and new structure doesn't
+  if (systemPreferences.value.volume !== undefined && !systemPreferences.value.bgm) {
+    systemPreferences.value.bgm = {
+      volume: systemPreferences.value.volume,
+      isDisabled: false,
+    }
+    systemPreferences.value.sfx = {
+      volume: systemPreferences.value.volume,
+      isDisabled: false,
+    }
+  }
+
+  // Ensure disabled property exists (for users upgrading from older versions)
+  if (systemPreferences.value.bgm && systemPreferences.value.bgm.isDisabled === undefined) {
+    systemPreferences.value.bgm.isDisabled = false
+  }
+  if (systemPreferences.value.sfx && systemPreferences.value.sfx.isDisabled === undefined) {
+    systemPreferences.value.sfx.isDisabled = false
+  }
+
+  const bgmVolume = ref(systemPreferences.value.bgm?.volume ?? 0.25)
+  const bgmDisabled = ref(systemPreferences.value.bgm?.isDisabled ?? false)
+  const sfxVolume = ref(systemPreferences.value.sfx?.volume ?? 0.25)
+  const sfxDisabled = ref(systemPreferences.value.sfx?.isDisabled ?? false)
 
   // Helper to get the currently active audio element
   const currentAudioRef = computed(() => (isUsingA.value ? audioRefA : audioRefB))
@@ -82,7 +114,7 @@ export const useAudio = () => {
     }
   }
 
-  // Initialize audio element with mobile compatibility
+  // Initialize audio element with mobile compatibility (for BGM)
   const initAudio = (src: string) => {
     if (!import.meta.client) return
 
@@ -90,7 +122,7 @@ export const useAudio = () => {
     ref.value = new Audio(src)
     ref.value.loop = true
     ref.value.preload = 'auto'
-    ref.value.volume = isMuted.value ? 0 : currentVolume.value
+    ref.value.volume = bgmVolume.value
 
     // Add mobile-specific attributes
     ref.value.setAttribute('playsinline', 'true')
@@ -111,7 +143,8 @@ export const useAudio = () => {
 
   // Enhanced play audio with mobile compatibility
   const playAudio = async (fadeDuration: number = 3) => {
-    if (!currentAudioRef.value.value) return
+    // Don't play if BGM is disabled
+    if (bgmDisabled.value || !currentAudioRef.value.value) return
 
     try {
       // Initialize audio context on first play
@@ -132,6 +165,7 @@ export const useAudio = () => {
       if (playPromise !== undefined) {
         await playPromise
         isPlaying.value = true
+        shouldBePlaying.value = true
         fadeInAudio(fadeDuration)
       }
     } catch (error) {
@@ -148,6 +182,7 @@ export const useAudio = () => {
     if (currentAudioRef.value.value) {
       currentAudioRef.value.value.pause()
       isPlaying.value = false
+      shouldBePlaying.value = false
     }
   }
 
@@ -157,11 +192,11 @@ export const useAudio = () => {
     fadeOutAudio(fadeDuration)
   }
 
-  // Fade in audio (active only)
+  // Fade in audio (active only) - for BGM
   const fadeInAudio = (duration: number = 3) => {
     if (!currentAudioRef.value.value) return
     const startVolume = 0
-    const targetVolume = isMuted.value ? 0 : currentVolume.value
+    const targetVolume = bgmVolume.value
     const startTime = Date.now()
     const fadeInterval = setInterval(() => {
       const elapsed = (Date.now() - startTime) / 1000
@@ -190,30 +225,70 @@ export const useAudio = () => {
       if (progress >= 1) {
         currentAudioRef.value.value!.pause()
         isPlaying.value = false
+        shouldBePlaying.value = false
         clearInterval(fadeInterval)
       }
     }, 50)
   }
 
-  // Set volume (both refs)
-  const setVolume = (volume: number) => {
-    currentVolume.value = Math.max(0, Math.min(1, volume))
-    if (!isMuted.value) {
-      if (audioRefA.value) audioRefA.value.volume = currentVolume.value
-      if (audioRefB.value) audioRefB.value.volume = currentVolume.value
+  // Set BGM volume (both refs)
+  const setBgmVolume = (volume: number) => {
+    bgmVolume.value = Math.max(0, Math.min(1, volume))
+    if (audioRefA.value) audioRefA.value.volume = bgmVolume.value
+    if (audioRefB.value) audioRefB.value.volume = bgmVolume.value
+  }
+
+  // Set SFX volume
+  const setSfxVolume = (volume: number) => {
+    sfxVolume.value = Math.max(0, Math.min(1, volume))
+  }
+
+  // Toggle BGM disabled state
+  const toggleBgmDisabled = () => {
+    const wasDisabled = bgmDisabled.value
+    bgmDisabled.value = !bgmDisabled.value
+
+    if (bgmDisabled.value) {
+      // If disabling BGM, stop any currently playing BGM
+      if (currentAudioRef.value.value) {
+        currentAudioRef.value.value.pause()
+        isPlaying.value = false
+        // Keep shouldBePlaying state so we can resume later
+      }
+    } else {
+      // If re-enabling BGM, resume if it should be playing
+      if (shouldBePlaying.value && currentTrack.value) {
+        playAudio()
+      }
     }
   }
 
-  // Toggle mute (both refs)
-  const toggleMute = () => {
-    isMuted.value = !isMuted.value
-    if (audioRefA.value) audioRefA.value.volume = isMuted.value ? 0 : currentVolume.value
-    if (audioRefB.value) audioRefB.value.volume = isMuted.value ? 0 : currentVolume.value
+  // Toggle SFX disabled state
+  const toggleSfxDisabled = () => {
+    sfxDisabled.value = !sfxDisabled.value
   }
+
+  // Legacy functions for backward compatibility
+  const setVolume = setBgmVolume
+  const toggleMute = toggleBgmDisabled
 
   // Enhanced crossfade with mobile compatibility
   const crossfadeTo = async (src: string, duration: number = 3) => {
     if (!import.meta.client) return
+
+    // Set intent to play this track
+    shouldBePlaying.value = true
+    currentTrack.value = src
+
+    // Don't start new BGM if disabled, but remember the intent
+    if (bgmDisabled.value) {
+      // If BGM is disabled, stop any currently playing BGM
+      if (currentAudioRef.value.value) {
+        currentAudioRef.value.value.pause()
+        isPlaying.value = false
+      }
+      return
+    }
 
     const fromRef = currentAudioRef.value
     // Return if the same track is already playing
@@ -229,8 +304,6 @@ export const useAudio = () => {
     toRef.value.setAttribute('playsinline', 'true')
     toRef.value.setAttribute('webkit-playsinline', 'true')
 
-    if (isMuted.value) toRef.value.volume = 0
-
     try {
       // Ensure audio context is active
       if (audioContext.value && audioContext.value.state === 'suspended') {
@@ -239,9 +312,6 @@ export const useAudio = () => {
 
       await toRef.value.play()
       isPlaying.value = true
-
-      // Update current track
-      currentTrack.value = src
     } catch (error) {
       console.warn('Audio crossfade failed:', error)
       return
@@ -250,7 +320,7 @@ export const useAudio = () => {
     // Start crossfade
     const startTime = Date.now()
     const fromStartVolume = fromRef.value?.volume ?? 0
-    const toTargetVolume = isMuted.value ? 0 : currentVolume.value
+    const toTargetVolume = bgmVolume.value
     const fadeInterval = setInterval(() => {
       const elapsed = (Date.now() - startTime) / 1000
       const progress = Math.min(elapsed / duration, 1)
@@ -321,15 +391,24 @@ export const useAudio = () => {
       audioRefB.value = undefined
     }
     isPlaying.value = false
+    shouldBePlaying.value = false
   }
 
   // Watch and save changes to localStorage
-  watch(currentVolume, (newVolume) => {
-    systemPreferences.value.volume = newVolume
+  watch(bgmVolume, (newVolume) => {
+    systemPreferences.value.bgm.volume = newVolume
   })
 
-  watch(isMuted, (newMutedState) => {
-    systemPreferences.value.isMuted = newMutedState
+  watch(bgmDisabled, (newDisabledState) => {
+    systemPreferences.value.bgm.isDisabled = newDisabledState
+  })
+
+  watch(sfxVolume, (newVolume) => {
+    systemPreferences.value.sfx.volume = newVolume
+  })
+
+  watch(sfxDisabled, (newDisabledState) => {
+    systemPreferences.value.sfx.isDisabled = newDisabledState
   })
 
   // Auto-cleanup on unmount
@@ -341,8 +420,13 @@ export const useAudio = () => {
   const playSfx = (src: string) => {
     if (!import.meta.client) return
 
+    // Don't play if SFX is disabled
+    if (sfxDisabled.value) {
+      return Promise.resolve()
+    }
+
     const sfx = new Audio(src)
-    sfx.volume = isMuted.value ? 0 : currentVolume.value
+    sfx.volume = sfxVolume.value
     sfx.setAttribute('playsinline', 'true')
     sfx.setAttribute('webkit-playsinline', 'true')
 
@@ -382,11 +466,27 @@ export const useAudio = () => {
 
     // State
     isPlaying: readonly(isPlaying),
-    currentVolume: readonly(currentVolume),
-    isMuted: readonly(isMuted),
     hasUserInteracted: readonly(hasUserInteracted),
     currentTrack: readonly(currentTrack),
-    currentTrackName: readonly(computed(getCurrentTrackName)), // Add this
+    currentTrackName: readonly(computed(getCurrentTrackName)),
+
+    // BGM State and Methods
+    bgmVolume: readonly(bgmVolume),
+    bgmDisabled: readonly(bgmDisabled),
+    setBgmVolume,
+    toggleBgmDisabled,
+
+    // SFX State and Methods
+    sfxVolume: readonly(sfxVolume),
+    sfxDisabled: readonly(sfxDisabled),
+    setSfxVolume,
+    toggleSfxDisabled,
+
+    // Legacy for backward compatibility
+    currentVolume: readonly(bgmVolume), // Alias to bgmVolume
+    isMuted: readonly(bgmDisabled), // Alias to bgmDisabled (now represents disabled state)
+    setVolume,
+    toggleMute,
 
     // Methods
     initAudio,
@@ -395,8 +495,6 @@ export const useAudio = () => {
     stopAudio,
     fadeInAudio,
     fadeOutAudio,
-    setVolume,
-    toggleMute,
     setupAutoplay,
     cleanup,
     crossfadeTo,

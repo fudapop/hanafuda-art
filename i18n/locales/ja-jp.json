@@ -197,7 +197,10 @@
       "toggleColorMode": "カラーモードの切り替え",
       "toggleFullscreen": "全画面の切り替え",
       "selectLanguage": "言語を選択",
-      "toggleMute": "ミュートの切り替え"
+      "enableBgm": "BGMを有効にする",
+      "disableBgm": "BGMを無効にする",
+      "enableSfx": "効果音を有効にする",
+      "disableSfx": "効果音を無効にする"
     },
     "gameplay": {
       "title": "ゲームプレイのルール",
@@ -228,11 +231,15 @@
       }
     },
     "audio": {
+      "bgm": "BGM",
+      "sfx": "効果音",
       "bgmVolume": "BGM音量",
       "sfxVolume": "効果音音量",
       "mute": "ミュート",
       "unmute": "ミュート解除",
-      "volume": "音量"
+      "volume": "音量",
+      "enabled": "有効",
+      "disabled": "無効"
     },
     "colorMode": {
       "dark": "ダーク",

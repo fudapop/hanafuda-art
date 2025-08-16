@@ -197,7 +197,10 @@
       "toggleColorMode": "Toggle Color Mode",
       "toggleFullscreen": "Toggle Fullscreen",
       "selectLanguage": "Select Language",
-      "toggleMute": "Toggle Mute"
+      "enableBgm": "Enable Background Music",
+      "disableBgm": "Disable Background Music",
+      "enableSfx": "Enable Sound Effects",
+      "disableSfx": "Disable Sound Effects"
     },
     "gameplay": {
       "title": "Gameplay Rules",
@@ -228,11 +231,15 @@
       }
     },
     "audio": {
+      "bgm": "Background Music",
+      "sfx": "Sound Effects",
       "bgmVolume": "BGM Volume",
       "sfxVolume": "SFX Volume",
       "mute": "Mute",
       "unmute": "Unmute",
-      "volume": "Volume"
+      "volume": "Volume",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
     },
     "colorMode": {
       "dark": "Dark",
