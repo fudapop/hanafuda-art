@@ -2,9 +2,10 @@
 
 All notable changes to Hanafuda Koi-Koi will be documented in this file.
 
-## [Unreleased] - 2025-08-16
+## [2.3.3] - 2025-08-16
 
-### New Features
+### Audio System Improvements
+
 - **Audio System Refinement**: Introduced separate volume and disable controls for Background Music (BGM) and Sound Effects (SFX).
 - **Resource Optimization**: Replaced mute functionality with a "disable" option for audio tracks, preventing them from playing in the background when off.
 - **Improved Audio Resume**: Fixed an issue where background music would not resume after being re-enabled from a disabled state.
