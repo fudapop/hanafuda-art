@@ -26,7 +26,9 @@ useSeoMeta({
   twitterDescription: 'Privacy Policy for New Hanafuda',
 })
 
-const { data: policy } = useAsyncData(() =>
-  queryCollection('policies').where('title', '=', 'Privacy Policy').first(),
+const { queryLocaleDocument } = useLocaleContent()
+
+const { data: policy } = await useAsyncData('privacy-policy', () =>
+  queryLocaleDocument('policies', 'stem', 'privacy-policy'),
 )
 </script>

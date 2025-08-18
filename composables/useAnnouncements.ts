@@ -46,9 +46,10 @@ export const useAnnouncements = async () => {
   // Get current user for authentication checks
   const user = useCurrentUser()
 
-  // Fetch announcements from Nuxt Content
+  // Fetch announcements from Nuxt Content with locale support
+  const { queryAllLocaleDocuments } = useLocaleContent()
   const { data: contentAnnouncements } = await useAsyncData('announcements', () =>
-    queryCollection('announcements').order('date', 'DESC').all(),
+    queryAllLocaleDocuments('announcements'),
   )
 
   // Impression tracking state - now synced with Firestore
@@ -91,15 +92,21 @@ export const useAnnouncements = async () => {
   const announcements = computed(() => {
     if (!contentAnnouncements.value) return []
 
-    return contentAnnouncements.value.map((announcement) => ({
-      id: btoa(`${announcement.date}::${announcement.title}`),
-      title: announcement.title,
-      description: announcement.description,
-      date: announcement.date,
-      features: announcement.features || [],
-      body: announcement.body || announcement,
-      impressions: impressions.value[announcement.id] || { views: 0, likes: 0 },
-    }))
+    return contentAnnouncements.value
+      .map((announcement) => ({
+        id: btoa(
+          String.fromCharCode(
+            ...new TextEncoder().encode(`${announcement.date}::${announcement.stem}`),
+          ),
+        ),
+        title: announcement.title,
+        description: announcement.description,
+        date: announcement.date,
+        features: announcement.features || [],
+        body: announcement.body || announcement,
+        impressions: impressions.value[announcement.id] || { views: 0, likes: 0 },
+      }))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Sort by date DESC
   })
 
   // Get announcements that haven't been dismissed
@@ -127,7 +134,9 @@ export const useAnnouncements = async () => {
 
       // Update local state immediately for responsive UI
       if (!impressions.value[announcementId]) {
-        const [date, title] = atob(announcementId).split('::')
+        const [date, title] = new TextDecoder()
+          .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
+          .split('::')
         impressions.value[announcementId] = {
           date,
           title,
@@ -154,7 +163,9 @@ export const useAnnouncements = async () => {
         })
       } else {
         // Create new document
-        const [date, title] = atob(announcementId).split('::')
+        const [date, title] = new TextDecoder()
+          .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
+          .split('::')
         await setDoc(impressionRef, {
           title,
           date,
@@ -180,7 +191,9 @@ export const useAnnouncements = async () => {
 
       // Update local state immediately for responsive UI
       if (!impressions.value[announcementId]) {
-        const [date, title] = atob(announcementId).split('::')
+        const [date, title] = new TextDecoder()
+          .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
+          .split('::')
         impressions.value[announcementId] = {
           date,
           title,
@@ -221,7 +234,9 @@ export const useAnnouncements = async () => {
         await updateDoc(impressionRef, updateData)
       } else {
         // Create new document
-        const [date, title] = atob(announcementId).split('::')
+        const [date, title] = new TextDecoder()
+          .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
+          .split('::')
         await setDoc(impressionRef, {
           announcementId,
           title,

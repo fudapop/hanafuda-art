@@ -1,12 +1,12 @@
 ---
 title: Attributions
 description: Credits and attributions for music, artwork, and other assets used in Hanafuda Koi-Koi.
-date: 2025-07-17
+date: 2025-08-17
 ---
 
 # Attributions
 
-_Last updated: 2025-07-17_
+_Last updated: 2025-08-17_
 
 ## Card Artwork
 
@@ -49,6 +49,7 @@ The background music in this game is provided by [PeriTune](https://peritune.com
 
 - **"Awayuki"** by PeriTune (Seiko) - Main background music
 - **"Epic Battle J Loop"** by PeriTune (Seiko) - Additional background music
+- **"Kengeki"** by PeriTune (Seiko) - Additional background music
 
 ## Licensing and Usage
 

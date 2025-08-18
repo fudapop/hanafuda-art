@@ -26,7 +26,9 @@ useSeoMeta({
   twitterDescription: 'Terms of Use for New Hanafuda',
 })
 
-const { data: terms } = useAsyncData(() =>
-  queryCollection('policies').where('title', '=', 'Terms of Use').first(),
+const { queryLocaleDocument } = useLocaleContent()
+
+const { data: terms } = await useAsyncData('terms', () =>
+  queryLocaleDocument('policies', 'stem', 'terms-of-use'),
 )
 </script>

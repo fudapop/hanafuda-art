@@ -26,7 +26,9 @@ useSeoMeta({
   twitterDescription: 'Artist Attributions for New Hanafuda',
 })
 
-const { data: attributions } = useAsyncData(() =>
-  queryCollection('policies').where('title', '=', 'Attributions').first(),
+const { queryLocaleDocument } = useLocaleContent()
+
+const { data: attributions } = await useAsyncData('attributions', () =>
+  queryLocaleDocument('policies', 'stem', 'attributions'),
 )
 </script>

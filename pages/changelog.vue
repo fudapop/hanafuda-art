@@ -56,7 +56,7 @@
         <div class="flex gap-2">
           <button
             v-for="(changelog, index) in sortedChangelogs"
-            :key="changelog.path"
+            :key="changelog._path || `changelog-${index}`"
             type="button"
             :class="[
               'w-2 h-2 rounded-full transition-colors',
@@ -66,7 +66,7 @@
                 ? 'bg-primary'
                 : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500',
             ]"
-            :title="`Go to ${changelog.title || `Version ${(changelog as any).version || index + 1}`}`"
+            :title="`Go to ${changelog.title || `Version ${changelog.version || index + 1}`}`"
             @click="currentPage = index"
           />
         </div>
@@ -112,9 +112,11 @@ useSeoMeta({
   twitterDescription: 'Changelog for New Hanafuda',
 })
 
+const { queryAllLocaleDocuments } = useLocaleContent()
+
 // Fetch all changelog entries
 const { data: allChangelogs } = await useAsyncData('changelog', () =>
-  queryCollection('changelog').all(),
+  queryAllLocaleDocuments('changelog'),
 )
 
 // Pagination state
@@ -123,7 +125,7 @@ const currentPage = ref(0)
 // Sort changelogs by publishedAt in descending order (most recent first)
 const sortedChangelogs = computed(() => {
   if (!allChangelogs.value || !Array.isArray(allChangelogs.value)) return []
-  return [...allChangelogs.value].sort((a, b) => {
+  return [...allChangelogs.value].sort((a: any, b: any) => {
     const dateA = new Date(a.publishedAt || 0).getTime()
     const dateB = new Date(b.publishedAt || 0).getTime()
     return dateB - dateA
