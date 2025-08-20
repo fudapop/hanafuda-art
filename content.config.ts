@@ -1,7 +1,10 @@
 import { defineCollection, defineContentConfig, z } from '@nuxt/content'
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
 
 // Define supported locales
-const SUPPORTED_LOCALES = ['en', 'ja'] as const
+const localization = JSON.parse(readFileSync(resolve('./localization.json'), 'utf-8'))
+const SUPPORTED_LOCALES = localization.locales.map((l: any) => l.code) as string[]
 
 // Define common schemas
 const announcementSchema = z.object({
@@ -16,13 +19,6 @@ const announcementSchema = z.object({
       likes: z.number().default(0),
     })
     .optional(),
-})
-
-const changelogSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  version: z.string(),
-  publishedAt: z.string().date(),
 })
 
 // Create collections for each locale
@@ -46,12 +42,12 @@ for (const locale of SUPPORTED_LOCALES) {
     },
   })
 
-  collections[`changelog_${locale}`] = defineCollection({
+  collections[`misc_${locale}`] = defineCollection({
     type: 'page',
     source: {
-      include: `${locale}/changelog/**/*.md`,
+      include: `${locale}/misc/**/*.md`,
+      prefix: '',
     },
-    schema: changelogSchema,
   })
 }
 

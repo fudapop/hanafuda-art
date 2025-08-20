@@ -29,6 +29,6 @@ useSeoMeta({
 const { queryLocaleDocument } = useLocaleContent()
 
 const { data: attributions } = await useAsyncData('attributions', () =>
-  queryLocaleDocument('policies', 'stem', 'attributions'),
+  queryLocaleDocument('misc', 'stem', 'attributions'),
 )
 </script>
