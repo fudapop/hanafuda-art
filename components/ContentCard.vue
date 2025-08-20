@@ -8,7 +8,7 @@
         <div class="pt-8 mt-12 border-t border-border">
           <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p class="text-sm text-text-secondary">
-              © {{ new Date().getFullYear() }} FudaPop. All rights reserved.
+              {{ t('footer.copyright.fullNotice', { year: new Date().getFullYear() }) }}
             </p>
             <!-- LEGAL LINKS -->
             <div
@@ -17,25 +17,25 @@
               <NuxtLink
                 to="/changelog"
                 class="transition-colors hover:text-primary"
-                >Changelog</NuxtLink
+                >{{ t('footer.links.changelog') }}</NuxtLink
               >
               <span>•</span>
               <NuxtLink
                 to="/attributions"
                 class="transition-colors hover:text-primary"
-                >Attributions</NuxtLink
+                >{{ t('footer.links.attributions') }}</NuxtLink
               >
               <span>•</span>
               <NuxtLink
                 to="/terms"
                 class="transition-colors hover:text-primary"
-                >Term of Use</NuxtLink
+                >{{ t('footer.links.termsOfUse') }}</NuxtLink
               >
               <span>•</span>
               <NuxtLink
                 to="/privacy"
                 class="transition-colors hover:text-primary"
-                >Privacy Policy</NuxtLink
+                >{{ t('footer.links.privacyPolicy') }}</NuxtLink
               >
             </div>
           </div>
@@ -46,6 +46,8 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
+
 const { padded = true } = defineProps<{
   padded?: boolean
 }>()

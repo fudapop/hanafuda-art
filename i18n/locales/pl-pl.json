@@ -24,6 +24,7 @@
       "showTable": "Pokaż tabelę"
     },
     "labels": {
+      "appName": "FudaPop",
       "loading": "Ładowanie...",
       "justAMoment": "Proszę czekać...",
       "coin": "moneta",
@@ -318,6 +319,7 @@
   },
   "footer": {
     "links": {
+      "changelog": "Dziennik zmian",
       "attributions": "Autorstwa",
       "termsOfUse": "Warunki użytkowania",
       "privacyPolicy": "Polityka prywatności"
@@ -331,6 +333,9 @@
     "credits": {
       "backgroundArtBy": "Grafika tła i projekt:",
       "developedBy": "Opracowane przez"
+    },
+    "copyright": {
+      "fullNotice": "© {year} FudaPop. Wszelkie prawa zastrzeżone."
     }
   },
   "errors": {

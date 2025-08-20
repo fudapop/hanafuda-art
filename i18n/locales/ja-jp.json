@@ -24,6 +24,7 @@
       "showTable": "テーブルを表示"
     },
     "labels": {
+      "appName": "札ポップ",
       "loading": "読み込み中...",
       "justAMoment": "少々お待ちください...",
       "coin": "コイン",
@@ -318,6 +319,7 @@
   },
   "footer": {
     "links": {
+      "changelog": "変更履歴",
       "attributions": "帰属表示",
       "termsOfUse": "利用規約",
       "privacyPolicy": "プライバシーポリシー"
@@ -331,6 +333,9 @@
     "credits": {
       "backgroundArtBy": "背景アート・デザイン：",
       "developedBy": "開発者："
+    },
+    "copyright": {
+      "fullNotice": "© {year} 札ポップ。 全著作権所有。"
     }
   },
   "errors": {
