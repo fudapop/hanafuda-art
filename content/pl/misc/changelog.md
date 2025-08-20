@@ -1,5 +1,11 @@
 # Dziennik zmian
 
+## [2.4.1] - 2025-08-20
+
+### Naprawione błędy
+- **Projekt kart**: Wybrany projekt kart jest teraz poprawnie zachowywany między sesjami.
+- **Lokalizacja**: Dodano brakujące tłumaczenia komunikatów toastowych i naprawiono routing oparty na lokalizacji.
+
 ## [2.4.0] - 2025-08-20
 
 ### Internacjonalizacja i treść

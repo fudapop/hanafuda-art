@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.4.1] - 2025-08-20
+
+### Bug Fixes
+- **Card Design**: The selected card design now persists correctly across sessions.
+- **Localization**: Added missing toast message translations and fixed locale-based routing.
+
 ## [2.4.0] - 2025-08-20
 
 ### Internationalization & Content
