@@ -301,16 +301,7 @@ const confirmUnlock = () => {
 const userIsGuest = toValue(useAuth().userIsGuest)
 const userLiked = toValue(computed(() => currentUser?.value?.designs.liked))
 
-// const coll = collection(getFirestore(), 'users')
 const likesCount = reactive<Map<CardDesign, number>>(new Map())
-// const getLikesCount = async (design: CardDesign) => {
-//   if (likesCount.has(design)) return likesCount.get(design)
-//   const q = query(coll, where('designs.liked', 'array-contains', design))
-//   const count = (await getCountFromServer(q)).data().count
-//   likesCount.set(design, count)
-//   return count
-// }
-
 const isLiked = (design: CardDesign) => userLiked?.includes(design)
 const handleLike = (design: CardDesign) => {
   if (!userLiked) return
@@ -323,18 +314,67 @@ const handleLike = (design: CardDesign) => {
   }
 }
 
+// localStorage key for design persistence
+const DESIGN_STORAGE_KEY = 'hanafuda-selected-design'
+
+// Get stored design from localStorage
+const getStoredDesign = (): CardDesign | null => {
+  if (import.meta.client) {
+    try {
+      const stored = localStorage.getItem(DESIGN_STORAGE_KEY)
+      return stored && DESIGNS.includes(stored as CardDesign) ? (stored as CardDesign) : null
+    } catch (error) {
+      console.warn('Failed to read design from localStorage:', error)
+      return null
+    }
+  }
+  return null
+}
+
+// Save design to localStorage
+const saveDesignToStorage = (design: CardDesign) => {
+  if (import.meta.client) {
+    try {
+      localStorage.setItem(DESIGN_STORAGE_KEY, design)
+    } catch (error) {
+      console.warn('Failed to save design to localStorage:', error)
+    }
+  }
+}
+
+// Watch for design changes and persist to localStorage
+watch(
+  currentDesign,
+  (newDesign) => {
+    if (newDesign) {
+      saveDesignToStorage(newDesign)
+    }
+  },
+  { immediate: false },
+)
+
 onMounted(() => {
+  // Try to get design from localStorage first
+  const storedDesign = getStoredDesign()
+
+  // Check if stored design is available to the user
+  const isStoredDesignAvailable = storedDesign && unlocked.value?.includes(storedDesign)
+
   if (!currentDesign.value || currentDesign.value === 'cherry-version') {
     const defaultDesign = unlocked.value?.find(isNew) || 'cherry-version'
-    if (userIsGuest) {
+
+    if (isStoredDesignAvailable) {
+      // Use stored design if it's available
+      currentDesign.value = storedDesign
+    } else if (userIsGuest) {
       currentDesign.value = defaultDesign
     } else {
       currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || defaultDesign
     }
+  } else if (storedDesign && !isStoredDesignAvailable && storedDesign !== currentDesign.value) {
+    // If stored design is not available but current is set, clear the invalid stored design
+    saveDesignToStorage(currentDesign.value)
   }
-  // DESIGNS.forEach(async (design) => {
-  //   likesCount.set(design, (await getLikesCount(design)) ?? 0)
-  // })
 })
 
 onUnmounted(() => {
