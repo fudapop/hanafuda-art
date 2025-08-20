@@ -13,6 +13,7 @@ import {
   signOut,
   type UserCredential,
 } from 'firebase/auth'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 
 export const useAuth = () => {
@@ -27,6 +28,7 @@ export const useAuth = () => {
   const error = ref()
   const toast = useToast()
   const { log } = useAnalytics()
+  const { t } = useI18n()
 
   const useGuest = () =>
     useStorage('hanafuda-guest', {} as Record<string, any>, sessionStorage, { mergeDefaults: true })
@@ -46,7 +48,7 @@ export const useAuth = () => {
       useGuest().value = {}
       return true
     } catch (err) {
-      toast.error('Unable to create an account. ' + (err as Error).message, {
+      toast.error(`${t('auth.messages.unableToCreateAccount')} ${(err as Error).message}`, {
         timeout: 8000,
       })
       error.value = err
@@ -62,7 +64,7 @@ export const useAuth = () => {
       useGuest().value = {}
       return true
     } catch (err) {
-      toast.error('Invalid email or password. Please try again.', {
+      toast.error(t('auth.messages.invalidEmailOrPassword'), {
         timeout: 8000,
       })
       error.value = err
@@ -82,7 +84,7 @@ export const useAuth = () => {
       useGuest().value = {}
       return true
     } catch (err) {
-      toast.error('Unable to link your account. ' + (err as Error).message, {
+      toast.error(`${t('auth.messages.unableToLinkAccount')} ${(err as Error).message}`, {
         timeout: 8000,
       })
       error.value = err
@@ -97,7 +99,7 @@ export const useAuth = () => {
       if (!result) return false
       return handleOAuth(result)
     } catch (err) {
-      toast.error('Unable to sign in. Please try again later.')
+      toast.error(t('auth.messages.unableToSignIn'))
       error.value = err
     }
     return false
@@ -120,7 +122,7 @@ export const useAuth = () => {
       auth.currentUser.delete()
     } else {
       signOut(auth)
-      toast.info('You have been signed out.')
+      toast.info(t('auth.messages.youHaveBeenSignedOut'))
     }
   }
 
@@ -132,7 +134,7 @@ export const useAuth = () => {
       const result = await linkWithPopup(user, new provider())
       return handleOAuth(result)
     } catch (err) {
-      toast.error('Unable to link your account. ' + (err as Error).message, {
+      toast.error(`${t('auth.messages.unableToLinkAccount')} ${(err as Error).message}`, {
         timeout: 8000,
       })
       error.value = err
@@ -156,7 +158,7 @@ export const useAuth = () => {
         return true
       }
     } catch (err) {
-      toast.error('Unable to sign in. Please try again later.')
+      toast.error(t('auth.messages.unableToSignIn'))
       error.value = err
     }
     return false
@@ -165,10 +167,10 @@ export const useAuth = () => {
   const resetPassword = async (email: string) => {
     try {
       await sendPasswordResetEmail(auth, email)
-      toast.success(`Password reset email has been sent to ${email}.`)
+      toast.success(t('auth.messages.passwordResetSent', { email }))
       return true
     } catch (err) {
-      toast.error('Unable to send password reset email.', {
+      toast.error(t('auth.messages.unableToSendPasswordReset'), {
         timeout: 8000,
       })
       console.error(err)
