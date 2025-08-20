@@ -15,25 +15,25 @@
               class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
             >
               <NuxtLink
-                to="/changelog"
+                :to="localeRoute('/changelog')"
                 class="transition-colors hover:text-primary"
                 >{{ t('footer.links.changelog') }}</NuxtLink
               >
               <span>•</span>
               <NuxtLink
-                to="/attributions"
+                :to="localeRoute('/attributions')"
                 class="transition-colors hover:text-primary"
                 >{{ t('footer.links.attributions') }}</NuxtLink
               >
               <span>•</span>
               <NuxtLink
-                to="/terms"
+                :to="localeRoute('/terms')"
                 class="transition-colors hover:text-primary"
                 >{{ t('footer.links.termsOfUse') }}</NuxtLink
               >
               <span>•</span>
               <NuxtLink
-                to="/privacy"
+                :to="localeRoute('/privacy')"
                 class="transition-colors hover:text-primary"
                 >{{ t('footer.links.privacyPolicy') }}</NuxtLink
               >
@@ -47,6 +47,7 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
+const localeRoute = useLocaleRoute()
 
 const { padded = true } = defineProps<{
   padded?: boolean

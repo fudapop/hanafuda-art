@@ -55,7 +55,6 @@ export default defineNuxtConfig({
       script: headScripts,
       title: 'New Hanafuda | Play Hanafuda Koi-Koi',
     },
-    pageTransition: { name: 'page', mode: 'out-in' },
   },
   compatibilityDate: '2025-07-18',
   components: [

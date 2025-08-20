@@ -67,23 +67,3 @@ onMounted(() => {
   registerCardCache()
 })
 </script>
-
-<style>
-.page-enter-active,
-.page-leave-active {
-  transition: all 0.8s;
-}
-
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-  /* filter: blur(0.5rem); */
-}
-
-/* .page-enter-from {
-  translate: 100% 0;
-}
-.page-leave-to {
-  translate: -100% 0;
-} */
-</style>
