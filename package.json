@@ -11,15 +11,16 @@
     "start": "nuxt start",
     "generate": "nuxt generate",
     "preview": "PORT=8888 nuxt preview",
+    "deploy:preview": "firebase hosting:channel:deploy v$(node -p \"require('./package.json').version\")",
+    "deploy:prod": "firebase deploy --only hosting",
     "postinstall": "nuxt prepare",
     "prerelease": "npm run test",
     "version": "npm run generate && git add -A",
-    "postversion": "git push && git push --tags",
+    "postversion": "git push && git push --tags && npm run deploy:preview",
     "release:patch": "npm version patch -m \"Release v%s\"",
     "release:minor": "npm version minor -m \"Release v%s\"",
     "release:major": "npm version major -m \"Release v%s\"",
-    "type:gen": "supabase gen types --lang typescript --project-id ymoriyakbittfgocvxbw --schema public,storage > supabase/types.ts",
-    "firebase:deploy": "firebase hosting:channel:deploy"
+    "type:gen": "supabase gen types --lang typescript --project-id ymoriyakbittfgocvxbw --schema public,storage > supabase/types.ts"
   },
   "devDependencies": {
     "@heroicons/vue": "^2.0.18",

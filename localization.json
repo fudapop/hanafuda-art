@@ -1,0 +1,26 @@
+{
+  "defaultLocale": "en",
+  "locales": [
+    {
+      "name": "English",
+      "code": "en",
+      "language": "en-US",
+      "file": "en-us.json",
+      "dir": "ltr"
+    },
+    {
+      "name": "日本語",
+      "code": "ja",
+      "language": "ja-JP",
+      "file": "ja-jp.json",
+      "dir": "ltr"
+    },
+    {
+      "name": "Polski",
+      "code": "pl",
+      "language": "pl-PL",
+      "file": "pl-pl.json",
+      "dir": "ltr"
+    }
+  ]
+}

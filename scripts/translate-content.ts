@@ -1,18 +1,38 @@
+/**
+ * Content Translation Script
+ *
+ * Automatically translates English markdown content files to multiple target locales
+ * using AI translation while preserving markdown formatting, links, and metadata.
+ *
+ * Usage:
+ *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts
+ *
+ * Examples:
+ *   # Check what would be translated (dry run)
+ *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --dry-run
+ *
+ *   # Translate specific directories to multiple locales
+ *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --include "content/en/policies,content/en/changelog" --locales "ja,pl"
+ *
+ *   # Translate announcements to Japanese only
+ *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --include "content/en/announcements" --locales "ja"
+ *
+ *   # Translate all content with preview
+ *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --dry-run --include "content/en" --locales "ja,pl"
+ */
+
 import { parseArgs } from 'jsr:@std/cli/parse-args'
 import { existsSync } from 'jsr:@std/fs/exists'
-import { dirname, fromFileUrl, join } from 'jsr:@std/path'
+import { dirname, join } from 'jsr:@std/path'
 import { googleAI } from 'npm:@genkit-ai/googleai'
 import { genkit, z } from 'npm:genkit'
-
-const SUPPORTED_TARGET_LOCALES = [
-  'ja',
-  'pl',
-  // Add new target locales here
-] as const
-
-const isSupportedLocale = (locale: string): locale is (typeof SUPPORTED_TARGET_LOCALES)[number] => {
-  return SUPPORTED_TARGET_LOCALES.includes(locale as (typeof SUPPORTED_TARGET_LOCALES)[number])
-}
+import {
+  formatLocaleList,
+  getSupportedTargetLocales,
+  setupWorkingDirectory,
+  TranslationMode,
+  validateTargetLocales,
+} from './translation-utils.ts'
 
 // Initialize Genkit with the Google AI plugin
 const ai = genkit({
@@ -83,6 +103,8 @@ const translateContentFlow = ai.defineFlow(
 
 // Parse command line arguments
 function parseCliArgs() {
+  const defaultTargetLocales = getSupportedTargetLocales()
+
   const args = parseArgs(Deno.args, {
     boolean: ['dry-run', 'help'],
     string: ['include', 'locales'],
@@ -93,7 +115,7 @@ function parseCliArgs() {
     },
     default: {
       include: 'content/en',
-      locales: SUPPORTED_TARGET_LOCALES.join(','),
+      locales: defaultTargetLocales.join(','),
     },
   })
 
@@ -118,13 +140,8 @@ function parseCliArgs() {
     Deno.exit(1)
   }
 
-  // Ensure the working directory is the root of the project
-  // This file should be located in the scripts directory
-  const currentFileUrl = import.meta.url
-  const currentDir = dirname(fromFileUrl(currentFileUrl))
-  const projectRoot = join(currentDir, '..')
-  Deno.chdir(projectRoot)
-  console.log(`🔍 Current working directory: ${Deno.cwd()}`)
+  // Setup working directory
+  setupWorkingDirectory()
 
   // Validate directories exist and are English source directories
   for (const dir of contentDirectories) {
@@ -141,16 +158,12 @@ function parseCliArgs() {
     }
   }
 
-  if (targetLanguages.length === 0) {
-    console.error('❌ Error: At least one target locale must be specified.')
-    Deno.exit(1)
-  }
-
-  // Validate locales are supported
-  const invalidLocales = targetLanguages.filter((locale) => !isSupportedLocale(locale))
-  if (invalidLocales.length > 0) {
-    console.error(`❌ Error: Unsupported locale(s): ${invalidLocales.join(', ')}`)
-    console.error(`   Valid locales are: ${SUPPORTED_TARGET_LOCALES.join(', ')}`)
+  // Validate target locales
+  const validation = validateTargetLocales(targetLanguages, TranslationMode.CONTENT)
+  if (!validation.isValid) {
+    for (const error of validation.errors) {
+      console.error(`❌ Error: ${error}`)
+    }
     Deno.exit(1)
   }
 
@@ -162,14 +175,15 @@ function parseCliArgs() {
   }
 }
 
-// Configuration from CLI arguments
-const { isDryRun, showHelp, contentDirectories, targetLanguages } = parseCliArgs()
-// The script will efficiently translate to all locales in a single API call per file
+// Configuration from CLI arguments will be loaded in main function
 
 /**
  * Show help information
  */
 function showHelpMessage() {
+  const supportedLocales = formatLocaleList(TranslationMode.CONTENT)
+  const defaultTargetLocales = getSupportedTargetLocales()
+
   console.log(`
 📖 Content Translation Script (Deno Version)
 
@@ -185,30 +199,29 @@ Directory Structure:
     ja/           ← Japanese translations
     pl/           ← Polish translations
 
-Usage: deno run --allow-read --allow-write --allow-env --allow-net translate-content-deno.ts [options]
+Usage: deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts [options]
 
 Options:
   --dry-run                     Run in dry-run mode (show what would be done without executing)
   --help, -h                    Show this help message
   --include, -i <directories>   Comma-separated list of directories to scan (default: content/en)
-  --locales, -l <languages>     Comma-separated list of target locales (default: ja,pl)
+  --locales, -l <languages>     Comma-separated list of target locales (default: ${defaultTargetLocales.join(',')})
 
 Examples:
-  # Use defaults (content/en → ja,pl)
-  deno run --allow-read --allow-write --allow-env --allow-net translate-content-deno.ts
+  # Use defaults (content/en → ${defaultTargetLocales.join(',')})
+  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts
 
   # Translate specific directories to multiple locales
-  deno run --allow-read --allow-write --allow-env --allow-net translate-content-deno.ts --include "content/en/policies,content/en/changelog" --locales "ja,pl,fr"
+  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts --include "content/en/policies,content/en/changelog" --locales "${defaultTargetLocales.join(',')}"
 
   # Short form with preview
-  deno run --allow-read --allow-write --allow-env --allow-net translate-content-deno.ts --dry-run -i "content/en/announcements" -l "ja,es"
+  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts --dry-run -i "content/en/announcements" -l "${defaultTargetLocales[0]}"
 
   # Translate all content to specific locales
-  deno run --allow-read --allow-write --allow-env --allow-net translate-content-deno.ts -i "content/en" -l "ja,pl,fr,es"
+  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts -i "content/en" -l "${defaultTargetLocales.join(',')}"
 
-Locale Codes:
-  ja (Japanese), pl (Polish), fr (French), es (Spanish), 
-  de (German), it (Italian), pt (Portuguese), zh (Chinese), etc.
+Supported Locales:
+  ${supportedLocales}
 `)
 }
 
@@ -234,7 +247,7 @@ interface TranslationSummary {
 /**
  * Get all English source files (.md) that need translation
  */
-async function getFilesToTranslate(): Promise<string[]> {
+async function getFilesToTranslate(contentDirectories: string[]): Promise<string[]> {
   const filesToTranslate: string[] = []
 
   for (const dir of contentDirectories) {
@@ -346,6 +359,7 @@ async function ensureTargetDirectoryExists(targetPath: string): Promise<void> {
 async function translateFileToLanguages(
   filePath: string,
   languageActions: { language: string; isUpdate: boolean }[],
+  isDryRun: boolean,
 ): Promise<TranslationResult[]> {
   const results: TranslationResult[] = []
   const dryRunPrefix = isDryRun ? '[DRY RUN] ' : ''
@@ -423,7 +437,11 @@ async function translateFileToLanguages(
 /**
  * Main translation function
  */
-async function translateContent(): Promise<TranslationSummary> {
+async function translateContent(
+  isDryRun: boolean,
+  contentDirectories: string[],
+  targetLanguages: string[],
+): Promise<TranslationSummary> {
   const modeText = isDryRun ? ' (DRY RUN MODE)' : ''
   console.log(`🌍 Starting content translation process${modeText}...\n`)
 
@@ -449,7 +467,7 @@ async function translateContent(): Promise<TranslationSummary> {
   }
 
   // Get all files that need translation
-  const filesToTranslate = await getFilesToTranslate()
+  const filesToTranslate = await getFilesToTranslate(contentDirectories)
   summary.totalFiles = filesToTranslate.length
 
   console.log(`📚 Found ${filesToTranslate.length} English markdown files`)
@@ -494,7 +512,7 @@ async function translateContent(): Promise<TranslationSummary> {
     // If there are languages to translate, do them all at once
     if (languageActions.length > 0) {
       summary.totalTranslations += languageActions.length
-      const results = await translateFileToLanguages(filePath, languageActions)
+      const results = await translateFileToLanguages(filePath, languageActions, isDryRun)
 
       // Process results
       for (const result of results) {
@@ -525,7 +543,7 @@ async function translateContent(): Promise<TranslationSummary> {
 /**
  * Print translation summary
  */
-function printSummary(summary: TranslationSummary) {
+function printSummary(summary: TranslationSummary, isDryRun: boolean) {
   const modeText = isDryRun ? ' (DRY RUN)' : ''
   console.log('\n' + '='.repeat(50))
   console.log(`📊 TRANSLATION SUMMARY${modeText}`)
@@ -577,15 +595,18 @@ function printSummary(summary: TranslationSummary) {
  * Main function
  */
 async function main() {
-  // Show help if requested
-  if (showHelp) {
-    showHelpMessage()
-    return
-  }
-
   try {
-    const summary = await translateContent()
-    printSummary(summary)
+    // Parse CLI arguments
+    const { isDryRun, showHelp, contentDirectories, targetLanguages } = parseCliArgs()
+
+    // Show help if requested
+    if (showHelp) {
+      showHelpMessage()
+      return
+    }
+
+    const summary = await translateContent(isDryRun, contentDirectories, targetLanguages)
+    printSummary(summary, isDryRun)
   } catch (error) {
     console.error('💥 Translation process failed:', error)
     Deno.exit(1)

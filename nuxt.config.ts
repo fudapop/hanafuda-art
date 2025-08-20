@@ -4,6 +4,7 @@ import { resolve } from 'path'
 
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 const seoMeta = JSON.parse(readFileSync(resolve('./seo-meta.json'), 'utf-8'))
+const localization = JSON.parse(readFileSync(resolve('./localization.json'), 'utf-8'))
 
 const headScripts = []
 
@@ -95,38 +96,16 @@ export default defineNuxtConfig({
   i18n: {
     autoDeclare: true,
     baseUrl: 'https://newhanafuda.art',
-    defaultLocale: 'en',
+    defaultLocale: localization.defaultLocale,
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
       redirectOn: 'root',
       alwaysRedirect: true,
-      fallbackLocale: 'en',
+      fallbackLocale: localization.defaultLocale,
     },
     langDir: 'locales/',
-    locales: [
-      {
-        name: 'English',
-        code: 'en',
-        language: 'en-US',
-        file: 'en-us.json',
-        dir: 'ltr',
-      },
-      {
-        name: '日本語',
-        code: 'ja',
-        language: 'ja-JP',
-        file: 'ja-jp.json',
-        dir: 'ltr',
-      },
-      {
-        name: 'Polski',
-        code: 'pl',
-        language: 'pl-PL',
-        file: 'pl-pl.json',
-        dir: 'ltr',
-      },
-    ],
+    locales: localization.locales,
     strategy: 'prefix_and_default',
   },
   modules: [
