@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.4.0] - 2025-08-20
+
+### Internationalization & Content
+- **Polish Language Support**: Added Polish (pl) as a new language option.
+- **Localized Content Pages**: Implemented translations for static content pages.
+- **Page Metadata Translations**: Added i18n support for page metadata.
+- **Footer Translations**: Added missing translations for page footers.
+- **Content Structure**: Updated the content directory structure to better support translations.
+
+### UI & Experience
+- **Page Transitions**: Removed global page transitions and smooth scrolling for a more native feel.
+
 ## [2.3.3] - 2025-08-16
 
 ### Audio System Improvements

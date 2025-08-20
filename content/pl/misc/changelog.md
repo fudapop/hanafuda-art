@@ -1,5 +1,17 @@
 # Dziennik zmian
 
+## [2.4.0] - 2025-08-20
+
+### Internacjonalizacja i treść
+- **Wsparcie dla języka polskiego**: Dodano język polski (pl) jako nową opcję językową.
+- **Zlokalizowane strony treści**: Wdrożono tłumaczenia dla statycznych stron treści.
+- **Tłumaczenia metadanych stron**: Dodano wsparcie i18n dla metadanych stron.
+- **Tłumaczenia stopek**: Dodano brakujące tłumaczenia dla stopek stron.
+- **Struktura treści**: Zaktualizowano strukturę katalogu treści, aby lepiej wspierać tłumaczenia.
+
+### Interfejs użytkownika i doświadczenie
+- **Przejścia między stronami**: Usunięto globalne przejścia między stronami i płynne przewijanie, aby zapewnić bardziej natywne odczucia.
+
 ## [2.3.3] - 2025-08-16
 
 ### Ulepszenia systemu audio
