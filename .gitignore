@@ -23,6 +23,7 @@ wip
 assets/HNFD*
 .cursorrules
 /notes
+.genkit
 
 # Local env files
 .env

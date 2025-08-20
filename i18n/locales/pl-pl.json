@@ -1,0 +1,428 @@
+{
+  "common": {
+    "actions": {
+      "playNow": "ZAGRAJ TERAZ",
+      "options": "OPCJE",
+      "signUp": "ZAREJESTRUJ SIĘ",
+      "signIn": "ZALOGUJ SIĘ",
+      "signOut": "WYLOGUJ SIĘ",
+      "close": "Zamknij",
+      "cancel": "Anuluj",
+      "back": "Wstecz",
+      "previous": "Poprzedni",
+      "next": "Następny",
+      "submit": "Prześlij",
+      "send": "Wyślij",
+      "save": "Zapisz",
+      "confirm": "Potwierdź",
+      "continue": "Kontynuuj",
+      "gotIt": "Rozumiem!",
+      "yes": "Tak",
+      "no": "Nie",
+      "like": "Polub",
+      "unlike": "Odlub",
+      "showTable": "Pokaż tabelę"
+    },
+    "labels": {
+      "loading": "Ładowanie...",
+      "justAMoment": "Proszę czekać...",
+      "coin": "moneta",
+      "coins": "monety",
+      "points": "punkty",
+      "round": "Runda",
+      "rounds": "rundy",
+      "player": "Gracz",
+      "collection": "Kolekcja",
+      "settings": "Ustawienia",
+      "theme": "Motyw",
+      "fullscreen": "Pełny ekran",
+      "exitFullscreen": "Wyjdź z pełnego ekranu",
+      "language": "Język",
+      "music": "Muzyka",
+      "total": "Łącznie",
+      "win": "Wygrana",
+      "lose": "Przegrana",
+      "draw": "Remis"
+    },
+    "states": {
+      "enabled": "Włączone",
+      "disabled": "Wyłączone",
+      "locked": "Zablokowane",
+      "unlocked": "Odblokowane",
+      "new": "Nowy",
+      "current": "Bieżący",
+      "active": "Aktywny",
+      "inactive": "Nieaktywny",
+      "selected": "Wybrane"
+    }
+  },
+  "menu": {
+    "options": {
+      "title": "Opcje",
+      "tabs": {
+        "deck": "Talia",
+        "yaku": "Lista Yaku",
+        "settings": "Ustawienia",
+        "profile": "Profil"
+      }
+    },
+    "avatarSelect": {
+      "title": "Wybierz swojego awatara"
+    }
+  },
+  "navigation": {
+    "backToTitleScreen": "Powrót do ekranu tytułowego",
+    "continueAsGuest": "Kontynuuj jako gość",
+    "signInToExistingAccount": "Zaloguj się do istniejącego konta →"
+  },
+  "auth": {
+    "fields": {
+      "emailAddress": "Adres e-mail",
+      "password": "Hasło"
+    },
+    "options": {
+      "rememberMe": "Zapamiętaj mnie",
+      "forgotPassword": "Zapomniałem hasła?"
+    },
+    "links": {
+      "iDontHaveAccount": "Nie mam konta",
+      "iAlreadyHaveAccount": "Mam już konto",
+      "orContinueWith": "lub kontynuuj z"
+    },
+    "providers": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "passwordReset": {
+      "title": "Zresetować hasło?",
+      "description": "Link do zmiany hasła zostanie wysłany, jeśli istnieje powiązane konto."
+    },
+    "passwordRequirements": {
+      "title": "Hasło musi zawierać co najmniej:",
+      "sixCharacters": "6 znaków",
+      "oneNumber": "1 cyfrę",
+      "oneUppercase": "1 wielką literę",
+      "oneLowercase": "1 małą literę",
+      "oneSpecialCharacter": "1 znak specjalny"
+    },
+    "notices": {
+      "signInRequired": "Logowanie jest wymagane, aby zapisać profil."
+    },
+    "messages": {
+      "unableToCreateAccount": "Nie można utworzyć konta.",
+      "invalidEmailOrPassword": "Nieprawidłowy e-mail lub hasło. Spróbuj ponownie.",
+      "unableToLinkAccount": "Nie można powiązać konta.",
+      "unableToSignIn": "Nie można się zalogować. Spróbuj ponownie później.",
+      "passwordResetSent": "E-mail resetujący hasło został wysłany na {email}.",
+      "unableToSendPasswordReset": "Nie można wysłać e-maila resetującego hasło.",
+      "accountLinked": "Konto powiązane! Może być konieczne odświeżenie przeglądarki, aby zaktualizować profil.",
+      "youreSignedIn": "Jesteś zalogowany! Baw się dobrze!",
+      "failedToLinkAccount": "Nie udało się powiązać konta. Spróbuj ponownie.",
+      "youHaveBeenSignedOut": "Zostałeś wylogowany."
+    }
+  },
+  "profile": {
+    "info": {
+      "lastUpdated": "Ostatnia aktualizacja:",
+      "playerRecord": "Rekord gracza"
+    },
+    "stats": {
+      "wins": "wygrane",
+      "losses": "przegrane",
+      "draws": "remisy"
+    }
+  },
+  "game": {
+    "title": "Hanafuda Koi-Koi",
+    "ui": {
+      "statusBar": {
+        "roundCounter": "Runda {current} / {max}"
+      }
+    },
+    "actions": {
+      "makeYourCall": "Podejmij decyzję...",
+      "opponentDeciding": "Przeciwnik się zastanawia...",
+      "calledStop": "powiedział stop.",
+      "koikoiWasCalled": "Koi-Koi zostało wywołane!",
+      "koikoi": "Koi-Koi",
+      "stop": "Stop"
+    },
+    "results": {
+      "theRoundIsADraw": "Runda kończy się remisem.",
+      "youWin": "WYGRYWASZ!",
+      "youLose": "PRZEGRYWASZ...",
+      "draw": "REMIS",
+      "luckyHand": "Szczęśliwa ręka",
+      "fourOfAKindFourPairs": "Kareta / Cztery pary",
+      "gotDealtA": "otrzymałeś",
+      "koiKoiBonus": "Bonus Koi-Koi"
+    },
+    "cardTypes": {
+      "bright": "jasna",
+      "animal": "zwierzę",
+      "ribbon": "wstążka",
+      "plain": "zwykła",
+      "brights": "jasne",
+      "animals": "zwierzęta",
+      "ribbons": "wstążki",
+      "plains": "zwykłe"
+    },
+    "yaku": {
+      "gokou": "Pięć jasnych",
+      "shikou": "Cztery jasne",
+      "ame-shikou": "Deszczowe cztery jasne (dowolne 3 + Człowiek deszczu)",
+      "sankou": "Trzy jasne (dowolne 3 oprócz Człowieka deszczu)",
+      "hanami-zake": "Oglądanie kwiatów",
+      "tsukimi-zake": "Oglądanie księżyca",
+      "ino-shika-chou": "Dzik, jeleń i motyl",
+      "aka-tan": "Czerwone wstążki poetyckie",
+      "ao-tan": "Niebieskie wstążki",
+      "tan-zaku": "Dowolne 5 wstążek (+1pkt / dodatkowa)",
+      "tane-zaku": "Dowolne 5 zwierząt (+1pkt / dodatkowe)",
+      "kasu": "Dowolne 10 zwykłych (+1pkt / dodatkowa)",
+      "kuttsuki": "4 pary w ręku",
+      "teshi": "4 tego samego w ręku",
+      "tsuki-fuda": "Karty miesiąca",
+      "requiresAtLeastOneOther": "Wymaga co najmniej jednego innego ukończonego yaku (nie {notYaku})"
+    },
+    "warnings": {
+      "leavingGame": "Opuszczanie gry...",
+      "gameWillBeForfeited": "Gra zostanie przegrana, a postęp nie zostanie zapisany. Czy na pewno chcesz odejść?",
+      "yesLeaveGame": "Tak, opuść grę",
+      "noKeepPlaying": "Nie, kontynuuj grę"
+    }
+  },
+  "settings": {
+    "actions": {
+      "toggleColorMode": "Przełącz tryb kolorów",
+      "toggleFullscreen": "Przełącz pełny ekran",
+      "selectLanguage": "Wybierz język",
+      "enableBgm": "Włącz muzykę w tle",
+      "disableBgm": "Wyłącz muzykę w tle",
+      "enableSfx": "Włącz efekty dźwiękowe",
+      "disableSfx": "Wyłącz efekty dźwiękowe"
+    },
+    "gameplay": {
+      "title": "Zasady rozgrywki",
+      "gameLength": "Długość gry",
+      "moonFlowerViewing": "Oglądanie księżyca/kwiatów",
+      "wildCardSakeCup": "Uniwersalna karta sake",
+      "wildCardSakeCupDescription": "Kielich sake liczy się jako typ zwierzęcy i zwykły.",
+      "doubleOverSeven": "Podwójne ponad siedem",
+      "doubleOverSevenDescription": "Podwój wynik, jeśli łączna wartość yaku wynosi 7 punktów lub więcej.",
+      "otherVariations": "Inne warianty",
+      "readAboutThisRule": "Przeczytaj o tej zasadzie na fudawiki.org",
+      "viewingOptions": {
+        "allow": "Ukończenie jest punktowane normalnie.",
+        "limited": "Wymaga innego ukończonego yaku do zdobycia punktów.",
+        "none": "Nie przyznaje się punktów za ukończenie."
+      }
+    },
+    "interface": {
+      "title": "Interfejs",
+      "cardLabels": "Etykiety kart",
+      "cardLabelsDescription": "Dołącz etykiety narożników kart, aby pomóc w dopasowywaniu.",
+      "cardSize": "Rozmiar kart",
+      "cardSizeDescription": "Wybierz rozmiar najlepszy dla twojego ekranu.",
+      "sizes": {
+        "small": "Mały",
+        "normal": "Normalny",
+        "large": "Duży"
+      }
+    },
+    "audio": {
+      "bgm": "Muzyka w tle",
+      "sfx": "Efekty dźwiękowe",
+      "bgmVolume": "Głośność muzyki tła",
+      "sfxVolume": "Głośność efektów",
+      "mute": "Wycisz",
+      "unmute": "Włącz dźwięk",
+      "volume": "Głośność",
+      "enabled": "Włączone",
+      "disabled": "Wyłączone"
+    },
+    "colorMode": {
+      "dark": "Ciemny",
+      "light": "Jasny",
+      "auto": "Automatyczny"
+    },
+    "notices": {
+      "settingsLocked": "Niektóre ustawienia są zablokowane podczas trwania gry.",
+      "languageChangeNotice": "Język można zmienić tylko na ekranie tytułowym."
+    }
+  },
+  "deck": {
+    "selectADeck": "Wybierz talię",
+    "tradeCoins": "Wymienić {cost} monet, aby użyć tej talii?",
+    "noKeepCoins": "Nie, zachowaj moje monety.",
+    "yesUnlockIt": "Tak, odblokuj!",
+    "limitedTimeOffer": "✨ OFERTA OGRANICZONA CZASOWO ✨",
+    "artBy": "Grafika: {creator} →",
+    "notices": {
+      "youDontHaveEnoughCoins": "Nie masz jeszcze wystarczająco monet...",
+      "youHaveUnlocked": "Odblokowałeś nową talię!"
+    }
+  },
+  "feedback": {
+    "thankYouForPlaying": "Dziękujemy za grę!",
+    "howWasExperience": "Jak było twoje doświadczenie?",
+    "feedbackSubmitted": "Twoja opinia została wysłana. Dziękujemy!",
+    "categories": {
+      "animationSmoothness": "Płynność animacji",
+      "easeOfControls": "Łatwość sterowania",
+      "imageQuality": "Jakość obrazu",
+      "soundQuality": "Jakość dźwięku"
+    },
+    "comments": {
+      "title": "Komentarze",
+      "type": "Typ komentarza",
+      "types": {
+        "idea": "💡 pomysł",
+        "error": "🪲 błąd",
+        "other": "💬 inne"
+      },
+      "descriptions": {
+        "idea": "Jak możemy ulepszyć grę lub co chciałbyś zobaczyć następne?",
+        "error": "Czy napotkałeś jakieś błędy? Opisz problem.",
+        "other": "Twoja opinia jest bardzo ceniona! 🙏🏽"
+      },
+      "placeholder": "Wprowadź swój komentarz tutaj..."
+    }
+  },
+  "announcements": {
+    "whatsNewTitle": "Co nowego w Hanafuda Koi-Koi!",
+    "dismiss": "Rozumiem!",
+    "dontShowAgain": "Nie pokazuj ponownie",
+    "resetAnnouncements": "Resetuj ogłoszenia",
+    "metrics": {
+      "views": "wyświetlenia",
+      "likes": "polubienia"
+    }
+  },
+  "collection": {
+    "viewCollection": "Zobacz {title}",
+    "yourCollection": "Twoja kolekcja",
+    "opponentCollection": "Kolekcja przeciwnika",
+    "viewCards": "Zobacz karty"
+  },
+  "signup": {
+    "prompt": {
+      "title": "Masz monety! Co powiesz na 500 więcej?",
+      "description": "Twoje monety można użyć do odblokowania nowych wzorów kart i awatarów. Jednak profile gości nie mogą być zapisane.",
+      "question": "Zalogować się, aby zapisać profil i otrzymać dodatkowe 500 monet?"
+    },
+    "actions": {
+      "noThanksDeleteMe": "Nie, dzięki, usuń mnie",
+      "yesGimmeCoins": "Tak, chcę monety!"
+    }
+  },
+  "footer": {
+    "links": {
+      "attributions": "Autorstwa",
+      "termsOfUse": "Warunki użytkowania",
+      "privacyPolicy": "Polityka prywatności"
+    },
+    "actions": {
+      "viewChangelog": "Zobacz dziennik zmian",
+      "viewAttributions": "Zobacz autorstwa",
+      "viewTermsOfUse": "Zobacz warunki użytkowania",
+      "viewPrivacyPolicy": "Zobacz politykę prywatności"
+    },
+    "credits": {
+      "backgroundArtBy": "Grafika tła i projekt:",
+      "developedBy": "Opracowane przez"
+    }
+  },
+  "errors": {
+    "http": {
+      "badRequest": "Błędne żądanie",
+      "internalServerError": "Wewnętrzny błąd serwera"
+    },
+    "browser": {
+      "fullscreenNotSupported": "Pełny ekran nie jest obsługiwany w tej przeglądarce."
+    },
+    "timeout": {
+      "functionCallTimedOut": "Wywołanie funkcji ({name}) przekroczyło limit czasu."
+    }
+  },
+  "cache": {
+    "status": {
+      "caching": "Buforowanie {design}: {progress}%",
+      "completedCaching": "Ukończono buforowanie {design}",
+      "cachingCards": "Buforowanie kart..."
+    },
+    "error": "Błąd: {error}"
+  },
+  "datetime": {
+    "months": {
+      "january": "Styczeń",
+      "february": "Luty",
+      "march": "Marzec",
+      "april": "Kwiecień",
+      "may": "Maj",
+      "june": "Czerwiec",
+      "july": "Lipiec",
+      "august": "Sierpień",
+      "september": "Wrzesień",
+      "october": "Październik",
+      "november": "Listopad",
+      "december": "Grudzień"
+    }
+  },
+  "hanafuda": {
+    "flowers": {
+      "pine": "Sosna",
+      "plum": "Śliwka",
+      "cherry": "Wiśnia",
+      "wisteria": "Glicynia",
+      "iris": "Irys",
+      "peony": "Piwonia",
+      "bushClover": "Koniczyna krzaczasta",
+      "susuki": "Trawa susuki",
+      "chrysanthemum": "Chryzantema",
+      "maple": "Klon",
+      "willow": "Wierzba",
+      "paulownia": "Paulownia"
+    }
+  },
+  "accessibility": {
+    "navigation": {
+      "skipToContent": "Przejdź do treści",
+      "openMenu": "Otwórz menu",
+      "closeMenu": "Zamknij menu"
+    },
+    "actions": {
+      "closePanel": "Zamknij panel"
+    }
+  },
+  "rankings": {
+    "title": "Rankingi",
+    "pageTitle": "Nowe Hanafuda | Rankingi",
+    "failedToLoad": "Nie udało się załadować danych rankingu. Spróbuj ponownie później.",
+    "retry": "Ponów",
+    "filters": {
+      "overall": "Ogólne",
+      "active": "Najbardziej aktywni",
+      "wins": "Najwięcej wygranych",
+      "winrate": "Najlepszy wskaźnik wygranych"
+    },
+    "table": {
+      "rank": "Pozycja",
+      "player": "Gracz",
+      "games": "Gry",
+      "wins": "Wygrane",
+      "losses": "Przegrane",
+      "draws": "Remisy",
+      "winRate": "Wskaźnik wygranych",
+      "coins": "Monety"
+    },
+    "player": {
+      "guest": "Gracz-gość",
+      "guestShort": "Gość"
+    },
+    "empty": {
+      "noPlayers": "Nie znaleziono graczy",
+      "beTheFirst": "Bądź pierwszym, który zagra i pojawi się w rankingu!"
+    }
+  }
+}

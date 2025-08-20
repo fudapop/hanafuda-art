@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "upload-to-static": "deno run --allow-read --allow-write --allow-env --allow-net --allow-run ./upload-to-static.js",
-    "convert-to-webp": "deno run --allow-read --allow-write --allow-run ./convert-to-webp.js"
+    "upload-to-static": "deno run --allow-read --allow-write --allow-env --allow-net --allow-run ./upload-to-static.ts",
+    "translate-content": "export $(cat ../.env | grep GEMINI_API_KEY | tr -d ' \t\r\n') && deno run --allow-read --allow-write --allow-env --allow-net --allow-run ./translate-content.ts"
   }
 }

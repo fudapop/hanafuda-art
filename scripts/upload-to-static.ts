@@ -7,10 +7,10 @@
  *
  */
 
-import { load } from 'https://deno.land/std@0.220.1/dotenv/mod.ts'
-import { join } from 'https://deno.land/std@0.220.1/path/mod.ts'
 import { parseArgs } from 'jsr:@std/cli/parse-args'
+import { load } from 'jsr:@std/dotenv'
 import { exists } from 'jsr:@std/fs/exists'
+import { join } from 'jsr:@std/path/join'
 import { createClient } from 'jsr:@supabase/supabase-js'
 
 /**
@@ -20,7 +20,7 @@ import { createClient } from 'jsr:@supabase/supabase-js'
  * for storage operations. Requires NUXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY
  * to be defined in the environment.
  */
-const env = await load({ envPath: join(import.meta.dirname, '../.env') })
+const env = await load({ envPath: join(import.meta.dirname!, '../.env') })
 
 const supabase = createClient(env.NUXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SECRET_KEY)
 const bucket = supabase.storage.from('static')
@@ -48,21 +48,21 @@ const upsert = args.upsert
  * @param {string} file - Path to check
  * @returns {Promise<boolean>} True if path is a directory
  */
-const isDirectory = async (file) => await exists(file, { isDirectory: true })
+const isDirectory = async (file: string) => await exists(file, { isDirectory: true })
 
 /**
  * Checks if a path is a file
  * @param {string} file - Path to check
  * @returns {Promise<boolean>} True if path is a file
  */
-const isFile = async (file) => await exists(file, { isFile: true })
+const isFile = async (file: string) => await exists(file, { isFile: true })
 
 /**
  * Validates if a filename is a supported image format
  * @param {string} filename - Filename to validate
  * @returns {boolean} True if filename has supported image extension
  */
-const isImage = (filename) => {
+const isImage = (filename: string) => {
   return /.*\.(png|jpg|jpeg|gif|avif|webp)$/.test(filename)
 }
 
@@ -72,7 +72,7 @@ const isImage = (filename) => {
  * @param {string} filepath - Full path to the file
  * @returns {Object} Upload item with path, fileOptions, and getFile method
  */
-const createUploadItem = (filename, filepath) => {
+const createUploadItem = (filename: string, filepath: string) => {
   const fileOptions = {
     contentType: `image/${filename.split('.').pop()}`,
     cacheControl: 'public, max-age=31536000',
@@ -92,7 +92,15 @@ const createUploadItem = (filename, filepath) => {
  * Processes the source path and creates upload items for all valid image files.
  * Supports both single file and directory uploads.
  */
-const uploadItems = []
+const uploadItems: {
+  path: string
+  fileOptions: {
+    contentType: string
+    cacheControl: string
+    upsert: boolean
+  }
+  getFile: () => ReturnType<typeof Deno.readFile>
+}[] = []
 
 if (await isDirectory(path)) {
   for await (const dirEntry of Deno.readDir(path)) {
@@ -104,6 +112,9 @@ if (await isDirectory(path)) {
   }
 } else if (await isFile(path)) {
   const filename = path.split('/').pop()
+  if (!filename) {
+    throw new Error(`No filename found for ${path}`)
+  }
   uploadItems.push(createUploadItem(filename, path))
 }
 

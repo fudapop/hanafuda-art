@@ -10,7 +10,6 @@ import {
   signInAnonymously,
   signInWithEmailAndPassword,
   signInWithPopup,
-  // FacebookAuthProvider,
   signOut,
   type UserCredential,
 } from 'firebase/auth'
@@ -20,7 +19,6 @@ export const useAuth = () => {
   const PROVIDERS = {
     google: GoogleAuthProvider,
     github: GithubAuthProvider,
-    // facebook: FacebookAuthProvider,
   } as const
 
   type OAuthProviders = keyof typeof PROVIDERS
@@ -146,7 +144,6 @@ export const useAuth = () => {
     try {
       const googleCredential = GoogleAuthProvider.credentialFromResult(result)
       const githubCredential = GithubAuthProvider.credentialFromResult(result)
-      // const facebookCredential = FacebookAuthProvider.credentialFromResult(result);
       const credential = googleCredential || githubCredential || null
 
       if (credential) {
