@@ -27,8 +27,13 @@
 const { logout, error } = useAuth()
 const user = useCurrentUser()
 const { t } = useI18n()
+const localeRoute = useLocaleRoute()
+
 const login = () => {
-  navigateTo('/sign-in')
+  const route = localeRoute({ name: 'sign-in', query: { signup: 'true' } })
+  if (route) {
+    navigateTo(route.fullPath)
+  }
 }
 
 const logoutUser = () => {
@@ -37,7 +42,10 @@ const logoutUser = () => {
 
 watch(user, () => {
   if (!user.value && useRoute().meta.requiresAuth) {
-    navigateTo('/sign-in?exit=true')
+    const route = localeRoute({ name: 'sign-in', query: { exit: 'true' } })
+    if (route) {
+      navigateTo(route.fullPath)
+    }
   }
 })
 </script>

@@ -150,7 +150,11 @@ onClickOutside(usernameInputRef, () => {
   username.value = usernameInputVal.value
 })
 
+const localeRoute = useLocaleRoute()
 const handleSignIn = () => {
-  navigateTo({ path: '/sign-in', query: { signup: 'true' } })
+  const route = localeRoute({ name: 'sign-in', query: { signup: 'true' } })
+  if (route) {
+    navigateTo(route.fullPath)
+  }
 }
 </script>

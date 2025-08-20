@@ -197,10 +197,15 @@ const showLoader = ref(false)
 const feedbackSubmitted = computed(() => user?.flags?.hasSubmittedFeedback)
 const signupDeclined = useStorage('hanafuda-signup-declined', false, sessionStorage)
 
+const localeRoute = useLocaleRoute()
+
 const handlePressExit = () => {
   if (!gameStart.value) {
     logout()
-    navigateTo({ path: '/sign-in', query: { exit: 'true' } })
+    const route = localeRoute({ name: 'sign-in', query: { exit: 'true' } })
+    if (route) {
+      navigateTo(route.fullPath)
+    }
   } else {
     leavingGame.value = true
   }

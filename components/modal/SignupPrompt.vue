@@ -56,11 +56,10 @@ defineEmits(['cancel'])
 
 const localeRoute = useLocaleRoute()
 
-const gotoSignIn = () =>
-  navigateTo(
-    localeRoute({
-      name: 'sign-in',
-      query: { signup: 'true' },
-    }),
-  )
+const gotoSignIn = () => {
+  const route = localeRoute({ name: 'sign-in', query: { signup: 'true' } })
+  if (route) {
+    navigateTo(route.fullPath)
+  }
+}
 </script>

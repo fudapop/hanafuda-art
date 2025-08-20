@@ -67,8 +67,10 @@ const { action, provider, onSuccess } = defineProps<{
   onSuccess?: () => void
 }>()
 
+const localeRoute = useLocaleRoute()
+
 const handleClick = async () => {
   const success = await action(provider)
-  success ? onSuccess?.() : navigateTo('/')
+  success ? onSuccess?.() : navigateTo(localeRoute('/'))
 }
 </script>
