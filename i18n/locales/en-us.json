@@ -429,5 +429,23 @@
       "noPlayers": "No players found",
       "beTheFirst": "Be the first to play and appear on the leaderboard!"
     }
+  },
+  "pages": {
+    "changelog": "Changelog",
+    "attributions": "Artist Attributions",
+    "privacy": "Privacy Policy",
+    "rankings": "Rankings",
+    "signIn": "Sign In",
+    "terms": "Terms of Use",
+    "home": "Home"
+  },
+  "pageDescriptions": {
+    "changelog": "Changelog for {appName}",
+    "attributions": "Artist Attributions for {appName}",
+    "privacy": "Privacy Policy for {appName}",
+    "rankings": "Player rankings for {appName}",
+    "signIn": "Sign in to your {appName} account",
+    "terms": "Terms of Use for {appName}",
+    "home": "Play the Japanese card game Hanafuda Koi-Koi against an AI opponent."
   }
 }

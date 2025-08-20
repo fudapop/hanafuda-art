@@ -429,5 +429,23 @@
       "noPlayers": "プレイヤーが見つかりません",
       "beTheFirst": "最初にプレイしてリーダーボードに表示されましょう！"
     }
+  },
+  "pages": {
+    "changelog": "変更履歴",
+    "attributions": "アーティストの帰属",
+    "privacy": "プライバシーポリシー",
+    "rankings": "ランキング",
+    "signIn": "サインイン",
+    "terms": "利用規約",
+    "home": "ホーム"
+  },
+  "pageDescriptions": {
+    "changelog": "{appName}の変更履歴",
+    "attributions": "{appName}のアーティストの帰属",
+    "privacy": "{appName}のプライバシーポリシー",
+    "rankings": "{appName}のプレイヤーランキング",
+    "signIn": "{appName}アカウントにサインイン",
+    "terms": "{appName}の利用規約",
+    "home": "AI対戦で花札「こいこい」をプレイしよう。"
   }
 }

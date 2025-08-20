@@ -53,13 +53,6 @@ export const useLocaleContent = () => {
         .first()
 
       // If we found a result, return it
-      console.log({
-        result,
-        collectionName,
-        field,
-        value,
-        currentLocale,
-      })
       if (result) {
         return result
       }

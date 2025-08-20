@@ -10,20 +10,17 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  pageTransition: {
-    mode: 'in-out',
-  },
-  title: 'New Hanafuda | Terms of Use',
-})
+const { t } = useI18n()
+const pageTitle = computed(() => `${t('game.title')} | ${t('pages.terms')}`)
+const pageDescription = computed(() => t('pageDescriptions.terms', { appName: t('game.title') }))
 
 useSeoMeta({
-  title: 'New Hanafuda | Terms of Use',
-  description: 'Terms of Use for New Hanafuda',
-  ogTitle: 'New Hanafuda | Terms of Use',
-  ogDescription: 'Terms of Use for New Hanafuda',
-  twitterTitle: 'New Hanafuda | Terms of Use',
-  twitterDescription: 'Terms of Use for New Hanafuda',
+  title: pageTitle.value,
+  description: pageDescription.value,
+  ogTitle: pageTitle.value,
+  ogDescription: pageDescription.value,
+  twitterTitle: pageTitle.value,
+  twitterDescription: pageDescription.value,
 })
 
 const { queryLocaleDocument } = useLocaleContent()

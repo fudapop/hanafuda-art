@@ -96,8 +96,17 @@
 <script setup lang="ts">
 import { useToast } from 'vue-toastification'
 
-definePageMeta({
-  title: 'New Hanafuda | Sign In',
+const { t } = useI18n()
+const pageTitle = computed(() => `${t('game.title')} | ${t('pages.signIn')}`)
+const pageDescription = computed(() => t('pageDescriptions.signIn', { appName: t('game.title') }))
+
+useSeoMeta({
+  title: pageTitle.value,
+  description: pageDescription.value,
+  ogTitle: pageTitle.value,
+  ogDescription: pageDescription.value,
+  twitterTitle: pageTitle.value,
+  twitterDescription: pageDescription.value,
 })
 
 const localeRoute = useLocaleRoute()
@@ -106,7 +115,6 @@ const { isMobile } = useDevice()
 
 const { loginAsGuest } = useAuth()
 const { upgradeGuestProfile, current: currentUser } = useProfile()
-const { t } = useI18n()
 const toast = useToast()
 const loggingIn = ref<boolean>(true)
 

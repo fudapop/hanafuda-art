@@ -429,5 +429,23 @@
       "noPlayers": "Nie znaleziono graczy",
       "beTheFirst": "Bądź pierwszym, który zagra i pojawi się w rankingu!"
     }
+  },
+  "pages": {
+    "changelog": "Dziennik Zmian",
+    "attributions": "Uznania dla Artystów",
+    "privacy": "Polityka Prywatności",
+    "rankings": "Rankingi",
+    "signIn": "Zaloguj się",
+    "terms": "Warunki Użytkowania",
+    "home": "Strona Główna"
+  },
+  "pageDescriptions": {
+    "changelog": "Dziennik zmian dla {appName}",
+    "attributions": "Uznania dla artystów dla {appName}",
+    "privacy": "Polityka prywatności dla {appName}",
+    "rankings": "Rankingi graczy dla {appName}",
+    "signIn": "Zaloguj się na swoje konto {appName}",
+    "terms": "Warunki użytkowania dla {appName}",
+    "home": "Zagraj w japońską grę karcianą Hanafuda Koi-Koi przeciwko przeciwnikowi AI."
   }
 }

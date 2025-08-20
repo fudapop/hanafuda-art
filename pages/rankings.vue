@@ -299,8 +299,16 @@ import { collection, getDocs, getFirestore } from 'firebase/firestore'
 
 const { t } = useI18n()
 
-definePageMeta({
-  title: 'New Hanafuda | Rankings',
+const pageTitle = computed(() => `${t('game.title')} | ${t('pages.rankings')}`)
+const pageDescription = computed(() => t('pageDescriptions.rankings', { appName: t('game.title') }))
+
+useSeoMeta({
+  title: pageTitle.value,
+  description: pageDescription.value,
+  ogTitle: pageTitle.value,
+  ogDescription: pageDescription.value,
+  twitterTitle: pageTitle.value,
+  twitterDescription: pageDescription.value,
 })
 
 interface LeaderboardPlayer {
