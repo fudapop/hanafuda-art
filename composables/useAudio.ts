@@ -5,22 +5,92 @@ export const useAudio = () => {
 
   const bucketUrl = `${config.public.supabaseUrl}/storage/v1/object/public/static/audio`
 
-  const BGM = {
-    main: `${bucketUrl}/bgm/PerituneMaterial_Awayuki.ogg`,
-    koikoi1: `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.ogg`,
-    koikoi2: `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.ogg`,
+  // BGM tracks with fallback formats (browser will try in order)
+  const BGM_TRACKS = {
+    main: {
+      name: 'Awayuki - Peritune',
+      sources: [
+        `${bucketUrl}/bgm/PerituneMaterial_Awayuki.ogg`,
+        `${bucketUrl}/bgm/PerituneMaterial_Awayuki.m4a`,
+        `${bucketUrl}/bgm/PerituneMaterial_Awayuki.mp3`,
+      ],
+    },
+    koikoi1: {
+      name: 'Epic Battle J - Peritune',
+      sources: [
+        `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.ogg`,
+        `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.m4a`,
+        `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.mp3`,
+      ],
+    },
+    koikoi2: {
+      name: 'Kengeki - Peritune',
+      sources: [
+        `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.ogg`,
+        `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.m4a`,
+        `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.mp3`,
+      ],
+    },
   } as const
 
-  // Add track names mapping internally
-  const trackNames = {
-    [BGM.main]: 'Awayuki - Peritune',
-    [BGM.koikoi1]: 'Epic Battle J - Peritune',
-    [BGM.koikoi2]: 'Kengeki - Peritune',
+  // Create audio element with fallback sources
+  const createAudioWithFallbacks = (sources: readonly string[]): HTMLAudioElement => {
+    const audio = new Audio()
+    audio.preload = 'auto'
+    audio.loop = true
+
+    // Try each source until one works
+    let currentSourceIndex = 0
+
+    const tryNextSource = () => {
+      if (currentSourceIndex < sources.length) {
+        audio.src = sources[currentSourceIndex]
+        currentSourceIndex++
+      }
+    }
+
+    // If current source fails, try the next one
+    audio.addEventListener('error', () => {
+      console.warn(`Audio source failed: ${audio.src}, trying next...`)
+      tryNextSource()
+    })
+
+    // Start with first source
+    tryNextSource()
+
+    return audio
+  }
+
+  // Legacy BGM object for backward compatibility
+  const BGM = {
+    main: BGM_TRACKS.main.sources[0], // Default to first (preferred) format
+    koikoi1: BGM_TRACKS.koikoi1.sources[0],
+    koikoi2: BGM_TRACKS.koikoi2.sources[0],
+    // Keep legacy fallback format properties for any existing references
+    mainM4a: BGM_TRACKS.main.sources[1],
+    koikoi1M4a: BGM_TRACKS.koikoi1.sources[1],
+    koikoi2M4a: BGM_TRACKS.koikoi2.sources[1],
+    mainMp3: BGM_TRACKS.main.sources[2],
+    koikoi1Mp3: BGM_TRACKS.koikoi1.sources[2],
+    koikoi2Mp3: BGM_TRACKS.koikoi2.sources[2],
   } as const
+
+  // Enhanced track names mapping that works with any format
+  const getTrackName = (src: string): string | null => {
+    for (const [trackKey, trackData] of Object.entries(BGM_TRACKS)) {
+      for (const sourceUrl of trackData.sources) {
+        if (src.includes(sourceUrl) || sourceUrl.includes(src)) {
+          return trackData.name
+        }
+      }
+    }
+    return null
+  }
 
   const SFX = {
     card1: `${bucketUrl}/sfx/card1.m4a`,
     card2: `${bucketUrl}/sfx/card2.m4a`,
+    card3: `${bucketUrl}/sfx/card3.m4a`,
     coin: `${bucketUrl}/sfx/coins-counting.m4a`,
     slash: `${bucketUrl}/sfx/sword-slash-and-swing-185432.mp3`,
   } as const
@@ -114,22 +184,31 @@ export const useAudio = () => {
     }
   }
 
-  // Initialize audio element with mobile compatibility (for BGM)
-  const initAudio = (src: string) => {
+  // Initialize audio element with mobile compatibility and automatic fallback support (for BGM)
+  const initAudio = (trackKeyOrSrc: keyof typeof BGM_TRACKS | string) => {
     if (!import.meta.client) return
 
     const ref = currentAudioRef.value
-    ref.value = new Audio(src)
-    ref.value.loop = true
-    ref.value.preload = 'auto'
+
+    if (typeof trackKeyOrSrc === 'string' && trackKeyOrSrc.startsWith('http')) {
+      // Direct URL provided
+      ref.value = new Audio(trackKeyOrSrc)
+      ref.value.loop = true
+      ref.value.preload = 'auto'
+      currentTrack.value = trackKeyOrSrc
+    } else {
+      // Track key provided - use fallback system
+      const trackKey = trackKeyOrSrc as keyof typeof BGM_TRACKS
+      const track = BGM_TRACKS[trackKey]
+      ref.value = createAudioWithFallbacks(track.sources)
+      currentTrack.value = track.sources[0] // Set to preferred format
+    }
+
     ref.value.volume = bgmVolume.value
 
     // Add mobile-specific attributes
     ref.value.setAttribute('playsinline', 'true')
     ref.value.setAttribute('webkit-playsinline', 'true')
-
-    // Set current track
-    currentTrack.value = src
 
     // Handle mobile audio loading
     ref.value.addEventListener('canplaythrough', () => {
@@ -272,13 +351,33 @@ export const useAudio = () => {
   const setVolume = setBgmVolume
   const toggleMute = toggleBgmDisabled
 
-  // Enhanced crossfade with mobile compatibility
-  const crossfadeTo = async (src: string, duration: number = 3) => {
+  // Enhanced crossfade with mobile compatibility and automatic fallback support
+  const crossfadeTo = async (
+    trackKeyOrSrc: keyof typeof BGM_TRACKS | string,
+    duration: number = 3,
+  ) => {
     if (!import.meta.client) return
+
+    let targetSrc: string
+    let newAudio: HTMLAudioElement
+
+    if (typeof trackKeyOrSrc === 'string' && trackKeyOrSrc.startsWith('http')) {
+      // Direct URL provided
+      targetSrc = trackKeyOrSrc
+      newAudio = new Audio(targetSrc)
+      newAudio.loop = true
+      newAudio.preload = 'auto'
+    } else {
+      // Track key provided - use fallback system
+      const trackKey = trackKeyOrSrc as keyof typeof BGM_TRACKS
+      const track = BGM_TRACKS[trackKey]
+      targetSrc = track.sources[0] // Set to preferred format for comparison
+      newAudio = createAudioWithFallbacks(track.sources)
+    }
 
     // Set intent to play this track
     shouldBePlaying.value = true
-    currentTrack.value = src
+    currentTrack.value = targetSrc
 
     // Don't start new BGM if disabled, but remember the intent
     if (bgmDisabled.value) {
@@ -291,15 +390,15 @@ export const useAudio = () => {
     }
 
     const fromRef = currentAudioRef.value
-    // Return if the same track is already playing
-    if (fromRef.value?.src?.includes(src)) return
+    // Return if the same track is already playing (check against all formats)
+    if (fromRef.value?.src && isSameTrack(fromRef.value.src, targetSrc)) {
+      return
+    }
 
     const toRef = inactiveAudioRef.value
 
-    // Prepare new audio element with mobile attributes
-    toRef.value = new Audio(src)
-    toRef.value.loop = true
-    toRef.value.preload = 'auto'
+    // Use the audio element with fallbacks
+    toRef.value = newAudio
     toRef.value.volume = 0
     toRef.value.setAttribute('playsinline', 'true')
     toRef.value.setAttribute('webkit-playsinline', 'true')
@@ -450,18 +549,23 @@ export const useAudio = () => {
     })
   }
 
+  // Helper to check if two audio sources are the same track (different formats)
+  const isSameTrack = (src1: string, src2: string): boolean => {
+    const name1 = getTrackName(src1)
+    const name2 = getTrackName(src2)
+    return name1 !== null && name1 === name2
+  }
+
   // Helper to get current track name
   const getCurrentTrackName = () => {
     if (!currentTrack.value) return null
-
-    const trackKey = Object.keys(trackNames).find((key) => currentTrack.value?.includes(key))
-
-    return trackKey ? trackNames[trackKey as keyof typeof trackNames] : null
+    return getTrackName(currentTrack.value)
   }
 
   return {
     // Constants
     BGM,
+    BGM_TRACKS, // Expose track data for advanced usage
     SFX,
 
     // State
@@ -500,5 +604,6 @@ export const useAudio = () => {
     crossfadeTo,
     playSfx,
     initAudioContext,
+    createAudioWithFallbacks, // Expose for advanced usage
   }
 }

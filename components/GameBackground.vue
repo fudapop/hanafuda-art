@@ -48,7 +48,7 @@ const cleanupCardSfx = watch(
   () => getCurrent.value.phase,
   (newPhase) => {
     if (newPhase === 'draw') {
-      audio.playSfx(SFX.card1)
+      audio.playSfx(SFX.card3)
     } else if (newPhase === 'collect') {
       audio.playSfx(SFX.card2)
     }
