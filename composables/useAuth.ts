@@ -27,8 +27,8 @@ export const useAuth = () => {
   const auth = useFirebaseAuth()!
   const error = ref()
   const toast = useToast()
-  const { log } = useAnalytics()
   const { t } = useI18n()
+  const { $clientPosthog } = useNuxtApp()
 
   const useGuest = () =>
     useStorage('hanafuda-guest', {} as Record<string, any>, sessionStorage, { mergeDefaults: true })
@@ -40,12 +40,8 @@ export const useAuth = () => {
       const guest = useGuest().value
       const { user } = await createUserWithEmailAndPassword(auth, email, password)
       if (!user) return false
-      if (guest?.uid) {
-        log('sign_up', { method: 'email' })
-      } else {
-        log('login', { method: 'email' })
-      }
       useGuest().value = {}
+      $clientPosthog?.capture('sign_up', { method: 'email' })
       return true
     } catch (err) {
       toast.error(`${t('auth.messages.unableToCreateAccount')} ${(err as Error).message}`, {
@@ -60,8 +56,8 @@ export const useAuth = () => {
     try {
       const { user } = await signInWithEmailAndPassword(auth, email, password)
       if (!user) return false
-      log('login', { method: 'email' })
       useGuest().value = {}
+      $clientPosthog?.capture('login', { method: 'email' })
       return true
     } catch (err) {
       toast.error(t('auth.messages.invalidEmailOrPassword'), {
@@ -82,6 +78,7 @@ export const useAuth = () => {
       )
       if (!linkedUser) return false
       useGuest().value = {}
+      $clientPosthog?.capture('link_account', { method: 'email' })
       return true
     } catch (err) {
       toast.error(`${t('auth.messages.unableToLinkAccount')} ${(err as Error).message}`, {
@@ -101,6 +98,7 @@ export const useAuth = () => {
     } catch (err) {
       toast.error(t('auth.messages.unableToSignIn'))
       error.value = err
+      $clientPosthog?.capture('login_failed', { method: providerName })
     }
     return false
   }
@@ -112,7 +110,7 @@ export const useAuth = () => {
       username: username,
     }
     useGuest().value = guest
-    log('login', { method: 'anonymous' })
+    $clientPosthog?.capture('login', { method: 'anonymous' })
     return user
   }
 
@@ -124,6 +122,7 @@ export const useAuth = () => {
       signOut(auth)
       toast.info(t('auth.messages.youHaveBeenSignedOut'))
     }
+    $clientPosthog?.reset()
   }
 
   const linkAccount = async (providerName: OAuthProviders) => {
@@ -132,6 +131,7 @@ export const useAuth = () => {
     const provider = PROVIDERS[providerName]
     try {
       const result = await linkWithPopup(user, new provider())
+      $clientPosthog?.capture('link_account', { method: providerName })
       return handleOAuth(result)
     } catch (err) {
       toast.error(`${t('auth.messages.unableToLinkAccount')} ${(err as Error).message}`, {
@@ -149,12 +149,8 @@ export const useAuth = () => {
       const credential = googleCredential || githubCredential || null
 
       if (credential) {
-        if (useGuest().value?.uid) {
-          log('sign_up', { method: credential.signInMethod })
-        } else {
-          log('login', { method: credential.signInMethod })
-        }
         useGuest().value = {}
+        $clientPosthog?.capture('login', { method: credential.signInMethod })
         return true
       }
     } catch (err) {

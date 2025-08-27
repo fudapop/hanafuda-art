@@ -188,6 +188,12 @@
           type="button"
           class="w-full pri-btn"
           @click="handleDismiss"
+          v-posthog-capture="{
+            event: 'dismiss_announcement',
+            properties: {
+              announcement: currentAnnouncement.title,
+            },
+          }"
         >
           {{ t('announcements.dismiss') }}
         </button>
@@ -195,6 +201,12 @@
           type="button"
           class="w-full text-sm underline appearance-none text-text"
           @click="handleDontShowAgain"
+          v-posthog-capture="{
+            event: 'dont_show_again_announcement',
+            properties: {
+              announcement: currentAnnouncement.title,
+            },
+          }"
         >
           {{ t('announcements.dontShowAgain') }}
         </button>

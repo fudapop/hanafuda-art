@@ -27,6 +27,7 @@ jobs:
           RECAPTCHA_KEY: '${{ secrets.RECAPTCHA_KEY }}'
           NUXT_PUBLIC_SUPABASE_URL: '${{ secrets.NUXT_PUBLIC_SUPABASE_URL }}'
           NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: '${{ secrets.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}'
+          NUXT_PUBLIC_POSTHOG_KEY: '${{ secrets.NUXT_PUBLIC_POSTHOG_KEY }}'
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'

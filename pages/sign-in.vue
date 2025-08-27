@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import { useToast } from 'vue-toastification'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const pageTitle = computed(() => `${t('game.title')} | ${t('pages.signIn')}`)
 const pageDescription = computed(() => t('pageDescriptions.signIn', { appName: t('game.title') }))
 
@@ -118,6 +118,20 @@ const { upgradeGuestProfile, current: currentUser } = useProfile()
 const toast = useToast()
 const loggingIn = ref<boolean>(true)
 
+const { $clientPosthog } = useNuxtApp()
+
+const identifyUser = () => {
+  $clientPosthog?.identify(currentUser.value!.uid, {
+    username: currentUser.value!.username,
+    locale: locale.value,
+    lastLogin: currentUser.value!.lastUpdated,
+    gamesPlayed:
+      currentUser.value!.record.win +
+      currentUser.value!.record.loss +
+      currentUser.value!.record.draw,
+  })
+}
+
 const handleLinked = () => {
   if (!currentUser.value) {
     toast.error(t('auth.messages.failedToLinkAccount'), { timeout: 8000 })
@@ -128,12 +142,14 @@ const handleLinked = () => {
     timeout: 8000,
   })
   upgradeGuestProfile(currentUser.value!)
+  identifyUser()
   navigateTo(localeRoute('/'))
 }
 
 const handleLoginSuccess = () => {
   loggingIn.value = true
   toast.success(t('auth.messages.youreSignedIn'), { timeout: 2000 })
+  identifyUser()
   navigateTo(localeRoute('/'))
 }
 
@@ -148,11 +164,13 @@ onBeforeMount(async () => {
     return
   }
   if (await getCurrentUser()) {
+    identifyUser()
     navigateTo(localeRoute('/'))
   } else {
     const guest = await loginAsGuest('Player 1')
     if (guest) {
       await useProfile().getProfile(guest)
+      identifyUser()
       navigateTo(localeRoute('/'))
     } else {
       loggingIn.value = false

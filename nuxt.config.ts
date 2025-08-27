@@ -117,12 +117,19 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxt/content',
     '@nuxtjs/device',
+    'nuxt-posthog',
   ],
   postcss: {
     plugins: {
       'tailwindcss/nesting': {},
       'tailwindcss': {},
       'autoprefixer': {},
+    },
+  },
+  posthog: {
+    proxy: true,
+    clientOptions: {
+      defaults: '2025-05-24',
     },
   },
   router: {
@@ -136,6 +143,9 @@ export default defineNuxtConfig({
       version: pkg.version,
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
       supabasePublishableKey: process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+      // posthogPublicKey: process.env.NUXT_PUBLIC_POSTHOG_KEY,
+      // posthogHost: 'https://us.i.posthog.com',
+      // posthogDefaults: '2025-05-24',
     },
     private: {
       supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,

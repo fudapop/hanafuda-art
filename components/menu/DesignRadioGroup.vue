@@ -33,6 +33,12 @@
         :value="design"
         :disabled="!unlocked?.includes(design)"
         @pointerenter="cacheDesignOnHover(design, getDesignInfo(design).formatExt)"
+        v-posthog-capture="{
+          event: 'view_design',
+          properties: {
+            design: design,
+          },
+        }"
       >
         <div
           :class="[
@@ -112,6 +118,12 @@
                 type="button"
                 aria-label="{{ t('common.actions.like') }}"
                 @click="() => handleLike(design)"
+                v-posthog-capture="{
+                  event: isLiked(design) ? 'unlike_design' : 'like_design',
+                  properties: {
+                    design: design,
+                  },
+                }"
                 :class="[
                   'flex items-center gap-2 px-2 text-sm rounded-md transition-colors pointer-events-auto',
                   'focus:outline-none focus-visible:outline-none',
@@ -187,6 +199,14 @@
             type="button"
             class="text-base pri-btn"
             @click="confirmUnlock"
+            v-posthog-capture="{
+              event: 'unlock_confirmed',
+              properties: {
+                design: newUnlock?.design,
+                cost: newUnlock?.cost,
+                coins: coins,
+              },
+            }"
           >
             {{ t('deck.yesUnlockIt') }}
           </button>
@@ -194,6 +214,14 @@
             type="button"
             class="text-base sec-btn sm:order-first"
             @click="cancelUnlock"
+            v-posthog-capture="{
+              event: 'unlock_canceled',
+              properties: {
+                design: newUnlock?.design,
+                cost: newUnlock?.cost,
+                coins: coins,
+              },
+            }"
           >
             {{ t('deck.noKeepCoins') }}
           </button>

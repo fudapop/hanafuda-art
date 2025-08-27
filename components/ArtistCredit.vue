@@ -5,6 +5,13 @@
     :href="designInfo.url"
     target="_blank"
     class="text-xs italic opacity-50 !pointer-events-auto sm:text-white underline underline-offset-4 whitespace-nowrap"
+    v-posthog-capture="{
+      event: 'view_artist_website',
+      properties: {
+        artist: designInfo.creator,
+        url: designInfo.url,
+      },
+    }"
   >
     {{ t('deck.artBy', { creator: designInfo.creator }) }}
   </a>

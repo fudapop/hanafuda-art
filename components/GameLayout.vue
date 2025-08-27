@@ -184,6 +184,7 @@ import { usePlayerStore } from '~/stores/playerStore'
 const { currentDesign } = useCardDesign()
 const { logout } = useAuth()
 const { t } = useI18n()
+const { $clientPosthog } = useNuxtApp()
 
 const { players } = storeToRefs(usePlayerStore())
 const user = toValue(useProfile().current)
@@ -207,16 +208,19 @@ const handlePressExit = () => {
       navigateTo(route.fullPath)
     }
   } else {
+    $clientPosthog?.capture('exit_game')
     leavingGame.value = true
   }
 }
 
 const handleConfirmExit = () => {
+  $clientPosthog?.capture('exit_game_confirmed')
   leavingGame.value = false
   gameStart.value = false
 }
 
 const handleSignupCancel = async () => {
+  $clientPosthog?.capture('signup_declined')
   showLoader.value = true
   promptSignup.value = false
   signupDeclined.value = true

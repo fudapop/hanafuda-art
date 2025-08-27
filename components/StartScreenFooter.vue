@@ -13,6 +13,7 @@
             title="View artist's website"
             target="_blank"
             class="hover:text-primary hover:underline"
+            v-posthog-capture="'view_artist_website'"
             >Parish Cherry</a
           >
         </p>
@@ -22,6 +23,7 @@
             href="https://www.andrehammons.dev"
             target="_blank"
             class="hover:text-primary hover:underline"
+            v-posthog-capture="'view_github_repo'"
             >FudaPop</a
           >
           - {{ t('footer.credits.developedBy') }}
@@ -29,6 +31,7 @@
             href="https://www.andrehammons.dev"
             target="_blank"
             class="hover:text-primary hover:underline"
+            v-posthog-capture="'view_developer_website'"
             >Andre Hammons</a
           >
         </p>
@@ -41,6 +44,7 @@
         :to="localeRoute('/changelog')"
         title="View changelog"
         class="block text-xs tracking-widest transition-colors select-none hover:text-primary text-text-secondary"
+        v-posthog-capture="'view_changelog'"
       >
         {{ $config.public.version }}
       </NuxtLink>
@@ -52,6 +56,7 @@
           :to="localeRoute('/attributions')"
           title="View attributions"
           class="transition-colors hover:text-primary"
+          v-posthog-capture="'view_attributions'"
           >{{ t('footer.links.attributions') }}</NuxtLink
         >
         <span>•</span>
@@ -59,6 +64,7 @@
           :to="localeRoute('/terms')"
           title="View terms of use"
           class="transition-colors hover:text-primary"
+          v-posthog-capture="'view_terms_of_use'"
           >{{ t('footer.links.termsOfUse') }}</NuxtLink
         >
         <span>•</span>
@@ -66,6 +72,7 @@
           :to="localeRoute('/privacy')"
           title="View privacy policy"
           class="transition-colors hover:text-primary"
+          v-posthog-capture="'view_privacy_policy'"
           >{{ t('footer.links.privacyPolicy') }}</NuxtLink
         >
       </div>
