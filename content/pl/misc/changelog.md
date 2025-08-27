@@ -1,5 +1,14 @@
 # Dziennik zmian
 
+## [2.4.2] - 2025-08-27
+
+### Analityka i prywatność
+- **Integracja z PostHog**: Zastąpiono Firebase Analytics przez PostHog w celu zapewnienia lepszej, skoncentrowanej na prywatności analityki i wglądu w zachowania użytkowników.
+
+### Ulepszenia systemu audio
+- **Integracja z kontrolkami mediów**: Muzyka w tle wyświetla teraz metadane utworu w kontrolkach mediów urządzenia (iOS/Android/desktop).
+- **Wydajność audio**: Dodano zapasowe formaty audio dla lepszej kompatybilności z przeglądarkami oraz dodatkowe efekty dźwiękowe kart.
+
 ## [2.4.1] - 2025-08-20
 
 ### Naprawione błędy

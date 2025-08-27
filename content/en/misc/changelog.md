@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.4.2] - 2025-08-27
+
+### Analytics & Privacy
+- **PostHog Integration**: Replaced Firebase Analytics with PostHog for better privacy-focused analytics and user insights.
+
+### Audio System Enhancements
+- **Media Controls Integration**: Background music now displays track metadata in device media controls (iOS/Android/desktop).
+- **Audio Performance**: Added fallback audio formats for better browser compatibility and additional card sound effects.
+
 ## [2.4.1] - 2025-08-20
 
 ### Bug Fixes
