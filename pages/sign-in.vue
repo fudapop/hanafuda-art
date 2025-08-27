@@ -121,14 +121,13 @@ const loggingIn = ref<boolean>(true)
 const { $clientPosthog } = useNuxtApp()
 
 const identifyUser = () => {
-  $clientPosthog?.identify(currentUser.value!.uid, {
-    username: currentUser.value!.username,
+  if (!currentUser.value) return
+  $clientPosthog?.identify(currentUser.value.uid, {
+    username: currentUser.value.username,
     locale: locale.value,
-    lastLogin: currentUser.value!.lastUpdated,
+    lastLogin: currentUser.value.lastUpdated,
     gamesPlayed:
-      currentUser.value!.record.win +
-      currentUser.value!.record.loss +
-      currentUser.value!.record.draw,
+      currentUser.value.record.win + currentUser.value.record.loss + currentUser.value.record.draw,
   })
 }
 
@@ -157,7 +156,7 @@ const handleLoginError = () => {
   loggingIn.value = false
 }
 
-onBeforeMount(async () => {
+onMounted(async () => {
   const { exit, signup } = useRoute().query
   if (exit || signup) {
     loggingIn.value = false
