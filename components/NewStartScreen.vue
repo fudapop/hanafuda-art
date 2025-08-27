@@ -65,16 +65,17 @@
       <div class="flex flex-col items-center gap-3 sm:gap-4">
         <button
           :class="[
-            'rounded-sm overflow-hidden mt-6 sm:mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 w-[140px] sm:w-[150px]',
+            'play-now-button rounded-sm mt-6 sm:mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+            'bg-gradient-to-b from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300',
+            'text-[#23221c] font-bold text-lg',
+            'hover:from-amber-200 hover:to-amber-300 dark:hover:from-amber-300 dark:hover:to-amber-400',
+            'active:from-amber-300 active:to-amber-400',
+            'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
             isMobile ? 'landscape:mt-0' : 'md:mt-24',
           ]"
           @click="$emit('start-game')"
         >
-          <img
-            src="/images/button-play-now.webp"
-            class="w-full h-full cover"
-          />
-          <span class="sr-only"> {{ t('common.actions.playNow') }} </span>
+          {{ t('common.actions.playNow') }}
         </button>
 
         <!-- Options Button - Only show when logged in -->
