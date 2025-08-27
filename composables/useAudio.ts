@@ -8,7 +8,8 @@ export const useAudio = () => {
   // BGM tracks with fallback formats (browser will try in order)
   const BGM_TRACKS = {
     main: {
-      name: 'Awayuki - Peritune',
+      name: 'Awayuki',
+      artwork: `${bucketUrl}/art/gambler-september-logo-512.png`,
       sources: [
         `${bucketUrl}/bgm/PerituneMaterial_Awayuki.ogg`,
         `${bucketUrl}/bgm/PerituneMaterial_Awayuki.m4a`,
@@ -16,7 +17,8 @@ export const useAudio = () => {
       ],
     },
     koikoi1: {
-      name: 'Epic Battle J - Peritune',
+      name: 'Epic Battle J',
+      artwork: `${bucketUrl}/art/gambler-june-logo-512.png`,
       sources: [
         `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.ogg`,
         `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.m4a`,
@@ -24,7 +26,8 @@ export const useAudio = () => {
       ],
     },
     koikoi2: {
-      name: 'Kengeki - Peritune',
+      name: 'Kengeki',
+      artwork: `${bucketUrl}/art/gambler-october-logo-512.png`,
       sources: [
         `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.ogg`,
         `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.m4a`,
@@ -109,11 +112,11 @@ export const useAudio = () => {
   // Load preferences from localStorage with separate BGM and SFX controls
   const systemPreferences = useStorage('hanafuda-system-preferences', {
     bgm: {
-      volume: 0.25,
+      volume: 0.2,
       isDisabled: false,
     },
     sfx: {
-      volume: 0.25,
+      volume: 0.3,
       isDisabled: false,
     },
     // Legacy fallback support
@@ -184,7 +187,59 @@ export const useAudio = () => {
     }
   }
 
-  // Initialize audio element with mobile compatibility and automatic fallback support (for BGM)
+  // Media Session API support
+  const setupMediaSession = (trackKey: keyof typeof BGM_TRACKS) => {
+    if (!import.meta.client || !navigator.mediaSession) return
+
+    const track = BGM_TRACKS[trackKey]
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.name,
+      artist: 'Peritune',
+      album: 'Hanafuda Koi-Koi BGM',
+      artwork: [
+        {
+          src: track.artwork, // You can add your game logo
+          sizes: '512x512',
+          type: 'image/webp',
+        },
+        {
+          src: '/images/logo-title.webp', // Fallback
+          sizes: '512x512',
+          type: 'image/webp',
+        },
+      ],
+    })
+
+    // Set up media session action handlers
+    navigator.mediaSession.setActionHandler('play', () => {
+      playAudio()
+    })
+
+    navigator.mediaSession.setActionHandler('pause', () => {
+      pauseAudio()
+    })
+
+    // Update playback state
+    navigator.mediaSession.playbackState = 'playing'
+  }
+
+  const updateMediaSessionState = (isPlayingState: boolean) => {
+    if (!import.meta.client || !navigator.mediaSession) return
+
+    navigator.mediaSession.playbackState = isPlayingState ? 'playing' : 'paused'
+  }
+
+  const clearMediaSession = () => {
+    if (!import.meta.client || !navigator.mediaSession) return
+
+    navigator.mediaSession.metadata = null
+    navigator.mediaSession.setActionHandler('play', null)
+    navigator.mediaSession.setActionHandler('pause', null)
+    navigator.mediaSession.playbackState = 'none'
+  }
+
+  // Enhanced initAudio with Media Session support
   const initAudio = (trackKeyOrSrc: keyof typeof BGM_TRACKS | string) => {
     if (!import.meta.client) return
 
@@ -196,12 +251,23 @@ export const useAudio = () => {
       ref.value.loop = true
       ref.value.preload = 'auto'
       currentTrack.value = trackKeyOrSrc
+
+      // Try to find matching track key for Media Session
+      for (const [key, trackData] of Object.entries(BGM_TRACKS)) {
+        if (trackData.sources.includes(trackKeyOrSrc as any)) {
+          setupMediaSession(key as keyof typeof BGM_TRACKS)
+          break
+        }
+      }
     } else {
       // Track key provided - use fallback system
       const trackKey = trackKeyOrSrc as keyof typeof BGM_TRACKS
       const track = BGM_TRACKS[trackKey]
       ref.value = createAudioWithFallbacks(track.sources)
-      currentTrack.value = track.sources[0] // Set to preferred format
+      currentTrack.value = track.sources[0]
+
+      // Setup Media Session for this track
+      setupMediaSession(trackKey)
     }
 
     ref.value.volume = bgmVolume.value
@@ -220,7 +286,7 @@ export const useAudio = () => {
     })
   }
 
-  // Enhanced play audio with mobile compatibility
+  // Enhanced playAudio with Media Session state update
   const playAudio = async (fadeDuration: number = 3) => {
     // Don't play if BGM is disabled
     if (bgmDisabled.value || !currentAudioRef.value.value) return
@@ -246,6 +312,9 @@ export const useAudio = () => {
         isPlaying.value = true
         shouldBePlaying.value = true
         fadeInAudio(fadeDuration)
+
+        // Update Media Session state
+        updateMediaSessionState(true)
       }
     } catch (error) {
       console.warn('Audio autoplay failed:', error)
@@ -256,12 +325,15 @@ export const useAudio = () => {
     }
   }
 
-  // Pause audio (active only)
+  // Enhanced pauseAudio with Media Session state update
   const pauseAudio = () => {
     if (currentAudioRef.value.value) {
       currentAudioRef.value.value.pause()
       isPlaying.value = false
       shouldBePlaying.value = false
+
+      // Update Media Session state
+      updateMediaSessionState(false)
     }
   }
 
@@ -367,12 +439,23 @@ export const useAudio = () => {
       newAudio = new Audio(targetSrc)
       newAudio.loop = true
       newAudio.preload = 'auto'
+
+      // Try to find matching track key for Media Session
+      for (const [key, trackData] of Object.entries(BGM_TRACKS)) {
+        if (trackData.sources.includes(trackKeyOrSrc as any)) {
+          setupMediaSession(key as keyof typeof BGM_TRACKS)
+          break
+        }
+      }
     } else {
       // Track key provided - use fallback system
       const trackKey = trackKeyOrSrc as keyof typeof BGM_TRACKS
       const track = BGM_TRACKS[trackKey]
       targetSrc = track.sources[0] // Set to preferred format for comparison
       newAudio = createAudioWithFallbacks(track.sources)
+
+      // Setup Media Session for this track
+      setupMediaSession(trackKey)
     }
 
     // Set intent to play this track
@@ -477,7 +560,7 @@ export const useAudio = () => {
     document.addEventListener('touchend', handleUserInteraction)
   }
 
-  // Cleanup (both refs)
+  // Enhanced cleanup with Media Session cleanup
   const cleanup = () => {
     if (audioRefA.value) {
       audioRefA.value.pause()
@@ -491,6 +574,9 @@ export const useAudio = () => {
     }
     isPlaying.value = false
     shouldBePlaying.value = false
+
+    // Clear Media Session
+    clearMediaSession()
   }
 
   // Watch and save changes to localStorage
@@ -605,5 +691,10 @@ export const useAudio = () => {
     playSfx,
     initAudioContext,
     createAudioWithFallbacks, // Expose for advanced usage
+
+    // Media Session methods (for advanced usage)
+    setupMediaSession,
+    updateMediaSessionState,
+    clearMediaSession,
   }
 }
