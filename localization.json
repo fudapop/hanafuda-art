@@ -21,6 +21,13 @@
       "language": "pl-PL",
       "file": "pl-pl.json",
       "dir": "ltr"
+    },
+    {
+      "name": "Русский",
+      "code": "ru",
+      "language": "ru-RU",
+      "file": "ru-ru.json",
+      "dir": "ltr"
     }
   ]
 }

@@ -113,6 +113,52 @@ Expected format:
   },
 )
 
+const translateEntireJsonFlow = ai.defineFlow(
+  {
+    name: 'translateEntireJsonFlow',
+    inputSchema: z.object({
+      sourceJson: z.record(z.any()),
+      sourceLocale: z.string(),
+      targetLocale: z.string(),
+    }),
+    outputSchema: z.record(z.any()),
+  },
+  async (input) => {
+    const { sourceJson, sourceLocale, targetLocale } = input
+
+    const sourceLanguageName = getLanguageName(sourceLocale)
+    const targetLanguageName = getLanguageName(targetLocale)
+
+    const prompt = `
+You are a professional translator specializing in user interface localization.
+
+Context: You are translating an entire JSON locale file from ${sourceLanguageName} (${sourceLocale}) to ${targetLanguageName} (${targetLocale}) for a Hanafuda Koi-Koi card game application.
+
+Task: Translate ALL text values while maintaining:
+- EXACT JSON structure and nesting
+- All object keys unchanged (do not translate keys, only values)
+- Placeholder variables like {email}, {cost}, {current}, {max}, {creator}, etc.
+- Special characters and emojis
+- Technical terms (keep "Hanafuda", "Koi-Koi", "Yaku" untranslated)
+- Contextual meaning appropriate for a card game interface
+
+Source JSON (${sourceLanguageName}):
+${JSON.stringify(sourceJson, null, 2)}
+
+Return the complete JSON structure with all string values translated to ${targetLanguageName}.
+Focus on natural, contextually appropriate translations for game UI elements.
+`
+
+    const { output } = await ai.generate({
+      prompt,
+    })
+
+    if (!output) throw new Error('Failed to translate entire JSON content')
+
+    return output
+  },
+)
+
 // Parse command line arguments
 function parseCliArgs() {
   const defaultTargetLocales = getTargetLocaleFiles()
@@ -374,13 +420,14 @@ async function translateLocale(
   try {
     // Load existing target JSON (if exists)
     let targetJson: JsonObject = {}
-    if (existsSync(targetFile)) {
+    const targetFileExists = existsSync(targetFile)
+    if (targetFileExists) {
       const targetContent = await Deno.readTextFile(targetFile)
       targetJson = JSON.parse(targetContent) as JsonObject
     }
 
     // Find missing keys
-    const missingKeys = forceUpdate
+    const missingKeys = forceUpdate || !targetFileExists
       ? findAllKeys(sourceJson)
       : findMissingKeys(sourceJson, targetJson)
 
@@ -408,20 +455,36 @@ async function translateLocale(
     }
 
     // Perform actual translation
-    console.log(
-      `🌐 Translating ${missingKeys.length} keys from ${sourceLocale} to ${targetLocale}...`,
-    )
+    let updatedJson: JsonObject
+    
+    if (!targetFileExists) {
+      // Translate entire JSON for new file
+      console.log(
+        `🌐 Translating entire JSON from ${sourceLocale} to ${targetLocale}...`,
+      )
+      
+      updatedJson = await translateEntireJsonFlow({
+        sourceJson,
+        sourceLocale,
+        targetLocale,
+      })
+    } else {
+      // Translate only missing keys
+      console.log(
+        `🌐 Translating ${missingKeys.length} keys from ${sourceLocale} to ${targetLocale}...`,
+      )
 
-    const translationResult = await translateJsonFlow({
-      sourceJson,
-      targetJson,
-      sourceLocale,
-      targetLocale,
-      missingKeys,
-    })
+      const translationResult = await translateJsonFlow({
+        sourceJson,
+        targetJson,
+        sourceLocale,
+        targetLocale,
+        missingKeys,
+      })
 
-    // Merge translations into target JSON
-    const updatedJson = mergeTranslations(targetJson, translationResult.translations)
+      // Merge translations into target JSON
+      updatedJson = mergeTranslations(targetJson, translationResult.translations)
+    }
 
     // Write the updated JSON file
     await Deno.writeTextFile(targetFile, JSON.stringify(updatedJson, null, 2) + '\n')
