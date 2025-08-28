@@ -21,7 +21,12 @@
       "no": "いいえ",
       "like": "いいね",
       "unlike": "いいねを解除",
-      "showTable": "テーブルを表示"
+      "showTable": "テーブルを表示",
+      "saving": "保存中...",
+      "loading": "読み込み中...",
+      "delete": "削除",
+      "saveGame": "ゲームを保存",
+      "loadGame": "ゲームを読み込む"
     },
     "labels": {
       "appName": "札ポップ",
@@ -146,7 +151,11 @@
       "calledStop": "が「ストップ」と宣言しました。",
       "koikoiWasCalled": "「こいこい」が宣言されました！",
       "koikoi": "こいこい",
-      "stop": "ストップ"
+      "stop": "ストップ",
+      "saveAndExit": "保存して終了",
+      "forfeitAndExit": "降参して終了",
+      "resumeGame": "ゲームを再開",
+      "deleteSave": "セーブデータを削除"
     },
     "results": {
       "theRoundIsADraw": "このラウンドは引き分けです。",
@@ -190,7 +199,14 @@
       "leavingGame": "ゲームを終了しています...",
       "gameWillBeForfeited": "ゲームは放棄され、進行状況は保存されません。本当にゲームを終了しますか？",
       "yesLeaveGame": "はい、ゲームを終了する",
-      "noKeepPlaying": "いいえ、プレイを続ける"
+      "noKeepPlaying": "いいえ、プレイを続ける",
+      "chooseHowToExit": "ゲームの終了方法を選択してください。"
+    },
+    "saveInfo": {
+      "lastSaved": "最終保存日時: {lastSaved}"
+    },
+    "confirmations": {
+      "deleteSave": "セーブデータを削除してもよろしいですか？この操作は元に戻せません。"
     }
   },
   "settings": {

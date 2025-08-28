@@ -157,8 +157,10 @@
     <!-- MODALS -->
     <LazyExitWarning
       :open="leavingGame"
+      :isSaving="isSaving"
       @cancel="leavingGame = false"
-      @confirm="handleConfirmExit"
+      @save="handleSaveAndExit"
+      @forfeit="handleForfeitAndExit"
     />
     <LazyFeedbackForm
       :open="promptFeedback"
@@ -191,6 +193,7 @@ const user = toValue(useProfile().current)
 
 const gameStart = useState('start', () => false)
 const leavingGame = ref(false)
+const isSaving = ref(false)
 const promptFeedback = ref(false)
 const promptSignup = ref(false)
 const showLoader = ref(false)
@@ -213,6 +216,33 @@ const handlePressExit = () => {
   }
 }
 
+const handleSaveAndExit = async () => {
+  $clientPosthog?.capture('exit_game_save')
+  isSaving.value = true
+  
+  try {
+    const { quickSave } = useStoreManager()
+    quickSave() // Save current game state
+    
+    leavingGame.value = false
+    gameStart.value = false
+  } catch (error) {
+    console.error('Failed to save game:', error)
+    // Still exit even if save fails, but could show error message
+    leavingGame.value = false
+    gameStart.value = false
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const handleForfeitAndExit = () => {
+  $clientPosthog?.capture('exit_game_forfeit')
+  leavingGame.value = false
+  gameStart.value = false
+}
+
+// Keep the old handler for backward compatibility (though it's no longer used)
 const handleConfirmExit = () => {
   $clientPosthog?.capture('exit_game_confirmed')
   leavingGame.value = false

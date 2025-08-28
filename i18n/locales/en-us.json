@@ -14,6 +14,9 @@
       "submit": "Submit",
       "send": "Send",
       "save": "Save",
+      "saving": "Saving...",
+      "loading": "Loading...",
+      "delete": "Delete",
       "confirm": "Confirm",
       "continue": "Continue",
       "gotIt": "Got it!",
@@ -21,7 +24,9 @@
       "no": "No",
       "like": "Like",
       "unlike": "Unlike",
-      "showTable": "Show Table"
+      "showTable": "Show Table",
+      "saveGame": "Save Game",
+      "loadGame": "Load Game"
     },
     "labels": {
       "appName": "FudaPop",
@@ -146,7 +151,11 @@
       "calledStop": "called stop.",
       "koikoiWasCalled": "Koi-Koi was called!",
       "koikoi": "Koi-Koi",
-      "stop": "Stop"
+      "stop": "Stop",
+      "saveAndExit": "Save & Exit",
+      "forfeitAndExit": "Forfeit & Exit",
+      "resumeGame": "Resume Game",
+      "deleteSave": "Delete Save"
     },
     "results": {
       "theRoundIsADraw": "The round is a draw.",
@@ -190,7 +199,14 @@
       "leavingGame": "Leaving the game...",
       "gameWillBeForfeited": "The game will be forfeited and progress will not be saved. Are you sure you want to leave?",
       "yesLeaveGame": "Yes, leave the game",
-      "noKeepPlaying": "No, keep playing"
+      "noKeepPlaying": "No, keep playing",
+      "chooseHowToExit": "Choose how to exit the game."
+    },
+    "saveInfo": {
+      "lastSaved": "Last saved: {lastSaved}"
+    },
+    "confirmations": {
+      "deleteSave": "Are you sure you want to delete your saved game? This action cannot be undone."
     }
   },
   "settings": {

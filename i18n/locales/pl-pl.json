@@ -21,7 +21,12 @@
       "no": "Nie",
       "like": "Polub",
       "unlike": "Odlub",
-      "showTable": "Pokaż tabelę"
+      "showTable": "Pokaż tabelę",
+      "saving": "Zapisywanie...",
+      "loading": "Ładowanie...",
+      "delete": "Usuń",
+      "saveGame": "Zapisz grę",
+      "loadGame": "Wczytaj grę"
     },
     "labels": {
       "appName": "FudaPop",
@@ -146,7 +151,11 @@
       "calledStop": "powiedział stop.",
       "koikoiWasCalled": "Koi-Koi zostało wywołane!",
       "koikoi": "Koi-Koi",
-      "stop": "Stop"
+      "stop": "Stop",
+      "saveAndExit": "Zapisz i wyjdź",
+      "forfeitAndExit": "Poddaj się i wyjdź",
+      "resumeGame": "Wznów grę",
+      "deleteSave": "Usuń zapis"
     },
     "results": {
       "theRoundIsADraw": "Runda kończy się remisem.",
@@ -190,7 +199,14 @@
       "leavingGame": "Opuszczanie gry...",
       "gameWillBeForfeited": "Gra zostanie przegrana, a postęp nie zostanie zapisany. Czy na pewno chcesz odejść?",
       "yesLeaveGame": "Tak, opuść grę",
-      "noKeepPlaying": "Nie, kontynuuj grę"
+      "noKeepPlaying": "Nie, kontynuuj grę",
+      "chooseHowToExit": "Wybierz sposób wyjścia z gry."
+    },
+    "saveInfo": {
+      "lastSaved": "Ostatni zapis: {lastSaved}"
+    },
+    "confirmations": {
+      "deleteSave": "Czy na pewno chcesz usunąć zapis gry? Tej czynności nie można cofnąć."
     }
   },
   "settings": {

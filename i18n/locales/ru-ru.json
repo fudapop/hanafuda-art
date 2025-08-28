@@ -21,7 +21,12 @@
       "no": "Нет",
       "like": "Нравится",
       "unlike": "Не нравится",
-      "showTable": "Показать стол"
+      "showTable": "Показать стол",
+      "saving": "Сохранение...",
+      "loading": "Загрузка...",
+      "delete": "Удалить",
+      "saveGame": "Сохранить игру",
+      "loadGame": "Загрузить игру"
     },
     "labels": {
       "appName": "FudaPop",
@@ -146,7 +151,11 @@
       "calledStop": "объявил стоп.",
       "koikoiWasCalled": "Было объявлено Koi-Koi!",
       "koikoi": "Koi-Koi",
-      "stop": "Стоп"
+      "stop": "Стоп",
+      "saveAndExit": "Сохранить и выйти",
+      "forfeitAndExit": "Сдаться и выйти",
+      "resumeGame": "Продолжить игру",
+      "deleteSave": "Удалить сохранение"
     },
     "results": {
       "theRoundIsADraw": "Раунд завершился вничью.",
@@ -190,7 +199,14 @@
       "leavingGame": "Выход из игры...",
       "gameWillBeForfeited": "Игра будет проиграна, и прогресс не будет сохранен. Вы уверены, что хотите выйти?",
       "yesLeaveGame": "Да, выйти из игры",
-      "noKeepPlaying": "Нет, продолжить играть"
+      "noKeepPlaying": "Нет, продолжить играть",
+      "chooseHowToExit": "Выберите способ выхода из игры."
+    },
+    "saveInfo": {
+      "lastSaved": "Последнее сохранение: {lastSaved}"
+    },
+    "confirmations": {
+      "deleteSave": "Вы уверены, что хотите удалить сохраненную игру? Это действие нельзя отменить."
     }
   },
   "settings": {

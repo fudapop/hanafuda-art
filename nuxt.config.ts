@@ -130,6 +130,7 @@ export default defineNuxtConfig({
     proxy: process.env.NODE_ENV !== 'production',
     clientOptions: {
       autocapture: true,
+      persistence: 'cookie',
     },
   },
   router: {
@@ -143,12 +144,18 @@ export default defineNuxtConfig({
       version: pkg.version,
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
       supabasePublishableKey: process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+      saveIntegritySalt: process.env.NUXT_PUBLIC_SAVE_INTEGRITY_SALT,
     },
     private: {
       supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
     },
   },
   ssr: false,
+  vite: {
+    optimizeDeps: {
+      force: true,
+    },
+  },
   vuefire: {
     auth: true,
     appCheck: {
@@ -165,11 +172,6 @@ export default defineNuxtConfig({
       messagingSenderId: '938327095699',
       appId: '1:938327095699:web:b79f95821825d93b295066',
       measurementId: 'G-RDPJ7SKMBT',
-    },
-  },
-  vite: {
-    optimizeDeps: {
-      force: true,
     },
   },
 })

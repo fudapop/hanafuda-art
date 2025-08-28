@@ -1,12 +1,42 @@
 /**
- * Tracks cards during game.
- * Provides methods to move cards around the table.
- * Ensures number of cards in game remains consistent.
+ * @fileoverview Card Store
+ * 
+ * Manages all card-related state during Hanafuda gameplay including player hands,
+ * field cards, deck, and collections. Provides methods to move cards around the
+ * table while maintaining game integrity through card counting and validation.
+ * 
+ * Features:
+ * - Card position tracking (hands, field, deck, collections)
+ * - Atomic card operations with integrity checking
+ * - Game state serialization with versioned hash-based tampering protection
+ * - Card dealing, collecting, and staging operations
+ * - Automatic card shuffling and deck management
+ * 
+ * State Structure:
+ * - hand: Cards currently held by each player
+ * - collection: Cards captured by each player
+ * - field: Cards currently on the playing field
+ * - deck: Remaining cards in the draw pile
+ * - staged: Cards temporarily staged for collection
+ * 
+ * @example
+ * ```typescript
+ * const cardStore = useCardStore()
+ * 
+ * // Deal initial cards
+ * cardStore.dealCards()
+ * 
+ * // Move card from hand to field
+ * cardStore.discard('matsu-ni-tsuru', 'p1')
+ * 
+ * // Check game integrity
+ * const isValid = cardStore.integrityCheck
+ * ```
  */
 
 import { defineStore } from 'pinia'
 import { type PlayerKey } from '~/stores/playerStore'
-import { type CardName, shuffle } from '~/utils/cards'
+import { type CardName, shuffle, DECK } from '~/utils/cards'
 
 type PlayerCardSet = Record<PlayerKey, Set<CardName>>
 
@@ -110,6 +140,130 @@ export const useCardStore = defineStore('cards', {
         state.field.clear()
         state.deck = new Set(shuffle([...DECK]))
       })
+    },
+    exportSerializedState(associatedDataSalt?: string): string {
+      const serializable = {
+        hand: {
+          p1: Array.from(this.hand.p1),
+          p2: Array.from(this.hand.p2)
+        },
+        collection: {
+          p1: Array.from(this.collection.p1),
+          p2: Array.from(this.collection.p2)
+        },
+        field: Array.from(this.field),
+        deck: Array.from(this.deck),
+        staged: Array.from(this.staged)
+      }
+      
+      // Add integrity hash to prevent tampering, using associated data as salt
+      const dataString = JSON.stringify(serializable)
+      const hash = this._generateHashWithAlgorithm(dataString, associatedDataSalt, 'fnv1a-mixed')
+      
+      return JSON.stringify({
+        data: serializable,
+        hash,
+        hashAlgorithm: 'fnv1a-mixed',
+        version: '1.0.0'
+      })
+    },
+    importSerializedState(serializedState: string, associatedDataSalt?: string): boolean {
+      try {
+        const parsed = JSON.parse(serializedState)
+        
+        // Expect new format with integrity protection
+        if (!parsed.data || !parsed.hash || !parsed.version) {
+          throw new Error('Invalid save format - missing required fields')
+        }
+        
+        const { data, hash: expectedHash, hashAlgorithm } = parsed
+        
+        // Verify integrity hash with appropriate algorithm
+        const dataString = JSON.stringify(data)
+        const actualHash = this._generateHashWithAlgorithm(dataString, associatedDataSalt, hashAlgorithm)
+        
+        if (actualHash !== expectedHash) {
+          throw new Error('Save data integrity verification failed - data may have been tampered with')
+        }
+        
+        // Validate structure
+        if (!data.hand || !data.collection || !data.field || !data.deck || !data.staged) {
+          throw new Error('Invalid card store state structure')
+        }
+        
+        this.$patch((state) => {
+          state.hand.p1 = new Set(data.hand.p1 || [])
+          state.hand.p2 = new Set(data.hand.p2 || [])
+          state.collection.p1 = new Set(data.collection.p1 || [])
+          state.collection.p2 = new Set(data.collection.p2 || [])
+          state.field = new Set(data.field || [])
+          state.deck = new Set(data.deck || [])
+          state.staged = new Set(data.staged || [])
+        })
+        
+        return true
+      } catch (error) {
+        console.error('Failed to import card store state:', error)
+        return false
+      }
+    },
+    
+    // Algorithm-aware hash generation for backward compatibility
+    _generateHashWithAlgorithm(data: string, associatedDataSalt?: string, algorithm?: string): string {
+      switch (algorithm) {
+        case 'fnv1a-mixed':
+          return this._generateFNV1aMixedHash(data, associatedDataSalt)
+        case 'simple': // For backward compatibility with very old saves
+          return this._generateSimpleHash(data, associatedDataSalt)
+        default:
+          // Default to current algorithm for saves without hashAlgorithm field
+          return this._generateFNV1aMixedHash(data, associatedDataSalt)
+      }
+    },
+
+    // Current hash method - FNV-1a with additional mixing
+    _generateFNV1aMixedHash(data: string, associatedDataSalt?: string): string {
+      // Get base salt from runtime config or fallback
+      const config = useRuntimeConfig()
+      const baseSalt = config.public.saveIntegritySalt || 'hanafuda-fallback-2024'
+      const fullData = data + baseSalt + (associatedDataSalt || '')
+      
+      // Improved hash function using FNV-1a with additional mixing
+      let hash = 0x811c9dc5 // FNV-1a 32-bit offset basis
+      
+      for (let i = 0; i < fullData.length; i++) {
+        // XOR with byte
+        hash ^= fullData.charCodeAt(i)
+        // Multiply by FNV-1a prime
+        hash = Math.imul(hash, 0x01000193)
+      }
+      
+      // Additional mixing to improve distribution
+      hash ^= hash >>> 16
+      hash = Math.imul(hash, 0x21f0aaad)
+      hash ^= hash >>> 15
+      hash = Math.imul(hash, 0x735a2d97)
+      hash ^= hash >>> 15
+      
+      // Convert to unsigned 32-bit integer and then to hex
+      return (hash >>> 0).toString(16).padStart(8, '0')
+    },
+
+    // Legacy simple hash for backward compatibility (if needed)
+    _generateSimpleHash(data: string, associatedDataSalt?: string): string {
+      // Simple hash function for backward compatibility
+      let hash = 0
+      const config = useRuntimeConfig()
+      const baseSalt = config.public.saveIntegritySalt || 'hanafuda-fallback-2024'
+      const fullData = data + baseSalt + (associatedDataSalt || '')
+      
+      for (let i = 0; i < fullData.length; i++) {
+        const char = fullData.charCodeAt(i)
+        hash = ((hash << 5) - hash) + char
+        hash = hash & hash // Convert to 32-bit integer
+      }
+      
+      return hash.toString(36) // Base36 for shorter hash
     },
   },
 })

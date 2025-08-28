@@ -1,23 +1,83 @@
+/**
+ * @fileoverview Game Data Store
+ * 
+ * Coordinates the overall game flow and state management for Hanafuda gameplay.
+ * Manages rounds, turns, phases, scoring, and game progression while working
+ * in harmony with other stores to maintain consistent game state.
+ * 
+ * Features:
+ * - Turn-based game flow management (select → draw → collect phases)
+ * - Round and match progression tracking
+ * - Score calculation and history maintenance
+ * - Game state transitions and validation
+ * - Unique game session identification
+ * - Serializable state for save/load functionality
+ * 
+ * Game Flow:
+ * 1. Select Phase: Player chooses card from hand
+ * 2. Draw Phase: Card drawn from deck
+ * 3. Collect Phase: Matching cards collected, yaku calculated
+ * 
+ * @example
+ * ```typescript
+ * const gameData = useGameDataStore()
+ * 
+ * // Start new round
+ * gameData.startRound()
+ * 
+ * // Progress through phases
+ * gameData.nextPhase() // select → draw → collect → select...
+ * 
+ * // Check current state
+ * const current = gameData.getCurrent
+ * console.log(`Round ${current.round}, Turn ${current.turn}, Phase: ${current.phase}`)
+ * 
+ * // End round with results
+ * gameData.saveResult({ winner: 'p1', score: 15 })
+ * gameData.endRound()
+ * ```
+ */
+
 import { defineStore } from 'pinia'
 import { useCardStore } from '~/stores/cardStore'
 import { useConfigStore } from '~/stores/configStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
-import { getRandomString } from '~/utils/myUtils'
+import { getRandomString, consoleLogColor } from '~/utils/myUtils'
 
+/** Result data for a completed round */
 export type RoundResult = {
   [x: string]: unknown
+  /** Round number */
   round?: number
+  /** Winning player or null for draw */
   winner: PlayerKey | null
+  /** Points scored in this round */
   score: number
 }
 
+/** Valid turn phases in order */
 const PHASES = ['select', 'draw', 'collect'] as const
 
+/** Current phase of the turn */
 type TurnPhase = (typeof PHASES)[number]
 
-/**
- * Coordinates the appropriate store actions during each phase of the game
- */
+/** Complete game data store state shape */
+export interface GameDataStoreState {
+  /** Unique identifier for this game session */
+  gameId: string
+  /** History of all completed rounds */
+  roundHistory: RoundResult[]
+  /** Current round number (1-based) */
+  roundCounter: number
+  /** Current turn number within round (1-based) */
+  turnCounter: number
+  /** Current turn phase */
+  turnPhase: TurnPhase
+  /** Whether current round has ended */
+  roundOver: boolean
+  /** Whether entire game/match has ended */
+  gameOver: boolean
+}
 export const useGameDataStore = defineStore('gameData', () => {
   // State
   const gameId = ref(getRandomString(28))
@@ -137,6 +197,8 @@ export const useGameDataStore = defineStore('gameData', () => {
 
   function reset() {
     roundCounter.value = 1
+    turnCounter.value = 1
+    turnPhase.value = 'select'
     roundOver.value = false
     gameOver.value = false
     const record = JSON.stringify(roundHistory.value.splice(0))
@@ -146,6 +208,43 @@ export const useGameDataStore = defineStore('gameData', () => {
   function _incrementTurn() {
     turnCounter.value++
     consoleLogColor(`TURN ${turnCounter.value}`, 'gray')
+  }
+
+  function exportSerializedState(): string {
+    const serializable = {
+      gameId: gameId.value,
+      roundHistory: [...roundHistory.value],
+      roundCounter: roundCounter.value,
+      turnCounter: turnCounter.value,
+      turnPhase: turnPhase.value,
+      roundOver: roundOver.value,
+      gameOver: gameOver.value
+    }
+    return JSON.stringify(serializable)
+  }
+
+  function importSerializedState(serializedState: string): boolean {
+    try {
+      const data = JSON.parse(serializedState)
+      
+      // Validate structure
+      if (typeof data.gameId !== 'string' || !Array.isArray(data.roundHistory)) {
+        throw new Error('Invalid game data store state structure')
+      }
+      
+      gameId.value = data.gameId
+      roundHistory.value.splice(0, roundHistory.value.length, ...data.roundHistory)
+      roundCounter.value = data.roundCounter || 1
+      turnCounter.value = data.turnCounter || 1
+      turnPhase.value = data.turnPhase || 'select'
+      roundOver.value = data.roundOver || false
+      gameOver.value = data.gameOver || false
+      
+      return true
+    } catch (error) {
+      console.error('Failed to import game data store state:', error)
+      return false
+    }
   }
 
   return {
@@ -171,5 +270,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     nextRound,
     generateGameId,
     reset,
+    exportSerializedState,
+    importSerializedState,
   }
 })

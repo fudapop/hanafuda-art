@@ -39,7 +39,7 @@ type JsonObject = { [key: string]: JsonValue }
 const ai = genkit({
   plugins: [googleAI()],
   model: googleAI.model('gemini-2.5-flash', {
-    temperature: 0.1,
+    temperature: 0,
   }),
 })
 
@@ -53,9 +53,7 @@ const translateJsonFlow = ai.defineFlow(
       targetLocale: z.string(),
       missingKeys: z.array(z.string()),
     }),
-    outputSchema: z.object({
-      translations: z.record(z.string(), z.any()),
-    }),
+    outputSchema: z.record(z.any()),
   },
   async (input) => {
     const { sourceJson, sourceLocale, targetLocale, missingKeys } = input
@@ -78,7 +76,7 @@ You are a professional translator specializing in user interface localization.
 Context: You are translating a JSON locale file from ${sourceLanguageName} (${sourceLocale}) to ${targetLanguageName} (${targetLocale}) for a Hanafuda Koi-Koi card game application.
 
 Task: Translate ONLY the provided missing keys while maintaining:
-- JSON structure and nesting
+- EXACT JSON structure and nesting
 - Placeholder variables like {email}, {cost}, {current}, {max}, {creator}, etc.
 - Special characters and emojis
 - Technical terms (keep "Hanafuda", "Koi-Koi", "Yaku" untranslated)
@@ -89,22 +87,10 @@ ${JSON.stringify(missingTranslations, null, 2)}
 
 Return a JSON object with the same structure containing the translations in ${targetLanguageName}.
 Focus on natural, contextually appropriate translations for game UI elements.
-
-Expected format:
-{
-  "translations": {
-    // Same structure as input but with translated values
-  }
-}
 `
 
     const { output } = await ai.generate({
       prompt,
-      output: {
-        schema: z.object({
-          translations: z.record(z.string(), z.any()),
-        }),
-      },
     })
 
     if (!output) throw new Error('Failed to translate JSON content')
@@ -427,9 +413,10 @@ async function translateLocale(
     }
 
     // Find missing keys
-    const missingKeys = forceUpdate || !targetFileExists
-      ? findAllKeys(sourceJson)
-      : findMissingKeys(sourceJson, targetJson)
+    const missingKeys =
+      forceUpdate || !targetFileExists
+        ? findAllKeys(sourceJson)
+        : findMissingKeys(sourceJson, targetJson)
 
     result.missingKeysCount = missingKeys.length
 
@@ -456,13 +443,11 @@ async function translateLocale(
 
     // Perform actual translation
     let updatedJson: JsonObject
-    
+
     if (!targetFileExists) {
       // Translate entire JSON for new file
-      console.log(
-        `🌐 Translating entire JSON from ${sourceLocale} to ${targetLocale}...`,
-      )
-      
+      console.log(`🌐 Translating entire JSON from ${sourceLocale} to ${targetLocale}...`)
+
       updatedJson = await translateEntireJsonFlow({
         sourceJson,
         sourceLocale,
@@ -483,7 +468,7 @@ async function translateLocale(
       })
 
       // Merge translations into target JSON
-      updatedJson = mergeTranslations(targetJson, translationResult.translations)
+      updatedJson = mergeTranslations(targetJson, translationResult)
     }
 
     // Write the updated JSON file

@@ -194,72 +194,76 @@ const applyExtraTags = (yakuList: YakuName[]) => {
 
 let lastCompleted: Set<YakuName> = new Set([])
 
-watchEffect(() => {
-  if (config.maxRounds !== 12) {
-    updateTsukiFuda(0)
-    consoleLogColor('TSUKI-FUDA not available for this game.', 'skyblue')
-    return
-  }
+onMounted(() => {
+  updateCollection()
 
-  // Display cards as arranged by artist
-  const { getDesignInfo } = useCardDesign()
-  const rearrange = (cards: CardName[]) => {
-    const { arrangement } = getDesignInfo()
-    if (arrangement?.reversed) {
-      return cards.toReversed()
+  watchEffect(() => {
+    if (config.maxRounds !== 12) {
+      updateTsukiFuda(0)
+      consoleLogColor('TSUKI-FUDA not available for this game.', 'skyblue')
+      return
     }
-    if (arrangement?.orderByName) {
-      // Create a map for O(1) lookups
-      const cardSet = new Set(cards)
-      // Only iterate arrangement once, filter out non-existent cards
-      return arrangement.orderByName.filter((name) => cardSet.has(name as CardName)) as CardName[]
+
+    // Display cards as arranged by artist
+    const { getDesignInfo } = useCardDesign()
+    const rearrange = (cards: CardName[]) => {
+      const { arrangement } = getDesignInfo()
+      if (arrangement?.reversed) {
+        return cards.toReversed()
+      }
+      if (arrangement?.orderByName) {
+        // Create a map for O(1) lookups
+        const cardSet = new Set(cards)
+        // Only iterate arrangement once, filter out non-existent cards
+        return arrangement.orderByName.filter((name) => cardSet.has(name as CardName)) as CardName[]
+      }
+      return cards
     }
-    return cards
-  }
-  updateTsukiFuda(month.value, rearrange)
-  consoleLogColor('TSUKI-FUDA: ' + YAKU['tsuki-fuda'].cards.join(', '), 'skyblue')
+    updateTsukiFuda(month.value, rearrange)
+    consoleLogColor('TSUKI-FUDA: ' + YAKU['tsuki-fuda'].cards.join(', '), 'skyblue')
+  })
+
+  watch(roundOver, () => {
+    if (roundOver.value) {
+      lastCompleted.clear()
+      resetCollection()
+    }
+  })
+
+  watch(
+    collection,
+    () => {
+      if (roundOver.value) return
+      updateCollection()
+
+      config.applyWildCardOption()
+      const { score, completed: completedYaku } = checkAll(
+        cs.collection[player],
+        config.allowViewingsYaku === 'none',
+      )
+
+      // Filter list based on viewings allowance setting
+      const newCompleted = config.applyViewingsOption(completedYaku)
+
+      // Tag potentially upgraded yaku
+      const taggedYaku = applyExtraTags(newCompleted)
+
+      // No yaku completed or upgraded since the last update
+      if (taggedYaku.every((yaku) => lastCompleted.has(yaku))) return
+
+      if (newCompleted.length) {
+        // Emits only if new yaku completed.
+        lastCompleted = new Set(taggedYaku)
+        emits('completed', {
+          player,
+          score: config.applyDoubleScoreOption(score),
+          completedYaku: getCompleted(cs.collection[player], newCompleted),
+        })
+      }
+    },
+    { flush: 'post' },
+  )
 })
-
-watch(roundOver, () => {
-  if (roundOver.value) {
-    lastCompleted.clear()
-    resetCollection()
-  }
-})
-
-watch(
-  collection,
-  () => {
-    if (roundOver.value) return
-    updateCollection()
-
-    config.applyWildCardOption()
-    const { score, completed: completedYaku } = checkAll(
-      cs.collection[player],
-      config.allowViewingsYaku === 'none',
-    )
-
-    // Filter list based on viewings allowance setting
-    const newCompleted = config.applyViewingsOption(completedYaku)
-
-    // Tag potentially upgraded yaku
-    const taggedYaku = applyExtraTags(newCompleted)
-
-    // No yaku completed or upgraded since the last update
-    if (taggedYaku.every((yaku) => lastCompleted.has(yaku))) return
-
-    if (newCompleted.length) {
-      // Emits only if new yaku completed.
-      lastCompleted = new Set(taggedYaku)
-      emits('completed', {
-        player,
-        score: config.applyDoubleScoreOption(score),
-        completedYaku: getCompleted(cs.collection[player], newCompleted),
-      })
-    }
-  },
-  { flush: 'post' },
-)
 </script>
 
 <style scoped>
