@@ -9,7 +9,7 @@
         ]"
       >
         <img
-          src="/images/logo-title.webp"
+          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/logo-title.webp"
           class="landscape:max-h-[20vw] max-h-[120px] h-[40vh]"
           :alt="t('game.title')"
         />

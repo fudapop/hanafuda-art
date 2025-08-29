@@ -23,7 +23,7 @@
         }"
       >
         <img
-          src="/images/sakura.webp"
+          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/sakura.webp"
           class="animate-spin [animation-duration:20s] drop-shadow-md"
         />
       </div>

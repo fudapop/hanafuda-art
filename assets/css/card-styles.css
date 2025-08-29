@@ -32,7 +32,7 @@
 
   & .down {
     --card-border-color: darkslategray;
-    --card-bg-color: url('/cards/cherry-version/card-back.webp');
+    --card-bg-color: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/cherry-version/card-back.webp');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -58,7 +58,7 @@
   --card-aspect: 11/16;
 
   & .down {
-    background-image: url('/cards/koinobori/card-back.webp') !important;
+    background-image: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/hanami/card-back.webp') !important;
     background-color: lightgoldenrodyellow !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -88,7 +88,9 @@
   --card-border-color: #333;
 
   & .down {
-    --card-bg-color: url('/cards/kinbotan/card-back.png'), linear-gradient(0deg, red, #5c381e);
+    --card-bg-color:
+      url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/kinbotan/card-back.webp'),
+      linear-gradient(0deg, red, #5c381e);
     background-size: 250%;
     background-position: 5% top;
     background-blend-mode: screen;
@@ -121,7 +123,7 @@
   }
 
   & .down {
-    background-image: url('/cards/koinobori/butterfly.png') !important;
+    background-image: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/koinobori/card-back.webp') !important;
     background-color: #59c6aa !important;
     background-size: 60% !important;
     background-repeat: no-repeat !important;
@@ -146,7 +148,7 @@
   }
 
   & .down {
-    --card-bg-color: url('/cards/modern/card-back.webp');
+    --card-bg-color: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/modern/card-back.webp');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -166,7 +168,7 @@
 
   & .down {
     --card-border-w: 1px;
-    background-image: url('/cards/moon-rabbit/card-back.webp') !important;
+    background-image: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/moon-rabbit/card-back.webp') !important;
     background-color: lightgray !important;
     background-size: 40% !important;
     background-repeat: no-repeat !important;
@@ -181,7 +183,9 @@
 
   & .down {
     --card-border-color: #555;
-    --card-bg-color: url('/cards/nishiki-fuda/card-back.webp'), linear-gradient(45deg, gray, #111);
+    --card-bg-color:
+      url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/nishiki-fuda/card-back.webp'),
+      linear-gradient(45deg, gray, #111);
     background-blend-mode: screen;
     background-size: contain !important;
     background-repeat: no-repeat !important;
@@ -194,7 +198,7 @@
   --card-border-color: transparent;
 
   & .down {
-    --card-bg-color: url('/cards/otwarte-karty/card-back.png');
+    --card-bg-color: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/otwarte-karty/card-back.png');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -213,7 +217,8 @@
 
   & .down {
     --card-bg-color:
-      url('/cards/post-card/jp-post-symbol.png'), linear-gradient(45deg, #60a27f, #035989);
+      url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/post-card/card-back.webp'),
+      linear-gradient(45deg, #60a27f, #035989);
     background-blend-mode: screen;
     background-size: contain !important;
     background-repeat: no-repeat !important;
@@ -222,7 +227,7 @@
 }
 
 .sabling-art {
-  --card-radius: 8px;
+  --card-radius: 5%;
   --card-border-w: 1px;
   --card-border-color: midnightblue;
   --card-aspect: 2/3;
@@ -232,7 +237,7 @@
   }
 
   & .down {
-    --card-bg-color: url('/cards/sabling-art/card-back.webp');
+    --card-bg-color: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/sabling-art/card-back.webp');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -247,7 +252,7 @@
   & .down {
     box-shadow: inset 0 0 1px 1px #610000;
     --card-border-color: #610000;
-    --card-bg-color: url('/cards/shou-suisaiga/card-back.webp');
+    --card-bg-color: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/shou-suisaiga/card-back.webp');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;

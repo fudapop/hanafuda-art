@@ -8,11 +8,11 @@
     />
     <div class="fixed inset-0 -z-20">
       <img
-        src="/images/bg-landing.webp"
+        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/bg-landing.webp"
         class="absolute z-5 object-cover w-full h-full dark:invert animate-ping [animation-duration:10s] motion-reduce:animate-none"
       />
       <img
-        src="/images/bg-landing.webp"
+        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/bg-landing.webp"
         class="object-cover w-full h-full dark:invert"
       />
     </div>
@@ -24,7 +24,7 @@
         class="static bg-transparent rounded-full aspect-[3/4] w-full h-full flex items-center justify-center overflow-hidden inert"
       >
         <img
-          src="/images/flowers-landing1.webp"
+          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/flowers-landing1.webp"
           class="object-contain w-full h-full transition-opacity duration-300 opacity-0 lg:opacity-100"
           loading="lazy"
         />
@@ -38,7 +38,7 @@
         class="bg-transparent rounded-full aspect-[3/4] w-full h-full flex items-center justify-center overflow-hidden inert"
       >
         <img
-          src="/images/flowers-landing2.webp"
+          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/flowers-landing2.webp"
           class="object-contain w-full h-full transition-opacity duration-300 opacity-0 lg:opacity-100"
           loading="lazy"
         />
@@ -54,7 +54,7 @@
       ]"
     >
       <img
-        src="/images/logo-title.webp"
+        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/logo-title.webp"
         :class="[
           'w-[100px] mb-1 sm:w-[120px] sm:mb-2',
           isMobile ? 'landscape:w-[25dvh]' : 'md:w-[180px]',
@@ -80,7 +80,7 @@
         >
           {{ isLoading ? t('common.actions.loading') : t('game.actions.resumeGame') }}
         </button>
-        
+
         <!-- Play Now Button - shown when no save exists -->
         <button
           v-else
@@ -99,7 +99,10 @@
         </button>
 
         <!-- Game State Management Panel - only show when save exists -->
-        <div v-if="hasSavedGame" class="flex flex-col items-center gap-2 mt-4">
+        <div
+          v-if="hasSavedGame"
+          class="flex flex-col items-center gap-2 mt-4"
+        >
           <div class="text-xs text-text-secondary">
             {{ t('game.saveInfo.lastSaved') }}: {{ formatSaveDate(lastSave?.timestamp) }}
           </div>
@@ -204,28 +207,28 @@ const handleSignin = () => {
 // Game save handlers
 const resumeGame = async () => {
   if (!lastSave.value) return
-  
+
   isLoading.value = true
   try {
     // Set global state to indicate we're resuming from save
     const resumeState = useState('resume-save', () => ({
       isResuming: false,
       saveKey: '',
-      saveData: null as any
+      saveData: null as any,
     }))
-    
+
     // Pre-load the save data but don't apply it yet
     const serializedData = localStorage.getItem(lastSave.value.key)
     if (serializedData) {
       const gameState = JSON.parse(serializedData)
-      
+
       // Store the save data and key for later loading
       resumeState.value = {
         isResuming: true,
         saveKey: lastSave.value.key,
-        saveData: gameState
+        saveData: gameState,
       }
-      
+
       // Start the game - it will handle the deferred loading
       emit('start-game')
     } else {
@@ -244,26 +247,26 @@ const startNewGame = () => {
     deleteSavedGame(lastSave.value.key)
     savedGames.value = listSavedGames()
   }
-  
+
   // Clear resume state to ensure normal game initialization
   const resumeState = useState('resume-save', () => ({
     isResuming: false,
     saveKey: '',
-    saveData: null as any
+    saveData: null as any,
   }))
-  
+
   resumeState.value = {
     isResuming: false,
     saveKey: '',
-    saveData: null
+    saveData: null,
   }
-  
+
   emit('start-game')
 }
 
 const deleteSave = () => {
   if (!lastSave.value) return
-  
+
   if (confirm(t('game.confirmations.deleteSave'))) {
     const success = deleteSavedGame(lastSave.value.key)
     if (success) {

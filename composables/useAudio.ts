@@ -204,7 +204,7 @@ export const useAudio = () => {
           type: 'image/webp',
         },
         {
-          src: '/images/logo-title.webp', // Fallback
+          src: 'https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/logo-title.webp', // Fallback
           sizes: '512x512',
           type: 'image/webp',
         },

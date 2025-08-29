@@ -23,7 +23,7 @@
               :style="{ marginLeft: `${(n - 1) * 15}px` }"
             >
               <img
-                src="/images/coin.webp"
+                src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
                 alt="koi-koi bonus"
                 class="object-cover object-center drop-shadow-sm"
               />

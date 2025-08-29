@@ -45,7 +45,7 @@
             class="flex items-center justify-center px-4 gap-x-2 sm:justify-start"
           >
             <img
-              src="/images/coin.webp"
+              src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
               alt="coin"
               class="w-5 h-5"
             />
@@ -89,7 +89,6 @@
         </div>
       </dl>
     </div>
-
 
     <!-- Account sign-in/out -->
     <div

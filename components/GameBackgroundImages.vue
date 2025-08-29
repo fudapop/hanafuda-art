@@ -5,7 +5,7 @@
       class="absolute inset-0 -z-10 dark:after:content-[''] dark:after:absolute dark:after:inset-0 dark:bg-brown-500/50"
     >
       <img
-        src="/images/bg-ingame.webp"
+        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/bg-ingame.webp"
         class="object-cover w-full h-full dark:invert"
       />
     </div>
@@ -26,7 +26,7 @@
       >
         <div class="static h-16 lg:scale-y-[2] origin-top transition-transform">
           <img
-            src="/images/player_bar.webp"
+            src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/player_bar.webp"
             class="w-full h-full"
             alt="Top decorative border"
           />
@@ -51,7 +51,7 @@
       >
         <div class="static h-16 lg:scale-y-[2] origin-bottom transition-transform">
           <img
-            src="/images/player_bar_bottom.webp"
+            src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/player_bar_bottom.webp"
             class="flex-shrink-0 w-full h-full"
             alt="Bottom decorative border"
           />
@@ -79,7 +79,7 @@
           class="bottom-0 left-0 transition-all origin-left -translate-x-1/2 flower-ornament lg:-translate-y-1/2 dark:invert dark:grayscale"
         >
           <img
-            src="/images/flower_ingame.webp"
+            src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/flower_ingame.webp"
             :class="{
               'object-contain w-full h-full [animation-fill-mode:forwards]': true,
               'animate-spin [animation-duration:60s]': animate,
@@ -102,7 +102,7 @@
           class="top-0 right-0 transition-all origin-right translate-x-1/2 flower-ornament lg:translate-y-1/2 dark:invert dark:grayscale"
         >
           <img
-            src="/images/flower_ingame.webp"
+            src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/flower_ingame.webp"
             :class="{
               'object-contain w-full h-full [animation-fill-mode:forwards]': true,
               'animate-spin [animation-duration:60s]': animate,

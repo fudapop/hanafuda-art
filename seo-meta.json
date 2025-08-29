@@ -13,7 +13,7 @@
   },
   {
     "property": "og:image",
-    "content": "/images/og-image-large.png"
+    "content": "https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/og-image-large.png"
   },
   {
     "property": "og:url",
@@ -45,7 +45,7 @@
   },
   {
     "name": "twitter:image",
-    "content": "/images/og-image-large.png"
+    "content": "https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/og-image-large.png"
   },
   {
     "property": "twitter:domain",

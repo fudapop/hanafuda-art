@@ -23,7 +23,10 @@ export type DesignInfo = {
 
 export type CardDesign = keyof typeof CARD_DESIGNS
 
-const DESIGNS = Object.keys(CARD_DESIGNS) as CardDesign[]
+const DESIGNS = (Object.keys(CARD_DESIGNS) as CardDesign[]).filter(
+  // Temporary filter; need better images
+  (design) => CARD_DESIGNS[design].name !== 'ramen-red',
+)
 
 type CardMap = Map<CardName, string>
 

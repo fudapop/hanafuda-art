@@ -16,6 +16,8 @@ if (process.env.NODE_ENV === 'production') {
   })
 }
 
+const bucketUrl = process.env.NUXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/static'
+
 export default defineNuxtConfig({
   app: {
     head: {
@@ -49,6 +51,35 @@ export default defineNuxtConfig({
         {
           rel: 'preconnect',
           href: process.env.NUXT_PUBLIC_SUPABASE_URL,
+        },
+        {
+          rel: 'preload',
+          as: 'image',
+          href: `${bucketUrl}/assets/bg-landing.webp`,
+          type: 'image/webp',
+        },
+        {
+          rel: 'preload',
+          as: 'image',
+          href: `${bucketUrl}/assets/logo-title.webp`,
+          type: 'image/webp',
+        },
+        {
+          rel: 'preload',
+          as: 'image',
+          href: `${bucketUrl}/assets/flowers-landing1.webp`,
+          type: 'image/webp',
+        },
+        {
+          rel: 'preload',
+          as: 'image',
+          href: `${bucketUrl}/assets/flowers-landing2.webp`,
+          type: 'image/webp',
+        },
+        {
+          rel: 'stylesheet',
+          as: 'style',
+          href: 'https://fonts.googleapis.com/css2?family=Potta+One&display=swap',
         },
       ],
       meta: seoMeta,

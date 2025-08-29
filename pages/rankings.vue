@@ -5,7 +5,7 @@
       <header
         :class="[
           'sticky top-0',
-          'px-4 py-6 min-h-20 lg:py-8 bg-[url(/images/player_bar.webp)] bg-cover bg-bottom lg:px-8',
+          'px-4 py-6 min-h-20 lg:py-8 bg-[url(https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/player_bar.webp)] bg-cover bg-bottom lg:px-8',
         ]"
       >
         <h1 class="text-lg font-bold text-center text-white lg:text-3xl">
@@ -173,7 +173,7 @@
                           player.record.coins.toLocaleString()
                         }}</span>
                         <img
-                          src="/images/coin.webp"
+                          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
                           alt="coin"
                           class="w-4 h-4 ml-1"
                         />
@@ -251,7 +251,7 @@
                     <div class="flex items-center justify-center font-medium text-text">
                       {{ player.record.coins.toLocaleString() }}
                       <img
-                        src="/images/coin.webp"
+                        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
                         alt="coin"
                         class="w-3 h-3 ml-1"
                       />
