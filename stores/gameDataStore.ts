@@ -1,10 +1,10 @@
 /**
  * @fileoverview Game Data Store
- * 
+ *
  * Coordinates the overall game flow and state management for Hanafuda gameplay.
  * Manages rounds, turns, phases, scoring, and game progression while working
  * in harmony with other stores to maintain consistent game state.
- * 
+ *
  * Features:
  * - Turn-based game flow management (select → draw → collect phases)
  * - Round and match progression tracking
@@ -12,26 +12,26 @@
  * - Game state transitions and validation
  * - Unique game session identification
  * - Serializable state for save/load functionality
- * 
+ *
  * Game Flow:
  * 1. Select Phase: Player chooses card from hand
  * 2. Draw Phase: Card drawn from deck
  * 3. Collect Phase: Matching cards collected, yaku calculated
- * 
+ *
  * @example
  * ```typescript
  * const gameData = useGameDataStore()
- * 
+ *
  * // Start new round
  * gameData.startRound()
- * 
+ *
  * // Progress through phases
  * gameData.nextPhase() // select → draw → collect → select...
- * 
+ *
  * // Check current state
  * const current = gameData.getCurrent
  * console.log(`Round ${current.round}, Turn ${current.turn}, Phase: ${current.phase}`)
- * 
+ *
  * // End round with results
  * gameData.saveResult({ winner: 'p1', score: 15 })
  * gameData.endRound()
@@ -42,7 +42,9 @@ import { defineStore } from 'pinia'
 import { useCardStore } from '~/stores/cardStore'
 import { useConfigStore } from '~/stores/configStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
-import { getRandomString, consoleLogColor } from '~/utils/myUtils'
+import type { CardName } from '~/utils/cards'
+import { consoleLogColor, getRandomString } from '~/utils/myUtils'
+import type { YakuName } from '~/utils/yaku'
 
 /** Result data for a completed round */
 export type RoundResult = {
@@ -53,6 +55,26 @@ export type RoundResult = {
   winner: PlayerKey | null
   /** Points scored in this round */
   score: number
+}
+
+// Simplified logging system - just two event types
+export type EventLog = PlayerEventLog | SystemEventLog
+
+/** Event for player actions */
+export interface PlayerEventLog {
+  type: 'player'
+  player: PlayerKey
+  action: 'discard' | 'match' | 'draw' | 'stop' | 'koi-koi' | 'complete'
+  cards: CardName[]
+  yaku?: YakuName
+  timestamp: number
+}
+
+/** Event for system messages */
+export interface SystemEventLog {
+  type: 'system'
+  message: string
+  timestamp: number
 }
 
 /** Valid turn phases in order */
@@ -77,6 +99,8 @@ export interface GameDataStoreState {
   roundOver: boolean
   /** Whether entire game/match has ended */
   gameOver: boolean
+  /** History of all actions taken in the game */
+  eventHistory: EventLog[]
 }
 export const useGameDataStore = defineStore('gameData', () => {
   // State
@@ -87,6 +111,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const turnPhase = ref('select' as TurnPhase)
   const roundOver = ref(false)
   const gameOver = ref(false)
+  const eventHistory = reactive<EventLog[]>([])
 
   // Getters
   const getCurrent = computed(() => ({
@@ -94,6 +119,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     turn: turnCounter.value,
     phase: turnPhase.value,
     player: usePlayerStore().activePlayer.id,
+    playerName: usePlayerStore().activePlayer.name,
     inactivePlayer: usePlayerStore().inactivePlayer.id,
     result: roundHistory.value[roundCounter.value - 1],
   }))
@@ -125,6 +151,31 @@ export const useGameDataStore = defineStore('gameData', () => {
   const pointsExhausted = computed(() => scoreboard.value.p1 === 0 || scoreboard.value.p2 === 0)
 
   // Actions
+  const logPlayerAction = (
+    player: PlayerKey,
+    action: PlayerEventLog['action'],
+    cards: CardName[] = [],
+    yaku?: YakuName,
+  ) => {
+    const log: PlayerEventLog = {
+      type: 'player',
+      player,
+      action,
+      cards,
+      yaku,
+      timestamp: Math.floor(Date.now() / 1000),
+    }
+    eventHistory.push(log)
+  }
+
+  const logSystemMessage = (message: string) => {
+    const log: SystemEventLog = {
+      type: 'system',
+      message,
+      timestamp: Math.floor(Date.now() / 1000),
+    }
+    eventHistory.push(log)
+  }
   function nextPhase() {
     // Loop through phases; select -> draw -> select -> etc...
     const i = (PHASES.indexOf(turnPhase.value) + 1) % PHASES.length
@@ -149,9 +200,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     turnPhase.value = PHASES[0]
     turnCounter.value = 1
     roundCounter.value = roundHistory.value.length + 1
-    consoleLogColor(`ROUND ${roundCounter.value}`, 'gray')
-    console.debug('\tRecord', roundHistory.value)
     useCardStore().dealCards()
+    logSystemMessage(`START ROUND ${roundCounter.value}`)
   }
 
   function saveResult(result: RoundResult) {
@@ -172,6 +222,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     if (roundCounter.value >= useConfigStore().maxRounds || pointsExhausted.value) {
       gameOver.value = true
     }
+    const winner = getCurrent.value.result?.winner
+    logSystemMessage(`END ROUND ${roundCounter.value}${winner ? ` - Winner: ${winner}` : ''}`)
   }
 
   function nextRound() {
@@ -201,6 +253,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     turnPhase.value = 'select'
     roundOver.value = false
     gameOver.value = false
+    eventHistory.splice(0, eventHistory.length)
     const record = JSON.stringify(roundHistory.value.splice(0))
     return record
   }
@@ -218,7 +271,8 @@ export const useGameDataStore = defineStore('gameData', () => {
       turnCounter: turnCounter.value,
       turnPhase: turnPhase.value,
       roundOver: roundOver.value,
-      gameOver: gameOver.value
+      gameOver: gameOver.value,
+      eventHistory: [...eventHistory],
     }
     return JSON.stringify(serializable)
   }
@@ -226,12 +280,12 @@ export const useGameDataStore = defineStore('gameData', () => {
   function importSerializedState(serializedState: string): boolean {
     try {
       const data = JSON.parse(serializedState)
-      
+
       // Validate structure
       if (typeof data.gameId !== 'string' || !Array.isArray(data.roundHistory)) {
         throw new Error('Invalid game data store state structure')
       }
-      
+
       gameId.value = data.gameId
       roundHistory.value.splice(0, roundHistory.value.length, ...data.roundHistory)
       roundCounter.value = data.roundCounter || 1
@@ -239,7 +293,7 @@ export const useGameDataStore = defineStore('gameData', () => {
       turnPhase.value = data.turnPhase || 'select'
       roundOver.value = data.roundOver || false
       gameOver.value = data.gameOver || false
-      
+      eventHistory.splice(0, eventHistory.length, ...data.eventHistory)
       return true
     } catch (error) {
       console.error('Failed to import game data store state:', error)
@@ -256,12 +310,15 @@ export const useGameDataStore = defineStore('gameData', () => {
     roundHistory,
     roundOver,
     gameOver,
+    eventHistory,
     // Getters
     getCurrent,
     getPreviousResult,
     scoreboard,
     pointsExhausted,
     // Actions
+    logPlayerAction,
+    logSystemMessage,
     nextPhase,
     checkCurrentPhase,
     startRound,

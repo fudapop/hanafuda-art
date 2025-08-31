@@ -142,7 +142,8 @@ const { isMobile } = useDevice()
 const { orientation } = useScreenOrientation()
 const isMobileLandscape = computed(() => isMobile && orientation.value?.includes('landscape'))
 
-const { roundOver, roundCounter: month } = storeToRefs(useGameDataStore())
+const ds = useGameDataStore()
+const { roundOver, roundCounter: month } = storeToRefs(ds)
 const cs = useCardStore()
 const config = useConfigStore()
 
@@ -254,6 +255,9 @@ onMounted(() => {
       if (newCompleted.length) {
         // Emits only if new yaku completed.
         lastCompleted = new Set(taggedYaku)
+        newCompleted.forEach((yaku) => {
+          ds.logPlayerAction(player, 'complete', YAKU[yaku].cards, yaku)
+        })
         emits('completed', {
           player,
           score: config.applyDoubleScoreOption(score),

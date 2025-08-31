@@ -96,6 +96,7 @@ const gridStyle = computed(() => {
   }
 })
 
+const ds = useGameDataStore()
 const cs = useCardStore()
 const { field } = storeToRefs(cs)
 
@@ -132,14 +133,14 @@ watch(
 
 const { getCardUrl } = useCardDesign()
 
-const { useSelectedCard, useMatchedCards, handleCardSelect } = useCardHandler()
+const { useSelectedCard, useMatchedCards, handleCardSelect, handlePlayerDiscard } = useCardHandler()
 
 const selectedCard = useSelectedCard()
 const matchedCards = useMatchedCards()
 
 const discarding = computed(() =>
   [
-    useGameDataStore().checkCurrentPhase('select'),
+    ds.checkCurrentPhase('select'),
     !!selectedCard.value,
     !matchedCards.value.length,
     usePlayerStore().players.p1.isActive,
@@ -149,10 +150,9 @@ const discarding = computed(() =>
 const handleDiscard = async (index: number) => {
   if (!selectedCard.value) return
   displayedCards[index] = selectedCard.value
-  cs.discard(selectedCard.value, 'p1')
-  selectedCard.value = null
-  await sleep()
-  useGameDataStore().nextPhase()
+  await handlePlayerDiscard()
+  await sleep(1500)
+  ds.nextPhase()
 }
 
 const handleClick = (card: CardName) => {

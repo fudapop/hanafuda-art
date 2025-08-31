@@ -22,12 +22,14 @@ export const useDecisionHandler = () => {
   const callKoikoi = () => {
     calledBy.value = ps.activePlayer.id
     decision.value = 'koikoi'
+    ds.logPlayerAction(ps.activePlayer.id, 'koi-koi')
   }
 
   const stopIsCalled = computed(() => decision.value === 'stop')
   const callStop = () => {
     calledBy.value = ps.activePlayer.id
     decision.value = 'stop'
+    ds.logPlayerAction(ps.activePlayer.id, 'stop')
   }
 
   const noCalls = computed(() => decision.value === null)
@@ -42,7 +44,8 @@ export const useDecisionHandler = () => {
     return decision.value
   }
 
-  const { roundOver, gameOver } = storeToRefs(useGameDataStore())
+  const ds = useGameDataStore()
+  const { roundOver, gameOver } = storeToRefs(ds)
 
   if (!watcher.value) {
     console.debug('Setting decision watcher...')

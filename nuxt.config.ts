@@ -149,6 +149,7 @@ export default defineNuxtConfig({
     '@nuxt/content',
     '@nuxtjs/device',
     'nuxt-posthog',
+    'shadcn-nuxt',
   ],
   postcss: {
     plugins: {
@@ -181,10 +182,14 @@ export default defineNuxtConfig({
       supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
     },
   },
+  shadcn: {
+    prefix: 'ui',
+  },
   ssr: false,
   vite: {
     optimizeDeps: {
-      force: true,
+      include: ['class-variance-authority', 'reka-ui', 'lucide-vue-next', 'clsx', 'tailwind-merge'],
+      exclude: ['better-sqlite3'],
     },
   },
   vuefire: {

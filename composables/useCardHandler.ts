@@ -1,9 +1,9 @@
 import { storeToRefs } from 'pinia'
-import { type CardName, matchByMonth, CARDS } from '~/utils/cards'
-import { getProgress, viewingYaku, type YakuProgress } from '~/utils/yaku'
 import { useCardStore } from '~/stores/cardStore'
-import { useGameDataStore } from '~/stores/gameDataStore'
 import { useConfigStore } from '~/stores/configStore'
+import { useGameDataStore } from '~/stores/gameDataStore'
+import { type CardName, CARDS, matchByMonth } from '~/utils/cards'
+import { getProgress, viewingYaku, type YakuProgress } from '~/utils/yaku'
 
 export const useCardHandler = () => {
   const cs = useCardStore()
@@ -114,6 +114,13 @@ export const useCardHandler = () => {
     }
   }
 
+  const handlePlayerDiscard = async () => {
+    if (!selectedCard.value) return
+    cs.discard(selectedCard.value, 'p1')
+    ds.logPlayerAction(ds.getCurrent.player, 'discard', [selectedCard.value])
+    selectedCard.value = null
+  }
+
   const selectCardFromHand = (card: CardName) => {
     if (!cs.hand.p1.has(card)) return
     selectedCard.value = card
@@ -131,7 +138,7 @@ export const useCardHandler = () => {
       throw Error(errMsg)
     }
     // Player selected a valid match
-    console.debug('\tMatching:', matchedCards.value.join(', ').toUpperCase())
+    // console.debug('\tMatching:', matchedCards.value.join(', ').toUpperCase())
     if (matchedCards.value.length === 3) {
       // Collect the entire suit
       handleMatched([...matchedCards.value, selected])
@@ -142,6 +149,7 @@ export const useCardHandler = () => {
   }
 
   const handleMatched = (matches: CardName[]) => {
+    ds.logPlayerAction(ds.getCurrent.player, 'match', matches)
     cs.stageForCollection(matches)
     // Collect all matched card at the end of the turn;
     if (ds.checkCurrentPhase('draw')) {
@@ -201,10 +209,12 @@ export const useCardHandler = () => {
       switch (matches.length) {
         case 0:
           cs.discard(selected, ds.getCurrent.player)
+          ds.logPlayerAction(ds.getCurrent.player, 'discard', [selected])
           break
         case 1:
         case 3:
           cs.stageForCollection([...matches, selected])
+          ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, ...matches])
           break
         case 2:
           const cardsInHand = [...cs.hand[ds.getCurrent.player]]
@@ -214,6 +224,8 @@ export const useCardHandler = () => {
           const p1 = getProgress(new Set([selected, matches[1], ...collection]), opponentCollection)
           const best = rateProgress(p0, cardsInHand) > rateProgress(p1, cardsInHand) ? 0 : 1
           cs.stageForCollection([matches[best], selected])
+          ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, matches[best]])
+          break
       }
       selectedCard.value = null
       ds.nextPhase()
@@ -225,6 +237,7 @@ export const useCardHandler = () => {
         `Phase check failed. Expected: 'draw'; Received: '${ds.getCurrent.phase}'`,
       )
       selectedCard.value = cs.revealCard()
+      ds.logPlayerAction(ds.getCurrent.player, 'draw', [selectedCard.value])
     },
 
     collect() {
@@ -240,6 +253,7 @@ export const useCardHandler = () => {
     useSelectedCard,
     useMatchedCards,
     handleCardSelect,
+    handlePlayerDiscard,
     matchExists,
     useActions,
   })

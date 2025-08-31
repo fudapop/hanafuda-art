@@ -78,6 +78,9 @@
         </div>
       </div>
 
+      <!-- ACTION LOG -->
+      <LazyEventLog />
+
       <LazyResultsModal :show="showModal">
         <LazyFinalResults
           v-if="gameOver"
