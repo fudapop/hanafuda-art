@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.5.0] - 2025-08-31
+
+### New Features
+- **Save & Resume Game**: Complete game state persistence system allowing players to save their progress and resume later. Features anti-save scumming measures with a single save slot system that automatically clears saves when resumed.
+- **Russian Language Support**: Added Russian (ru) as a new language option with comprehensive translations for all game content, menus, and user interface elements.
+
+### Performance & Technical Improvements
+- **Static Asset Optimization**: Improved loading performance by serving static assets from a dedicated storage bucket, reducing load times and bandwidth usage.
+
+### UI & Experience Improvements
+- **Start Screen Enhancement**: Replaced static "Play Now" image with a styled, translatable button to improve internationalization support and accessibility.
+- **Responsive Card Sizing**: Card size settings apply globally while preserving specific layouts for UI components, ensuring consistent user experience across different screen sizes.
+
 ## [2.4.2] - 2025-08-27
 
 ### Analytics & Privacy

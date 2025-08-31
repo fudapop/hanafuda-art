@@ -1,5 +1,18 @@
 # Dziennik zmian
 
+## [2.5.0] - 2025-08-31
+
+### Nowe funkcje
+- **Zapisywanie i wznawianie gry**: Kompletny system trwałości stanu gry, pozwalający graczom na zapisywanie postępów i ich późniejsze wznowienie. Funkcje zapobiegające oszustwom z pojedynczym slotem zapisu, który automatycznie czyści zapisy po wznowieniu.
+- **Obsługa języka rosyjskiego**: Dodano język rosyjski (ru) jako nową opcję językową z kompleksowymi tłumaczeniami całej zawartości gry, menu i elementów interfejsu użytkownika.
+
+### Ulepszenia wydajności i techniczne
+- **Optymalizacja zasobów statycznych**: Poprawiono wydajność ładowania poprzez serwowanie zasobów statycznych z dedykowanego segmentu przechowywania, skracając czas ładowania i zużycie przepustowości.
+
+### Ulepszenia interfejsu użytkownika i doświadczenia
+- **Ulepszenie ekranu startowego**: Zastąpiono statyczny obraz „Zagraj teraz” stylizowanym, przetłumaczalnym przyciskiem w celu poprawy obsługi internacjonalizacji i dostępności.
+- **Responsywne skalowanie kart**: Ustawienia rozmiaru kart są stosowane globalnie, zachowując jednocześnie specyficzne układy dla komponentów interfejsu użytkownika, zapewniając spójne wrażenia użytkownika na różnych rozmiarach ekranu.
+
 ## [2.4.2] - 2025-08-27
 
 ### Analityka i prywatność
