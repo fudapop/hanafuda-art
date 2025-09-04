@@ -108,7 +108,7 @@
           </div>
           <div class="flex gap-2">
             <button
-              class="px-3 py-1 text-xs font-medium text-red-600 transition-colors border border-red-300 rounded hover:bg-red-50 hover:border-red-400"
+              class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-sm hover:bg-red-50 hover:border-red-400"
               @click="deleteSave"
               :title="t('game.actions.deleteSave')"
             >

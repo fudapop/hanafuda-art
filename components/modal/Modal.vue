@@ -46,7 +46,7 @@
             >
               <!-- rounded blur in the background -->
               <div
-                class="absolute rounded-full inset-8 -z-10 bg-hanafuda-purple/20 dark:bg-hanafuda-purple/10 blur-xl"
+                class="absolute rounded-full inset-8 -z-10 bg-hanafuda-brown/20 dark:bg-black/10 blur-xl"
               ></div>
               <div :class="isMobile && 'h-max'">
                 <slot name="image" />

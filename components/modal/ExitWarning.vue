@@ -20,24 +20,27 @@
     </template>
     <template #actions>
       <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-3">
+        <!-- Safe action: Save & Exit - Green/positive color -->
         <button
           type="button"
-          class="px-4 py-2 text-sm font-medium transition-colors rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+          class="px-4 py-2 text-sm font-semibold tracking-wide transition-colors rounded-sm bg-hanafuda-green hover:bg-hanafuda-green/90"
           @click="$emit('save')"
           :disabled="isSaving"
         >
           {{ isSaving ? t('common.actions.saving') : t('game.actions.saveAndExit') }}
         </button>
+        <!-- Destructive action: Forfeit - Red/danger styling -->
         <button
           type="button"
-          class="px-4 py-2 text-sm font-medium text-red-600 transition-colors border border-red-300 rounded-md hover:bg-red-50 hover:border-red-400"
+          class="px-4 py-2 text-sm font-medium tracking-wide text-red-500 transition-colors duration-300 border border-red-300 rounded-sm hover:bg-red-50 hover:border-red-400"
           @click="$emit('forfeit')"
         >
           {{ t('game.actions.forfeitAndExit') }}
         </button>
+        <!-- Primary/recommended action: Keep playing - Gold accent -->
         <button
           type="button"
-          class="pri-btn"
+          class="tracking-wide pri-btn"
           @click="$emit('cancel')"
         >
           {{ t('game.warnings.noKeepPlaying') }}
@@ -50,9 +53,9 @@
 <script setup lang="ts">
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 
-const { open, isSaving } = defineProps<{ 
+const { open, isSaving } = defineProps<{
   open: boolean
-  isSaving?: boolean 
+  isSaving?: boolean
 }>()
 const { t } = useI18n()
 
