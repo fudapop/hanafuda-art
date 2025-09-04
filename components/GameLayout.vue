@@ -18,7 +18,12 @@
           id="exit-button"
           type="button"
           @click="handlePressExit"
-          :class="['game-ui-btn', gameStart && 'opacity-50 hover:opacity-100']"
+          :class="[
+            'game-ui-btn',
+            gameStart && 'opacity-50 hover:opacity-100',
+            player1Inactive && 'cursor-wait',
+          ]"
+          :disabled="player1Inactive"
         >
           <Icon
             name="mdi:logout"
@@ -197,6 +202,7 @@ const isSaving = ref(false)
 const promptFeedback = ref(false)
 const promptSignup = ref(false)
 const showLoader = ref(false)
+const player1Inactive = computed(() => gameStart.value && !players.value.p1.isActive)
 
 const feedbackSubmitted = computed(() => user?.flags?.hasSubmittedFeedback)
 const signupDeclined = useStorage('hanafuda-signup-declined', false, sessionStorage)
@@ -219,11 +225,11 @@ const handlePressExit = () => {
 const handleSaveAndExit = async () => {
   $clientPosthog?.capture('exit_game_save')
   isSaving.value = true
-  
+
   try {
     const { quickSave } = useStoreManager()
     quickSave() // Save current game state
-    
+
     leavingGame.value = false
     gameStart.value = false
   } catch (error) {
