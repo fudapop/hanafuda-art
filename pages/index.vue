@@ -139,7 +139,6 @@ const autoOpponent: Ref<boolean> = useOpponent()
 const showModal = ref(false)
 const showLoader = ref(false)
 const gameStart = useState('start')
-const gameTest = useState('test')
 
 const toast = useToast()
 
@@ -302,42 +301,43 @@ watch(activePlayer, () => {
 
 watch(gameStart, () => {
   if (gameStart.value) {
-    if (!gameTest.value) {
-      // Check if we're resuming from a saved game
-      const resumeState = useState('resume-save', () => ({
+    // Check if we're resuming from a saved game
+    const resumeState = useState('resume-save', () => ({
+      isResuming: false,
+      saveKey: '',
+      saveData: null as any,
+    }))
+
+    if (resumeState.value.isResuming && resumeState.value.saveData) {
+      // Load saved state directly without calling startRound()
+      try {
+        const { deserializeGameState, deleteSavedGame } = useStoreManager()
+        const success = deserializeGameState(resumeState.value.saveData)
+
+        if (success) {
+          // Clear the save since we're now actively playing
+          if (resumeState.value.saveKey) {
+            deleteSavedGame(resumeState.value.saveKey)
+          }
+        } else {
+          console.error('Failed to restore save state')
+        }
+      } catch (error) {
+        console.error('Error during save restore:', error)
+      }
+
+      // Clear the resume state
+      resumeState.value = {
         isResuming: false,
         saveKey: '',
-        saveData: null as any
-      }))
-      
-      if (resumeState.value.isResuming && resumeState.value.saveData) {
-        // Load saved state directly without calling startRound()
-        try {
-          const { deserializeGameState, deleteSavedGame } = useStoreManager()
-          const success = deserializeGameState(resumeState.value.saveData)
-          
-          if (success) {
-            // Clear the save since we're now actively playing
-            if (resumeState.value.saveKey) {
-              deleteSavedGame(resumeState.value.saveKey)
-            }
-          } else {
-            console.error('Failed to restore save state')
-          }
-        } catch (error) {
-          console.error('Error during save restore:', error)
-        }
-        
-        // Clear the resume state
-        resumeState.value = {
-          isResuming: false,
-          saveKey: '',
-          saveData: null
-        }
-      } else {
-        // Normal new game initialization
-        startRound()
+        saveData: null,
       }
+
+      showLoader.value = false
+      autoOpponent.value = true
+    } else {
+      // Normal new game initialization
+      startRound()
     }
   } else {
     console.debug('Resetting game...')
