@@ -1,5 +1,15 @@
 # Dziennik zmian
 
+## [2.5.1] - 2025-09-03
+
+### Naprawione błędy i ulepszenia
+- **Zarządzanie stanem gry**: Naprawiono problem, w którym gry mogły być zapisywane podczas tury przeciwnika, zapewniając że funkcja zapisu jest dostępna tylko podczas tury gracza.
+- **Wznowienie autopilota**: Naprawiono funkcjonalność auto-przeciwnika, aby prawidłowo uruchomić się przy wznowieniu gry po odświeżeniu strony.
+- **Trwałość gry**: Wyjaśniono dokumentację dotyczącą zachowania trwałości zapisów gry.
+
+### Ulepszenia interfejsu użytkownika i wizualne  
+- **Ulepszenie modali**: Ulepszone tła modali i wizualizacje przycisków dla poprawy doświadczenia użytkownika.
+
 ## [2.5.0] - 2025-08-31
 
 ### Nowe funkcje

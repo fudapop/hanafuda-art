@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.5.1] - 2025-09-03
+
+### Bug Fixes & Improvements
+- **Game State Management**: Fixed an issue where games could be saved during the opponent's turn, ensuring save functionality is only available during the player's turn.
+- **Auto-play Resume**: Fixed auto-opponent functionality to properly start when resuming a game after a page refresh.
+- **Game Persistence**: Clarified documentation regarding game save persistence behavior.
+
+### UI & Visual Improvements  
+- **Modal Enhancement**: Enhanced modal backgrounds and button visuals for improved user experience.
+
 ## [2.5.0] - 2025-08-31
 
 ### New Features
