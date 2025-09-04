@@ -200,7 +200,7 @@
       "gameWillBeForfeited": "The game will be forfeited and progress will not be saved. Are you sure you want to leave?",
       "yesLeaveGame": "Yes, leave the game",
       "noKeepPlaying": "No, keep playing",
-      "chooseHowToExit": "Choose how to exit the game."
+      "chooseHowToExit": "Choose how to exit the game. Saves are temporary and deleted when resumed."
     },
     "saveInfo": {
       "lastSaved": "Last saved: {lastSaved}"

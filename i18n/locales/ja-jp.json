@@ -200,7 +200,7 @@
       "gameWillBeForfeited": "ゲームは放棄され、進行状況は保存されません。本当にゲームを終了しますか？",
       "yesLeaveGame": "はい、ゲームを終了する",
       "noKeepPlaying": "いいえ、プレイを続ける",
-      "chooseHowToExit": "ゲームの終了方法を選択してください。"
+      "chooseHowToExit": "ゲームの終了方法を選択してください。セーブは一時的で、再開時に削除されます。"
     },
     "saveInfo": {
       "lastSaved": "最終保存日時: {lastSaved}"

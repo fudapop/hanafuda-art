@@ -200,7 +200,7 @@
       "gameWillBeForfeited": "Gra zostanie przegrana, a postęp nie zostanie zapisany. Czy na pewno chcesz odejść?",
       "yesLeaveGame": "Tak, opuść grę",
       "noKeepPlaying": "Nie, kontynuuj grę",
-      "chooseHowToExit": "Wybierz sposób wyjścia z gry."
+      "chooseHowToExit": "Wybierz sposób wyjścia z gry. Zapisy są tymczasowe i usuwane przy wznowieniu."
     },
     "saveInfo": {
       "lastSaved": "Ostatni zapis: {lastSaved}"
