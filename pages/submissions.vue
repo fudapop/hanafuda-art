@@ -52,99 +52,59 @@
         </div>
       </div>
 
-      <!-- Mapping Progress (only show when we have files) -->
-      <div
-        v-if="submissionFiles.length > 0"
-        class="mb-8"
-      >
-        <MappingProgress
-          :mapped-count="mappingProgress.mapped"
-          :total-cards="mappingProgress.total"
-          :progress-percentage="mappingProgress.percentage"
-          :is-complete="isComplete"
-          :mappings="getAllMappings()"
-          :show-debug="isDev"
-          @clear-all="handleClearAllMappings"
-          @upload="handleUploadMappings"
-          @debug="debugMappingState"
-        />
-      </div>
+      <!-- Sequential Mapping Interface -->
+      <div v-if="submissionType === 'deck' && submissionFiles.length > 0">
+        <!-- Overall Progress -->
+        <!-- <div class="mb-8">
+          <MappingProgress
+            :mapped-count="mappingProgress.mapped"
+            :total-cards="mappingProgress.total"
+            :progress-percentage="mappingProgress.percentage"
+            :is-complete="isComplete"
+            :mappings="getAllMappings()"
+            :show-debug="isDev"
+            @clear-all="handleClearAllMappings"
+            @upload="handleUploadMappings"
+            @debug="debugState"
+          />
+        </div> -->
 
-      <!-- Instructions -->
-      <div
-        v-if="submissionFiles.length > 0"
-        class="mb-6"
-      >
-        <div class="p-4 border border-blue-200 rounded-md bg-blue-50">
-          <div class="flex">
-            <svg
-              class="w-5 h-5 text-blue-400 mt-0.5 mr-3"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            <div>
-              <h3 class="text-sm font-medium text-blue-800">How to map your cards:</h3>
-              <p class="mt-1 text-sm text-blue-700">
-                Drag files from the left panel and drop them onto the corresponding hanafuda cards
-                on the right. Each card must be mapped before you can upload your submission.
-              </p>
-            </div>
-          </div>
+        <!-- Review Mode -->
+        <div
+          v-if="isInReviewMode"
+          class="mb-8"
+        >
+          <ReviewScreen
+            :mappings="getAllMappings()"
+            :skipped-cards="Array.from(skippedCards)"
+            :unmapped-cards="unmappedCards"
+            @edit-mapping="editMapping"
+            @exit-review="exitReviewMode"
+            @upload="handleUploadMappings"
+          />
         </div>
-      </div>
 
-      <!-- Main Mapping Interface -->
-      <div
-        v-if="submissionType === 'deck' && submissionFiles.length > 0"
-        class="grid min-h-0 grid-cols-2 gap-8"
-      >
-        <!-- Submitted Files (Left Side) -->
-        <section
-          class="flex flex-col min-w-0 p-6 bg-white border border-gray-200 rounded-lg shadow-sm"
-        >
-          <h2 class="mb-4 text-lg font-semibold text-gray-900">
-            Your Submitted Files ({{ submissionFiles.length }})
-          </h2>
-          <div class="grid grid-cols-4 gap-3 max-h-[600px] overflow-y-auto flex-1">
-            <DraggableFileCard
-              v-for="(file, index) in submissionFiles"
-              :key="`file-${index}`"
-              :file="file"
-              :file-index="index"
-              :is-mapped="isFileMapped(index)"
-              :show-file-info="true"
-              @drag-start="startDrag"
-              @drag-end="endDrag"
-            />
-          </div>
-        </section>
-
-        <!-- Hanafuda Cards (Right Side) -->
-        <section
-          class="flex flex-col min-w-0 p-6 bg-white border border-gray-200 rounded-lg shadow-sm"
-        >
-          <h2 class="mb-4 text-lg font-semibold text-gray-900">
-            Hanafuda Cards ({{ cardObjects.length }})
-          </h2>
-          <div class="grid grid-cols-4 gap-3 max-h-[600px] overflow-y-auto flex-1">
-            <DroppableCardSlot
-              v-for="card in cardObjects"
-              :key="card.name"
-              :card="card"
-              :mapping="getCardMapping(card.name)"
-              :is-drag-active="isDragging"
-              @drop="handleCardDrop"
-              @remove-mapping="handleRemoveMapping"
-            />
-          </div>
-        </section>
+        <!-- Sequential Card Selector -->
+        <div v-else>
+          <CardSelector
+            :current-card="currentCard"
+            :current-card-index="currentCardIndex"
+            :total-cards="totalCards"
+            :available-files="submissionFiles"
+            :mapped-file-indices="mappedFiles"
+            :is-current-card-mapped="isCurrentCardMapped"
+            :all-cards="allCards"
+            :is-card-mapped="isCardMapped"
+            :is-card-skipped="isCardSkipped"
+            :get-current-card-mapping="() => getCardMapping(currentCard?.name)"
+            @select-file="handleSelectFile"
+            @previous="goToPrevious"
+            @next="handleNext"
+            @finish="handleFinish"
+            @clear-mapping="handleClearMapping"
+            @go-to-card="goToCard"
+          />
+        </div>
       </div>
 
       <!-- Single Card Mode -->
@@ -178,47 +138,76 @@
         <p class="mt-1 text-sm text-gray-500">Upload 48 card images to begin mapping.</p>
       </div>
     </div>
+
+    <!-- Upload Progress -->
+    <UploadProgress />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { CardName } from '~/utils/cards'
-import { CARDS } from '~/utils/cards'
 
 definePageMeta({
   requiresAuth: true,
   middleware: ['auth'],
 })
 
-// Import our new components
-import DraggableFileCard from '~/components/submissions/DraggableFileCard.vue'
-import DroppableCardSlot from '~/components/submissions/DroppableCardSlot.vue'
-import MappingProgress from '~/components/submissions/MappingProgress.vue'
+// Import components
+import CardSelector from '~/components/submissions/CardSelector.vue'
+import UploadProgress from '~/components/submissions/UploadProgress.vue'
+
+// Import composables
+import { useFileUploadManager } from '~/composables/useFileUploadManager'
 
 // Submission state
 const submissionType = ref<'deck' | 'single'>('deck')
 const submissionFiles = ref<File[]>([])
 
-// Drag and drop mapping functionality
+// Sequential card mapping functionality
 const {
+  // Sequential state
+  currentCardIndex,
+  currentCard,
+  totalCards,
+  skippedCards,
+  isInReviewMode,
+  allCards,
+
+  // Navigation
+  goToNext,
+  goToPrevious,
+  goToCard,
+  goToFirstUnmapped,
+  goToNextUnmapped,
+
+  // Mapping
+  mapCurrentCard,
+
+  // Review
+  enterReviewMode,
+  exitReviewMode,
+
+  // Status
+  getCompletionStatus,
+  unmappedCards,
+  isCardSkipped,
+
+  // Base mapping functionality
   mappingProgress,
   isComplete,
-  isDragging,
-  isFileMapped,
+  mappedFiles,
   isCardMapped,
+  isCurrentCardMapped,
   getCardMapping,
   getAllMappings,
-  startDrag,
-  endDrag,
-  handleDrop,
-  removeMappingByCard,
   clearAllMappings,
+  removeMappingByCard,
   generateUploadMappings,
   debugState,
-} = useCardMapping()
+} = useSequentialCardMapping()
 
-// Other composables
-const { getCardUrl } = useCardDesign()
+// File upload manager
+const { uploadCardMappings, hasActiveUploads } = useFileUploadManager()
 
 // Development mode check
 const isDev = process.dev
@@ -244,27 +233,41 @@ const handleFileChange = (e: Event) => {
   })
 }
 
-// Drag and drop handlers
-const handleCardDrop = (cardName: CardName, fileIndex: number) => {
+const handleSelectFile = (cardName: CardName, fileIndex: number) => {
   const file = submissionFiles.value[fileIndex]
   if (!file) {
     console.error(`No file found at index ${fileIndex}`)
     return
   }
 
-  const success = handleDrop(cardName, submissionFiles.value)
+  const success = mapCurrentCard(fileIndex, file)
   if (success) {
     console.log(`Successfully mapped file ${fileIndex} to card ${cardName}`)
+
+    // Check if all cards are now mapped and auto-trigger review
+    nextTick(() => {
+      const status = getCompletionStatus()
+      if (status.canUpload) {
+        console.log('All cards mapped! Entering review mode...')
+        enterReviewMode()
+      }
+    })
   } else {
     console.warn(`Failed to map file ${fileIndex} to card ${cardName}`)
   }
 }
 
-const handleRemoveMapping = (cardName: CardName) => {
-  const success = removeMappingByCard(cardName)
-  if (success) {
-    console.log(`Removed mapping for card ${cardName}`)
+const handleNext = () => {
+  // Try to go to next unmapped card first
+  if (!goToNextUnmapped()) {
+    // If no unmapped cards, just go to next card
+    goToNext()
   }
+}
+
+const handleFinish = () => {
+  // Always enter review mode when finish is clicked
+  enterReviewMode()
 }
 
 const handleClearAllMappings = () => {
@@ -273,7 +276,9 @@ const handleClearAllMappings = () => {
 }
 
 const handleUploadMappings = () => {
-  if (!isComplete.value) {
+  const status = getCompletionStatus()
+
+  if (!status.canUpload) {
     console.warn('Cannot upload - mapping is not complete')
     return
   }
@@ -281,94 +286,66 @@ const handleUploadMappings = () => {
   const uploadMappings = generateUploadMappings()
   console.log('Generated upload mappings:', uploadMappings)
 
-  // Here you would implement the actual upload logic
-  // For now, we'll just log the mappings
-  alert(`Ready to upload ${Object.keys(uploadMappings).length} mapped cards!`)
+  // Convert to CardMapping array format
+  const cardMappings = Object.entries(uploadMappings).map(([cardName, file]) => ({
+    fileIndex: 0, // Not needed for upload
+    cardName: cardName as CardName,
+    file,
+  }))
+
+  // Use the file upload manager
+  uploadCardMappings(cardMappings)
 }
 
-const debugMappingState = () => {
-  debugState()
+const handleClearMapping = (cardName: CardName) => {
+  // Remove the mapping for this card
+  const success = removeMappingByCard(cardName)
+  if (success) {
+    console.log(`Cleared mapping for card ${cardName}`)
+  }
 }
 
-// Create array of card objects for template
-const cardObjects = computed(() => {
-  return Object.values(CARDS)
+const editMapping = (cardName: CardName) => {
+  // Find the card index and navigate to it
+  const cardIndex = allCards.value.findIndex((card: any) => card.name === cardName)
+  if (cardIndex !== -1) {
+    goToCard(cardIndex)
+    exitReviewMode()
+  }
+}
+
+// Navigation protection during uploads
+const router = useRouter()
+
+// Prevent navigation away during uploads
+onBeforeRouteLeave((to, from, next) => {
+  if (hasActiveUploads.value) {
+    const confirmed = confirm(
+      'Uploads are in progress. Are you sure you want to leave? Your uploads will be cancelled.',
+    )
+    if (confirmed) {
+      next()
+    } else {
+      next(false)
+    }
+  } else {
+    next()
+  }
+})
+
+// Handle browser refresh/close during uploads
+onMounted(() => {
+  const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    if (hasActiveUploads.value) {
+      event.preventDefault()
+      event.returnValue = 'Uploads are in progress. Are you sure you want to leave?'
+    }
+  }
+
+  window.addEventListener('beforeunload', handleBeforeUnload)
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', handleBeforeUnload)
+  })
 })
 </script>
-
-<style scoped>
-/* Enhanced drag and drop visual feedback */
-.drag-preview {
-  opacity: 0.8;
-  transform: rotate(5deg);
-  border: 2px dashed #3b82f6;
-}
-
-.drop-zone-active {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-}
-
-/* Smooth transitions for card states */
-.card-transition {
-  transition: all 0.2s ease-in-out;
-}
-
-.card-mapped {
-  transform: scale(0.98);
-  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.2);
-}
-
-.card-dragging {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  z-index: 50;
-}
-
-/* File upload styling enhancement */
-input[type='file']::-webkit-file-upload-button {
-  transition: all 0.2s ease-in-out;
-}
-
-input[type='file']:hover::-webkit-file-upload-button {
-  transform: translateY(-1px);
-}
-
-/* Progress bar animation */
-.progress-bar {
-  transition: width 0.3s ease-in-out;
-}
-
-/* Loading states */
-.loading-shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-/* Dark mode support for drag states */
-@media (prefers-color-scheme: dark) {
-  .drop-zone-active {
-    border-color: #60a5fa;
-    background-color: rgba(59, 130, 246, 0.1);
-  }
-}
-</style>

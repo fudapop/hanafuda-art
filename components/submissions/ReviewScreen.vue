@@ -121,14 +121,12 @@
         ← Continue Mapping
       </button>
 
-      <button
-        v-if="unmappedCards.length === 0"
-        type="button"
-        class="px-6 py-2 text-sm font-medium text-white transition-colors bg-green-600 rounded-md hover:bg-green-700"
-        @click="$emit('upload')"
-      >
-        Upload All Cards
-      </button>
+      <!-- Upload Status Component -->
+      <UploadStatus
+        :can-upload="unmappedCards.length === 0"
+        :mappings="mappings"
+        @upload="$emit('upload')"
+      />
     </div>
   </div>
 </template>
