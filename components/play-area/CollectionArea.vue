@@ -256,7 +256,8 @@ onMounted(() => {
         // Emits only if new yaku completed.
         lastCompleted = new Set(taggedYaku)
         newCompleted.forEach((yaku) => {
-          ds.logPlayerAction(player, 'complete', YAKU[yaku].cards, yaku)
+          const yakuCards = YAKU[yaku].cards.filter((card) => cs.collection[player].has(card))
+          ds.logPlayerAction(player, 'complete', yakuCards, yaku)
         })
         emits('completed', {
           player,

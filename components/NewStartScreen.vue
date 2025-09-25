@@ -261,6 +261,7 @@ const startNewGame = () => {
     saveData: null,
   }
 
+  console.debug('Starting new game - will initialize clean state')
   emit('start-game')
 }
 

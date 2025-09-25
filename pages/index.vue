@@ -204,9 +204,17 @@ const handleNext = async () => {
 const handleClose = () => {
   ds.nextRound() // This should fix the issue of not swapping to the winner after final round
   showModal.value = false
-  ds.reset()
+  resetAllStores()
   // Return to the start screen
   gameStart.value = false
+}
+
+// Reset all stores to initial state
+const resetAllStores = () => {
+  console.debug('Resetting all stores to initial state...')
+  ds.reset() // Reset game data store
+  ps.reset() // Reset player store to initial state (p1 active and dealer)
+  cs.reset() // Reset card store
 }
 
 const startRound = async () => {
@@ -340,12 +348,16 @@ watch(gameStart, () => {
       autoOpponent.value = true
     } else {
       // Normal new game initialization
+      console.debug('Starting new game - ensuring clean state...')
+      resetAllStores() // Ensure clean state before starting
       startRound()
     }
   } else {
     console.debug('Resetting game...')
     if (!roundOver.value) ds.endRound()
     if (!gameOver.value) handleClose()
+    // Additional cleanup - ensure stores are reset when returning to start screen
+    resetAllStores()
   }
 })
 

@@ -68,7 +68,10 @@
                 </div>
                 <ul
                   v-if="log.cards.length > 0"
-                  class="flex items-start h-full gap-1 py-1 min-h-12 flex-wrap"
+                  :class="[
+                    'flex items-start h-full gap-1 py-1 min-h-12',
+                    log.cards.length > 4 && 'flex-wrap',
+                  ]"
                 >
                   <li
                     v-for="card in log.cards"
@@ -171,7 +174,6 @@ const ds = useGameDataStore()
 const history = computed(() => ds.eventHistory)
 
 const DEFAULT_HEIGHT = 48
-const MIN_HEIGHT = 16
 const COLLAPSED_HEIGHT = 20
 const DEFAULT_WIDTH = 70
 const MIN_WIDTH = 50

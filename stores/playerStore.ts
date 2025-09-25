@@ -145,13 +145,16 @@ export const usePlayerStore = defineStore('players', () => {
   function reset(newDealer?: PlayerKey | null) {
     bonusMultiplier.value = 1
     // newDealer = newDealer ?? winningPlayer.value;
-    if (newDealer) {
-      playerList.value.forEach((p) => {
-        p.isDealer = p.id === newDealer
-        p.isActive = p.id === newDealer
-      })
-    }
-    // console.debug("Set new dealer:", { newDealer, active: activePlayer.value })
+    
+    // If no newDealer specified, reset to initial state (p1 active and dealer)
+    const dealerToSet = newDealer || 'p1'
+    
+    playerList.value.forEach((p) => {
+      p.isDealer = p.id === dealerToSet
+      p.isActive = p.id === dealerToSet
+    })
+    
+    console.debug(`Player store reset: ${dealerToSet} is now active and dealer`)
   }
 
   function exportSerializedState(): string {

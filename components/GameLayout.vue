@@ -245,6 +245,7 @@ const handleSaveAndExit = async () => {
 const handleForfeitAndExit = () => {
   $clientPosthog?.capture('exit_game_forfeit')
   leavingGame.value = false
+  // Reset gameStart to trigger cleanup in main game component
   gameStart.value = false
 }
 
