@@ -1,5 +1,10 @@
 # Dziennik zmian
 
+## [2.6.0] - 2025-09-21
+
+### Nowe funkcje
+- **Dziennik zdarzeń na ekranie**: Dodano zmienny, składany panel dziennika zdarzeń, który śledzi wszystkie akcje gry w czasie rzeczywistym. Gracze mogą teraz monitorować swoje ruchy, dobieranie kart, dopasowania i ukończenie yaku z oznaczeniami czasowymi i wizualnymi wskaźnikami kart. Panel może być przesuwany, składany lub całkowicie ukryty w zależności od preferencji gracza, z ustawieniami automatycznie zapisywanymi między sesjami.
+
 ## [2.5.1] - 2025-09-03
 
 ### Naprawione błędy i ulepszenia

@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.6.0] - 2025-09-21
+
+### New Features
+- **On-Screen Event Log**: Added a resizable, collapsible event log panel that tracks all game actions in real-time. Players can now monitor their moves, card draws, matches, and yaku completions with timestamps and visual card indicators. The panel can be repositioned, collapsed, or hidden entirely based on player preference, with settings automatically saved between sessions.
+
 ## [2.5.1] - 2025-09-03
 
 ### Bug Fixes & Improvements
