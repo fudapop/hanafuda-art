@@ -149,6 +149,7 @@ describe('useStoreManager', () => {
         turnPhase: 'select',
         roundOver: false,
         gameOver: false,
+        eventHistory: [],
       }),
       players: JSON.stringify({
         players: {
