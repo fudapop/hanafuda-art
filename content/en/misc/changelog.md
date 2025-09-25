@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.6.1] - 2025-09-25
+
+### Bug Fixes
+- **Game State Management**: Fixed an issue where forfeiting a game and starting a new one would leave game stores in an inconsistent state, causing UI elements like the logout button to become disabled and game state to be corrupted. All game stores now properly reset to their initial state when starting a new game.
+
 ## [2.6.0] - 2025-09-21
 
 ### New Features

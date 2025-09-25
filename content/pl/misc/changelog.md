@@ -1,5 +1,10 @@
 # Dziennik zmian
 
+## [2.6.1] - 2025-09-25
+
+### Naprawione błędy
+- **Zarządzanie stanem gry**: Naprawiono problem, w którym poddanie gry i rozpoczęcie nowej pozostawiało sklepy gier w niespójnym stanie, powodując wyłączenie elementów interfejsu użytkownika, takich jak przycisk wylogowania, oraz uszkodzenie stanu gry. Wszystkie sklepy gier są teraz prawidłowo resetowane do stanu początkowego przy rozpoczynaniu nowej gry.
+
 ## [2.6.0] - 2025-09-21
 
 ### Nowe funkcje
