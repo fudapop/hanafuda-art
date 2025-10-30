@@ -1,7 +1,7 @@
 {
   "name": "new-hanafuda",
   "private": true,
-  "version": "2.6.1",
+  "version": "2025.10.0",
   "type": "module",
   "scripts": {
     "test": "vitest run",
@@ -14,12 +14,7 @@
     "deploy:preview": "firebase hosting:channel:deploy v$(node -p \"require('./package.json').version\")",
     "deploy:prod": "firebase deploy --only hosting",
     "postinstall": "nuxt prepare",
-    "prerelease": "npm run test",
-    "version": "npm run generate && git add -A",
-    "postversion": "git push && git push --tags && npm run deploy:preview",
-    "release:patch": "npm version patch -m \"Release v%s\"",
-    "release:minor": "npm version minor -m \"Release v%s\"",
-    "release:major": "npm version major -m \"Release v%s\"",
+    "release": "node scripts/release-calver.cjs",
     "type:gen": "supabase gen types --lang typescript --project-id ymoriyakbittfgocvxbw --schema public,storage > supabase/types.ts",
     "ui:add": "pnpm dlx shadcn-vue@latest add"
   },

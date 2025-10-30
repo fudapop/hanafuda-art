@@ -1,6 +1,9 @@
 # Dziennik zmian
 
-## [Nieopublikowane]
+## [2025.10.1] - 2025-10-30
+
+### Aktualizacje projektu
+- **Schemat wersjonowania**: Migracja z semantycznego wersjonowania (SemVer) do kalendarzowego wersjonowania (CalVer) w formacie YYYY.MM.MICRO. Numery wersji teraz odzwierciedlają datę wydania i sekwencję w danym miesiącu.
 
 ### Nowe funkcje
 - **System profilu lokalnego**: Zaimplementowano fundamentalną architekturę local-first dla profili graczy. Gra działa teraz przede wszystkim na danych lokalnych z ulepszoną infrastrukturą synchronizacji profili, poprawioną rozdzielczością konfliktów ze śledzeniem źródeł oraz bardziej niezawodnymi przejściami z konta gościa na konto uwierzytelnione. Ta podstawa zapewnia lepszą integralność danych i przygotowuje grunt pod przyszłe możliwości pracy offline.

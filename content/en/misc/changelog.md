@@ -1,6 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [2025.10.1] - 2025-10-30
+
+### Project Updates
+- **Versioning Scheme**: Migrated from Semantic Versioning (SemVer) to Calendar Versioning (CalVer) using YYYY.MM.MICRO format. Version numbers now reflect the release date and sequence within that month.
 
 ### New Features
 - **Local-First Profile System**: Implemented foundational local-first architecture for player profiles. The game now primarily operates on local data with enhanced profile sync infrastructure, improved conflict resolution with source tracking, and more robust guest-to-authenticated account transitions. This groundwork enables better data integrity and sets the stage for future offline-first capabilities.
