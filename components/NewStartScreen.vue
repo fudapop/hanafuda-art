@@ -63,19 +63,6 @@
       />
       <h1 class="sr-only">{{ t('game.title') }}</h1>
 
-      <!-- Welcome message for guests -->
-      <div
-        v-if="isGuest && currentProfile"
-        class="text-center mb-2"
-      >
-        <p class="text-sm text-text-secondary">
-          {{ t('guest.welcome', { username: currentProfile.username }) }}
-        </p>
-        <p class="text-xs text-text-secondary/80 mt-1 text-balance">
-          {{ t('guest.progressSavedLocally') }}
-        </p>
-      </div>
-
       <div class="flex flex-col items-center gap-3 sm:gap-4">
         <!-- Resume Game Button - shown when save exists -->
         <button
@@ -179,7 +166,7 @@ const localeRoute = useLocaleRoute()
 const isGuest = computed(() => currentProfile.value?.isGuest === true)
 
 // Game save management
-const { listSavedGames, loadGameFromStorage, deleteSavedGame, quickLoad } = useStoreManager()
+const { listSavedGames, deleteSavedGame } = useStoreManager()
 const isLoading = ref(false)
 
 // Check for saved games (only use the most recent one)

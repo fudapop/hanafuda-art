@@ -1,6 +1,6 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { usePlayerProfile } from './usePlayerProfile'
 import { useFirestoreSyncAdapter } from './adapters/useFirestoreSyncAdapter'
+import { usePlayerProfile } from './usePlayerProfile'
 
 /**
  * Auth-aware wrapper around usePlayerProfile with sync
@@ -126,12 +126,12 @@ export const useProfile = () => {
 
             if (hasGuest) {
               // Load existing guest profile
-              const guestProfile = await createLocalGuestProfile('Guest Player')
+              const guestProfile = await createLocalGuestProfile()
               await playerProfile.loadLocalGuestProfile(guestProfile)
               console.info('Guest profile loaded')
             } else {
               // Create new guest profile
-              const guestProfile = await createLocalGuestProfile('Guest Player')
+              const guestProfile = await createLocalGuestProfile()
               await playerProfile.loadLocalGuestProfile(guestProfile)
               console.info('New guest profile created')
             }

@@ -36,7 +36,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         const { loadLocalGuestProfile } = useProfile()
 
         if (!current.value || !current.value.isGuest) {
-          const guest = await createLocalGuestProfile('Guest Player')
+          const guest = await createLocalGuestProfile()
           await loadLocalGuestProfile(guest)
         }
       } catch (err) {

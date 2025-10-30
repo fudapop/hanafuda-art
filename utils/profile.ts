@@ -258,26 +258,26 @@ export function getDefaultDesigns(): readonly string[] {
 
 /**
  * Generate a random username using hanafuda flowers and animals/brights.
- * Format: 'flower-animal/bright-nanoid' (e.g., 'cherry-blossom-bridge-3j4k')
+ * Format: 'flower-animal/bright-nanoid' (e.g., 'cherry-bridge-3j4k')
  *
  * @returns Random username string
  *
  * @example
  * ```ts
  * const username = generateRandomUsername()
- * // Returns something like 'pine-crane-3j4k' or 'cherry-blossom-bridge-7m2n'
+ * // Returns something like 'pine-crane-3j4k' or 'cherry-bridge-7m2n'
  * ```
  */
 export function generateRandomUsername(): string {
   const flowers = [
     'pine',
     'plum',
-    'cherry-blossom',
+    'cherry',
     'wisteria',
     'iris',
     'peony',
-    'bush-clover',
-    'silver-grass',
+    'clover',
+    'grass',
     'chrysanthemum',
     'maple',
     'willow',
@@ -293,7 +293,7 @@ export function generateRandomUsername(): string {
     'boar',
     'moon',
     'geese',
-    'sake-cup',
+    'sake',
     'deer',
     'swallow',
     'phoenix',

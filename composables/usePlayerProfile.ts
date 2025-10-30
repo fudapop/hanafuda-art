@@ -444,21 +444,15 @@ export const usePlayerProfile = () => {
           guestStats: guestProfile.stats,
         })
 
-        // Transfer by updating UID and auth fields
-        // Generate random username if guest username is 'Guest Player' (avoids keeping generic guest name)
-        const displayName = (user as any).displayName?.split(' ')[0]
-        const newUsername =
-          displayName ||
-          (guestProfile.username === 'Guest Player'
-            ? generateRandomUsername()
-            : guestProfile.username)
+        const username = guestProfile.username || generateRandomUsername()
 
+        // Transfer by updating UID and auth fields
         const authenticatedProfile: PlayerProfile = {
           ...guestProfile,
           uid: user.uid, // New UID
           email: (user as any).email || '',
           avatar: (user as any).photoURL || guestProfile.avatar,
-          username: newUsername,
+          username: guestProfile.username || generateRandomUsername(),
           isGuest: undefined, // No longer a guest
           record: {
             ...guestProfile.record,
