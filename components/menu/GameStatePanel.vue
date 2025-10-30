@@ -125,7 +125,7 @@ const showStatus = (message: string, isError = false, isWarning = false) => {
 const handleQuickSave = async () => {
   isSaving.value = true
   try {
-    const saveKey = quickSave()
+    const saveKey = await quickSave()
     savedGames.value = listSavedGames()
     showStatus('Game saved successfully!')
   } catch (error) {
@@ -139,7 +139,7 @@ const handleQuickSave = async () => {
 const handleQuickLoad = async () => {
   isLoading.value = true
   try {
-    const success = quickLoad()
+    const success = await quickLoad()
     if (success) {
       showStatus('Game loaded successfully!')
     } else {
@@ -160,7 +160,7 @@ const handleQuickLoad = async () => {
 const handleLoadSave = async (saveKey: string) => {
   isLoading.value = true
   try {
-    const success = loadGameFromStorage(saveKey)
+    const success = await loadGameFromStorage(saveKey)
     if (success) {
       showStatus('Game loaded successfully!')
     } else {
@@ -226,9 +226,9 @@ const handleClearAllSaves = () => {
   }
 }
 
-const handleExportGame = () => {
+const handleExportGame = async () => {
   try {
-    exportGameState()
+    await exportGameState()
     showStatus('Game exported successfully!')
   } catch (error) {
     console.error('Export failed:', error)

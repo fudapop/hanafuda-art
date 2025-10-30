@@ -1,34 +1,34 @@
 /**
  * @fileoverview Card Store
- * 
+ *
  * Manages all card-related state during Hanafuda gameplay including player hands,
  * field cards, deck, and collections. Provides methods to move cards around the
  * table while maintaining game integrity through card counting and validation.
- * 
+ *
  * Features:
  * - Card position tracking (hands, field, deck, collections)
  * - Atomic card operations with integrity checking
  * - Game state serialization with versioned hash-based tampering protection
  * - Card dealing, collecting, and staging operations
  * - Automatic card shuffling and deck management
- * 
+ *
  * State Structure:
  * - hand: Cards currently held by each player
  * - collection: Cards captured by each player
  * - field: Cards currently on the playing field
  * - deck: Remaining cards in the draw pile
  * - staged: Cards temporarily staged for collection
- * 
+ *
  * @example
  * ```typescript
  * const cardStore = useCardStore()
- * 
+ *
  * // Deal initial cards
  * cardStore.dealCards()
- * 
+ *
  * // Move card from hand to field
  * cardStore.discard('matsu-ni-tsuru', 'p1')
- * 
+ *
  * // Check game integrity
  * const isValid = cardStore.integrityCheck
  * ```
@@ -36,7 +36,7 @@
 
 import { defineStore } from 'pinia'
 import { type PlayerKey } from '~/stores/playerStore'
-import { type CardName, shuffle, DECK } from '~/utils/cards'
+import { type CardName, DECK, shuffle } from '~/utils/cards'
 
 type PlayerCardSet = Record<PlayerKey, Set<CardName>>
 
@@ -141,56 +141,103 @@ export const useCardStore = defineStore('cards', {
         state.deck = new Set(shuffle([...DECK]))
       })
     },
-    exportSerializedState(associatedDataSalt?: string): string {
+    async exportSerializedState(associatedDataSalt?: string, gameId?: string): Promise<string> {
       const serializable = {
         hand: {
           p1: Array.from(this.hand.p1),
-          p2: Array.from(this.hand.p2)
+          p2: Array.from(this.hand.p2),
         },
         collection: {
           p1: Array.from(this.collection.p1),
-          p2: Array.from(this.collection.p2)
+          p2: Array.from(this.collection.p2),
         },
         field: Array.from(this.field),
         deck: Array.from(this.deck),
-        staged: Array.from(this.staged)
+        staged: Array.from(this.staged),
       }
-      
-      // Add integrity hash to prevent tampering, using associated data as salt
+
+      // Encrypt card data to prevent plain text visibility
       const dataString = JSON.stringify(serializable)
-      const hash = this._generateHashWithAlgorithm(dataString, associatedDataSalt, 'fnv1a-mixed')
-      
+      const encryptedData = await this._encryptCardData(dataString, gameId)
+
+      // Add integrity hash to prevent tampering, using associated data as salt
+      // Hash the encrypted data to verify it hasn't been tampered with
+      const hash = this._generateHashWithAlgorithm(encryptedData, associatedDataSalt, 'fnv1a-mixed')
+
       return JSON.stringify({
-        data: serializable,
+        encryptedData,
         hash,
         hashAlgorithm: 'fnv1a-mixed',
-        version: '1.0.0'
+        version: '1.0.0',
       })
     },
-    importSerializedState(serializedState: string, associatedDataSalt?: string): boolean {
+    async importSerializedState(
+      serializedState: string,
+      associatedDataSalt?: string,
+      gameId?: string,
+    ): Promise<boolean> {
       try {
         const parsed = JSON.parse(serializedState)
-        
-        // Expect new format with integrity protection
-        if (!parsed.data || !parsed.hash || !parsed.version) {
-          throw new Error('Invalid save format - missing required fields')
+
+        // Handle both encrypted (new) and plain text (legacy) formats
+        let data: any
+
+        if (parsed.encryptedData) {
+          // New encrypted format
+          if (!parsed.hash || !parsed.version) {
+            throw new Error('Invalid save format - missing required fields')
+          }
+
+          const { encryptedData, hash: expectedHash, hashAlgorithm } = parsed
+
+          // Verify integrity hash with appropriate algorithm
+          const actualHash = this._generateHashWithAlgorithm(
+            encryptedData,
+            associatedDataSalt,
+            hashAlgorithm,
+          )
+
+          if (actualHash !== expectedHash) {
+            throw new Error(
+              'Save data integrity verification failed - data may have been tampered with',
+            )
+          }
+
+          // Decrypt the card data
+          const decryptedString = await this._decryptCardData(encryptedData, gameId)
+          data = JSON.parse(decryptedString)
+        } else if (parsed.data) {
+          // Legacy plain text format (backward compatibility)
+          if (!parsed.hash || !parsed.version) {
+            throw new Error('Invalid save format - missing required fields')
+          }
+
+          const { data: plainData, hash: expectedHash, hashAlgorithm } = parsed
+
+          // Verify integrity hash with appropriate algorithm
+          const dataString = JSON.stringify(plainData)
+          const actualHash = this._generateHashWithAlgorithm(
+            dataString,
+            associatedDataSalt,
+            hashAlgorithm,
+          )
+
+          if (actualHash !== expectedHash) {
+            throw new Error(
+              'Save data integrity verification failed - data may have been tampered with',
+            )
+          }
+
+          data = plainData
+        } else {
+          throw new Error('Invalid save format - missing data or encryptedData field')
         }
-        
-        const { data, hash: expectedHash, hashAlgorithm } = parsed
-        
-        // Verify integrity hash with appropriate algorithm
-        const dataString = JSON.stringify(data)
-        const actualHash = this._generateHashWithAlgorithm(dataString, associatedDataSalt, hashAlgorithm)
-        
-        if (actualHash !== expectedHash) {
-          throw new Error('Save data integrity verification failed - data may have been tampered with')
-        }
-        
+
         // Validate structure
         if (!data.hand || !data.collection || !data.field || !data.deck || !data.staged) {
           throw new Error('Invalid card store state structure')
         }
-        
+
         this.$patch((state) => {
           state.hand.p1 = new Set(data.hand.p1 || [])
           state.hand.p2 = new Set(data.hand.p2 || [])
@@ -200,16 +247,20 @@ export const useCardStore = defineStore('cards', {
           state.deck = new Set(data.deck || [])
           state.staged = new Set(data.staged || [])
         })
-        
+
         return true
       } catch (error) {
         console.error('Failed to import card store state:', error)
         return false
       }
     },
-    
+
     // Algorithm-aware hash generation for backward compatibility
-    _generateHashWithAlgorithm(data: string, associatedDataSalt?: string, algorithm?: string): string {
+    _generateHashWithAlgorithm(
+      data: string,
+      associatedDataSalt?: string,
+      algorithm?: string,
+    ): string {
       switch (algorithm) {
         case 'fnv1a-mixed':
           return this._generateFNV1aMixedHash(data, associatedDataSalt)
@@ -227,24 +278,24 @@ export const useCardStore = defineStore('cards', {
       const config = useRuntimeConfig()
       const baseSalt = config.public.saveIntegritySalt || 'hanafuda-fallback-2024'
       const fullData = data + baseSalt + (associatedDataSalt || '')
-      
+
       // Improved hash function using FNV-1a with additional mixing
       let hash = 0x811c9dc5 // FNV-1a 32-bit offset basis
-      
+
       for (let i = 0; i < fullData.length; i++) {
         // XOR with byte
         hash ^= fullData.charCodeAt(i)
         // Multiply by FNV-1a prime
         hash = Math.imul(hash, 0x01000193)
       }
-      
+
       // Additional mixing to improve distribution
       hash ^= hash >>> 16
       hash = Math.imul(hash, 0x21f0aaad)
       hash ^= hash >>> 15
       hash = Math.imul(hash, 0x735a2d97)
       hash ^= hash >>> 15
-      
+
       // Convert to unsigned 32-bit integer and then to hex
       return (hash >>> 0).toString(16).padStart(8, '0')
     },
@@ -256,14 +307,118 @@ export const useCardStore = defineStore('cards', {
       const config = useRuntimeConfig()
       const baseSalt = config.public.saveIntegritySalt || 'hanafuda-fallback-2024'
       const fullData = data + baseSalt + (associatedDataSalt || '')
-      
+
       for (let i = 0; i < fullData.length; i++) {
         const char = fullData.charCodeAt(i)
-        hash = ((hash << 5) - hash) + char
+        hash = (hash << 5) - hash + char
         hash = hash & hash // Convert to 32-bit integer
       }
-      
+
       return hash.toString(36) // Base36 for shorter hash
+    },
+
+    /**
+     * Derives an encryption key from gameId and salt using PBKDF2
+     */
+    async _deriveEncryptionKey(gameId?: string): Promise<CryptoKey> {
+      const config = useRuntimeConfig()
+      const baseSalt = config.public.saveIntegritySalt || 'hanafuda-fallback-2024'
+
+      // Combine gameId and salt for key derivation
+      const keyMaterial = gameId ? `${gameId}|${baseSalt}` : baseSalt
+      const encoder = new TextEncoder()
+      const keyData = encoder.encode(keyMaterial)
+
+      // Import the password/key material as raw bytes for PBKDF2
+      const importedKey = await crypto.subtle.importKey('raw', keyData, 'PBKDF2', false, [
+        'deriveBits',
+        'deriveKey',
+      ])
+
+      // Derive a 256-bit key using PBKDF2
+      const saltBuffer = encoder.encode(baseSalt)
+      const derivedKey = await crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: saltBuffer,
+          iterations: 100000,
+          hash: 'SHA-256',
+        },
+        importedKey,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt'],
+      )
+
+      return derivedKey
+    },
+
+    /**
+     * Encrypts card data using AES-GCM
+     */
+    async _encryptCardData(data: string, gameId?: string): Promise<string> {
+      try {
+        const key = await this._deriveEncryptionKey(gameId)
+        const encoder = new TextEncoder()
+        const dataBuffer = encoder.encode(data)
+
+        // Generate a random IV (initialization vector)
+        const iv = crypto.getRandomValues(new Uint8Array(12))
+
+        // Encrypt the data
+        const encryptedBuffer = await crypto.subtle.encrypt(
+          {
+            name: 'AES-GCM',
+            iv: iv,
+          },
+          key,
+          dataBuffer,
+        )
+
+        // Combine IV and encrypted data, then encode as base64
+        const combined = new Uint8Array(iv.length + encryptedBuffer.byteLength)
+        combined.set(iv, 0)
+        combined.set(new Uint8Array(encryptedBuffer), iv.length)
+
+        // Convert to base64 for storage
+        return btoa(String.fromCharCode(...combined))
+      } catch (error) {
+        console.error('Failed to encrypt card data:', error)
+        throw error
+      }
+    },
+
+    /**
+     * Decrypts card data using AES-GCM
+     */
+    async _decryptCardData(encryptedData: string, gameId?: string): Promise<string> {
+      try {
+        const key = await this._deriveEncryptionKey(gameId)
+
+        // Decode from base64
+        const combined = Uint8Array.from(atob(encryptedData), (c) => c.charCodeAt(0))
+
+        // Extract IV (first 12 bytes) and encrypted data
+        const iv = combined.slice(0, 12)
+        const encryptedBuffer = combined.slice(12)
+
+        // Decrypt the data
+        const decryptedBuffer = await crypto.subtle.decrypt(
+          {
+            name: 'AES-GCM',
+            iv: iv,
+          },
+          key,
+          encryptedBuffer,
+        )
+
+        // Convert back to string
+        const decoder = new TextDecoder()
+        return decoder.decode(decryptedBuffer)
+      } catch (error) {
+        console.error('Failed to decrypt card data:', error)
+        throw error
+      }
     },
   },
 })

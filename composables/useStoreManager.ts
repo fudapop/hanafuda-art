@@ -1,10 +1,10 @@
 /**
  * @fileoverview Store Manager Composable
- * 
+ *
  * Provides a centralized interface for game state serialization and persistence.
  * Implements a single-save slot system that prevents save scumming by only allowing
  * one suspended game state at a time.
- * 
+ *
  * Anti-Save Scumming Features:
  * - Single save slot system (key: 'hanafuda-current-save')
  * - Save only available through "Save & Exit" dialog
@@ -12,40 +12,40 @@
  * - No manual save/load during active gameplay
  * - Hash-based integrity protection prevents tampering
  * - Environment variable salt for additional security
- * 
+ *
  * Game State Lifecycle:
  * 1. Player starts new game → No save exists
- * 2. Player exits via "Save & Exit" → Save created, game suspended  
+ * 2. Player exits via "Save & Exit" → Save created, game suspended
  * 3. Player returns → "Resume Game" button appears
  * 4. Player resumes → Save deleted, game continues from saved state
  * 5. Player exits again → Must choose save/forfeit again
- * 
+ *
  * Technical Features:
  * - Complete game state serialization/deserialization
  * - Cross-store hash verification with associated data salt
  * - Version compatibility checking for save formats
  * - File export/import for backup purposes
  * - Error handling and recovery mechanisms
- * 
+ *
  * @example
  * ```typescript
  * const { quickSave, quickLoad, listSavedGames } = useStoreManager()
- * 
+ *
  * // Save current game state (called from exit dialog)
  * const saveKey = quickSave() // Creates 'hanafuda-current-save'
- * 
+ *
  * // Check if suspended game exists
  * const saves = listSavedGames() // Max 1 save
- * 
+ *
  * // Resume game (automatically deletes save after loading)
  * const success = quickLoad()
  * ```
  */
 
 import { useCardStore } from '~/stores/cardStore'
+import { useConfigStore } from '~/stores/configStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { usePlayerStore } from '~/stores/playerStore'
-import { useConfigStore } from '~/stores/configStore'
 
 /**
  * Serialized game state format for persistence
@@ -58,7 +58,7 @@ export interface SerializedGameState {
   timestamp: number
   /** Unique game identifier */
   gameId: string
-  
+
   /** Serialized card store state (hands, field, deck, collections) */
   cards: string
   /** Serialized game data store state (rounds, turns, phase, history) */
@@ -73,14 +73,14 @@ export const useStoreManager = () => {
   /**
    * Generates associated data salt from other stores for integrity protection
    * @param gameDataStore Game data store instance
-   * @param playerStore Player store instance  
+   * @param playerStore Player store instance
    * @param configStore Config store instance
    * @returns Salt string derived from cross-store data
    */
   const generateAssociatedDataSalt = (
     gameDataStore: ReturnType<typeof useGameDataStore>,
     playerStore: ReturnType<typeof usePlayerStore>,
-    configStore: ReturnType<typeof useConfigStore>
+    configStore: ReturnType<typeof useConfigStore>,
   ): string => {
     // Use key data from other stores as salt to detect cross-store tampering
     const saltComponents = [
@@ -91,16 +91,16 @@ export const useStoreManager = () => {
       playerStore.activePlayer.id,
       playerStore.bonusMultiplier.toString(),
       configStore.maxRounds.toString(),
-      configStore.allowViewingsYaku
+      configStore.allowViewingsYaku,
     ]
-    
+
     return saltComponents.join('|')
   }
 
   /**
    * Serializes the current game state from all stores
    */
-  const serializeGameState = (): SerializedGameState => {
+  const serializeGameState = async (): Promise<SerializedGameState> => {
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
     const playerStore = usePlayerStore()
@@ -108,22 +108,23 @@ export const useStoreManager = () => {
 
     // Generate salt from associated data in other stores
     const associatedSalt = generateAssociatedDataSalt(gameDataStore, playerStore, configStore)
+    const gameId = gameDataStore.gameId
 
     return {
       version: '1.0.0',
       timestamp: Date.now(),
-      gameId: gameDataStore.gameId,
-      cards: cardStore.exportSerializedState(associatedSalt),
+      gameId,
+      cards: await cardStore.exportSerializedState(associatedSalt, gameId),
       gameData: gameDataStore.exportSerializedState(),
       players: playerStore.exportSerializedState(),
-      config: configStore.exportSerializedState()
+      config: configStore.exportSerializedState(),
     }
   }
 
   /**
    * Restores game state to all stores from serialized data
    */
-  const deserializeGameState = (serializedState: SerializedGameState): boolean => {
+  const deserializeGameState = async (serializedState: SerializedGameState): Promise<boolean> => {
     try {
       const cardStore = useCardStore()
       const gameDataStore = useGameDataStore()
@@ -139,25 +140,28 @@ export const useStoreManager = () => {
       const nonCardResults = [
         gameDataStore.importSerializedState(serializedState.gameData),
         playerStore.importSerializedState(serializedState.players),
-        configStore.importSerializedState(serializedState.config)
+        configStore.importSerializedState(serializedState.config),
       ]
 
-      if (!nonCardResults.every(result => result === true)) {
+      if (!nonCardResults.every((result) => result === true)) {
         throw new Error('Failed to restore non-card store states')
       }
 
       // Generate the same associated salt that was used during export
       const associatedSalt = generateAssociatedDataSalt(gameDataStore, playerStore, configStore)
 
-      // Now restore card store with associated data salt for integrity verification
-      const cardResult = cardStore.importSerializedState(serializedState.cards, associatedSalt)
+      // Now restore card store with associated data salt and gameId for integrity verification and decryption
+      const cardResult = await cardStore.importSerializedState(
+        serializedState.cards,
+        associatedSalt,
+        serializedState.gameId,
+      )
 
       if (!cardResult) {
         throw new Error('Card store failed to import - possible data tampering detected')
       }
 
       return true
-
     } catch (error) {
       console.error('Failed to restore game state:', error)
       return false
@@ -167,12 +171,12 @@ export const useStoreManager = () => {
   /**
    * Saves current game state to localStorage (single save slot)
    */
-  const saveGameToStorage = (key?: string): string => {
-    const gameState = serializeGameState()
-    
+  const saveGameToStorage = async (key?: string): Promise<string> => {
+    const gameState = await serializeGameState()
+
     // For single save slot, always use fixed key and clear existing saves
     const storageKey = key || 'hanafuda-current-save'
-    
+
     // Clear any existing saves to maintain single save slot
     if (!key) {
       const existingSaves = listSavedGames()
@@ -180,7 +184,7 @@ export const useStoreManager = () => {
         localStorage.removeItem(save.key)
       }
     }
-    
+
     try {
       localStorage.setItem(storageKey, JSON.stringify(gameState))
       return storageKey
@@ -193,7 +197,7 @@ export const useStoreManager = () => {
   /**
    * Loads game state from localStorage
    */
-  const loadGameFromStorage = (key: string): boolean => {
+  const loadGameFromStorage = async (key: string): Promise<boolean> => {
     try {
       const serializedData = localStorage.getItem(key)
       if (!serializedData) {
@@ -202,8 +206,7 @@ export const useStoreManager = () => {
       }
 
       const gameState = JSON.parse(serializedData) as SerializedGameState
-      return deserializeGameState(gameState)
-
+      return await deserializeGameState(gameState)
     } catch (error) {
       console.error('Failed to load game from localStorage:', error)
       return false
@@ -215,7 +218,7 @@ export const useStoreManager = () => {
    */
   const listSavedGames = (): Array<{ key: string; timestamp: number; gameId: string }> => {
     const savedGames: Array<{ key: string; timestamp: number; gameId: string }> = []
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
       // Check for current single save or legacy save format
@@ -227,7 +230,7 @@ export const useStoreManager = () => {
             savedGames.push({
               key,
               timestamp: gameState.timestamp,
-              gameId: gameState.gameId
+              gameId: gameState.gameId,
             })
           }
         } catch (error) {
@@ -235,7 +238,7 @@ export const useStoreManager = () => {
         }
       }
     }
-    
+
     return savedGames.sort((a, b) => b.timestamp - a.timestamp)
   }
 
@@ -255,16 +258,16 @@ export const useStoreManager = () => {
   /**
    * Exports current game state as downloadable JSON file
    */
-  const exportGameState = (filename?: string): void => {
-    const gameState = serializeGameState()
+  const exportGameState = async (filename?: string): Promise<void> => {
+    const gameState = await serializeGameState()
     const dataStr = JSON.stringify(gameState, null, 2)
     const dataBlob = new Blob([dataStr], { type: 'application/json' })
-    
+
     const link = document.createElement('a')
     link.href = URL.createObjectURL(dataBlob)
     link.download = filename || `hanafuda-save-${gameState.gameId}.json`
     link.click()
-    
+
     URL.revokeObjectURL(link.href)
   }
 
@@ -272,25 +275,25 @@ export const useStoreManager = () => {
    * Imports game state from JSON file
    */
   const importGameState = (file: File): Promise<boolean> => {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const reader = new FileReader()
-      
-      reader.onload = (event) => {
+
+      reader.onload = async (event) => {
         try {
           const gameState = JSON.parse(event.target?.result as string) as SerializedGameState
-          const success = deserializeGameState(gameState)
+          const success = await deserializeGameState(gameState)
           resolve(success)
         } catch (error) {
           console.error('Failed to import game state:', error)
           resolve(false)
         }
       }
-      
+
       reader.onerror = () => {
         console.error('Failed to read file')
         resolve(false)
       }
-      
+
       reader.readAsText(file)
     })
   }
@@ -298,28 +301,28 @@ export const useStoreManager = () => {
   /**
    * Quick save with auto-generated key
    */
-  const quickSave = (): string => {
-    return saveGameToStorage()
+  const quickSave = async (): Promise<string> => {
+    return await saveGameToStorage()
   }
 
   /**
    * Quick load from current save (single save slot)
    */
-  const quickLoad = (): boolean => {
+  const quickLoad = async (): Promise<boolean> => {
     // Try to load from fixed save key first
     const fixedSaveExists = localStorage.getItem('hanafuda-current-save')
     if (fixedSaveExists) {
-      return loadGameFromStorage('hanafuda-current-save')
+      return await loadGameFromStorage('hanafuda-current-save')
     }
-    
+
     // Fallback to any existing saves for backward compatibility
     const saves = listSavedGames()
     if (saves.length === 0) {
       console.warn('No saved games found')
       return false
     }
-    
-    return loadGameFromStorage(saves[0].key)
+
+    return await loadGameFromStorage(saves[0].key)
   }
 
   /**
@@ -328,7 +331,7 @@ export const useStoreManager = () => {
   const isVersionCompatible = (version: string): boolean => {
     const [major, minor] = version.split('.').map(Number)
     const [currentMajor, currentMinor] = '1.0.0'.split('.').map(Number)
-    
+
     return major === currentMajor && minor <= currentMinor
   }
 
@@ -342,6 +345,6 @@ export const useStoreManager = () => {
     exportGameState,
     importGameState,
     quickSave,
-    quickLoad
+    quickLoad,
   }
 }

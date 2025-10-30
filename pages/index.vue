@@ -309,7 +309,7 @@ watch(activePlayer, () => {
   }
 })
 
-watch(gameStart, () => {
+watch(gameStart, async () => {
   if (gameStart.value) {
     // Check if we're resuming from a saved game
     const resumeState = useState('resume-save', () => ({
@@ -322,7 +322,7 @@ watch(gameStart, () => {
       // Load saved state directly without calling startRound()
       try {
         const { deserializeGameState, deleteSavedGame } = useStoreManager()
-        const success = deserializeGameState(resumeState.value.saveData)
+        const success = await deserializeGameState(resumeState.value.saveData)
 
         if (success) {
           // Clear the save since we're now actively playing

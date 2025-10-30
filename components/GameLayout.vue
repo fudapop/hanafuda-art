@@ -228,7 +228,7 @@ const handleSaveAndExit = async () => {
 
   try {
     const { quickSave } = useStoreManager()
-    quickSave() // Save current game state
+    await quickSave() // Save current game state
 
     leavingGame.value = false
     gameStart.value = false
