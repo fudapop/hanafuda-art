@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### New Features
+- **Local-First Profile System**: Implemented foundational local-first architecture for player profiles. The game now primarily operates on local data with enhanced profile sync infrastructure, improved conflict resolution with source tracking, and more robust guest-to-authenticated account transitions. This groundwork enables better data integrity and sets the stage for future offline-first capabilities.
+- **Player Statistics Tracking**: Added comprehensive stats tracking system that records and displays player performance metrics. Track your wins, losses, win rate, favorite yaku combinations, and game history over time. Stats are automatically saved and synced across devices for authenticated players.
+
 ## [2.6.1] - 2025-09-25
 
 ### Bug Fixes

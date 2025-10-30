@@ -1,5 +1,11 @@
 # Dziennik zmian
 
+## [Nieopublikowane]
+
+### Nowe funkcje
+- **System profilu lokalnego**: Zaimplementowano fundamentalną architekturę local-first dla profili graczy. Gra działa teraz przede wszystkim na danych lokalnych z ulepszoną infrastrukturą synchronizacji profili, poprawioną rozdzielczością konfliktów ze śledzeniem źródeł oraz bardziej niezawodnymi przejściami z konta gościa na konto uwierzytelnione. Ta podstawa zapewnia lepszą integralność danych i przygotowuje grunt pod przyszłe możliwości pracy offline.
+- **Śledzenie statystyk gracza**: Dodano kompleksowy system śledzenia statystyk, który rejestruje i wyświetla metryki wydajności gracza. Śledź swoje wygrane, przegrane, wskaźnik wygranych, ulubione kombinacje yaku oraz historię gier w czasie. Statystyki są automatycznie zapisywane i synchronizowane między urządzeniami dla uwierzytelnionych graczy.
+
 ## [2.6.1] - 2025-09-25
 
 ### Naprawione błędy
