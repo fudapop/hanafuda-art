@@ -39,7 +39,6 @@ export const useCardHandler = () => {
 
   const rateProgress = (progress: YakuProgress[], restCards: CardName[]): number => {
     const filteredList = progress.filter((p) => !viewingYaku.has(p.yaku.name))
-    console.debug(config.allowViewingsYaku)
     switch (config.allowViewingsYaku) {
       case 'none':
         progress = filteredList
@@ -124,7 +123,7 @@ export const useCardHandler = () => {
   const selectCardFromHand = (card: CardName) => {
     if (!cs.hand.p1.has(card)) return
     selectedCard.value = card
-    console.debug(ds.getCurrent.player.toUpperCase(), '>>> Selected', card.toUpperCase())
+    // console.debug(ds.getCurrent.player.toUpperCase(), '>>> Selected', card.toUpperCase())
   }
 
   const matchSelection = (card: CardName, selected: CardName) => {
@@ -161,7 +160,6 @@ export const useCardHandler = () => {
 
   const resetSelection = () => {
     selectedCard.value = null
-    console.debug('\tSelection was reset')
   }
 
   const useActions = () => ({

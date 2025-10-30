@@ -109,10 +109,10 @@ watch(
 watch(gameOver, async () => {
   if (!gameOver.value) return
   const result = getResult()
-  const currentUser = toValue(useProfile().current)
-  if (currentUser) {
-    currentUser.record[result]++
-    currentUser.record.coins += ds.scoreboard.p1
+  const { current: currentUser, updateGameRecord } = useProfile()
+  if (currentUser.value) {
+    // Update game record properly through the exposed method
+    await updateGameRecord(result, ds.scoreboard.p1)
   }
   ds.generateGameId()
 })

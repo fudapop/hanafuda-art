@@ -3,13 +3,7 @@
     <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
       <GameBackgroundImages />
     </div>
-    <button
-      v-if="!isSignIn"
-      :class="[
-        'fixed w-10 h-10 transition-all duration-300 rounded-md top-4 left-4 place-content-center z-20',
-        'bg-black/20 hover:bg-black/30 hover:scale-105',
-      ]"
-    >
+    <button class="fixed w-10 h-10 place-content-center game-ui-btn top-4 left-4 z-20">
       <NuxtLink :to="localeRoute('/')">
         <Icon
           name="mdi:arrow-left"
@@ -23,8 +17,6 @@
 </template>
 
 <script setup lang="ts">
-const route = useRoute()
 const localeRoute = useLocaleRoute()
-const isSignIn = computed(() => route.path.includes('/sign-in'))
 const { t } = useI18n()
 </script>

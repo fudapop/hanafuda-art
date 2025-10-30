@@ -24,6 +24,9 @@ assets/HNFD*
 .cursorrules
 /notes
 .genkit
+WARP.md
+CLAUDE.md
+GEMINI.md
 
 # Local env files
 .env

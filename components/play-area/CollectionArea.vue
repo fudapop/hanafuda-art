@@ -114,6 +114,7 @@ import { useGameDataStore } from '~/stores/gameDataStore'
 import { type PlayerKey } from '~/stores/playerStore'
 import { type CardName, sortByType } from '~/utils/cards'
 import { checkAll, type CompletedYaku, YAKU, type YakuName } from '~/utils/yaku'
+import { useProfile } from '~/composables/useProfile'
 
 export type CompletionEvent = {
   player: PlayerKey
@@ -170,6 +171,8 @@ const updateCollection = () => {
 }
 
 const resetCollection = () => {
+  // Stats tracking is now centralized in useStatsTracking composable
+  // Just clear the visual collection display
   coll.brights.clear()
   coll.animals.clear()
   coll.ribbons.clear()
@@ -255,6 +258,7 @@ onMounted(() => {
       if (newCompleted.length) {
         // Emits only if new yaku completed.
         lastCompleted = new Set(taggedYaku)
+
         newCompleted.forEach((yaku) => {
           const yakuCards = YAKU[yaku].cards.filter((card) => cs.collection[player].has(card))
           ds.logPlayerAction(player, 'complete', yakuCards, yaku)

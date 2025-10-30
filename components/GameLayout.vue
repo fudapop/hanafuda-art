@@ -194,7 +194,7 @@ const { t } = useI18n()
 const { $clientPosthog } = useNuxtApp()
 
 const { players } = storeToRefs(usePlayerStore())
-const user = toValue(useProfile().current)
+const { current: user } = useProfile()
 
 const gameStart = useState('start', () => false)
 const leavingGame = ref(false)
@@ -204,14 +204,14 @@ const promptSignup = ref(false)
 const showLoader = ref(false)
 const player1Inactive = computed(() => gameStart.value && !players.value.p1.isActive)
 
-const feedbackSubmitted = computed(() => user?.flags?.hasSubmittedFeedback)
+const feedbackSubmitted = computed(() => user.value?.flags?.hasSubmittedFeedback)
 const signupDeclined = useStorage('hanafuda-signup-declined', false, sessionStorage)
 
 const localeRoute = useLocaleRoute()
 
-const handlePressExit = () => {
+const handlePressExit = async () => {
   if (!gameStart.value) {
-    logout()
+    await logout()
     const route = localeRoute({ name: 'sign-in', query: { exit: 'true' } })
     if (route) {
       navigateTo(route.fullPath)
@@ -269,7 +269,7 @@ const handleSignupCancel = async () => {
 const unwatchGame = watch([gameStart, leavingGame], async () => {
   if (!gameStart.value && !leavingGame.value) {
     showLoader.value = true
-    if (user?.isGuest && !signupDeclined.value) {
+    if (user.value?.isGuest && !signupDeclined.value) {
       await sleep()
       showLoader.value = false
       promptSignup.value = true

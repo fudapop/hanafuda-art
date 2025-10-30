@@ -1,13 +1,9 @@
-import { useStorage } from '@vueuse/core'
 import {
   createUserWithEmailAndPassword,
   EmailAuthProvider,
   GithubAuthProvider,
   GoogleAuthProvider,
-  linkWithCredential,
-  linkWithPopup,
   sendPasswordResetEmail,
-  signInAnonymously,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -30,21 +26,15 @@ export const useAuth = () => {
   const { t } = useI18n()
   const { $clientPosthog } = useNuxtApp()
 
-  const useGuest = () =>
-    useStorage('hanafuda-guest', {} as Record<string, any>, sessionStorage, { mergeDefaults: true })
-
-  const userIsGuest = computed(() => auth.currentUser?.isAnonymous)
-
   const signUpWithEmail = async (email: string, password: string) => {
     try {
-      const guest = useGuest().value
       const { user } = await createUserWithEmailAndPassword(auth, email, password)
       if (!user) return false
-      useGuest().value = {}
+      // Guest profile transfer handled by useProfile auth watcher
       $clientPosthog?.capture('sign_up', { method: 'email' })
       return true
     } catch (err) {
-      toast.error(`${t('auth.messages.unableToCreateAccount')} ${(err as Error).message}`, {
+      toast.error(`${t('auth.messages.unableToCreateAccount')}\n${(err as Error).message}`, {
         timeout: 8000,
       })
       error.value = err
@@ -56,32 +46,11 @@ export const useAuth = () => {
     try {
       const { user } = await signInWithEmailAndPassword(auth, email, password)
       if (!user) return false
-      useGuest().value = {}
+      // Guest profile transfer handled by useProfile auth watcher
       $clientPosthog?.capture('login', { method: 'email' })
       return true
     } catch (err) {
       toast.error(t('auth.messages.invalidEmailOrPassword'), {
-        timeout: 8000,
-      })
-      error.value = err
-      return false
-    }
-  }
-
-  const linkWithEmail = async (email: string, password: string) => {
-    const user = auth.currentUser
-    if (!user) return false
-    try {
-      const { user: linkedUser } = await linkWithCredential(
-        user,
-        EmailAuthProvider.credential(email, password),
-      )
-      if (!linkedUser) return false
-      useGuest().value = {}
-      $clientPosthog?.capture('link_account', { method: 'email' })
-      return true
-    } catch (err) {
-      toast.error(`${t('auth.messages.unableToLinkAccount')} ${(err as Error).message}`, {
         timeout: 8000,
       })
       error.value = err
@@ -103,42 +72,25 @@ export const useAuth = () => {
     return false
   }
 
-  const loginAsGuest = async (username?: string) => {
-    const { user } = await signInAnonymously(auth)
-    const guest = {
-      uid: user.uid,
-      username: username,
-    }
-    useGuest().value = guest
-    $clientPosthog?.capture('login', { method: 'anonymous' })
-    return user
-  }
-
-  const logout = () => {
-    if (auth.currentUser?.isAnonymous) {
-      useGuest().value = {}
-      auth.currentUser.delete()
-    } else {
-      signOut(auth)
-      toast.info(t('auth.messages.youHaveBeenSignedOut'))
-    }
-    $clientPosthog?.reset()
-  }
-
-  const linkAccount = async (providerName: OAuthProviders) => {
-    const user = auth.currentUser
-    if (!user) return false
-    const provider = PROVIDERS[providerName]
+  const logout = async () => {
     try {
-      const result = await linkWithPopup(user, new provider())
-      $clientPosthog?.capture('link_account', { method: providerName })
-      return handleOAuth(result)
-    } catch (err) {
-      toast.error(`${t('auth.messages.unableToLinkAccount')} ${(err as Error).message}`, {
-        timeout: 8000,
-      })
-      error.value = err
-      return false
+      // Clear profile state using useProfile's resetLocal
+      const { resetLocal } = useProfile()
+      await resetLocal()
+
+      // Handle Firebase logout
+      if (auth.currentUser) {
+        await signOut(auth)
+        toast.info(t('auth.messages.youHaveBeenSignedOut'))
+      }
+
+      $clientPosthog?.reset()
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Even if logout fails, we should still reset PostHog
+      $clientPosthog?.reset()
+      // Show user feedback
+      toast.error(t('auth.messages.logoutError') || 'Failed to sign out')
     }
   }
 
@@ -149,7 +101,7 @@ export const useAuth = () => {
       const credential = googleCredential || githubCredential || null
 
       if (credential) {
-        useGuest().value = {}
+        // Guest profile transfer handled by useProfile auth watcher
         $clientPosthog?.capture('login', { method: credential.signInMethod })
         return true
       }
@@ -179,13 +131,8 @@ export const useAuth = () => {
     signUpWithEmail,
     loginWithEmail,
     loginWithOAuth,
-    loginAsGuest,
     logout,
-    linkAccount,
-    linkWithEmail,
     error,
-    useGuest,
-    userIsGuest,
     resetPassword,
   }
 }

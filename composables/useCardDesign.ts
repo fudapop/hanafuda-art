@@ -44,16 +44,25 @@ export const useCardDesign = () => {
    * @returns Info for the current design or the design specified.
    * See link for more: {@link DesignInfo}
    *
+   * @throws {Error} If the design info is not found.
+   *
    */
-  const getDesignInfo = (designName?: CardDesign) =>
-    CARD_DESIGNS[designName ?? currentDesign.value] as DesignInfo
+  const getDesignInfo = (designName?: CardDesign): DesignInfo => {
+    const design = designName ?? currentDesign.value
+    const info = CARD_DESIGNS[design]
+    if (!info) {
+      throw new Error(`Design info not found for design: ${design}`)
+    }
+    return info
+  }
 
   const getCardUrl = (cardName: CardName, design?: CardDesign): string => {
     if (!supabase.value) {
       throw new Error('Supabase not initialized')
     }
     const designName = design ?? currentDesign.value
-    const path = `cards/${designName}/${cardName}.${getDesignInfo(designName).formatExt || 'webp'}`
+    const designInfo = getDesignInfo(designName)
+    const path = `cards/${designName}/${cardName}.${designInfo.formatExt || 'webp'}`
     const {
       data: { publicUrl },
     } = supabase.value.storage.from('static').getPublicUrl(path, {

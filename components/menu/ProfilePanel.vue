@@ -4,7 +4,7 @@
       id="user-info"
       class="grid p-4 mx-3"
     >
-      <div class="sm:grid sm:grid-cols-2 sm:px-8">
+      <div class="sm:grid sm:grid-cols-2 sm:px-8 order-1">
         <!-- Avatar -->
         <div
           v-if="user"
@@ -63,37 +63,23 @@
               }}</span>
             </p>
           </div>
+
+          <!-- Sync Status (for authenticated users only) -->
+          <div
+            v-if="!user?.isGuest"
+            class="px-4 mt-2"
+          >
+            <SyncStatusIndicator />
+          </div>
         </div>
         <!-- END User Info Panel-->
       </div>
     </div>
 
-    <!-- Player Record -->
-    <div
-      v-if="user?.record"
-      class="items-center px-8 mx-2 border-t border-b h-max bg-surface border-t-border border-b-border"
-    >
-      <h3 class="sr-only">{{ t('profile.info.playerRecord') }}</h3>
-      <dl class="flex justify-around">
-        <div
-          v-for="(val, key) in record"
-          :key="key"
-          class="px-4 py-3 overflow-hidden sm:py-5 sm:p-6"
-        >
-          <dt class="text-sm font-medium truncate text-text-secondary">
-            {{ key }}
-          </dt>
-          <dd class="text-lg font-semibold tracking-tight text-text sm:text-3xl">
-            {{ val }}
-          </dd>
-        </div>
-      </dl>
-    </div>
-
     <!-- Account sign-in/out -->
     <div
       v-if="user?.isGuest"
-      class="flex flex-col items-center justify-center h-20 gap-4 pt-4 mx-auto sm:flex-row text-text"
+      class="flex flex-col items-center justify-center h-20 gap-4 mx-auto sm:flex-row text-text"
     >
       <div>
         <ExclamationCircleIcon class="inline w-6 h-6 align-top" />
@@ -108,18 +94,249 @@
     </div>
     <div
       v-else
-      class="flex flex-col items-center justify-center pt-4"
+      class="order-last flex flex-col items-center justify-center pt-4"
     >
       <LoginButton />
     </div>
+
+    <!-- Player Record -->
+    <div
+      v-if="user?.record"
+      class="mx-2 my-3 rounded-lg bg-surface border border-border overflow-hidden"
+    >
+      <h3 class="sr-only">{{ t('profile.info.playerRecord') }}</h3>
+      <dl class="flex justify-around p-2">
+        <div
+          v-for="(val, key) in record"
+          :key="key"
+          class="px-4 py-4 overflow-hidden text-center flex-1"
+        >
+          <dt class="text-sm font-medium truncate text-text-secondary capitalize">
+            {{ key }}
+          </dt>
+          <dd class="text-2xl font-bold tracking-tight text-text sm:text-3xl">
+            {{ val }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Detailed Stats -->
+    <div
+      v-if="user?.stats"
+      class="mx-2 my-3"
+    >
+      <!-- Overview Stats Cards -->
+      <div class="grid grid-cols-3 gap-3 mb-3">
+        <div class="rounded-lg bg-surface border border-border p-3">
+          <dt class="text-sm font-medium text-text-secondary mb-2 flex items-center gap-1.5">
+            <Icon name="mdi:cards-variant" />
+            {{ t('profile.stats.totalCardsCaptured') }}
+          </dt>
+          <dd class="text-2xl font-bold text-text">
+            {{ user.stats.totalCardsCaptured }}
+          </dd>
+        </div>
+        <div class="rounded-lg bg-surface border border-border p-3">
+          <dt class="text-sm font-medium text-text-secondary mb-2 flex items-center gap-1.5">
+            <!-- <span class="text-base">🎯</span> -->
+            <Icon name="mdi:cards" />
+            {{ t('profile.stats.totalYakuCompleted') }}
+          </dt>
+          <dd class="text-2xl font-bold text-text">
+            {{ user.stats.totalYakuCompleted }}
+          </dd>
+        </div>
+        <div class="rounded-lg bg-surface border border-border p-3">
+          <dt class="text-sm font-medium text-text-secondary mb-2 flex items-center gap-1.5">
+            <Icon name="mdi:gamepad-variant" />
+            {{ t('profile.stats.totalRoundsPlayed') }}
+          </dt>
+          <dd class="text-2xl font-bold text-text">
+            {{ user.stats.totalRoundsPlayed }}
+          </dd>
+        </div>
+      </div>
+
+      <!-- Koi-Koi Calls -->
+      <div class="rounded-lg bg-surface border border-border p-3 mb-3">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="text-sm font-semibold text-text-secondary">
+            {{ t('profile.stats.koikoiCalls') }}
+          </h4>
+          <button
+            @click="showKoikoiHelp = true"
+            class="hover:opacity-70 transition-opacity"
+            type="button"
+          >
+            <QuestionMarkCircleIcon class="w-4 h-4 text-text-secondary" />
+          </button>
+        </div>
+        <dl class="grid grid-cols-3 gap-3">
+          <div class="text-center">
+            <dt
+              class="text-sm font-medium text-text-secondary flex items-center justify-center gap-1.5 mb-2"
+            >
+              <Icon name="mdi:check" />
+              {{ t('profile.stats.koikoiSuccess') }}
+            </dt>
+            <dd class="text-xl font-bold text-text">
+              {{ user.stats.koikoiCalled_success }}
+            </dd>
+          </div>
+          <div class="text-center">
+            <dt
+              class="text-sm font-medium text-text-secondary flex items-center justify-center gap-1.5 mb-2"
+            >
+              <Icon name="mdi:close" />
+              {{ t('profile.stats.koikoiFail') }}
+            </dt>
+            <dd class="text-xl font-bold text-text">
+              {{ user.stats.koikoiCalled_fail }}
+            </dd>
+          </div>
+          <div class="text-center">
+            <dt
+              class="text-sm font-medium text-text-secondary flex items-center justify-center gap-1.5 mb-2"
+            >
+              <Icon name="mdi:sync" />
+              {{ t('profile.stats.koikoiReversal') }}
+            </dt>
+            <dd class="text-xl font-bold text-text">
+              {{ user.stats.koikoiCalled_reversal }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Cards by Type -->
+      <div class="rounded-lg bg-surface border border-border p-3">
+        <h4 class="text-sm font-semibold text-text-secondary mb-3">
+          {{ t('profile.stats.cardsCapturedByType') }}
+        </h4>
+        <dl class="grid grid-cols-4 gap-3">
+          <div class="text-center">
+            <dt class="text-sm font-medium text-text-secondary mb-2 capitalize">
+              <Icon
+                name="material-symbols:sunny"
+                class="mb-1"
+              />
+              {{ t('game.cardTypes.brights') }}
+            </dt>
+            <dd class="text-xl font-bold text-text">
+              {{ user.stats.cardsCaptured_bright }}
+            </dd>
+          </div>
+          <div class="text-center">
+            <dt class="text-sm font-medium text-text-secondary mb-2 capitalize">
+              <Icon
+                name="lucide:panda"
+                class="mb-1"
+              />
+              {{ t('game.cardTypes.animals') }}
+            </dt>
+            <dd class="text-xl font-bold text-text">
+              {{ user.stats.cardsCaptured_animal }}
+            </dd>
+          </div>
+          <div class="text-center">
+            <dt class="text-sm font-medium text-text-secondary mb-2 capitalize">
+              <Icon
+                name="game-icons:scroll-unfurled"
+                class="mb-1"
+              />
+              {{ t('game.cardTypes.ribbons') }}
+            </dt>
+            <dd class="text-xl font-bold text-text">
+              {{ user.stats.cardsCaptured_ribbon }}
+            </dd>
+          </div>
+          <div class="text-center">
+            <dt class="text-sm font-medium text-text-secondary mb-2 capitalize">
+              <Icon
+                name="ph:plant-fill"
+                class="mb-1"
+              />
+              {{ t('game.cardTypes.plains') }}
+            </dt>
+            <dd class="text-xl font-bold text-text">
+              {{ user.stats.cardsCaptured_plain }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Koi-Koi Help Modal -->
+    <Modal :open="showKoikoiHelp">
+      <template #title>
+        {{ t('profile.help.koikoiStats.title') }}
+      </template>
+      <template #description>
+        <div class="space-y-4 text-left px-2">
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+              <CheckCircleIcon class="w-10 h-10 text-green-500 mt-0.5" />
+            </div>
+            <div class="flex-1">
+              <strong class="text-text block mb-2">{{ t('profile.stats.koikoiSuccess') }}</strong>
+              <p class="text-sm text-text-secondary leading-relaxed">
+                {{ t('profile.help.koikoiStats.success') }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+              <XCircleIcon class="w-10 h-10 text-red-500 mt-0.5" />
+            </div>
+            <div class="flex-1">
+              <strong class="text-text block mb-2">{{ t('profile.stats.koikoiFail') }}</strong>
+              <p class="text-sm text-text-secondary leading-relaxed">
+                {{ t('profile.help.koikoiStats.fail') }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+              <ArrowPathIcon class="w-10 h-10 text-primary mt-0.5" />
+            </div>
+            <div class="flex-1">
+              <strong class="text-text block mb-2">{{ t('profile.stats.koikoiReversal') }}</strong>
+              <p class="text-sm text-text-secondary leading-relaxed">
+                {{ t('profile.help.koikoiStats.reversal') }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #actions>
+        <div class="flex justify-center mt-6">
+          <button
+            class="action-button"
+            @click="showKoikoiHelp = false"
+          >
+            {{ t('common.actions.gotIt') }}
+          </button>
+        </div>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ExclamationCircleIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  PencilSquareIcon,
+  QuestionMarkCircleIcon,
+  XCircleIcon,
+  ArrowPathIcon,
+} from '@heroicons/vue/24/outline'
 import { onClickOutside, useDateFormat } from '@vueuse/core'
 
 const { t } = useI18n()
+
+const showKoikoiHelp = ref(false)
 
 const user = useProfile().current
 const avatar = computed({

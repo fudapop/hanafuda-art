@@ -225,25 +225,23 @@ const getOptionDescription = (option: ViewingsOptions) => {
   }
 }
 
-const user = toValue(useProfile().current)
+const { current: user, updateProfile } = useProfile()
 
-const saveSettings = () => {
-  if (!settingsUpdated.value || !user) return
-  if (!user.settings) {
-    console.info('Creating settings...')
-  } else {
-    console.info('Updating settings...')
-  }
-  user.settings = config.getCurrentSettings
-  console.info('Profile updated.')
+const saveSettings = async () => {
+  if (!settingsUpdated.value || !user.value) return
+
+  // Use updateProfile to properly persist settings changes
+  await updateProfile({ settings: config.getCurrentSettings as unknown as Record<string, unknown> })
   settingsUpdated.value = false
 }
 
 onMounted(async () => {
-  // Database reads/writes minimized by using local storage.
-  if (!config.settingsLoaded && user?.settings) {
-    config.loadUserSettings(user.settings as GameSettings)
+  // Settings are now loaded when the profile is loaded in usePlayerProfile
+  // This check is kept for backwards compatibility in case settings weren't loaded yet
+  if (!config.settingsLoaded && user.value?.settings) {
+    config.loadUserSettings(user.value.settings as unknown as GameSettings)
   }
+
   watch(config, () => {
     settingsUpdated.value = true
     // Register listener to save settings when the panel is closed.

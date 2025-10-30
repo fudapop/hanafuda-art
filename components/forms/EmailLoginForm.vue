@@ -159,9 +159,9 @@ import { CheckIcon } from '@heroicons/vue/20/solid'
 import { useStorage } from '@vueuse/core'
 
 const { t } = useI18n()
-const emit = defineEmits(['success', 'error', 'linked'])
+const emit = defineEmits(['success', 'error'])
 
-const { useGuest, linkWithEmail, loginWithEmail, signUpWithEmail } = useAuth()
+const { loginWithEmail, signUpWithEmail } = useAuth()
 
 const newAccount = ref<boolean>(useRoute().query.signup === 'true')
 const rememberedEmail = useStorage('hanafuda-email', '', localStorage, { mergeDefaults: true })
@@ -175,21 +175,13 @@ const values = reactive({
 })
 
 const { query } = useRoute()
-const userIsGuest = ref<boolean>(false)
-
-const emailAction = computed(() =>
-  userIsGuest.value ? linkWithEmail : newAccount.value ? signUpWithEmail : loginWithEmail,
-)
+const emailAction = computed(() => (newAccount.value ? signUpWithEmail : loginWithEmail))
 
 const handleEmailLogin = () => {
   if (!isValidPassword.value) return
   emailAction.value(values.email, values.password).then((success) => {
     if (success) {
-      if (userIsGuest.value) {
-        emit('linked')
-      } else {
-        emit('success')
-      }
+      emit('success')
     } else {
       emit('error')
     }
@@ -218,10 +210,6 @@ const showResetModal = ref(false)
 const handleForgotPassword = () => {
   showResetModal.value = true
 }
-
-onMounted(() => {
-  userIsGuest.value = Boolean(useGuest().value.uid)
-})
 </script>
 
 <style scoped>

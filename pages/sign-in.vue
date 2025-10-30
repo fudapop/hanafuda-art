@@ -45,31 +45,14 @@
           <div class="max-w-md mx-auto min-w-[300px] pt-8 w-full space-y-8">
             <EmailLoginForm
               @success="handleLoginSuccess"
-              @linked="handleLinked"
               @error="handleLoginError"
               class="mb-4"
             />
 
-            <OAuthSignupForm
-              v-if="currentUser"
-              @success="handleLinked"
-              @error="handleLoginError"
-            />
             <OAuthLoginForm
-              v-else
               @success="handleLoginSuccess"
               @error="handleLoginError"
             />
-
-            <div class="w-full text-sm text-center">
-              <NuxtLink
-                :external="!currentUser"
-                :to="localeRoute('/')"
-                class="text-text-secondary hover:underline hover:text-primary"
-              >
-                {{ t('navigation.continueAsGuest') }}
-              </NuxtLink>
-            </div>
 
             <!-- Legal Links -->
             <div class="w-full space-x-2 text-xs text-center text-text-secondary">
@@ -113,8 +96,7 @@ const localeRoute = useLocaleRoute()
 
 const { isMobile } = useDevice()
 
-const { loginAsGuest } = useAuth()
-const { upgradeGuestProfile, current: currentUser } = useProfile()
+const { current: currentUser } = useProfile()
 const toast = useToast()
 const loggingIn = ref<boolean>(true)
 
@@ -129,20 +111,6 @@ const identifyUser = () => {
     gamesPlayed:
       currentUser.value.record.win + currentUser.value.record.loss + currentUser.value.record.draw,
   })
-}
-
-const handleLinked = () => {
-  if (!currentUser.value) {
-    toast.error(t('auth.messages.failedToLinkAccount'), { timeout: 8000 })
-    return
-  }
-  loggingIn.value = true
-  toast.success(t('auth.messages.accountLinked'), {
-    timeout: 8000,
-  })
-  upgradeGuestProfile(currentUser.value!)
-  identifyUser()
-  navigateTo(localeRoute('/'))
 }
 
 const handleLoginSuccess = () => {
@@ -166,14 +134,8 @@ onMounted(async () => {
     identifyUser()
     navigateTo(localeRoute('/'))
   } else {
-    const guest = await loginAsGuest('Player 1')
-    if (guest) {
-      await useProfile().getProfile(guest)
-      identifyUser()
-      navigateTo(localeRoute('/'))
-    } else {
-      loggingIn.value = false
-    }
+    // No authenticated user - guest profile will be auto-created by app
+    loggingIn.value = false
   }
 })
 </script>

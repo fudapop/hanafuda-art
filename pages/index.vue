@@ -103,7 +103,7 @@ import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
 import { useCardStore } from '~/stores/cardStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
-import { checkForWin } from '~/utils/yaku'
+import { checkForWin, type YakuName } from '~/utils/yaku'
 
 definePageMeta({
   requiresAuth: true,
@@ -150,6 +150,9 @@ const { decisionIsPending, makeDecision, callStop, koikoiIsCalled, stopIsCalled,
 
 const handleDecision = async () => await makeDecision()
 
+// Initialize stats tracking (automatically watches for round completion)
+useStatsTracking()
+
 const handleCompletion = (data: CompletionEvent) => {
   const { player, score, completedYaku } = data
   if (player) {
@@ -172,13 +175,7 @@ const handleStop = () => {
   const player = activePlayer.value.id
   console.debug(player.toUpperCase(), '>>> Called STOP')
   ds.endRound()
-  const result = ds.getCurrent.result
-  console.log({
-    WINNER: result.winner?.toUpperCase(),
-    SCORE: result.score,
-    // @ts-expect-error
-    COMPLETED: result.completedYaku.map((yaku) => yaku.name).join(', '),
-  })
+  // Stats are automatically tracked by useStatsTracking composable
 }
 
 const handleKoikoi = () => {
@@ -238,7 +235,8 @@ const handleInstantWin = (result: CompletionEvent) => {
   handleCompletion(result)
   showModal.value = true
   callStop()
-  handleStop()
+  ds.endRound()
+  // Stats are automatically tracked by useStatsTracking composable
 }
 
 const checkDeal = () => {
@@ -295,6 +293,7 @@ watch(turnCounter, () => {
     handleCompletion({ player: null, score: 0 })
     callStop()
     ds.endRound()
+    // Stats are automatically tracked by useStatsTracking composable
   }
 })
 

@@ -26,7 +26,8 @@
       "unlike": "Unlike",
       "showTable": "Show Table",
       "saveGame": "Save Game",
-      "loadGame": "Load Game"
+      "loadGame": "Load Game",
+      "retry": "Retry"
     },
     "labels": {
       "appName": "FudaPop",
@@ -81,6 +82,10 @@
     "continueAsGuest": "Continue as guest",
     "signInToExistingAccount": "Sign in to an existing account →"
   },
+  "guest": {
+    "welcome": "Welcome, {username}!",
+    "progressSavedLocally": "Your progress is saved on this device only. Sign in to save across devices."
+  },
   "auth": {
     "fields": {
       "emailAddress": "Email address",
@@ -123,7 +128,10 @@
       "unableToSendPasswordReset": "Unable to send password reset email.",
       "accountLinked": "Account linked! You may need to refresh your browser to update your profile.",
       "youreSignedIn": "You're signed in! Have fun!",
+      "progressSaved": "Welcome back! Your progress has been saved to your account.",
       "failedToLinkAccount": "Failed to link account. Please try again.",
+      "failedToCreateGuest": "Failed to create guest profile. Please refresh the page.",
+      "logoutError": "Failed to sign out. Please try again.",
       "youHaveBeenSignedOut": "You have been signed out."
     }
   },
@@ -135,7 +143,34 @@
     "stats": {
       "wins": "wins",
       "losses": "losses",
-      "draws": "draws"
+      "draws": "draws",
+      "totalYakuCompleted": "Yaku Completed",
+      "totalCardsCaptured": "Cards Captured",
+      "totalRoundsPlayed": "Rounds Played",
+      "koikoiCalls": "Koi-Koi Calls",
+      "koikoiSuccess": "Success",
+      "koikoiFail": "Failed",
+      "koikoiReversal": "Reversals",
+      "cardsCapturedByType": "Cards by Type",
+      "detailedStats": "Detailed Stats",
+      "gameplayStats": "Gameplay Stats"
+    },
+    "sync": {
+      "status": "Sync Status",
+      "synced": "Synced",
+      "pendingChanges": "Changes Pending",
+      "syncing": "Syncing...",
+      "error": "Sync Error",
+      "lastSynced": "Last synced:",
+      "never": "Never"
+    },
+    "help": {
+      "koikoiStats": {
+        "title": "Koi-Koi Stats Explanation",
+        "success": "You called Koi-Koi and won the round",
+        "fail": "You called Koi-Koi but lost the round (loss or draw)",
+        "reversal": "The opponent called Koi-Koi, but you won the round"
+      }
     }
   },
   "game": {

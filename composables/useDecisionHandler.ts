@@ -37,10 +37,10 @@ export const useDecisionHandler = () => {
   const makeDecision = async (): Promise<KoikoiDecision> => {
     decision.value = 'pending'
     while (decisionIsPending.value) {
-      console.log('Player is deciding...')
+      // console.log('Player is deciding...')
       await sleep(500)
     }
-    if (decision.value) console.info(decision.value.toUpperCase(), 'was called.')
+    // if (decision.value) console.info(decision.value.toUpperCase(), 'was called.')
     return decision.value
   }
 
@@ -48,7 +48,6 @@ export const useDecisionHandler = () => {
   const { roundOver, gameOver } = storeToRefs(ds)
 
   if (!watcher.value) {
-    console.debug('Setting decision watcher...')
     watcher.value = watch([roundOver, gameOver], () => {
       if (roundOver.value === false || gameOver.value) {
         decision.value = null

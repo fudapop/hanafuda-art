@@ -326,7 +326,8 @@ const confirmUnlock = () => {
   initialDesign = currentDesign.value
 }
 
-const userIsGuest = toValue(useAuth().userIsGuest)
+const { current: currentProfile } = useProfile()
+const userIsGuest = computed(() => currentProfile.value?.isGuest === true)
 const userLiked = toValue(computed(() => currentUser?.value?.designs.liked))
 
 const likesCount = reactive<Map<CardDesign, number>>(new Map())
@@ -394,7 +395,7 @@ onMounted(() => {
     if (isStoredDesignAvailable) {
       // Use stored design if it's available
       currentDesign.value = storedDesign
-    } else if (userIsGuest) {
+    } else if (userIsGuest.value) {
       currentDesign.value = defaultDesign
     } else {
       currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || defaultDesign

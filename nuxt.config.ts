@@ -8,7 +8,8 @@ const localization = JSON.parse(readFileSync(resolve('./localization.json'), 'ut
 
 const headScripts = []
 
-if (process.env.NODE_ENV === 'production') {
+const isProduction = process.env.NODE_ENV === 'production'
+if (isProduction) {
   headScripts.push({
     id: 'cookieyes',
     type: 'text/javascript',
@@ -159,7 +160,8 @@ export default defineNuxtConfig({
     },
   },
   posthog: {
-    proxy: process.env.NODE_ENV !== 'production',
+    disabled: !isProduction,
+    proxy: !isProduction,
     clientOptions: {
       autocapture: true,
       persistence: 'cookie',

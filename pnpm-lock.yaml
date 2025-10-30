@@ -35,6 +35,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      dexbee-js:
+        specifier: ^0.3.0
+        version: 0.3.1
       firebase:
         specifier: ^10.1.0
         version: 10.14.1
@@ -3325,6 +3328,9 @@ packages:
 
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
+
+  dexbee-js@0.3.1:
+    resolution: {integrity: sha512-qqs9Ha96T4sXsdZTCJGhzDJn2dAe/OiYfWX+iGNe3U6GZykJeSJ+pV6J9X1mtD9fN9uiyAGxhBGKFnKxZY6irw==}
 
   didyoumean@1.2.2:
     resolution: {integrity: sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==}
@@ -10791,6 +10797,8 @@ snapshots:
   devlop@1.1.0:
     dependencies:
       dequal: 2.0.3
+
+  dexbee-js@0.3.1: {}
 
   didyoumean@1.2.2: {}
 

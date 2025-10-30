@@ -26,7 +26,8 @@
       "loading": "読み込み中...",
       "delete": "削除",
       "saveGame": "ゲームを保存",
-      "loadGame": "ゲームを読み込む"
+      "loadGame": "ゲームを読み込む",
+      "retry": "再試行"
     },
     "labels": {
       "appName": "札ポップ",
@@ -81,6 +82,10 @@
     "continueAsGuest": "ゲストとして続行",
     "signInToExistingAccount": "既存のアカウントにサインイン →"
   },
+  "guest": {
+    "welcome": "ようこそ、{username}さん！",
+    "progressSavedLocally": "進捗はこのデバイスにのみ保存されます。複数のデバイスで保存するにはサインインしてください。"
+  },
   "auth": {
     "fields": {
       "emailAddress": "メールアドレス",
@@ -123,7 +128,10 @@
       "unableToSendPasswordReset": "パスワードリセット用のメールを送信できませんでした。",
       "accountLinked": "アカウントがリンクされました！プロフィールを更新するには、ブラウザをリフレッシュする必要がある場合があります。",
       "youreSignedIn": "サインインしました！楽しんでください！",
+      "progressSaved": "おかえりなさい！あなたの進捗はアカウントに保存されました。",
       "failedToLinkAccount": "アカウントのリンクに失敗しました。もう一度お試しください。",
+      "failedToCreateGuest": "ゲストプロフィールの作成に失敗しました。ページを更新してください。",
+      "logoutError": "サインアウトに失敗しました。もう一度お試しください。",
       "youHaveBeenSignedOut": "サインアウトしました。"
     }
   },
@@ -135,7 +143,34 @@
     "stats": {
       "wins": "勝ち",
       "losses": "負け",
-      "draws": "引き分け"
+      "draws": "引き分け",
+      "totalYakuCompleted": "役完成数",
+      "totalCardsCaptured": "獲得カード数",
+      "totalRoundsPlayed": "ゲーム数",
+      "koikoiCalls": "こいこいコール",
+      "koikoiSuccess": "成功",
+      "koikoiFail": "失敗",
+      "koikoiReversal": "逆転",
+      "cardsCapturedByType": "カードタイプ別獲得数",
+      "detailedStats": "詳細統計",
+      "gameplayStats": "ゲームプレイ統計"
+    },
+    "sync": {
+      "status": "同期ステータス",
+      "synced": "同期済み",
+      "pendingChanges": "変更保留中",
+      "syncing": "同期中...",
+      "error": "同期エラー",
+      "lastSynced": "最終同期：",
+      "never": "なし"
+    },
+    "help": {
+      "koikoiStats": {
+        "title": "こいこい統計の説明",
+        "success": "こいこいを宣言してラウンドに勝利しました",
+        "fail": "こいこいを宣言しましたが、ラウンドに敗北しました（負けまたは引き分け）",
+        "reversal": "相手がこいこいを宣言しましたが、あなたがラウンドに勝利しました"
+      }
     }
   },
   "game": {

@@ -1,208 +1,225 @@
-import { useStorage } from '@vueuse/core'
-import { type User, getAuth, onAuthStateChanged } from 'firebase/auth'
-import { type DocumentData, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
-import { type CardDesign } from '~/composables/useCardDesign'
-import { type GameSettings, useConfigStore } from '~/stores/configStore'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { usePlayerProfile } from './usePlayerProfile'
+import { useFirestoreSyncAdapter } from './adapters/useFirestoreSyncAdapter'
 
-interface UserProfile {
-  uid: string
-  avatar: string
-  username: string
-  record: {
-    coins: number
-    win: number
-    draw: number
-    loss: number
-  }
-  lastUpdated: Date
-  designs: {
-    unlocked: CardDesign[]
-    liked: CardDesign[]
-  }
-  settings: Record<string, any> | null
-  flags: Record<string, any>
-  isGuest?: boolean
-}
-
-const defaultDesigns: CardDesign[] = ['cherry-version', 'ramen-red', 'flash-black']
-
+/**
+ * Auth-aware wrapper around usePlayerProfile with sync
+ * Adds automatic profile cleanup on logout and bidirectional Firestore sync
+ */
 export const useProfile = () => {
-  const useWatcher = (): Ref<any> => useState('watcher', () => null)
-  const useUserProfile = (): Ref<UserProfile | null> => useState('profile', () => null)
+  const playerProfile = usePlayerProfile()
 
-  const useGuestProfile = (profile?: UserProfile | Partial<UserProfile>) =>
-    useStorage('hanafuda-guest', profile?.isGuest ? profile : {}, sessionStorage, {
-      mergeDefaults: true,
-    })
-
-  const profile = useUserProfile()
-  const watcher = useWatcher()
-  /**
-   * Retrieve data from Firestore
-   */
-  const getUserData = async (user: User) => {
-    const docRef = await getDoc(doc(getFirestore(), 'users', `u_${user.uid}`))
-    return docRef.exists() ? docRef.data() : null
-  }
-
-  /**
-   * Save new data to Firestore
-   */
-  const setUserData = () => {
-    if (!profile.value) return
-    setDoc(doc(getFirestore(), 'users', `u_${profile.value.uid}`), profile.value, {
-      merge: true,
-    })
-  }
-
-  /**
-   * Load data from Firestore if available, sessionStorage if guest, or create a new profile
-   */
-  const loadProfile = async (user: User) => {
-    const userData = await getUserData(user)
-    if (userData) {
-      loadUserData(user, userData)
-    } else if (user.isAnonymous) {
-      loadGuestData(user)
-    } else {
-      createNewProfile(user)
-    }
-  }
-
-  const { p1Avatar } = useAvatar()
-
-  const loadUserData = (user: User, userData: DocumentData) => {
-    profile.value = {
-      uid: user.uid,
-      avatar: userData.avatar || user.photoURL || p1Avatar.value,
-      username:
-        userData.username || user.displayName?.split(' ')[0] || `User_${user.uid.slice(0, 5)}`,
-      lastUpdated: userData.lastUpdated?.toDate() || new Date(),
-      record: userData.record || { coins: 500, win: 0, draw: 0, loss: 0 },
-      designs: userData.designs || { unlocked: [...defaultDesigns], liked: [] },
-      settings: userData.settings || null,
-      flags: userData.flags || {
-        isNewPlayer: true,
-        hasSubmittedFeedback: false,
-      },
-    }
-
-    if (userData.settings) {
-      const config = useConfigStore()
-      config.loadUserSettings(userData.settings as GameSettings)
-    }
-  }
-
-  const loadGuestData = (user: User) => {
-    const guest = useGuestProfile({
-      uid: user.uid,
-      avatar: user.photoURL || p1Avatar.value,
-      username: user.displayName?.split(' ')[0] || `User #${user.uid.slice(0, 5)}`,
-      lastUpdated: new Date(),
-      record: { coins: 0, win: 0, draw: 0, loss: 0 },
-      designs: { unlocked: [...defaultDesigns], liked: [] },
-      flags: {
-        isNewPlayer: true,
-        hasSubmittedFeedback: false,
-      },
-      isGuest: true,
-    })
-    profile.value = guest.value as UserProfile
-  }
-
-  const createNewProfile = (user: User) => {
-    profile.value = {
-      uid: user.uid,
-      avatar: user.photoURL || p1Avatar.value,
-      username: user.displayName?.split(' ')[0] || `User #${user.uid.slice(0, 5)}`,
-      lastUpdated: new Date(),
-      record: { coins: 500, win: 0, draw: 0, loss: 0 },
-      designs: { unlocked: [...defaultDesigns], liked: [] },
-      settings: null,
-      flags: {
-        isNewPlayer: true,
-        hasSubmittedFeedback: false,
-      },
-    }
-    setUserData()
-  }
-
-  const upgradeGuestProfile = (guestProfile: UserProfile) => {
-    delete guestProfile.isGuest
-    profile.value = guestProfile
-    profile.value.lastUpdated = new Date()
-    profile.value.record.coins += 500
-    setUserData()
-    console.debug('Upgraded guest profile.')
-    deleteGuestProfile()
-  }
-
-  const deleteGuestProfile = () => {
-    useGuestProfile().value = {}
-  }
-
-  const getProfile = async (user: User) => {
-    if (profile.value) return profile.value
-    await loadProfile(user)
-    return profile.value
-  }
-
-  const updateProfile = () => {
-    if (!profile.value) return
-    const data: Partial<UserProfile> = {
-      avatar: profile.value.avatar,
-      username: profile.value.username,
-      settings: profile.value.settings,
-      record: profile.value.record,
-      flags: profile.value.flags,
-      designs: profile.value.designs,
-      lastUpdated: new Date(),
-    }
-    if (!profile.value.isGuest) {
-      console.log('Updating profile...')
-      setDoc(doc(getFirestore(), 'users', `u_${profile.value.uid}`), data, {
-        merge: true,
+  // Initialize Firestore sync adapter
+  const initializeSync = () => {
+    if (!playerProfile.syncAdapter.value) {
+      const adapter = useFirestoreSyncAdapter()
+      playerProfile.setSyncAdapter(adapter, {
+        autoSync: true,
+        debounceMs: 1000,
+        maxRetries: 3,
+        realtimeSync: false, // Can enable for live updates
+        conflictStrategy: 'last-write-wins',
       })
-    } else {
-      const guest = useGuestProfile()
-      console.log('Updating guest profile...')
-      for (const key in data) {
-        // @ts-ignore
-        guest.value[key as keyof Partial<UserProfile>] = data[key]
+    }
+  }
+
+  /**
+   * Transfers guest profile to authenticated profile.
+   * Pulls remote profile, transfers guest data, syncs back, and handles errors.
+   */
+  const transferGuestToAuthProfile = async (user: any) => {
+    let transferSucceeded = false
+    try {
+      // Step 1: Pull remote profile if it exists
+      let remoteProfile = null
+      try {
+        initializeSync()
+        const adapter = playerProfile.syncAdapter.value
+        if (adapter) {
+          remoteProfile = await adapter.pull(user.uid)
+        }
+
+        if (remoteProfile) {
+          console.info('Found existing authenticated profile in Firestore', {
+            remoteCoins: remoteProfile.record.coins,
+          })
+        }
+      } catch (pullError) {
+        console.warn('Failed to check remote profile:', pullError)
+        // Continue - might be first time user, no remote profile yet
+      }
+
+      // Step 2: Transfer/merge guest profile
+      // Pass remote profile so it merges with it (if exists)
+      // If no remote profile, it creates new from guest + signup bonus
+      await playerProfile.transferGuestProfile(user, remoteProfile || undefined)
+      transferSucceeded = true
+      console.info('Guest profile transferred successfully')
+
+      // Step 3: Push final merged profile back to remote
+      try {
+        await playerProfile.syncPush()
+        console.info('Merged profile synced to remote')
+      } catch (syncError) {
+        console.warn('Failed to sync merged profile to remote:', syncError)
+        // Continue with local profile - allows offline play
+        // Local transfer already succeeded, no recovery needed
+      }
+
+      // Step 4: Show success notification
+      if (import.meta.client) {
+        try {
+          await nextTick()
+          const { useToast } = await import('vue-toastification')
+          const toast = useToast()
+          toast.success('Progress saved successfully!', { timeout: 3000 })
+        } catch (toastError) {
+          console.warn('Failed to show toast notification:', toastError)
+        }
+      }
+    } catch (error) {
+      console.error('Guest profile transfer failed:', error)
+      // Only reload profile if transfer actually failed
+      if (!transferSucceeded) {
+        await playerProfile.getProfile(user)
+        await playerProfile.syncPull()
       }
     }
   }
 
-  const current = computed(() => profile.value)
+  // Set up auth state watcher for cleanup on logout
+  const useAuthWatcher = (): Ref<any> => useState('auth-watcher', () => null)
+  const authWatcher = useAuthWatcher()
 
-  if (!watcher.value) {
-    console.debug('Setting profile watcher...')
-    watcher.value = watch(
-      current,
-      () => {
-        if (!current.value) {
-          console.debug('Cleared profile watcher.')
-          watcher.value?.()
-          watcher.value = null
+  // Track if we just logged out to prevent immediate guest creation
+  const useLogoutFlag = (): Ref<boolean> => useState('just-logged-out', () => false)
+  const justLoggedOut = useLogoutFlag()
+
+  // Track if we're currently handling auth change to prevent re-entry
+  const useAuthHandling = (): Ref<boolean> => useState('auth-handling', () => false)
+  const isHandlingAuth = useAuthHandling()
+
+  if (!authWatcher.value) {
+    authWatcher.value = onAuthStateChanged(getAuth(), async (user) => {
+      // Prevent re-entry while handling auth change
+      if (isHandlingAuth.value) {
+        console.info('Auth handler already running, skipping')
+        return
+      }
+
+      isHandlingAuth.value = true
+
+      try {
+        if (user === null) {
+          // No Firebase user - guest mode
+          // Check if we need to create/load guest profile
+          if (!playerProfile.current.value) {
+            // Don't create guest immediately after logout
+            if (justLoggedOut.value) {
+              console.info('Just logged out, skipping guest creation')
+              justLoggedOut.value = false
+              return
+            }
+
+            const { createLocalGuestProfile } = await import('~/composables/usePlayerProfile')
+            const hasGuest = await playerProfile.hasLocalProfile('guest_profile')
+
+            if (hasGuest) {
+              // Load existing guest profile
+              const guestProfile = await createLocalGuestProfile('Guest Player')
+              await playerProfile.loadLocalGuestProfile(guestProfile)
+              console.info('Guest profile loaded')
+            } else {
+              // Create new guest profile
+              const guestProfile = await createLocalGuestProfile('Guest Player')
+              await playerProfile.loadLocalGuestProfile(guestProfile)
+              console.info('New guest profile created')
+            }
+          }
+        } else if (user && !playerProfile.current.value) {
+          // User logged in - check for existing authenticated profile FIRST
+          initializeSync()
+
+          const hasGuest = await playerProfile.hasLocalProfile('guest_profile')
+
+          if (hasGuest) {
+            // Guest profile exists - need to merge with authenticated profile
+            // CRITICAL: Check Firestore FIRST before transferring
+            console.info('Guest profile detected, checking for existing remote profile')
+
+            await transferGuestToAuthProfile(user)
+          } else {
+            // No guest profile - check for local authenticated profile
+            const hasLocal = await playerProfile.hasLocalProfile(user.uid)
+
+            if (hasLocal) {
+              // Local authenticated profile exists - load it
+              console.info('Loading existing authenticated profile')
+              await playerProfile.getProfile(user)
+              await playerProfile.syncPull()
+            } else {
+              // No local profile at all - check remote first before creating new
+              try {
+                initializeSync()
+                const adapter = playerProfile.syncAdapter.value
+                const remoteProfile = adapter ? await adapter.pull(user.uid) : null
+
+                if (remoteProfile) {
+                  // Use the migration function to load remote profile
+                  await playerProfile.migrateFromFirestore(user)
+                } else {
+                  // No profile anywhere - create new and push to remote
+                  await playerProfile.getProfile(user)
+                  await playerProfile.syncPush()
+                }
+              } catch (error) {
+                console.error('Error checking remote profile:', error)
+                // Fallback: create new profile (but don't push to avoid overwriting)
+                await playerProfile.getProfile(user)
+              }
+            }
+          }
+        } else if (user && playerProfile.current.value) {
+          // If a guest profile is currently loaded when the user authenticates,
+          // transfer it immediately without waiting for a refresh
+          if (playerProfile.current.value.isGuest) {
+            initializeSync()
+
+            await transferGuestToAuthProfile(user)
+          } else {
+            // Authenticated profile already loaded - ensure sync is active
+            initializeSync()
+          }
         }
-        updateProfile()
-      },
-      { deep: true },
-    )
-
-    console.debug('Setting auth watcher...')
-    onAuthStateChanged(getAuth(), () => {
-      if (getAuth().currentUser === null) {
-        profile.value = null
-        deleteGuestProfile()
+      } finally {
+        // Always reset the flag
+        isHandlingAuth.value = false
       }
     })
   }
 
   return {
-    current,
-    getProfile,
-    updateProfile,
-    upgradeGuestProfile,
+    // Existing API
+    current: playerProfile.current,
+    getProfile: playerProfile.getProfile,
+    updateProfile: playerProfile.updateProfile,
+    transferGuestProfile: playerProfile.transferGuestProfile,
+    hasLocalProfile: playerProfile.hasLocalProfile,
+    getLocalData: playerProfile.getLocalData,
+    loadLocalGuestProfile: playerProfile.loadLocalGuestProfile,
+    updateGameRecord: playerProfile.updateGameRecord,
+    updatePlayerStats: playerProfile.updatePlayerStats,
+    resetLocal: async (uid?: string) => {
+      // Set logout flag to prevent immediate guest creation
+      justLoggedOut.value = true
+      await playerProfile.resetLocal(uid)
+    },
+
+    // Sync API
+    syncStatus: playerProfile.syncStatus,
+    sync: playerProfile.sync,
+    syncPull: playerProfile.syncPull,
+    syncPush: playerProfile.syncPush,
+    getSyncMetadata: playerProfile.getSyncMetadata,
   }
 }

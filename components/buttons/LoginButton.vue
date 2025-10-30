@@ -36,8 +36,8 @@ const login = () => {
   }
 }
 
-const logoutUser = () => {
-  logout()
+const logoutUser = async () => {
+  await logout()
 }
 
 watch(user, () => {

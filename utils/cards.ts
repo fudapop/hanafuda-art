@@ -109,7 +109,10 @@ const TEST_DECKS = {
 }
 
 type CardName = (typeof DECK)[number] | 'card-back'
-type CardType = 'bright' | 'animal' | 'ribbon' | 'plain'
+
+const CARD_TYPES = ['bright', 'animal', 'ribbon', 'plain'] as const
+
+type CardType = (typeof CARD_TYPES)[number]
 
 interface FlowerCard {
   name: CardName
@@ -400,7 +403,9 @@ export {
   DECK,
   TEST_DECKS,
   CARDS,
+  CARD_TYPES,
   type CardName,
+  type CardType,
   type FlowerCard,
   shuffle,
   sortByType,

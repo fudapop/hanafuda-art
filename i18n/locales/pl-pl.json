@@ -26,7 +26,8 @@
       "loading": "Ładowanie...",
       "delete": "Usuń",
       "saveGame": "Zapisz grę",
-      "loadGame": "Wczytaj grę"
+      "loadGame": "Wczytaj grę",
+      "retry": "Ponów"
     },
     "labels": {
       "appName": "FudaPop",
@@ -81,6 +82,10 @@
     "continueAsGuest": "Kontynuuj jako gość",
     "signInToExistingAccount": "Zaloguj się do istniejącego konta →"
   },
+  "guest": {
+    "welcome": "Witaj, {username}!",
+    "progressSavedLocally": "Twój postęp jest zapisywany tylko na tym urządzeniu. Zaloguj się, aby zapisać na wielu urządzeniach."
+  },
   "auth": {
     "fields": {
       "emailAddress": "Adres e-mail",
@@ -123,7 +128,10 @@
       "unableToSendPasswordReset": "Nie można wysłać e-maila resetującego hasło.",
       "accountLinked": "Konto powiązane! Może być konieczne odświeżenie przeglądarki, aby zaktualizować profil.",
       "youreSignedIn": "Jesteś zalogowany! Baw się dobrze!",
+      "progressSaved": "Witaj z powrotem! Twój postęp został zapisany na Twoim koncie.",
       "failedToLinkAccount": "Nie udało się powiązać konta. Spróbuj ponownie.",
+      "failedToCreateGuest": "Nie udało się utworzyć profilu gościa. Odśwież stronę.",
+      "logoutError": "Nie udało się wylogować. Spróbuj ponownie.",
       "youHaveBeenSignedOut": "Zostałeś wylogowany."
     }
   },
@@ -135,7 +143,34 @@
     "stats": {
       "wins": "wygrane",
       "losses": "przegrane",
-      "draws": "remisy"
+      "draws": "remisy",
+      "totalYakuCompleted": "Ukończone Yaku",
+      "totalCardsCaptured": "Złapane Karty",
+      "totalRoundsPlayed": "Rozegrane Rundy",
+      "koikoiCalls": "Wywołania Koi-Koi",
+      "koikoiSuccess": "Sukces",
+      "koikoiFail": "Niepowodzenie",
+      "koikoiReversal": "Przewroty",
+      "cardsCapturedByType": "Karty według Typu",
+      "detailedStats": "Szczegółowe Statystyki",
+      "gameplayStats": "Statystyki Rozgrywki"
+    },
+    "sync": {
+      "status": "Status Synchronizacji",
+      "synced": "Zsynchronizowano",
+      "pendingChanges": "Zmiany Oczekujące",
+      "syncing": "Synchronizowanie...",
+      "error": "Błąd Synchronizacji",
+      "lastSynced": "Ostatnia synchronizacja:",
+      "never": "Nigdy"
+    },
+    "help": {
+      "koikoiStats": {
+        "title": "Wyjaśnienie Statystyk Koi-Koi",
+        "success": "Wywołałeś Koi-Koi i wygrałeś rundę",
+        "fail": "Wywołałeś Koi-Koi, ale przegrałeś rundę (przegrana lub remis)",
+        "reversal": "Przeciwnik wywołał Koi-Koi, ale ty wygrałeś rundę"
+      }
     }
   },
   "game": {
