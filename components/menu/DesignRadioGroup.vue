@@ -32,7 +32,6 @@
         ]"
         :value="design"
         :disabled="!unlocked?.includes(design)"
-        @pointerenter="cacheDesignOnHover(design, getDesignInfo(design).formatExt)"
         v-posthog-capture="{
           event: 'view_design',
           properties: {
@@ -244,7 +243,6 @@ import DesignDescription from './DesignDescription.vue'
 type CardDesign = (typeof DESIGNS)[number]
 
 const { DESIGNS, currentDesign, getDesignInfo } = useCardDesign()
-const { cacheDesignOnHover } = useCardCache()
 const toast = useToast()
 const { t } = useI18n()
 

@@ -17,8 +17,6 @@ const gameIsStarted = useState('start', () => false)
 
 const { fetchCardUrlMap, currentDesign } = useCardDesign()
 
-const { cacheDesignIfNeeded } = useCardCache()
-
 const preloadHead = useHead({})
 
 const addImagePreloadLinks = (design: CardDesign) => {
@@ -74,7 +72,6 @@ const cleanupBgm = watch(
 )
 
 onMounted(() => {
-  cacheDesignIfNeeded(currentDesign.value)
   addImagePreloadLinks(currentDesign.value)
 })
 
