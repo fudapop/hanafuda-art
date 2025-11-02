@@ -14,6 +14,7 @@
       </Transition>
     </div>
     <SystemOptionsPopover />
+    <NuxtPwaManifest />
     <NuxtPage />
   </NuxtLayout>
 </template>

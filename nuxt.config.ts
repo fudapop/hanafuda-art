@@ -152,6 +152,7 @@ export default defineNuxtConfig({
     'nuxt-posthog',
     'shadcn-nuxt',
     'nuxt-charts',
+    '@vite-pwa/nuxt',
   ],
   postcss: {
     plugins: {
@@ -166,6 +167,43 @@ export default defineNuxtConfig({
     clientOptions: {
       autocapture: true,
       persistence: 'localStorage+cookie',
+    },
+  },
+  pwa: {
+    devOptions: {
+      enabled: true,
+      type: 'module',
+    },
+    manifest: {
+      description: 'Play Hanafuda Koi-Koi',
+      icons: [
+        {
+          src: 'icons/icon_64x64.png',
+          sizes: '64x64',
+          type: 'image/png',
+        },
+        {
+          src: 'icons/icon_92x92.png',
+          sizes: '92x92',
+          type: 'image/png',
+        },
+        {
+          src: 'icons/icon_144x144.png',
+          sizes: '144x144',
+          type: 'image/png',
+        },
+        {
+          src: 'icons/icon_512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+      name: 'New Hanafuda Koi-Koi',
+      short_name: 'Koi-Koi',
+    },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,webp,png,svg}'],
+      navigateFallback: '/',
     },
   },
   router: {
