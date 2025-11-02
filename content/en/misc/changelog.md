@@ -2,8 +2,14 @@
 
 ## [Unreleased]
 
+## [2025.11.0] - 2025-11-02
+
 ### New Features
 - **Enhanced Stats Panel**: Redesigned player statistics with interactive visual breakdowns. All stat cards now feature mini donut charts showing data distribution at a glance, and clicking any card opens a detailed modal with full breakdowns. Added "Games Played" tracking alongside "Rounds Played" to distinguish between overall match results and individual round performance. Stats categories include Cards Captured by type, Yaku Completed, Koi-Koi Calls outcomes, Rounds Played results, and Games Played results.
+
+### Bug Fixes
+- **Game Records**: Fixed an issue where completing a game would incorrectly record both a win and loss, causing inaccurate statistics. Game completion now properly updates the record only once with the correct result.
+- **Save Game Security**: Enhanced save game functionality with encrypted card data to prevent plain text visibility and potential manipulation of saved game states.
 
 ## [2025.10.1] - 2025-10-30
 

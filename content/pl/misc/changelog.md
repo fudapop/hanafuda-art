@@ -2,8 +2,14 @@
 
 ## [Niewydane]
 
+## [2025.11.0] - 2025-11-02
+
 ### Nowe funkcje
 - **Ulepszony panel statystyk**: Przeprojektowano statystyki gracza z interaktywnymi wizualizacjami. Wszystkie karty statystyk zawierają teraz mini wykresy kołowe pokazujące rozkład danych na pierwszy rzut oka, a kliknięcie dowolnej karty otwiera szczegółowy modal z pełnymi podziałami. Dodano śledzenie "Rozegranych Gier" obok "Rozegranych Rund", aby rozróżnić ogólne wyniki meczów od wyników poszczególnych rund. Kategorie statystyk obejmują: Zdobyte Karty według typu, Ukończone Yaku, wyniki Wywołań Koi-Koi, wyniki Rozegranych Rund i wyniki Rozegranych Gier.
+
+### Naprawione błędy
+- **Rekordy Gry**: Naprawiono problem, w którym ukończenie gry nieprawidłowo zapisywało zarówno wygraną, jak i przegraną, powodując niedokładne statystyki. Zakończenie gry teraz prawidłowo aktualizuje rekord tylko raz z poprawnym wynikiem.
+- **Bezpieczeństwo Zapisanej Gry**: Ulepszona funkcjonalność zapisu gry z zaszyfrowanymi danymi kart, aby zapobiec widoczności zwykłego tekstu i potencjalnej manipulacji zapisanymi stanami gry.
 
 ## [2025.10.1] - 2025-10-30
 
