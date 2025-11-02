@@ -108,12 +108,14 @@ watch(
 )
 watch(gameOver, async () => {
   if (!gameOver.value) return
+  // Only update game record from the actual user's StatusBar (Player 1)
+  // Player 2's StatusBar has user=null and should not update the record
+  if (!user) return
+
   const result = getResult()
-  const { current: currentUser, updateGameRecord } = useProfile()
-  if (currentUser.value) {
-    // Update game record properly through the exposed method
-    await updateGameRecord(result, ds.scoreboard.p1)
-  }
+  const { updateGameRecord } = useProfile()
+  // Update game record properly through the exposed method
+  await updateGameRecord(result, ds.scoreboard.p1)
   ds.generateGameId()
 })
 </script>
