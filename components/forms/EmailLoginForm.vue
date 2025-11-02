@@ -147,7 +147,7 @@
         </section>
       </Transition>
     </form>
-    <LazyPasswordResetForm
+    <PasswordResetForm
       :open="showResetModal"
       @cancel="() => (showResetModal = false)"
     />

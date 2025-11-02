@@ -50,7 +50,7 @@
     <!-- </div> -->
   </div>
 
-  <LazyModal
+  <Modal
     :open="modalOpen"
     ref="modalRef"
     :title="t('common.labels.collection')"
@@ -101,7 +101,7 @@
         </button>
       </div>
     </template>
-  </LazyModal>
+  </Modal>
 </template>
 
 <script setup lang="ts">

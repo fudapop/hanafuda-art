@@ -10,7 +10,7 @@
 
       <!-- OPPONENT HAND -->
       <div class="absolute inset-x-0 top-0 h-28">
-        <LazyOpponentArea />
+        <OpponentArea />
       </div>
 
       <!-- OPPONENT COLLECTION -->
@@ -21,7 +21,7 @@
         ]"
       >
         <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
-          <LazyCollectionArea
+          <CollectionArea
             player="p2"
             @completed="handleCompletion"
           />
@@ -39,8 +39,8 @@
               'transition-transform duration-200 origin-left scale-75 sm:scale-100',
             ]"
           >
-            <LazyDeck />
-            <LazyFieldDisplay />
+            <Deck />
+            <FieldDisplay />
           </div>
         </div>
       </div>
@@ -53,7 +53,7 @@
         ]"
       >
         <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
-          <LazyCollectionArea
+          <CollectionArea
             player="p1"
             @completed="handleCompletion"
           />
@@ -73,25 +73,25 @@
           class="w-screen max-w-full py-8 mx-auto overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x"
         >
           <div v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')">
-            <LazyHandDisplay id="p1" />
+            <HandDisplay id="p1" />
           </div>
         </div>
       </div>
 
       <!-- ACTION LOG -->
-      <LazyEventLog />
+      <EventLog />
 
-      <LazyResultsModal :show="showModal">
-        <LazyFinalResults
+      <ResultsModal :show="showModal">
+        <FinalResults
           v-if="gameOver"
           :results="ds.roundHistory"
           @close="handleClose"
         />
-        <LazyRoundResults
+        <RoundResults
           v-else
           @next="handleNext"
         />
-      </LazyResultsModal>
+      </ResultsModal>
     </div>
   </GameLayout>
 </template>

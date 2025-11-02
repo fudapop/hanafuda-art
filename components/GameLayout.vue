@@ -72,7 +72,7 @@
           </template>
           <!-- PROFILE TAB -->
           <template #tab-panel-4>
-            <LazyProfilePanel />
+            <ProfilePanel />
           </template>
           <template #tab-icon-4>
             <Icon
@@ -93,7 +93,7 @@
         '-translate-y-full': !gameStart,
       }"
     >
-      <LazyStatusBar
+      <StatusBar
         :user="null"
         :playerNum="2"
       />
@@ -132,7 +132,7 @@
         'translate-y-full': !gameStart,
       }"
     >
-      <LazyStatusBar
+      <StatusBar
         :user="user"
         :playerNum="1"
       />
@@ -160,14 +160,14 @@
     </Transition>
 
     <!-- MODALS -->
-    <LazyExitWarning
+    <ExitWarning
       :open="leavingGame"
       :isSaving="isSaving"
       @cancel="leavingGame = false"
       @save="handleSaveAndExit"
       @forfeit="handleForfeitAndExit"
     />
-    <!-- <LazyFeedbackForm
+    <!-- <FeedbackForm
       :open="promptFeedback"
       @close="
         () => {
@@ -175,7 +175,7 @@
         }
       "
     /> -->
-    <LazySignupPrompt
+    <SignupPrompt
       :open="promptSignup"
       @cancel="handleSignupCancel"
     />

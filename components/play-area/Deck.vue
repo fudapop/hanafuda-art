@@ -59,7 +59,7 @@
             class="relative z-30 overflow-hidden transition-transform card"
           >
             <template v-if="useConfigStore().cardLabels">
-              <LazyCardLabel :card="revealedCard" />
+              <CardLabel :card="revealedCard" />
             </template>
             <CardImage
               v-if="revealedCardImg"

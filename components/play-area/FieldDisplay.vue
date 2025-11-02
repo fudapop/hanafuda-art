@@ -44,7 +44,7 @@
           @click="() => handleClick(card)"
         >
           <template v-if="useConfigStore().cardLabels">
-            <LazyCardLabel :card="card" />
+            <CardLabel :card="card" />
           </template>
           <CardImage
             :src="getCardUrl(card)!"
