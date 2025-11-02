@@ -103,7 +103,7 @@ import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
 import { useCardStore } from '~/stores/cardStore'
 import { useGameDataStore } from '~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
-import { checkForWin, type YakuName } from '~/utils/yaku'
+import { checkForWin } from '~/utils/yaku'
 
 definePageMeta({
   requiresAuth: true,
@@ -153,6 +153,8 @@ const handleDecision = async () => await makeDecision()
 // Initialize stats tracking (automatically watches for round completion)
 useStatsTracking()
 
+const { $clientPosthog } = useNuxtApp()
+
 const handleCompletion = (data: CompletionEvent) => {
   const { player, score, completedYaku } = data
   if (player) {
@@ -199,6 +201,7 @@ const handleNext = async () => {
 
 // Closing the final results modal
 const handleClose = () => {
+  $clientPosthog?.capture('game_ended')
   ds.nextRound() // This should fix the issue of not swapping to the winner after final round
   showModal.value = false
   resetAllStores()

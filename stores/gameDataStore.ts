@@ -44,7 +44,7 @@ import { useConfigStore } from '~/stores/configStore'
 import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
 import type { CardName } from '~/utils/cards'
 import { consoleLogColor, getRandomString } from '~/utils/myUtils'
-import type { YakuName } from '~/utils/yaku'
+import type { CompletedYaku, YakuName } from '~/utils/yaku'
 
 /** Result data for a completed round */
 export type RoundResult = {
@@ -55,6 +55,8 @@ export type RoundResult = {
   winner: PlayerKey | null
   /** Points scored in this round */
   score: number
+  /** Completed yaku in this round */
+  completedYaku?: CompletedYaku[]
 }
 
 // Simplified logging system - just two event types

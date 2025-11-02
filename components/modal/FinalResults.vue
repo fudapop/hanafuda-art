@@ -116,7 +116,7 @@ defineEmits(['close'])
 const ds = useGameDataStore()
 
 const final = computed(() => {
-  let result
+  let result: string
   const [p1Score, p2Score] = [ds.scoreboard.p1, ds.scoreboard.p2]
   if (p1Score === p2Score) {
     result = 'Draw'

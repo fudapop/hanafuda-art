@@ -167,14 +167,14 @@
       @save="handleSaveAndExit"
       @forfeit="handleForfeitAndExit"
     />
-    <LazyFeedbackForm
+    <!-- <LazyFeedbackForm
       :open="promptFeedback"
       @close="
         () => {
           promptFeedback = false
         }
       "
-    />
+    /> -->
     <LazySignupPrompt
       :open="promptSignup"
       @cancel="handleSignupCancel"
@@ -199,7 +199,7 @@ const { current: user } = useProfile()
 const gameStart = useState('start', () => false)
 const leavingGame = ref(false)
 const isSaving = ref(false)
-const promptFeedback = ref(false)
+// const promptFeedback = ref(false)
 const promptSignup = ref(false)
 const showLoader = ref(false)
 const player1Inactive = computed(() => gameStart.value && !players.value.p1.isActive)
@@ -249,13 +249,6 @@ const handleForfeitAndExit = () => {
   gameStart.value = false
 }
 
-// Keep the old handler for backward compatibility (though it's no longer used)
-const handleConfirmExit = () => {
-  $clientPosthog?.capture('exit_game_confirmed')
-  leavingGame.value = false
-  gameStart.value = false
-}
-
 const handleSignupCancel = async () => {
   $clientPosthog?.capture('signup_declined')
   showLoader.value = true
@@ -263,7 +256,7 @@ const handleSignupCancel = async () => {
   signupDeclined.value = true
   await sleep()
   showLoader.value = false
-  promptFeedback.value = true
+  // promptFeedback.value = true
 }
 
 const unwatchGame = watch([gameStart, leavingGame], async () => {
@@ -278,7 +271,7 @@ const unwatchGame = watch([gameStart, leavingGame], async () => {
     if (!feedbackSubmitted.value) {
       await sleep()
       showLoader.value = false
-      promptFeedback.value = true
+      // promptFeedback.value = true
       return
     }
     await sleep(500)

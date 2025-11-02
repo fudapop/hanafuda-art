@@ -181,8 +181,8 @@ const submitted = computed({
   get: () => user?.flags?.hasSubmittedFeedback,
   set: (value) => {
     if (!user) return
-    if (!user.flags) user.flags = {}
-    user.flags.hasSubmittedFeedback = value
+    if (!user.flags) user.flags = { isNewPlayer: true, hasSubmittedFeedback: false }
+    user.flags.hasSubmittedFeedback = value ?? false
   },
 })
 
@@ -198,7 +198,7 @@ const saveFeedback = async () => {
     ratings: ratings,
     comments,
     submitted_at: Timestamp.now(),
-    submitted_by: user.isGuest ? `g_${user?.uid}` : doc(getFirestore(), 'users', `u_${user.uid}`),
+    submitted_by: `${user.uid}`,
   })
 }
 
