@@ -136,7 +136,7 @@
           </div>
           <div class="flex items-start gap-4">
             <div class="flex-shrink-0">
-              <CircleStackIcon class="w-10 h-10 text-accent mt-0.5" />
+              <CircleStackIcon class="w-10 h-10 text-yellow-500 mt-0.5" />
             </div>
             <div class="flex-1">
               <div class="flex items-center justify-between mb-2">
@@ -308,10 +308,10 @@ const koikoiChartData = computed(() => [
 ])
 
 const koikoiChartLabels = computed(() => [
-  { name: t('profile.stats.koikoiSuccess'), color: '#22c55e' },
-  { name: t('profile.stats.koikoiFail'), color: '#ef4444' },
-  { name: t('profile.stats.koikoiStack'), color: '#ffe6a0' },
-  { name: t('profile.stats.koikoiReversal'), color: '#171311' },
+  { name: t('profile.stats.koikoiSuccess'), color: '#16a34a' }, // green-600
+  { name: t('profile.stats.koikoiFail'), color: '#ef4444' }, // red-500
+  { name: t('profile.stats.koikoiReversal'), color: '#f97316' }, // orange-500
+  { name: t('profile.stats.koikoiStack'), color: '#eab308' }, // yellow-100
 ])
 
 const koikoiChartCategories = computed(() =>

@@ -142,7 +142,7 @@
             <div class="flex-shrink-0">
               <Icon
                 name="mdi:trophy"
-                class="w-10 h-10 text-green-500 mt-0.5"
+                class="w-10 h-10 text-green-600 mt-0.5"
               />
             </div>
             <div class="flex-1">
@@ -200,7 +200,7 @@
             <div class="flex-shrink-0">
               <Icon
                 name="mdi:trophy"
-                class="w-10 h-10 text-green-500 mt-0.5"
+                class="w-10 h-10 text-green-600 mt-0.5"
               />
             </div>
             <div class="flex-1">
@@ -303,7 +303,7 @@ const roundsWinRatio = computed(() => {
 })
 
 const chartLabels = computed(() => [
-  { name: t('profile.stats.wins'), color: '#22c55e' }, // green-500
+  { name: t('profile.stats.wins'), color: '#16a34a' }, // green-600
   { name: t('profile.stats.losses'), color: '#ef4444' }, // red-500
   { name: t('profile.stats.draws'), color: '#eab308' }, // yellow-500
 ])
