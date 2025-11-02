@@ -99,6 +99,11 @@
       :title="t('profile.stats.koikoiCalls')"
       :data="koikoiChartData"
       :categories="koikoiChartCategories"
+      :center-data="{
+        name: `${t('profile.stats.koikoiSuccess')} %`,
+        value: `${koikoiSuccessRatio.toFixed(2)}%`,
+      }"
+      :start-date="startDate"
       @close="showKoikoiModal = false"
     >
       <template #legend>
@@ -174,6 +179,7 @@
       :title="t('profile.stats.cardsCapturedByType')"
       :data="cardsChartData"
       :categories="cardsChartCategories"
+      :start-date="startDate"
       @close="showCardsModal = false"
     >
       <template #legend>
@@ -245,6 +251,7 @@
       :title="t('profile.stats.yakuBreakdown')"
       :data="yakuChartData"
       :categories="yakuChartCategories"
+      :start-date="startDate"
       @close="showYakuModal = false"
     >
       <template #legend>
@@ -285,6 +292,8 @@ import {
 const { t } = useI18n()
 
 const user = useProfile().current
+const startDate = computed(() => normalizeTimestamp(user.value?.stats._meta.createdAt))
+
 const showKoikoiModal = ref(false)
 const showCardsModal = ref(false)
 const showYakuModal = ref(false)
@@ -298,6 +307,13 @@ const totalKoikoiCalls = computed(() => {
     user.value.stats.koikoiCalled_stack +
     user.value.stats.koikoiCalled_reversal
   )
+})
+
+const koikoiSuccessRatio = computed(() => {
+  const total =
+    (user.value?.stats.koikoiCalled_success || 0) + (user.value?.stats.koikoiCalled_fail || 0)
+  if (total === 0) return 0
+  return ((user.value?.stats.koikoiCalled_success || 0) / total) * 100
 })
 
 const koikoiChartData = computed(() => [

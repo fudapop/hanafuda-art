@@ -158,7 +158,7 @@
       "gameplayStats": "Статистика Игры",
       "yakuBreakdown": "Разбивка Яку",
       "roundsBreakdown": "Разбивка Раундов",
-      "gamesPlayed": "Сыграно Игр",
+      "gamesCompleted": "Сыграно Игр",
       "gamesBreakdown": "Разбивка Игр"
     },
     "sync": {

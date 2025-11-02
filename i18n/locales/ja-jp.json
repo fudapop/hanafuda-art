@@ -158,7 +158,7 @@
       "gameplayStats": "ゲームプレイ統計",
       "yakuBreakdown": "役の内訳",
       "roundsBreakdown": "ラウンドの内訳",
-      "gamesPlayed": "対戦数",
+      "gamesCompleted": "対戦数",
       "gamesBreakdown": "対戦の内訳"
     },
     "sync": {

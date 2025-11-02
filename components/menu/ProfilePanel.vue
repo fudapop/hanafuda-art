@@ -106,7 +106,7 @@
     >
       <HorizontalBarStatCard
         icon="mdi:trophy"
-        :label="t('profile.stats.gamesPlayed')"
+        :label="t('profile.stats.gamesCompleted')"
         :wins="user.record.win"
         :losses="user.record.loss"
         :draws="user.record.draw"
@@ -192,6 +192,7 @@
       :data="roundsChartData"
       :categories="roundsChartCategories"
       :center-data="{ name: 'W/L %', value: `${(roundsWinRatio * 100).toFixed(2)}%` }"
+      :start-date="startDate"
       @close="showRoundsModal = false"
     >
       <template #legend>
@@ -263,11 +264,8 @@ const username = computed({
     if (user.value) user.value.username = username
   },
 })
-const record = computed(() => ({
-  [t('profile.stats.wins')]: Number(user.value?.record.win),
-  [t('profile.stats.losses')]: Number(user.value?.record.loss),
-  [t('profile.stats.draws')]: Number(user.value?.record.draw),
-}))
+
+const startDate = computed(() => normalizeTimestamp(user.value?.stats._meta.createdAt))
 
 // Games & Rounds Played Modals
 const showGamesModal = ref(false)
