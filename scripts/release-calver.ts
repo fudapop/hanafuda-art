@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S deno run --allow-read --allow-write --allow-env --allow-run
 
 /**
  * CalVer Release Script
@@ -6,43 +6,112 @@
  * Example: 2025.10.1, 2025.10.2, 2025.11.1
  *
  * Usage:
- *   node release-calver.cjs           # Run release process
- *   node release-calver.cjs --dry-run  # Preview what would be done
- *   node release-calver.cjs -d         # Same as --dry-run
+ *   deno run --allow-read --allow-write --allow-env --allow-run scripts/release-calver.ts           # Run release process
+ *   deno run --allow-read --allow-write --allow-env --allow-run scripts/release-calver.ts --dry-run  # Preview what would be done
+ *   deno run --allow-read --allow-write --allow-env --allow-run scripts/release-calver.ts -d         # Same as --dry-run
  */
 
-const fs = require('fs')
-const { execSync } = require('child_process')
-const path = require('path')
+import { join } from '@std/path/join'
 
 // Parse command line arguments
-const args = process.argv.slice(2)
-const isDryRun = args.includes('--dry-run') || args.includes('-d')
+const isDryRun = Deno.args.includes('--dry-run') || Deno.args.includes('-d')
 
-const PACKAGE_JSON = path.join(__dirname, '../package.json')
+const PACKAGE_JSON = join(import.meta.dirname!, '../package.json')
+
+/**
+ * Parse command string into command and args, handling quoted strings
+ */
+const parseCommand = (cmd: string): { command: string; args: string[] } => {
+  const args: string[] = []
+  let current = ''
+  let inQuotes = false
+  let quoteChar = ''
+
+  for (let i = 0; i < cmd.length; i++) {
+    const char = cmd[i]
+    if ((char === '"' || char === "'") && (i === 0 || cmd[i - 1] !== '\\')) {
+      if (!inQuotes) {
+        inQuotes = true
+        quoteChar = char
+      } else if (char === quoteChar) {
+        inQuotes = false
+        quoteChar = ''
+      } else {
+        current += char
+      }
+    } else if (char === ' ' && !inQuotes) {
+      if (current) {
+        args.push(current)
+        current = ''
+      }
+    } else {
+      current += char
+    }
+  }
+  if (current) {
+    args.push(current)
+  }
+
+  return { command: args[0], args: args.slice(1) }
+}
 
 /**
  * Execute shell command and return output
  */
-const exec = (cmd, options = {}) => {
+const exec = async (cmd: string, options: { skipDryRun?: boolean } = {}) => {
   if (isDryRun && options.skipDryRun !== true) {
     console.log(`[DRY RUN] Would execute: ${cmd}`)
     return ''
   }
   try {
-    return execSync(cmd, { encoding: 'utf8', stdio: 'inherit', ...options })
+    // Handle commands with && (e.g., "git push && git push --tags")
+    if (cmd.includes(' && ')) {
+      const commands = cmd.split(' && ')
+      for (const subCmd of commands) {
+        await exec(subCmd.trim(), { skipDryRun: true })
+      }
+      return ''
+    }
+
+    const { command, args } = parseCommand(cmd)
+
+    const process = new Deno.Command(command, {
+      args,
+      stdout: 'inherit',
+      stderr: 'inherit',
+      stdin: 'inherit',
+    })
+
+    const { code } = await process.output()
+    if (code !== 0) {
+      console.error(`Command failed: ${cmd} (exit code: ${code})`)
+      Deno.exit(1)
+    }
+    return ''
   } catch (error) {
     console.error(`Command failed: ${cmd}`, error)
-    process.exit(1)
+    Deno.exit(1)
   }
 }
 
 /**
  * Execute shell command silently and return output
  */
-const execSilent = (cmd) => {
+const execSilent = async (cmd: string): Promise<string> => {
   try {
-    return execSync(cmd, { encoding: 'utf8', stdio: 'pipe' }).trim()
+    const { command, args } = parseCommand(cmd)
+
+    const process = new Deno.Command(command, {
+      args,
+      stdout: 'piped',
+      stderr: 'piped',
+    })
+
+    const { code, stdout } = await process.output()
+    if (code !== 0) {
+      return ''
+    }
+    return new TextDecoder().decode(stdout).trim()
   } catch {
     return ''
   }
@@ -51,7 +120,7 @@ const execSilent = (cmd) => {
 /**
  * Parse CalVer version string
  */
-const parseCalVer = (version) => {
+const parseCalVer = (version: string) => {
   const match = version.match(/^(\d{4})\.(\d{1,2})\.(\d+)$/)
   if (!match) return null
   return {
@@ -64,7 +133,7 @@ const parseCalVer = (version) => {
 /**
  * Calculate next CalVer version
  */
-const getNextVersion = (currentVersion) => {
+const getNextVersion = (currentVersion: string): string => {
   const now = new Date()
   const currentYear = now.getFullYear()
   const currentMonth = now.getMonth() + 1 // 0-indexed
@@ -84,22 +153,22 @@ const getNextVersion = (currentVersion) => {
     return `${currentYear}.${currentMonth}.${parsed.micro + 1}`
   }
 
-  // New month or year, reset micro to 1
-  return `${currentYear}.${currentMonth}.1`
+  // New month or year, reset micro to 0
+  return `${currentYear}.${currentMonth}.0`
 }
 
 /**
  * Check if git signing key is configured
  */
-const hasSigningKey = () => {
-  const signingKey = execSilent('git config --get user.signingkey')
+const hasSigningKey = async (): Promise<boolean> => {
+  const signingKey = await execSilent('git config --get user.signingkey')
   return signingKey.length > 0
 }
 
 /**
  * Main release process
  */
-const main = () => {
+const main = async () => {
   if (isDryRun) {
     console.log('🗓️  CalVer Release Process (DRY RUN MODE)\n')
     console.log('⚠️  This is a dry run. No changes will be made.\n')
@@ -108,14 +177,15 @@ const main = () => {
   }
 
   // Check for uncommitted changes
-  const status = execSilent('git status --porcelain')
+  const status = await execSilent('git status --porcelain')
   if (status) {
     console.error('❌ Error: You have uncommitted changes. Please commit or stash them first.')
-    process.exit(1)
+    Deno.exit(1)
   }
 
   // Read current version
-  const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, 'utf8'))
+  const pkgText = Deno.readTextFileSync(PACKAGE_JSON)
+  const pkg = JSON.parse(pkgText)
   const currentVersion = pkg.version
   const nextVersion = getNextVersion(currentVersion)
 
@@ -129,13 +199,13 @@ const main = () => {
     console.log('')
   } else {
     pkg.version = nextVersion
-    fs.writeFileSync(PACKAGE_JSON, JSON.stringify(pkg, null, 2) + '\n')
+    Deno.writeTextFileSync(PACKAGE_JSON, JSON.stringify(pkg, null, 2) + '\n')
     console.log('✅ Updated package.json\n')
   }
 
   // Run prerelease hook (tests)
   console.log('🧪 Running prerelease tests...')
-  exec('pnpm test')
+  await exec('pnpm test')
   if (!isDryRun) {
     console.log('✅ Tests passed\n')
   } else {
@@ -144,7 +214,7 @@ const main = () => {
 
   // Run version hook (generate static site)
   console.log('🏗️  Generating static site...')
-  exec('pnpm generate')
+  await exec('pnpm generate')
   if (!isDryRun) {
     console.log('✅ Site generated\n')
   } else {
@@ -153,7 +223,7 @@ const main = () => {
 
   // Stage all changes
   console.log('📋 Staging changes...')
-  exec('git add -A')
+  await exec('git add -A')
   if (!isDryRun) {
     console.log('✅ Changes staged\n')
   } else {
@@ -161,12 +231,14 @@ const main = () => {
   }
 
   // Create signed commit
-  const shouldSign = hasSigningKey()
-  const signFlag = shouldSign ? '-S' : ''
+  const shouldSign = await hasSigningKey()
   const commitMessage = `Release v${nextVersion}`
+  const commitCmd = shouldSign
+    ? `git commit -S -m "${commitMessage}"`
+    : `git commit -m "${commitMessage}"`
 
   console.log(`📝 Creating commit: "${commitMessage}"${shouldSign ? ' (signed)' : ''}`)
-  exec(`git commit ${signFlag} -m "${commitMessage}"`)
+  await exec(commitCmd)
   if (!isDryRun) {
     console.log('✅ Commit created\n')
   } else {
@@ -175,7 +247,7 @@ const main = () => {
 
   // Create git tag
   console.log(`🏷️  Creating tag: v${nextVersion}`)
-  exec(`git tag v${nextVersion}`)
+  await exec(`git tag v${nextVersion}`)
   if (!isDryRun) {
     console.log('✅ Tag created\n')
   } else {
@@ -184,7 +256,7 @@ const main = () => {
 
   // Push changes and tags
   console.log('⬆️  Pushing to remote...')
-  exec('git push && git push --tags')
+  await exec('git push && git push --tags')
   if (!isDryRun) {
     console.log('✅ Pushed to remote\n')
   } else {
@@ -193,7 +265,7 @@ const main = () => {
 
   // Deploy preview
   console.log('🚀 Deploying preview...')
-  exec('pnpm deploy:preview')
+  await exec('pnpm deploy:preview')
   if (!isDryRun) {
     console.log('✅ Preview deployed\n')
   } else {

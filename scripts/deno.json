@@ -1,7 +1,12 @@
 {
+  "imports": {
+    "@std/path": "jsr:@std/path@1.1.1"
+  },
   "tasks": {
     "upload-to-static": "deno run --allow-read --allow-write --allow-env --allow-net --allow-run ./upload-to-static.ts",
     "translate-content": "export $(cat ../.env | grep GEMINI_API_KEY | tr -d ' \t\r\n') && deno run --allow-read --allow-write --allow-env --allow-net --allow-run --allow-sys ./translate-content.ts",
-    "translate-json": "export $(cat ../.env | grep GEMINI_API_KEY | tr -d ' \t\r\n') && deno run --allow-read --allow-write --allow-env --allow-net --allow-run --allow-sys ./translate-json.ts"
+    "translate-json": "export $(cat ../.env | grep GEMINI_API_KEY | tr -d ' \t\r\n') && deno run --allow-read --allow-write --allow-env --allow-net --allow-run --allow-sys ./translate-json.ts",
+    "release": "deno run --allow-read --allow-write --allow-env --allow-run ./release-calver.ts",
+    "release:dry-run": "deno run --allow-read --allow-write --allow-env --allow-run ./release-calver.ts --dry-run"
   }
 }

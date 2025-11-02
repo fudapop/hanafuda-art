@@ -14,7 +14,7 @@
     "deploy:preview": "firebase hosting:channel:deploy v$(node -p \"require('./package.json').version\")",
     "deploy:prod": "firebase deploy --only hosting",
     "postinstall": "nuxt prepare",
-    "release": "node scripts/release-calver.cjs",
+    "release": "deno run --allow-read --allow-write --allow-env --allow-run scripts/release-calver.ts",
     "type:gen": "supabase gen types --lang typescript --project-id ymoriyakbittfgocvxbw --schema public,storage > supabase/types.ts",
     "ui:add": "pnpm dlx shadcn-vue@latest add"
   },
