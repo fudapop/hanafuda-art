@@ -68,6 +68,7 @@
     "genkit": "^1.16.1",
     "lucide-vue-next": "^0.542.0",
     "nanoid": "^5.0.7",
+    "nuxt-charts": "^1.0.2",
     "nuxt-vuefire": "^0.2.12",
     "pinia": "^2.1.4",
     "posthog-js": "^1.260.3",

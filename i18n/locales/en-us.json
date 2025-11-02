@@ -148,12 +148,18 @@
       "totalCardsCaptured": "Cards Captured",
       "totalRoundsPlayed": "Rounds Played",
       "koikoiCalls": "Koi-Koi Calls",
+      "totalCalls": "Total Calls",
       "koikoiSuccess": "Success",
       "koikoiFail": "Failed",
+      "koikoiStack": "Stack",
       "koikoiReversal": "Reversals",
       "cardsCapturedByType": "Cards by Type",
       "detailedStats": "Detailed Stats",
-      "gameplayStats": "Gameplay Stats"
+      "gameplayStats": "Gameplay Stats",
+      "yakuBreakdown": "Yaku Breakdown",
+      "roundsBreakdown": "Rounds Breakdown",
+      "gamesPlayed": "Games Played",
+      "gamesBreakdown": "Games Breakdown"
     },
     "sync": {
       "status": "Sync Status",
@@ -169,6 +175,7 @@
         "title": "Koi-Koi Stats Explanation",
         "success": "You called Koi-Koi and won the round",
         "fail": "You called Koi-Koi but lost the round (loss or draw)",
+        "stack": "You called Koi-Koi multiple times in a single round",
         "reversal": "The opponent called Koi-Koi, but you won the round"
       }
     }

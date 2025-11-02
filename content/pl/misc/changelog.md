@@ -1,5 +1,10 @@
 # Dziennik zmian
 
+## [Niewydane]
+
+### Nowe funkcje
+- **Ulepszony panel statystyk**: Przeprojektowano statystyki gracza z interaktywnymi wizualizacjami. Wszystkie karty statystyk zawierają teraz mini wykresy kołowe pokazujące rozkład danych na pierwszy rzut oka, a kliknięcie dowolnej karty otwiera szczegółowy modal z pełnymi podziałami. Dodano śledzenie "Rozegranych Gier" obok "Rozegranych Rund", aby rozróżnić ogólne wyniki meczów od wyników poszczególnych rund. Kategorie statystyk obejmują: Zdobyte Karty według typu, Ukończone Yaku, wyniki Wywołań Koi-Koi, wyniki Rozegranych Rund i wyniki Rozegranych Gier.
+
 ## [2025.10.1] - 2025-10-30
 
 ### Aktualizacje projektu

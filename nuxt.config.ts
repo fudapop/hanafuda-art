@@ -151,6 +151,7 @@ export default defineNuxtConfig({
     '@nuxtjs/device',
     'nuxt-posthog',
     'shadcn-nuxt',
+    'nuxt-charts',
   ],
   postcss: {
     plugins: {

@@ -496,6 +496,7 @@ export {
   updateTsukiFuda,
   viewingYaku,
   YAKU,
+  YAKU_NAMES,
   type CompletedYaku,
   type Yaku,
   type YakuName,

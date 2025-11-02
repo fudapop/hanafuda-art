@@ -99,244 +99,156 @@
       <LoginButton />
     </div>
 
-    <!-- Player Record -->
+    <!-- Games & Rounds Played -->
     <div
       v-if="user?.record"
-      class="mx-2 my-3 rounded-lg bg-surface border border-border overflow-hidden"
+      class="mx-2 my-3 grid sm:grid-cols-2 gap-3"
     >
-      <h3 class="sr-only">{{ t('profile.info.playerRecord') }}</h3>
-      <dl class="flex justify-around p-2">
-        <div
-          v-for="(val, key) in record"
-          :key="key"
-          class="px-4 py-4 overflow-hidden text-center flex-1"
-        >
-          <dt class="text-sm font-medium truncate text-text-secondary capitalize">
-            {{ key }}
-          </dt>
-          <dd class="text-2xl font-bold tracking-tight text-text sm:text-3xl">
-            {{ val }}
-          </dd>
-        </div>
-      </dl>
+      <HorizontalBarStatCard
+        icon="mdi:trophy"
+        :label="t('profile.stats.gamesPlayed')"
+        :wins="user.record.win"
+        :losses="user.record.loss"
+        :draws="user.record.draw"
+        @click="showGamesModal = true"
+      />
+
+      <HorizontalBarStatCard
+        icon="mdi:gamepad-variant"
+        :label="t('profile.stats.totalRoundsPlayed')"
+        :wins="user.stats.roundsPlayed_win"
+        :losses="user.stats.roundsPlayed_loss"
+        :draws="user.stats.roundsPlayed_draw"
+        @click="showRoundsModal = true"
+      />
     </div>
 
     <!-- Detailed Stats -->
-    <div
-      v-if="user?.stats"
-      class="mx-2 my-3"
+    <PlayerStatsPanel />
+
+    <!-- Games Played Breakdown Modal -->
+    <DonutChartModal
+      v-if="user?.record"
+      :open="showGamesModal"
+      :title="t('profile.stats.gamesBreakdown')"
+      :data="gamesChartData"
+      :categories="gamesChartCategories"
+      :center-data="{ name: 'W/L %', value: `${(gamesWinRatio * 100).toFixed(2)}%` }"
+      @close="showGamesModal = false"
     >
-      <!-- Overview Stats Cards -->
-      <div class="grid grid-cols-3 gap-3 mb-3">
-        <div class="rounded-lg bg-surface border border-border p-3">
-          <dt class="text-sm font-medium text-text-secondary mb-2 flex items-center gap-1.5">
-            <Icon name="mdi:cards-variant" />
-            {{ t('profile.stats.totalCardsCaptured') }}
-          </dt>
-          <dd class="text-2xl font-bold text-text">
-            {{ user.stats.totalCardsCaptured }}
-          </dd>
-        </div>
-        <div class="rounded-lg bg-surface border border-border p-3">
-          <dt class="text-sm font-medium text-text-secondary mb-2 flex items-center gap-1.5">
-            <!-- <span class="text-base">🎯</span> -->
-            <Icon name="mdi:cards" />
-            {{ t('profile.stats.totalYakuCompleted') }}
-          </dt>
-          <dd class="text-2xl font-bold text-text">
-            {{ user.stats.totalYakuCompleted }}
-          </dd>
-        </div>
-        <div class="rounded-lg bg-surface border border-border p-3">
-          <dt class="text-sm font-medium text-text-secondary mb-2 flex items-center gap-1.5">
-            <Icon name="mdi:gamepad-variant" />
-            {{ t('profile.stats.totalRoundsPlayed') }}
-          </dt>
-          <dd class="text-2xl font-bold text-text">
-            {{ user.stats.totalRoundsPlayed }}
-          </dd>
-        </div>
-      </div>
-
-      <!-- Koi-Koi Calls -->
-      <div class="rounded-lg bg-surface border border-border p-3 mb-3">
-        <div class="flex items-center justify-between mb-3">
-          <h4 class="text-sm font-semibold text-text-secondary">
-            {{ t('profile.stats.koikoiCalls') }}
-          </h4>
-          <button
-            @click="showKoikoiHelp = true"
-            class="hover:opacity-70 transition-opacity"
-            type="button"
-          >
-            <QuestionMarkCircleIcon class="w-4 h-4 text-text-secondary" />
-          </button>
-        </div>
-        <dl class="grid grid-cols-3 gap-3">
-          <div class="text-center">
-            <dt
-              class="text-sm font-medium text-text-secondary flex items-center justify-center gap-1.5 mb-2"
-            >
-              <Icon name="mdi:check" />
-              {{ t('profile.stats.koikoiSuccess') }}
-            </dt>
-            <dd class="text-xl font-bold text-text">
-              {{ user.stats.koikoiCalled_success }}
-            </dd>
-          </div>
-          <div class="text-center">
-            <dt
-              class="text-sm font-medium text-text-secondary flex items-center justify-center gap-1.5 mb-2"
-            >
-              <Icon name="mdi:close" />
-              {{ t('profile.stats.koikoiFail') }}
-            </dt>
-            <dd class="text-xl font-bold text-text">
-              {{ user.stats.koikoiCalled_fail }}
-            </dd>
-          </div>
-          <div class="text-center">
-            <dt
-              class="text-sm font-medium text-text-secondary flex items-center justify-center gap-1.5 mb-2"
-            >
-              <Icon name="mdi:sync" />
-              {{ t('profile.stats.koikoiReversal') }}
-            </dt>
-            <dd class="text-xl font-bold text-text">
-              {{ user.stats.koikoiCalled_reversal }}
-            </dd>
-          </div>
-        </dl>
-      </div>
-
-      <!-- Cards by Type -->
-      <div class="rounded-lg bg-surface border border-border p-3">
-        <h4 class="text-sm font-semibold text-text-secondary mb-3">
-          {{ t('profile.stats.cardsCapturedByType') }}
-        </h4>
-        <dl class="grid grid-cols-4 gap-3">
-          <div class="text-center">
-            <dt class="text-sm font-medium text-text-secondary mb-2 capitalize">
-              <Icon
-                name="material-symbols:sunny"
-                class="mb-1"
-              />
-              {{ t('game.cardTypes.brights') }}
-            </dt>
-            <dd class="text-xl font-bold text-text">
-              {{ user.stats.cardsCaptured_bright }}
-            </dd>
-          </div>
-          <div class="text-center">
-            <dt class="text-sm font-medium text-text-secondary mb-2 capitalize">
-              <Icon
-                name="lucide:panda"
-                class="mb-1"
-              />
-              {{ t('game.cardTypes.animals') }}
-            </dt>
-            <dd class="text-xl font-bold text-text">
-              {{ user.stats.cardsCaptured_animal }}
-            </dd>
-          </div>
-          <div class="text-center">
-            <dt class="text-sm font-medium text-text-secondary mb-2 capitalize">
-              <Icon
-                name="game-icons:scroll-unfurled"
-                class="mb-1"
-              />
-              {{ t('game.cardTypes.ribbons') }}
-            </dt>
-            <dd class="text-xl font-bold text-text">
-              {{ user.stats.cardsCaptured_ribbon }}
-            </dd>
-          </div>
-          <div class="text-center">
-            <dt class="text-sm font-medium text-text-secondary mb-2 capitalize">
-              <Icon
-                name="ph:plant-fill"
-                class="mb-1"
-              />
-              {{ t('game.cardTypes.plains') }}
-            </dt>
-            <dd class="text-xl font-bold text-text">
-              {{ user.stats.cardsCaptured_plain }}
-            </dd>
-          </div>
-        </dl>
-      </div>
-    </div>
-
-    <!-- Koi-Koi Help Modal -->
-    <Modal :open="showKoikoiHelp">
-      <template #title>
-        {{ t('profile.help.koikoiStats.title') }}
-      </template>
-      <template #description>
-        <div class="space-y-4 text-left px-2">
-          <div class="flex items-start gap-4">
+      <template #legend>
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
             <div class="flex-shrink-0">
-              <CheckCircleIcon class="w-10 h-10 text-green-500 mt-0.5" />
+              <Icon
+                name="mdi:trophy"
+                class="w-10 h-10 text-green-500 mt-0.5"
+              />
             </div>
             <div class="flex-1">
-              <strong class="text-text block mb-2">{{ t('profile.stats.koikoiSuccess') }}</strong>
-              <p class="text-sm text-text-secondary leading-relaxed">
-                {{ t('profile.help.koikoiStats.success') }}
-              </p>
+              <div class="flex items-center justify-between">
+                <strong class="text-text capitalize">{{ t('profile.stats.wins') }}</strong>
+                <span class="text-lg font-bold text-text">{{ user.record.win }}</span>
+              </div>
             </div>
           </div>
-          <div class="flex items-start gap-4">
+          <div class="flex items-center gap-4">
             <div class="flex-shrink-0">
-              <XCircleIcon class="w-10 h-10 text-red-500 mt-0.5" />
+              <Icon
+                name="mdi:close"
+                class="w-10 h-10 text-red-500 mt-0.5"
+              />
             </div>
             <div class="flex-1">
-              <strong class="text-text block mb-2">{{ t('profile.stats.koikoiFail') }}</strong>
-              <p class="text-sm text-text-secondary leading-relaxed">
-                {{ t('profile.help.koikoiStats.fail') }}
-              </p>
+              <div class="flex items-center justify-between">
+                <strong class="text-text capitalize">{{ t('profile.stats.losses') }}</strong>
+                <span class="text-lg font-bold text-text">{{ user.record.loss }}</span>
+              </div>
             </div>
           </div>
-          <div class="flex items-start gap-4">
+          <div class="flex items-center gap-4">
             <div class="flex-shrink-0">
-              <ArrowPathIcon class="w-10 h-10 text-primary mt-0.5" />
+              <Icon
+                name="material-symbols:handshake"
+                class="w-10 h-10 text-yellow-500 mt-0.5"
+              />
             </div>
             <div class="flex-1">
-              <strong class="text-text block mb-2">{{ t('profile.stats.koikoiReversal') }}</strong>
-              <p class="text-sm text-text-secondary leading-relaxed">
-                {{ t('profile.help.koikoiStats.reversal') }}
-              </p>
+              <div class="flex items-center justify-between">
+                <strong class="text-text capitalize">{{ t('profile.stats.draws') }}</strong>
+                <span class="text-lg font-bold text-text">{{ user.record.draw }}</span>
+              </div>
             </div>
           </div>
         </div>
       </template>
-      <template #actions>
-        <div class="flex justify-center mt-6">
-          <button
-            class="action-button"
-            @click="showKoikoiHelp = false"
-          >
-            {{ t('common.actions.gotIt') }}
-          </button>
+    </DonutChartModal>
+
+    <!-- Rounds Played Breakdown Modal -->
+    <DonutChartModal
+      v-if="user?.stats"
+      :open="showRoundsModal"
+      :title="t('profile.stats.roundsBreakdown')"
+      :data="roundsChartData"
+      :categories="roundsChartCategories"
+      :center-data="{ name: 'W/L %', value: `${(roundsWinRatio * 100).toFixed(2)}%` }"
+      @close="showRoundsModal = false"
+    >
+      <template #legend>
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
+            <div class="flex-shrink-0">
+              <Icon
+                name="mdi:trophy"
+                class="w-10 h-10 text-green-500 mt-0.5"
+              />
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <strong class="text-text capitalize">{{ t('profile.stats.wins') }}</strong>
+                <span class="text-lg font-bold text-text">{{ user.stats.roundsPlayed_win }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="flex-shrink-0">
+              <Icon
+                name="mdi:close"
+                class="w-10 h-10 text-red-500 mt-0.5"
+              />
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <strong class="text-text capitalize">{{ t('profile.stats.losses') }}</strong>
+                <span class="text-lg font-bold text-text">{{ user.stats.roundsPlayed_loss }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="flex-shrink-0">
+              <Icon
+                name="material-symbols:handshake"
+                class="w-10 h-10 text-yellow-500 mt-0.5"
+              />
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <strong class="text-text capitalize">{{ t('profile.stats.draws') }}</strong>
+                <span class="text-lg font-bold text-text">{{ user.stats.roundsPlayed_draw }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </template>
-    </Modal>
+    </DonutChartModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  PencilSquareIcon,
-  QuestionMarkCircleIcon,
-  XCircleIcon,
-  ArrowPathIcon,
-} from '@heroicons/vue/24/outline'
+import { ExclamationCircleIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { onClickOutside, useDateFormat } from '@vueuse/core'
 
 const { t } = useI18n()
-
-const showKoikoiHelp = ref(false)
 
 const user = useProfile().current
 const avatar = computed({
@@ -356,6 +268,53 @@ const record = computed(() => ({
   [t('profile.stats.losses')]: Number(user.value?.record.loss),
   [t('profile.stats.draws')]: Number(user.value?.record.draw),
 }))
+
+// Games & Rounds Played Modals
+const showGamesModal = ref(false)
+const showRoundsModal = ref(false)
+
+// Chart data for modals
+const gamesChartData = computed(() => [
+  user.value?.record.win || 0,
+  user.value?.record.loss || 0,
+  user.value?.record.draw || 0,
+])
+
+const gamesWinRatio = computed(() => {
+  if ((user.value?.record.win || 0) + (user.value?.record.loss || 0) === 0) return 0
+  return (
+    (user.value?.record.win || 0) / ((user.value?.record.win || 0) + (user.value?.record.loss || 0))
+  )
+})
+
+const roundsChartData = computed(() => [
+  user.value?.stats.roundsPlayed_win || 0,
+  user.value?.stats.roundsPlayed_loss || 0,
+  user.value?.stats.roundsPlayed_draw || 0,
+])
+
+const roundsWinRatio = computed(() => {
+  if ((user.value?.stats.roundsPlayed_win || 0) + (user.value?.stats.roundsPlayed_loss || 0) === 0)
+    return 0
+  return (
+    (user.value?.stats.roundsPlayed_win || 0) /
+    ((user.value?.stats.roundsPlayed_win || 0) + (user.value?.stats.roundsPlayed_loss || 0))
+  )
+})
+
+const chartLabels = computed(() => [
+  { name: t('profile.stats.wins'), color: '#22c55e' }, // green-500
+  { name: t('profile.stats.losses'), color: '#ef4444' }, // red-500
+  { name: t('profile.stats.draws'), color: '#eab308' }, // yellow-500
+])
+
+const gamesChartCategories = computed(() =>
+  Object.fromEntries(chartLabels.value.map((i) => [i.name, { name: i.name, color: i.color }])),
+)
+
+const roundsChartCategories = computed(() =>
+  Object.fromEntries(chartLabels.value.map((i) => [i.name, { name: i.name, color: i.color }])),
+)
 
 const usernameInputRef: Ref<HTMLInputElement | null> = ref(null)
 const usernameInputVal = ref(username.value)

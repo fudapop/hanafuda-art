@@ -148,12 +148,18 @@
       "totalCardsCaptured": "Złapane Karty",
       "totalRoundsPlayed": "Rozegrane Rundy",
       "koikoiCalls": "Wywołania Koi-Koi",
+      "totalCalls": "Całkowite Wywołania",
       "koikoiSuccess": "Sukces",
       "koikoiFail": "Niepowodzenie",
+      "koikoiStack": "Stos",
       "koikoiReversal": "Przewroty",
       "cardsCapturedByType": "Karty według Typu",
       "detailedStats": "Szczegółowe Statystyki",
-      "gameplayStats": "Statystyki Rozgrywki"
+      "gameplayStats": "Statystyki Rozgrywki",
+      "yakuBreakdown": "Podział Yaku",
+      "roundsBreakdown": "Podział Rund",
+      "gamesPlayed": "Rozegrane Gry",
+      "gamesBreakdown": "Podział Gier"
     },
     "sync": {
       "status": "Status Synchronizacji",
@@ -169,6 +175,7 @@
         "title": "Wyjaśnienie Statystyk Koi-Koi",
         "success": "Wywołałeś Koi-Koi i wygrałeś rundę",
         "fail": "Wywołałeś Koi-Koi, ale przegrałeś rundę (przegrana lub remis)",
+        "stack": "Wywołałeś Koi-Koi wielokrotnie w jednej rundzie",
         "reversal": "Przeciwnik wywołał Koi-Koi, ale ty wygrałeś rundę"
       }
     }

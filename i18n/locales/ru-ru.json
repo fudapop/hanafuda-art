@@ -148,12 +148,18 @@
       "totalCardsCaptured": "Захваченных Карт",
       "totalRoundsPlayed": "Сыгранных Раундов",
       "koikoiCalls": "Вызовы Кой-Кой",
+      "totalCalls": "Всего Вызовов",
       "koikoiSuccess": "Успешно",
       "koikoiFail": "Провал",
+      "koikoiStack": "Стек",
       "koikoiReversal": "Реверсы",
       "cardsCapturedByType": "Карты по Типу",
       "detailedStats": "Детальная Статистика",
-      "gameplayStats": "Статистика Игры"
+      "gameplayStats": "Статистика Игры",
+      "yakuBreakdown": "Разбивка Яку",
+      "roundsBreakdown": "Разбивка Раундов",
+      "gamesPlayed": "Сыграно Игр",
+      "gamesBreakdown": "Разбивка Игр"
     },
     "sync": {
       "status": "Статус Синхронизации",
@@ -169,6 +175,7 @@
         "title": "Объяснение Статистики Кой-Кой",
         "success": "Вы вызвали Кой-Кой и выиграли раунд",
         "fail": "Вы вызвали Кой-Кой, но проиграли раунд (проигрыш или ничья)",
+        "stack": "Вы вызвали Кой-Кой несколько раз в одном раунде",
         "reversal": "Противник вызвал Кой-Кой, но вы выиграли раунд"
       }
     }

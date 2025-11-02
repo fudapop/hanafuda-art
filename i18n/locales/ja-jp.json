@@ -148,12 +148,18 @@
       "totalCardsCaptured": "獲得カード数",
       "totalRoundsPlayed": "ゲーム数",
       "koikoiCalls": "こいこいコール",
+      "totalCalls": "合計コール数",
       "koikoiSuccess": "成功",
       "koikoiFail": "失敗",
+      "koikoiStack": "スタック",
       "koikoiReversal": "逆転",
       "cardsCapturedByType": "カードタイプ別獲得数",
       "detailedStats": "詳細統計",
-      "gameplayStats": "ゲームプレイ統計"
+      "gameplayStats": "ゲームプレイ統計",
+      "yakuBreakdown": "役の内訳",
+      "roundsBreakdown": "ラウンドの内訳",
+      "gamesPlayed": "対戦数",
+      "gamesBreakdown": "対戦の内訳"
     },
     "sync": {
       "status": "同期ステータス",
@@ -169,6 +175,7 @@
         "title": "こいこい統計の説明",
         "success": "こいこいを宣言してラウンドに勝利しました",
         "fail": "こいこいを宣言しましたが、ラウンドに敗北しました（負けまたは引き分け）",
+        "stack": "1ラウンドで複数回こいこいを宣言しました",
         "reversal": "相手がこいこいを宣言しましたが、あなたがラウンドに勝利しました"
       }
     }
