@@ -165,7 +165,7 @@ export default defineNuxtConfig({
     proxy: !isProduction,
     clientOptions: {
       autocapture: true,
-      persistence: 'cookie',
+      persistence: 'localStorage+cookie',
     },
   },
   router: {
