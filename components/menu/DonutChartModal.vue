@@ -95,3 +95,15 @@ const dateRange = computed(() => {
   })}`
 })
 </script>
+
+<style>
+:root {
+  --vis-donut-background-color: transparent;
+}
+
+/* Hide tooltip from charts */
+[data-vis-xy-container] svg,
+[data-vis-single-container] svg {
+  pointer-events: none;
+}
+</style>

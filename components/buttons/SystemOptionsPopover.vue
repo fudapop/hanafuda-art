@@ -76,7 +76,7 @@
         <!-- Installed PWA on mobile should already be fullscreen -->
         <div
           class="mb-3"
-          v-if="isSupported && !isMobilePWAInstalled"
+          v-if="isSupported"
         >
           <label class="block mb-2 text-xs font-medium text-white sr-only">{{
             t('common.labels.fullscreen')
@@ -283,10 +283,6 @@ const handleLocaleChange = (event: Event) => {
   setLocale(selectedLocale)
 }
 
-const { $pwa } = useNuxtApp()
-const { isMobile } = useDevice()
-const isMobilePWAInstalled = computed(() => isMobile && $pwa?.isPWAInstalled)
-
 const { isFullscreen, toggle, enter, isSupported } = useFullscreen(undefined, {
   autoExit: true,
 })
@@ -337,7 +333,7 @@ watchEffect(() => {
   // Dispatch custom event for plugin to sync immediately
   if (process.client) {
     window.dispatchEvent(new CustomEvent('color-mode-change'))
-    
+
     // Also apply directly to HTML element for immediate effect in PWA
     const html = document.documentElement
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
