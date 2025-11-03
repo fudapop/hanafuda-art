@@ -1,6 +1,23 @@
 # Dziennik zmian
 
-## [Niewydane]
+## [2025.11.1] - 2025-11-03
+
+### Nowe funkcje
+- **Wsparcie Progressive Web App (PWA)**: New Hanafuda można teraz zainstalować jako samodzielną aplikację na urządzeniu! Ciesz się natywnym doświadczeniem aplikacji z możliwością gry offline i zwiększoną wydajnością dzięki inteligentnemu buforowaniu zasobów.
+- **Ulepszone modale statystyk**: Modale statystyk wyświetlają teraz zakresy dat dla śledzonych danych i zawierają wskaźnik sukcesu Koi-Koi w centrum wykresu kołowego, zapewniając lepszy kontekst dla metryk wydajności w czasie.
+- **Wsparcie ikon offline**: Wszystkie zestawy ikon zostały skonsolidowane i skonfigurowane dla dostępu offline, zapewniając płynne doświadczenie nawet bez połączenia z internetem.
+
+### Ulepszenia UI i doświadczenia użytkownika
+- **Optymalizacja mobilna**: Urządzenia mobilne domyślnie używają teraz małego rozmiaru kart dla optymalnego wykorzystania ekranu.
+- **Inteligentne wstępne ładowanie multimediów**: Pliki audio i obrazy kart są teraz inteligentnie wstępnie ładowane przy rozpoczęciu gry, skracając czas ładowania i zapewniając płynniejszą rozgrywkę.
+- **Synchronizacja trybu kolorów**: Preferencja trybu ciemnego synchronizuje się teraz prawidłowo podczas uruchamiania aplikacji w trybie samodzielnym PWA.
+
+### Ulepszenia wydajności i techniczne
+- **Nowoczesny Service Worker**: Zaimplementowano Service Worker oparty na Workbox z inteligentnymi strategiami buforowania dla szybszego ładowania i niezawodnej funkcjonalności offline.
+- **Zoptymalizowane ładowanie zasobów**: Usunięto lazy-loading z komponentów, aby poprawić stabilność trybu offline i przewidywalne zachowanie ładowania.
+
+### Ulepszenia UI i wizualne
+- **Udoskonalony schemat kolorów**: Zaktualizowano paletę kolorów w panelach statystyk dla lepszej spójności wizualnej i czytelności.
 
 ## [2025.11.0] - 2025-11-02
 

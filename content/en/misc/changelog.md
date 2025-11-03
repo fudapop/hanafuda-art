@@ -1,6 +1,23 @@
 # Changelog
 
-## [Unreleased]
+## [2025.11.1] - 2025-11-03
+
+### New Features
+- **Progressive Web App (PWA) Support**: New Hanafuda can now be installed as a standalone app on your device! Enjoy a native app-like experience with offline play capabilities and improved performance through intelligent asset caching.
+- **Enhanced Stats Modals**: Stats modals now display date ranges for tracked data and include Koi-Koi success ratio in the center of the donut chart, giving you better context for your performance metrics over time.
+- **Offline Icon Support**: All icon sets have been consolidated and configured for offline access, ensuring a seamless experience even without an internet connection.
+
+### UI & Experience Improvements
+- **Mobile Optimization**: Mobile devices now default to the small card size for optimal screen usage.
+- **Smart Media Preloading**: Audio files and card images are now intelligently preloaded when you start the game, reducing load times and ensuring smoother gameplay.
+- **Color Mode Sync**: Dark mode preference now properly syncs when running the app in standalone PWA mode.
+
+### Performance & Technical Improvements
+- **Modern Service Worker**: Implemented Workbox-powered service worker with intelligent caching strategies for faster load times and reliable offline functionality.
+- **Optimized Asset Loading**: Removed lazy-loading from components to improve offline mode stability and predictable loading behavior.
+
+### UI & Visual Improvements
+- **Refined Color Scheme**: Updated color palette in statistics panels for improved visual consistency and readability.
 
 ## [2025.11.0] - 2025-11-02
 
