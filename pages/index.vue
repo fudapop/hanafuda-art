@@ -134,7 +134,6 @@ const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
 
 const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
-const { applyCardSizeMultiplier } = useCardDesign()
 
 const { opponentPlay, useOpponent } = useAutoplay()
 const autoOpponent: Ref<boolean> = useOpponent()
@@ -375,6 +374,9 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
   // Apply card size multiplier from user settings
-  applyCardSizeMultiplier()
+  // Default to smaller cards if mobile
+  const { isMobile } = useDevice()
+  const { applyCardSizeMultiplier } = useCardDesign()
+  applyCardSizeMultiplier(isMobile ? 0.8 : undefined)
 })
 </script>

@@ -1,5 +1,5 @@
 import CARD_DESIGNS from '~/assets/designInfo.json'
-import { useConfigStore } from '~/stores/configStore'
+import { type CardSizeOptions, useConfigStore } from '~/stores/configStore'
 import { type CardName, DECK } from '~/utils/cards'
 import { useSupabase } from './useSupabase'
 
@@ -104,9 +104,19 @@ export const useCardDesign = () => {
 
   /**
    * Apply card size multiplier from config to CSS custom properties
+   * @param multiplier - Card size option override
+   *
    */
-  const applyCardSizeMultiplier = () => {
+  const applyCardSizeMultiplier = (multiplier?: CardSizeOptions) => {
+    const validOptions: CardSizeOptions[] = [0.8, 1, 1.2]
     const config = useConfigStore()
+
+    const validMultiplier: CardSizeOptions =
+      validOptions.find((option) => option === multiplier) || config.cardSizeMultiplier
+
+    if (validMultiplier) {
+      config.cardSizeMultiplier = validMultiplier
+    }
 
     watch(
       () => config.cardSizeMultiplier,

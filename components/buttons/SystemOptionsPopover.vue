@@ -73,9 +73,10 @@
         </div>
 
         <!-- Fullscreen Toggle -->
+        <!-- Installed PWA on mobile should already be fullscreen -->
         <div
           class="mb-3"
-          v-if="isSupported"
+          v-if="isSupported && !isMobilePWAInstalled"
         >
           <label class="block mb-2 text-xs font-medium text-white sr-only">{{
             t('common.labels.fullscreen')
@@ -281,6 +282,10 @@ const handleLocaleChange = (event: Event) => {
   const selectedLocale = target.value as typeof locale.value
   setLocale(selectedLocale)
 }
+
+const { $pwa } = useNuxtApp()
+const { isMobile } = useDevice()
+const isMobilePWAInstalled = computed(() => isMobile && $pwa?.isPWAInstalled)
 
 const { isFullscreen, toggle, enter, isSupported } = useFullscreen(undefined, {
   autoExit: true,
