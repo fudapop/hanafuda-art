@@ -132,17 +132,16 @@
                     : 'text-text-secondary hover:text-primary/80',
                 ]"
               >
-                <!-- <span
-            class="absolute pt-1 m-auto text-sm opacity-50 text-text -left-3"
-            >{{ likesCount.get(design) }}</span
-            > -->
-                <Icon
-                  :name="isLiked(design) ? 'heroicons:heart-solid' : 'heroicons:heart'"
+                <HeartSolidIcon
+                  v-if="isLiked(design)"
+                  class="w-6 h-6"
+                />
+                <HeartOutlineIcon
+                  v-else
                   class="w-6 h-6"
                 />
               </button>
             </div>
-
             <DesignDescription
               :design="design"
               :is-new="isNew(design)"
@@ -236,7 +235,9 @@ import {
   CheckCircleIcon,
   LockClosedIcon,
   LockOpenIcon,
+  HeartIcon as HeartSolidIcon,
 } from '@heroicons/vue/20/solid'
+import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import { useToast } from 'vue-toastification'
 import DesignDescription from './DesignDescription.vue'
 

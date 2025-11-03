@@ -121,7 +121,7 @@
               size="icon"
               @click="showLogPanel"
             >
-              <Icon name="radix-icons:activity-log" />
+              <Icon name="mdi:format-list-bulleted" />
             </UiButton>
             <template v-if="!hPanelRef?.isCollapsed">
               <UiButton

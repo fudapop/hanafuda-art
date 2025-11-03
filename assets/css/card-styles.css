@@ -198,7 +198,7 @@
   --card-border-color: transparent;
 
   & .down {
-    --card-bg-color: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/otwarte-karty/card-back.png');
+    --card-bg-color: url('https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/cards/otwarte-karty/card-back.webp');
     background-size: cover !important;
     background-repeat: no-repeat !important;
     background-position: center !important;

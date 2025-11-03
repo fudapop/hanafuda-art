@@ -68,7 +68,7 @@
         type="button"
       >
         <div class="text-sm font-medium text-text-secondary mb-2 flex items-center gap-1.5">
-          <Icon name="mingcute:copper-coin-fill" />
+          <Icon name="mdi:chevron-double-up" />
           {{ t('profile.stats.koikoiCalls') }}
         </div>
         <div class="grid items-center grid-cols-2 gap-2">
