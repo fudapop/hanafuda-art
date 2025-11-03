@@ -54,11 +54,14 @@ const audio = useAudio()
 // Provide audio controls globally
 provide('audio', audio)
 
-onMounted(() => {
+onMounted(async () => {
   // Initialize audio with background music
   audio.initAudio(audio.BGM.main)
 
   // Setup autoplay after user interaction
   audio.setupAutoplay()
+
+  // Preload
+  audio.preloadAudioCache()
 })
 </script>

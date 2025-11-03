@@ -160,7 +160,7 @@
     </Transition>
 
     <!-- MODALS -->
-    <ExitWarning
+    <LazyExitWarning
       :open="leavingGame"
       :isSaving="isSaving"
       @cancel="leavingGame = false"
@@ -175,7 +175,7 @@
         }
       "
     /> -->
-    <SignupPrompt
+    <LazySignupPrompt
       :open="promptSignup"
       @cancel="handleSignupCancel"
     />

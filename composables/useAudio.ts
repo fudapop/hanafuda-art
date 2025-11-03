@@ -98,6 +98,13 @@ export const useAudio = () => {
     slash: `${bucketUrl}/sfx/sword-slash-and-swing-185432.mp3`,
   } as const
 
+  const getAudioSourceUrls = (): { bgm: string[]; sfx: string[]; art: string[] } => {
+    const bgm = Array.from(Object.values(BGM))
+    const sfx = Array.from(Object.values(SFX))
+    const art = Object.entries(BGM_TRACKS).map(([_, track]) => track.artwork)
+    return { bgm, sfx, art }
+  }
+
   const audioRefA = ref<HTMLAudioElement>()
   const audioRefB = ref<HTMLAudioElement>()
   const isUsingA = ref(true)
@@ -527,6 +534,14 @@ export const useAudio = () => {
     }, 50)
   }
 
+  // Preload audio files into the cache
+  const preloadAudioCache = async () => {
+    const { bgm, sfx, art } = getAudioSourceUrls()
+    // Preload the default format
+    const urls = [...bgm.filter((src) => src.endsWith('ogg')), ...sfx, ...art]
+    await Promise.allSettled(urls.map(async (url) => fetch(url, { mode: 'no-cors' })))
+  }
+
   // Enhanced setup autoplay with mobile-specific handling
   const setupAutoplay = (onInteraction?: () => void) => {
     if (!import.meta.client) return
@@ -679,6 +694,7 @@ export const useAudio = () => {
     toggleMute,
 
     // Methods
+    preloadAudioCache,
     initAudio,
     playAudio,
     pauseAudio,

@@ -235,8 +235,8 @@ import {
   CheckCircleIcon,
   LockClosedIcon,
   LockOpenIcon,
-  HeartIcon as HeartSolidIcon,
 } from '@heroicons/vue/20/solid'
+import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import { useToast } from 'vue-toastification'
 import DesignDescription from './DesignDescription.vue'

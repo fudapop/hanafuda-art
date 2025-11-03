@@ -79,27 +79,31 @@ export const useCardDesign = () => {
   }
 
   /**
-   * Asynchronously fetches the URLs for all cards in the specified design.
-   * If the design has been fetched before, the URLs are retrieved from the cache.
+   * Generates the URLs for all cards in the specified design.
    *
    * @param cardDesign Design to get card URLs for.
    * @returns Map of card names to URLs for the specified design.
    */
-  const fetchCardUrlMap = async (design: CardDesign) => {
-    // Check if the URLs are already in the cache
+  const getCardUrlMap = (design: CardDesign) => {
     let urlMap: CardMap = new Map()
 
-    // Generate URLs for Supabase (service worker will handle caching)
-    // urlMap = new Map()
-    if (!supabase.value) {
-      throw new Error('Supabase not initialized')
-    }
     for (const cardName of DECK) {
       const url = getCardUrl(cardName, design)
       urlMap.set(cardName, url)
     }
 
     return urlMap
+  }
+
+  /**
+   * Asynchronously fetch images to preload the cache
+   *
+   * @param cardDesign Design to fetch images for.
+   *
+   */
+  const preloadCardImageCache = async (design: CardDesign) => {
+    const urls = Array.from(getCardUrlMap(design).values())
+    await Promise.allSettled(urls.map((url) => fetch(url, { mode: 'no-cors' })))
   }
 
   /**
@@ -111,12 +115,13 @@ export const useCardDesign = () => {
     const validOptions: CardSizeOptions[] = [0.8, 1, 1.2]
     const config = useConfigStore()
 
+    // Use provided multiplier if valid, else use config value if valid, else default to 1
     const validMultiplier: CardSizeOptions =
-      validOptions.find((option) => option === multiplier) || config.cardSizeMultiplier
+      validOptions.find((option) => option === multiplier) ||
+      validOptions.find((option) => option === config.cardSizeMultiplier) ||
+      1
 
-    if (validMultiplier) {
-      config.cardSizeMultiplier = validMultiplier
-    }
+    config.cardSizeMultiplier = validMultiplier
 
     watch(
       () => config.cardSizeMultiplier,
@@ -132,7 +137,8 @@ export const useCardDesign = () => {
   }
 
   return {
-    fetchCardUrlMap,
+    preloadCardImageCache,
+    getCardUrlMap,
     currentDesign,
     getCardUrl,
     getDesignInfo,

@@ -243,10 +243,10 @@ export default defineNuxtConfig({
           urlPattern: /^https:\/\/.*\.supabase\.(?:co|io)\/.*/i,
           handler: 'CacheFirst',
           options: {
-            cacheName: 'supabase-cache',
+            cacheName: 'supabase-cache', // images and audio
             expiration: {
               maxEntries: 1000,
-              maxAgeSeconds: 365 * 24 * 60 * 60, // 1 hour
+              maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
             },
             cacheableResponse: {
               statuses: [0, 200],

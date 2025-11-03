@@ -375,7 +375,6 @@ onBeforeUnmount(() => {
 onMounted(() => {
   // Apply card size multiplier from user settings
   // Default to smaller cards if mobile
-  const { isMobile } = useDevice()
   const { applyCardSizeMultiplier } = useCardDesign()
   applyCardSizeMultiplier(isMobile ? 0.8 : undefined)
 })

@@ -15,23 +15,6 @@ const { roundCounter, roundOver, getCurrent } = storeToRefs(useGameDataStore())
 
 const gameIsStarted = useState('start', () => false)
 
-const { fetchCardUrlMap, currentDesign } = useCardDesign()
-
-const preloadHead = useHead({})
-
-const addImagePreloadLinks = (design: CardDesign) => {
-  fetchCardUrlMap(design).then((urlMap) => {
-    const preloadTags = Array.from(urlMap.values()).map((url) => ({
-      rel: 'preload',
-      href: url,
-      as: 'image' as const,
-    }))
-    preloadHead?.patch({
-      link: preloadTags,
-    })
-  })
-}
-
 const audio = inject('audio') as ReturnType<typeof useAudio>
 
 const { BGM, SFX } = audio
@@ -71,8 +54,14 @@ const cleanupBgm = watch(
   },
 )
 
-onMounted(() => {
-  addImagePreloadLinks(currentDesign.value)
+const { preloadCardImageCache, currentDesign } = useCardDesign()
+
+onMounted(async () => {
+  try {
+    await preloadCardImageCache(currentDesign.value)
+  } catch (error) {
+    console.error('Failed to preload card images:', error)
+  }
 })
 
 onUnmounted(() => {
