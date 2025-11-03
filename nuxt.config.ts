@@ -8,6 +8,14 @@ const localization = JSON.parse(readFileSync(resolve('./localization.json'), 'ut
 
 const headScripts = []
 
+// Apply color mode synchronously before render (critical for PWA)
+// Read from separate file for better maintainability
+const colorModeInitScript = readFileSync(resolve('./scripts/color-mode-init.js'), 'utf-8')
+headScripts.push({
+  innerHTML: colorModeInitScript,
+  type: 'text/javascript',
+})
+
 const isProduction = process.env.NODE_ENV === 'production'
 if (isProduction) {
   headScripts.push({
@@ -123,7 +131,7 @@ export default defineNuxtConfig({
   devServer: {
     port: 8888,
   },
-  devtools: { enabled: false },
+  devtools: { enabled: true },
   i18n: {
     autoDeclare: true,
     baseUrl: 'https://newhanafuda.art',

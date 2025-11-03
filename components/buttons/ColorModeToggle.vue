@@ -31,19 +31,65 @@
 </template>
 
 <script setup lang="ts">
-import { useColorMode, useCycleList } from '@vueuse/core'
+import { useColorMode, useCycleList, useStorage } from '@vueuse/core'
+
+type ColorMode = 'auto' | 'dark' | 'light'
 
 const mode = useColorMode({
   emitAuto: true,
 })
 
-const { state, next } = useCycleList(['dark', 'light', 'auto'], { initialValue: mode.value })
+// Sync with system preferences storage (used by SystemOptionsPopover)
+const systemPreferences = useStorage('hanafuda-system-preferences', {
+  colorMode: 'auto' as ColorMode,
+  fullscreen: false,
+})
+
+// Initialize state from system preferences or VueUse storage
+const initialValue = systemPreferences.value.colorMode || mode.value || 'auto'
+const { state, next } = useCycleList<ColorMode>(['dark', 'light', 'auto'], {
+  initialValue: initialValue as ColorMode,
+})
 
 const handleClick = () => {
   next()
 }
 
+// Watch for color mode changes and sync to both storage systems
 watchEffect(() => {
-  mode.value = state.value as any
+  const newMode = state.value as ColorMode
+  mode.value = newMode as any
+  systemPreferences.value.colorMode = newMode
+
+  // Dispatch custom event for plugin to sync immediately
+  if (process.client) {
+    window.dispatchEvent(new CustomEvent('color-mode-change'))
+    
+    // Also apply directly to HTML element for immediate effect in PWA
+    const html = document.documentElement
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
+    if (newMode === 'dark' || (newMode === 'auto' && prefersDark)) {
+      html.classList.add('dark')
+    } else {
+      html.classList.remove('dark')
+    }
+  }
+})
+
+// Sync initial state from storage on mount
+onMounted(() => {
+  if (systemPreferences.value.colorMode && systemPreferences.value.colorMode !== state.value) {
+    const targetMode = systemPreferences.value.colorMode
+    // Set mode value directly
+    mode.value = targetMode as any
+    
+    // Update cycle list to sync with target mode (max 2 iterations)
+    let attempts = 0
+    while (state.value !== targetMode && attempts < 3) {
+      next()
+      attempts++
+    }
+  }
 })
 </script>

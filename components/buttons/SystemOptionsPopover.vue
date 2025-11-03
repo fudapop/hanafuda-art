@@ -330,8 +330,24 @@ const handleColorModeClick = () => {
 
 // Watch for color mode changes and save to localStorage
 watchEffect(() => {
-  mode.value = colorModeState.value
-  systemPreferences.value.colorMode = colorModeState.value
+  const newMode = colorModeState.value
+  mode.value = newMode
+  systemPreferences.value.colorMode = newMode
+
+  // Dispatch custom event for plugin to sync immediately
+  if (process.client) {
+    window.dispatchEvent(new CustomEvent('color-mode-change'))
+    
+    // Also apply directly to HTML element for immediate effect in PWA
+    const html = document.documentElement
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
+    if (newMode === 'dark' || (newMode === 'auto' && prefersDark)) {
+      html.classList.add('dark')
+    } else {
+      html.classList.remove('dark')
+    }
+  }
 })
 
 // Watch for fullscreen changes and save to localStorage
