@@ -1,7 +1,7 @@
 {
   "name": "new-hanafuda",
   "private": true,
-  "version": "2025.11.0",
+  "version": "2025.11.1",
   "type": "module",
   "scripts": {
     "test": "vitest run",
