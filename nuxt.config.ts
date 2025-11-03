@@ -175,7 +175,15 @@ export default defineNuxtConfig({
       type: 'module',
     },
     manifest: {
+      id: 'com.fudapop.koikoi',
+      name: 'Hanafuda Koi-Koi',
+      short_name: 'Hanafuda Koi-Koi',
+      categories: ['games'],
       description: 'Play Hanafuda Koi-Koi',
+      display_override: ['fullscreen', 'window-controls-overlay', 'minimal-ui'],
+      display: 'standalone',
+      orientation: 'natural',
+      background_color: 'rgb(255 250 240)',
       icons: [
         {
           src: 'icons/icon_64x64.png',
@@ -198,12 +206,54 @@ export default defineNuxtConfig({
           type: 'image/png',
         },
       ],
-      name: 'New Hanafuda Koi-Koi',
-      short_name: 'Koi-Koi',
+      screenshots: [
+        {
+          src: 'screenshots/desktop-game-in-progress.webp',
+          sizes: '1280x720',
+          form_factor: 'wide',
+          label: 'Desktop view during gameplay in dark mode',
+        },
+        {
+          src: 'screenshots/mobile-menu-open.webp',
+          sizes: '750x1540',
+          form_factor: 'narrow',
+          label: 'Mobile menu open to deck selection in light mode',
+        },
+      ],
     },
     workbox: {
-      globPatterns: ['**/*.{js,css,html,webp,png,svg}'],
+      globPatterns: ['**/*.{js,css,html,webp,png}'],
       navigateFallback: '/',
+      runtimeCaching: [
+        {
+          urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'google-fonts-cache',
+            expiration: {
+              maxEntries: 4,
+              maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
+            },
+            cacheableResponse: {
+              statuses: [0, 200],
+            },
+          },
+        },
+        {
+          urlPattern: /^https:\/\/.*\.supabase\.(?:co|io)\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'supabase-cache',
+            expiration: {
+              maxEntries: 1000,
+              maxAgeSeconds: 365 * 24 * 60 * 60, // 1 hour
+            },
+            cacheableResponse: {
+              statuses: [0, 200],
+            },
+          },
+        },
+      ],
     },
   },
   router: {
