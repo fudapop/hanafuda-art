@@ -96,7 +96,7 @@
             type="button"
             :class="[
               'flex items-center gap-2 px-2 py-1 text-sm rounded-md transition-colors',
-              'focus:outline-none focus-visible:outline-none',
+              'focus:outline-hidden focus-visible:outline-hidden',
               'focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-2',
               isLiked(currentAnnouncement.id)
                 ? 'text-primary hover:text-primary/80'
@@ -163,7 +163,7 @@
           type="button"
           :disabled="currentPage === newAnnouncements.length - 1"
           :class="[
-            'flex items-center gap-2 px-3 py-1.5 text-sm rounded-sm transition-colors',
+            'flex items-center gap-2 px-3 py-1.5 text-sm rounded-xs transition-colors',
             currentPage === newAnnouncements.length - 1
               ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
               : 'text-text focus-visible:ring-1 focus-visible:ring-primary',

@@ -1,43 +1,165 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/container-queries';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+@plugin '@headlessui/tailwindcss' {
+  prefix: 'ui';
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-xs: 420px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  --color-primary: hsl(10 75% 57%);
+  --color-accent: hsl(43 71% 66%);
+
+  --color-sakura: hsl(330 82% 60%);
+  --color-sakura-light: hsl(330 87% 82%);
+  --color-sakura-dark: hsl(328 77% 42%);
+
+  --color-background: hsl(45 67% 97%);
+  --color-surface: hsl(50 40% 94%);
+  --color-border: hsl(50 30% 76%);
+
+  --color-text: hsl(10 7% 15%);
+  --color-text-secondary: hsl(35 13% 32%);
+
+  --color-hanafuda-red: hsl(10 75% 57%);
+  --color-hanafuda-gold: hsl(43 71% 66%);
+  --color-hanafuda-cream: hsl(45 67% 97%);
+  --color-hanafuda-brown: hsl(30 7% 51%);
+  --color-hanafuda-purple: hsl(270 35% 56%);
+  --color-hanafuda-green: hsl(150 30% 56%);
+}
+
+@utility card {
+  padding: 0;
+  border-radius: var(--card-radius);
+  border: var(--card-border-w) solid var(--card-border-color);
+  height: var(--card-height);
+  aspect-ratio: var(--card-aspect);
+
+  &.down {
+    background: var(--card-bg-color);
+    background-size: cover;
+  }
+}
+
+@utility down {
+  &.card {
+    background: var(--card-bg-color);
+    background-size: cover;
+  }
+}
+
+@utility pri-btn {
+  @apply relative rounded-xs inline-flex justify-center items-center px-4 py-2 font-semibold text-text dark:text-hanafuda-cream hover:bg-accent/90 bg-accent dark:bg-hanafuda-gold shadow-xs ring-1 ring-inset ring-border;
+  transition: all 0.2s ease-in-out;
+
+  [disabled]:is(&, .sec-btn, .action-button) {
+    @apply bg-gray-300 dark:bg-gray-600 text-gray-400 cursor-not-allowed ring-0 transform-none hover:ring-0;
+  }
+}
+
+@utility sec-btn {
+  @apply rounded-xs inline-flex justify-center items-center bg-surface hover:bg-surface/90 px-4 py-2 font-semibold text-text shadow-xs ring-1 ring-inset ring-border;
+  transition: all 0.2s ease-in-out;
+
+  [disabled]:is(.pri-btn, &, .action-button) {
+    @apply bg-gray-300 dark:bg-gray-600 text-gray-400 cursor-not-allowed ring-0 transform-none hover:ring-0;
+  }
+}
+
+@utility action-button {
+  @apply px-6 py-2 block mx-auto mt-2 text-xl text-text font-bold bg-background ring-2 ring-border shadow-xs hover:ring-primary transition-all duration-200 rounded-xs min-w-[150px];
+
+  [disabled]:is(.pri-btn, .sec-btn, &) {
+    @apply bg-gray-300 dark:bg-gray-600 text-gray-400 cursor-not-allowed ring-0 transform-none hover:ring-0;
+  }
+}
+
+@utility game-ui-btn {
+  @apply flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-300 bg-black/20 dark:bg-white/10 backdrop-blur-xs border border-white/20 hover:bg-black/30 dark:hover:bg-white/20 hover:scale-105 shadow-lg hover:shadow-xl;
+}
+
+@utility staged {
+  animation: fadeRight 300ms ease-in-out 100ms forwards;
+}
+
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 @layer base {
   /* Hanafuda Color Palette CSS Variables */
-  :root {
-    /* Primary and accent colors */
-    --color-primary: 10 75% 57%; /* coral-red from flower */
-    --color-accent: 43 71% 66%; /* soft gold from motif */
+  .dark {
+    /* Primary and accent colors for dark mode */
+    --color-primary: hsl(10 100% 68%); /* lighter coral for dark bg */
+    --color-accent: hsl(45 100% 77%); /* soft, light gold */
 
     /* Purple accent (petals) */
-    --color-purple: 270 35% 56%; /* muted purple */
+    --color-purple: hsl(270 45% 74%); /* lighter muted purple */
 
     /* Green accent (leaves) */
-    --color-green: 150 30% 56%; /* soft green */
+    --color-green: hsl(150 45% 70%); /* lighter, soft green */
 
-    /* Sakura variants (optional, if used elsewhere) */
-    --color-sakura: 330 82% 60%; /* pink-500 - cherry blossom pink */
-    --color-sakura-light: 330 87% 82%; /* pink-300 - lighter sakura */
-    --color-sakura-dark: 328 77% 42%; /* pink-700 - deeper sakura */
+    /* Sakura variants for dark mode */
+    --color-sakura: hsl(328 77% 42%); /* deep pink */
+    --color-sakura-light: hsl(330 87% 82%); /* same lighter sakura */
+    --color-sakura-dark: hsl(330 82% 60%); /* original sakura for contrast */
 
-    /* Natural, warm backgrounds */
-    --color-background: 45 67% 97%; /* lighter, creamier */
-    --color-surface: 50 40% 94%; /* soft off-white */
-    --color-border: 50 30% 76%; /* warm light border */
-    --color-button: 50 30% 76%; /* warm light button */
+    /* Natural, warm backgrounds for dark mode */
+    --color-background: hsl(15 15% 8%); /* deep brown-black */
+    --color-surface: hsl(30 10% 12%); /* dark, warm surface */
+    --color-border: hsl(35 10% 39%); /* muted, warm border */
+    --color-button: hsl(35 10% 39%); /* muted, warm button */
 
-    /* Text colors */
-    --color-text: 10 7% 15%; /* deep brown for contrast */
-    --color-text-secondary: 35 13% 32%; /* darker muted brown for better contrast */
+    /* Text colors for dark mode */
+    --color-text: hsl(25 35% 93%); /* warm, light text */
+    --color-text-secondary: hsl(
+      25 20% 74%
+    ); /* lighter for better contrast against dark backgrounds */
 
-    /* Game-specific colors */
-    --color-hanafuda-red: 10 75% 57%; /* coral-red */
-    --color-hanafuda-gold: 43 71% 66%; /* soft gold */
-    --color-hanafuda-cream: 45 67% 97%; /* background cream */
-    --color-hanafuda-brown: 30 7% 51%; /* natural brown */
-    --color-hanafuda-purple: 270 35% 56%; /* purple accent */
-    --color-hanafuda-green: 150 30% 56%; /* green accent */
+    /* Game-specific colors for dark mode */
+    --color-hanafuda-red: hsl(10 100% 68%); /* lighter coral */
+    --color-hanafuda-gold: hsl(45 100% 77%); /* soft, light gold */
+    --color-hanafuda-cream: hsl(15 15% 8%); /* dark background */
+    --color-hanafuda-brown: hsl(25 20% 69%); /* lighter brown for contrast */
+    --color-hanafuda-purple: hsl(270 45% 74%); /* purple accent */
+    --color-hanafuda-green: hsl(150 45% 70%); /* green accent */
+  }
 
+  :root {
     /* Shadcn colors */
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
@@ -67,39 +189,6 @@
   }
 
   .dark {
-    /* Primary and accent colors for dark mode */
-    --color-primary: 10 100% 68%; /* lighter coral for dark bg */
-    --color-accent: 45 100% 77%; /* soft, light gold */
-
-    /* Purple accent (petals) */
-    --color-purple: 270 45% 74%; /* lighter muted purple */
-
-    /* Green accent (leaves) */
-    --color-green: 150 45% 70%; /* lighter, soft green */
-
-    /* Sakura variants for dark mode */
-    --color-sakura: 328 77% 42%; /* deep pink */
-    --color-sakura-light: 330 87% 82%; /* same lighter sakura */
-    --color-sakura-dark: 330 82% 60%; /* original sakura for contrast */
-
-    /* Natural, warm backgrounds for dark mode */
-    --color-background: 15 15% 8%; /* deep brown-black */
-    --color-surface: 30 10% 12%; /* dark, warm surface */
-    --color-border: 35 10% 39%; /* muted, warm border */
-    --color-button: 35 10% 39%; /* muted, warm button */
-
-    /* Text colors for dark mode */
-    --color-text: 25 35% 93%; /* warm, light text */
-    --color-text-secondary: 25 20% 74%; /* lighter for better contrast against dark backgrounds */
-
-    /* Game-specific colors for dark mode */
-    --color-hanafuda-red: 10 100% 68%; /* lighter coral */
-    --color-hanafuda-gold: 45 100% 77%; /* soft, light gold */
-    --color-hanafuda-cream: 15 15% 8%; /* dark background */
-    --color-hanafuda-brown: 25 20% 69%; /* lighter brown for contrast */
-    --color-hanafuda-purple: 270 45% 74%; /* purple accent */
-    --color-hanafuda-green: 150 45% 70%; /* green accent */
-
     /* Shadcn colors for dark mode */
     --background: 20 14.3% 4.1%;
     --foreground: 60 9.1% 97.8%;
@@ -148,65 +237,13 @@
   *::-webkit-scrollbar {
     width: 0.3rem;
     height: 0.3rem;
-    @apply bg-gray-50/20 dark:bg-gray-700/50 rounded-sm;
+    @apply bg-gray-50/20 dark:bg-gray-700/50 rounded-xs;
   }
 
   *::-webkit-scrollbar-thumb {
     width: 0.3rem;
     height: 0.3rem;
-    @apply bg-gray-400 dark:bg-gray-300 rounded-sm;
-  }
-}
-
-@layer components {
-  .card {
-    padding: 0;
-    border-radius: var(--card-radius);
-    border: var(--card-border-w) solid var(--card-border-color);
-    height: var(--card-height);
-    aspect-ratio: var(--card-aspect);
-  }
-
-  .card.down {
-    background: var(--card-bg-color);
-    background-size: cover;
-  }
-
-  .pri-btn {
-    @apply relative rounded-sm inline-flex justify-center items-center px-4 py-2 font-semibold text-text dark:text-hanafuda-cream hover:bg-accent/90 bg-accent dark:bg-hanafuda-gold shadow-sm ring-1 ring-inset ring-border;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .sec-btn {
-    @apply rounded-sm inline-flex justify-center items-center bg-surface hover:bg-surface/90 px-4 py-2 font-semibold text-text shadow-sm ring-1 ring-inset ring-border;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .action-button {
-    @apply px-6 py-2 block mx-auto mt-2 text-xl text-text font-bold bg-background ring-2 ring-border shadow-sm hover:ring-primary transition-all duration-200 rounded-sm min-w-[150px];
-  }
-
-  [disabled]:is(.pri-btn, .sec-btn, .action-button) {
-    @apply bg-gray-300 dark:bg-gray-600 text-gray-400 cursor-not-allowed ring-0 transform-none hover:ring-0;
-  }
-
-  .game-ui-btn {
-    @apply flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-300 bg-black/20 dark:bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-black/30 dark:hover:bg-white/20 hover:scale-105 shadow-lg hover:shadow-xl;
-  }
-}
-
-@layer utilities {
-  .staged {
-    animation: fadeRight 300ms ease-in-out 100ms forwards;
-  }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    @apply bg-gray-400 dark:bg-gray-300 rounded-xs;
   }
 }
 

@@ -19,7 +19,7 @@
         :key="revealedCard"
         :card="revealedCard"
         :src="revealedCardImg"
-        class="absolute top-1/8 left-1/2 z-10 object-cover rounded-[--card-radius]"
+        class="absolute top-1/8 left-1/2 z-10 object-cover rounded-(--card-radius)"
       />
     </Transition>
     <!-- Clickable area for revealing a card -->

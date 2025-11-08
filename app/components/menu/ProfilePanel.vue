@@ -15,7 +15,7 @@
               class="absolute right-0 w-5 h-auto opacity-50 text-text-secondary bottom-4 group-hover:opacity-100"
             />
             <img
-              class="w-32 h-auto mx-auto my-2 border rounded-full sm:my-4 sm:w-36 border-border drop-shadow-sm"
+              class="w-32 h-auto mx-auto my-2 border rounded-full sm:my-4 sm:w-36 border-border drop-shadow-xs"
               :src="user.avatar"
               :alt="user.username"
             />
@@ -28,7 +28,7 @@
           <div class="relative h-10">
             <input
               ref="usernameInputRef"
-              class="w-full h-full text-lg font-semibold border-none rounded-sm peer text-text bg-surface focus:bg-background focus:outline-none focus-visible:outline-none ring-1 ring-border focus-visible:ring-primary"
+              class="w-full h-full text-lg font-semibold border-none rounded-xs peer text-text bg-surface focus:bg-background focus:outline-hidden focus-visible:outline-hidden ring-1 ring-border focus-visible:ring-primary"
               type="text"
               v-model="usernameInputVal"
               @keyup.enter="handleInputEnter"
@@ -139,7 +139,7 @@
       <template #legend>
         <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <Icon
                 name="mdi:trophy"
                 class="w-10 h-10 text-green-600 mt-0.5"
@@ -153,7 +153,7 @@
             </div>
           </div>
           <div class="flex items-center gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <Icon
                 name="mdi:close"
                 class="w-10 h-10 text-red-500 mt-0.5"
@@ -167,7 +167,7 @@
             </div>
           </div>
           <div class="flex items-center gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <Icon
                 name="material-symbols:handshake"
                 class="w-10 h-10 text-yellow-500 mt-0.5"
@@ -198,7 +198,7 @@
       <template #legend>
         <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <Icon
                 name="mdi:trophy"
                 class="w-10 h-10 text-green-600 mt-0.5"
@@ -212,7 +212,7 @@
             </div>
           </div>
           <div class="flex items-center gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <Icon
                 name="mdi:close"
                 class="w-10 h-10 text-red-500 mt-0.5"
@@ -226,7 +226,7 @@
             </div>
           </div>
           <div class="flex items-center gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <Icon
                 name="material-symbols:handshake"
                 class="w-10 h-10 text-yellow-500 mt-0.5"

@@ -7,14 +7,14 @@
       v-model="enabled"
       :class="[
         enabled ? 'bg-primary' : 'bg-border',
-        'relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-2',
+        'relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-1 focus:ring-primary focus:ring-offset-2',
       ]"
     >
       <span class="sr-only">Use setting</span>
       <span
         :class="[
           enabled ? 'translate-x-6' : 'translate-x-0',
-          'pointer-events-none relative inline-block h-5 w-5 transform rounded-md bg-white shadow ring-0 transition duration-200 ease-in-out',
+          'pointer-events-none relative inline-block h-5 w-5 transform rounded-md bg-white shadow-sm ring-0 transition duration-200 ease-in-out',
         ]"
       >
         <span
@@ -58,7 +58,7 @@
       </span>
     </HeadlessSwitch>
 
-    <span class="flex flex-col flex-grow ml-4">
+    <span class="flex flex-col grow ml-4">
       <HeadlessSwitchLabel
         as="span"
         class="text-sm font-medium leading-6 text-text"

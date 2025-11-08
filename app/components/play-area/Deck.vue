@@ -25,7 +25,7 @@
               <img
                 src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
                 alt="koi-koi bonus"
-                class="object-cover object-center drop-shadow-sm"
+                class="object-cover object-center drop-shadow-xs"
               />
             </div>
           </TransitionGroup>
@@ -74,7 +74,7 @@
 
       <!-- Show 'Draw Card' button after the first match/discard -->
       <!-- <button v-else v-show="!selectedCard && ds.checkCurrentPhase('draw')" type="button"
-        class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-indigo-600 shadow-sm card hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        class="translate-x-[8px] translate-y-[52%] absolute inset-0 my-auto text-sm font-semibold text-white bg-indigo-600 shadow-xs card hover:bg-indigo-500 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         @click="handleDraw">
         Draw Card
       </button> -->

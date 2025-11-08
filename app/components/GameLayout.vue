@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sm:[@media_(max-height:500px)]:[--card-height:80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-[100dvh] overflow-hidden relative"
+    class="sm:[@media_(max-height:500px)]:[--card-height:80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-dvh overflow-hidden relative"
   >
     <!-- BACKGROUND ELEMENTS -->
     <div

@@ -18,7 +18,7 @@
           <div class="text-2xl font-bold text-text">
             {{ user.stats.totalCardsCaptured }}
           </div>
-          <div class="flex-shrink-0 -mr-1">
+          <div class="shrink-0 -mr-1">
             <DonutChart
               hide-legend
               :data="cardsChartData"
@@ -46,7 +46,7 @@
           </div>
           <div
             v-if="yakuChartData.length > 0"
-            class="flex-shrink-0 -mr-1"
+            class="shrink-0 -mr-1"
           >
             <DonutChart
               hide-legend
@@ -77,7 +77,7 @@
           </div>
           <div
             v-if="totalKoikoiCalls > 0"
-            class="flex-shrink-0 -mr-1"
+            class="shrink-0 -mr-1"
           >
             <DonutChart
               hide-legend
@@ -110,7 +110,7 @@
         <!-- Legend with Explanations -->
         <div class="space-y-4">
           <div class="flex items-start gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <CheckCircleIcon class="w-10 h-10 text-green-500 mt-0.5" />
             </div>
             <div class="flex-1">
@@ -126,7 +126,7 @@
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <XCircleIcon class="w-10 h-10 text-red-500 mt-0.5" />
             </div>
             <div class="flex-1">
@@ -140,7 +140,7 @@
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <CircleStackIcon class="w-10 h-10 text-yellow-500 mt-0.5" />
             </div>
             <div class="flex-1">
@@ -154,7 +154,7 @@
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <ArrowPathIcon class="w-10 h-10 text-orange-500 mt-0.5" />
             </div>
             <div class="flex-1">
@@ -188,7 +188,7 @@
           <div class="flex items-start gap-3">
             <Icon
               name="material-symbols:sunny"
-              class="w-8 h-8 text-yellow-500 flex-shrink-0"
+              class="w-8 h-8 text-yellow-500 shrink-0"
             />
             <div class="flex-1">
               <div class="flex items-center justify-between mb-1">
@@ -202,7 +202,7 @@
           <div class="flex items-start gap-3">
             <Icon
               name="lucide:panda"
-              class="w-8 h-8 text-orange-500 flex-shrink-0"
+              class="w-8 h-8 text-orange-500 shrink-0"
             />
             <div class="flex-1">
               <div class="flex items-center justify-between mb-1">
@@ -216,7 +216,7 @@
           <div class="flex items-start gap-3">
             <Icon
               name="game-icons:scroll-unfurled"
-              class="w-8 h-8 text-red-500 flex-shrink-0"
+              class="w-8 h-8 text-red-500 shrink-0"
             />
             <div class="flex-1">
               <div class="flex items-center justify-between mb-1">
@@ -230,7 +230,7 @@
           <div class="flex items-start gap-3">
             <Icon
               name="ph:plant-fill"
-              class="w-8 h-8 text-green-600 flex-shrink-0"
+              class="w-8 h-8 text-green-600 shrink-0"
             />
             <div class="flex-1">
               <div class="flex items-center justify-between mb-1">
@@ -265,7 +265,7 @@
             <div class="grid">
               <div class="flex items-center gap-2">
                 <div
-                  class="w-2 h-2 rounded-full flex-shrink-0"
+                  class="w-2 h-2 rounded-full shrink-0"
                   :style="{
                     backgroundColor: yakuChartCategories[t(`game.yaku.${yaku.key}`)].color,
                   }"

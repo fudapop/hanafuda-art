@@ -44,7 +44,7 @@
             <div
               v-for="log in history"
               :key="log.timestamp"
-              class="grid h-12 flex-shrink-0 grid-cols-2 gap-1 px-4 mb-5"
+              class="grid h-12 shrink-0 grid-cols-2 gap-1 px-4 mb-5"
             >
               <template v-if="log.type === 'player'">
                 <div :class="getPlayerColor(log.player)">

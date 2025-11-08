@@ -3,7 +3,7 @@
     <button
       type="button"
       title="Open/close all"
-      class="fixed z-50 border rounded-sm text-text bg-surface bottom-16 right-3 hover:bg-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary border-border"
+      class="fixed z-50 border rounded-xs text-text bg-surface bottom-16 right-3 hover:bg-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary border-border"
       @click="openAll = !openAll"
     >
       <ChevronDownIcon :class="['w-8 h-8', openAll ? 'rotate-180' : '']" />
@@ -21,10 +21,10 @@
       >
         <HeadlessDisclosureButton
           :class="[
-            'relative grid w-full grid-cols-[repeat(2,1fr)_max-content] px-4 py-2 items-center text-sm font-medium text-left rounded-sm focus:outline-none focus-visible:ring focus-visible:ring-opacity-75',
+            'relative grid w-full grid-cols-[repeat(2,1fr)_max-content] px-4 py-2 items-center text-sm font-medium text-left rounded-xs focus:outline-hidden focus-visible:ring-3 focus-visible:ring-opacity-75',
             open && 'bg-border text-text',
             isComplete(yaku)
-              ? '!text-green-900 bg-green-400 hover:bg-green-200 focus-visible:ring-green-500'
+              ? 'text-green-900! bg-green-400 hover:bg-green-200 focus-visible:ring-green-500'
               : 'text-text bg-accent/20 hover:bg-accent/30 focus-visible:ring-primary border border-border',
           ]"
         >
@@ -92,8 +92,8 @@
                 v-for="card in yaku.cards"
                 :key="card"
                 :class="[
-                  'card overflow-hidden drop-shadow-sm relative',
-                  '[&:nth-child(n+11)]:-mt-4',
+                  'card overflow-hidden drop-shadow-xs relative',
+                  'nth-[n+11]:-mt-4',
                   '[&:nth-child(n+11):nth-child(-n+20)]:ml-4',
                   (opponentHas(card) || playerHas(card)) &&
                     'after:absolute after:inset-0 after:bg-black/60',
@@ -119,7 +119,7 @@
               class="flex items-center mt-4 text-xs text-text-secondary"
             >
               <ExclamationCircleIcon
-                class="flex-shrink-0 inline w-4 h-auto mr-1 pointer-events-none"
+                class="shrink-0 inline w-4 h-auto mr-1 pointer-events-none"
               />
               <p class="max-w-prose text-balance">
                 {{

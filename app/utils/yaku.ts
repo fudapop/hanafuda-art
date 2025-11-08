@@ -449,7 +449,7 @@ function getCompleted(collectedCards: Set<CardName>, completedYaku: YakuName[]) 
 }
 
 function checkForWin(cards: Set<CardName>): CompletedYaku | null {
-  let completed = null
+  let completed: CompletedYaku | null = null
   teyaku.forEach((name) => {
     const points = YAKU[name].check(cards)
     if (points) {
@@ -467,7 +467,12 @@ function checkForTeyaku(cardArr: CardName[]): [YakuName | null, CardName[]] {
   // Check array for 4 of same suit/flower or 4 pairs
   // Returns name of found winning/voiding condition
   // Returns null if neither found
-  let suitArr = cardArr.map((card) => CARDS[card].month)
+  let suitArr = cardArr.reduce((acc, card) => {
+    if (CARDS[card]) {
+      acc.push(CARDS[card].month)
+    }
+    return acc
+  }, [] as number[])
   let suitCount = new Map()
   for (let suit of suitArr) {
     if (suitCount.has(suit)) {
@@ -478,7 +483,7 @@ function checkForTeyaku(cardArr: CardName[]): [YakuName | null, CardName[]] {
   }
   if ([...suitCount.values()].every((count) => count === 2)) return ['kuttsuki', cardArr]
   if ([...suitCount.values()].some((count) => count === 4))
-    return ['teshi', cardArr.filter((card) => suitCount.get(CARDS[card].month) === 4)]
+    return ['teshi', cardArr.filter((card) => suitCount.get(CARDS[card]?.month) === 4)]
   return [null, [] as CardName[]]
 }
 

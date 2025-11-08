@@ -4,7 +4,7 @@
     v-if="!!focusedYaku"
   >
     <div
-      class="block w-full overflow-y-visible rounded-sm group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-border"
+      class="block w-full overflow-y-visible rounded-xs group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-border"
     >
       <!-- CARD IMAGES -->
       <div
@@ -55,7 +55,7 @@
       class="relative"
     >
       <div
-        class="block w-full overflow-hidden rounded-sm group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-border"
+        class="block w-full overflow-hidden rounded-xs group aspect-h-7 aspect-w-10 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-border"
       >
         <!-- CARD IMAGES -->
         <div

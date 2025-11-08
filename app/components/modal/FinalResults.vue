@@ -31,7 +31,7 @@
             <img
               src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
               alt="coin"
-              class="inline w-5 h-5 mb-1 ml-1 drop-shadow-sm"
+              class="inline w-5 h-5 mb-1 ml-1 drop-shadow-xs"
             />
           </span>
         </div>
@@ -63,7 +63,7 @@
           : !result.winner
             ? 'text-text bg-surface'
             : 'text-text bg-primary'
-      } px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring focus-visible:ring-primary dark:focus-visible:ring-accent focus-visible:ring-opacity-75`"
+      } px-4 py-2 text-left text-sm font-medium focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary dark:focus-visible:ring-accent focus-visible:ring-opacity-75`"
     >
       <span class="capitalize"
         >{{ t('common.labels.round') }} {{ result.round }}:

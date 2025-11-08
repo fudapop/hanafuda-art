@@ -18,7 +18,7 @@
             type="email"
             autocomplete="email"
             required
-            class="block w-full rounded-sm border-0 py-1.5 text-text bg-surface shadow-sm ring-1 ring-inset ring-border placeholder:text-text-secondary focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+            class="block w-full rounded-xs border-0 py-1.5 text-text bg-surface shadow-xs ring-1 ring-inset ring-border placeholder:text-text-secondary focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
             v-model="values.email"
             @blur="rememberEmail"
           />
@@ -38,7 +38,7 @@
             type="password"
             autocomplete="current-password"
             required
-            class="block w-full rounded-sm border-0 py-1.5 text-text bg-surface shadow-sm ring-1 ring-inset ring-border placeholder:text-text-secondary focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+            class="block w-full rounded-xs border-0 py-1.5 text-text bg-surface shadow-xs ring-1 ring-inset ring-border placeholder:text-text-secondary focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
             v-model="values.password"
           />
         </div>
@@ -108,7 +108,7 @@
                 ref="remember-me"
                 name="remember-me"
                 type="checkbox"
-                class="w-4 h-4 rounded text-primary border-border focus:ring-primary"
+                class="w-4 h-4 rounded-sm text-primary border-border focus:ring-primary"
                 v-model="rememberMe"
                 @change="rememberEmail"
               />

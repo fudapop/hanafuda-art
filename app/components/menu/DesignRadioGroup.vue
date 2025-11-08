@@ -4,7 +4,7 @@
     as="div"
     class="relative w-full @container px-4"
   >
-    <div class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-sm bg-surface">
+    <div class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-xs bg-surface">
       <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-text">
         {{ t('deck.selectADeck') }}
         <p class="ml-2 text-sm font-medium text-text-secondary whitespace-nowrap">
@@ -17,7 +17,7 @@
         <img
           src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
           alt="coin"
-          class="w-5 h-5 drop-shadow-sm"
+          class="w-5 h-5 drop-shadow-xs"
         />
         {{ coins }}
       </div>
@@ -28,7 +28,7 @@
         v-slot="{ checked }"
         :class="[
           design,
-          'group rounded-sm focus-visible:ring-1 focus-visible:ring-offset-2 focus-visible:ring-primary',
+          'group rounded-xs focus-visible:ring-1 focus-visible:ring-offset-2 focus-visible:ring-primary',
         ]"
         :value="design"
         :disabled="!unlocked?.includes(design)"
@@ -41,7 +41,7 @@
       >
         <div
           :class="[
-            'grid w-full rounded-[inherit] @lg:grid-cols-[200px,1fr] place-items-center grid-rows-[200px,1fr] @lg:grid-rows-1 relative',
+            'grid w-full rounded-[inherit] @lg:grid-cols-[200px_1fr] place-items-center grid-rows-[200px_1fr] @lg:grid-rows-1 relative',
             checked ? 'ring-2 ring-primary' : 'ring-0',
           ]"
         >
@@ -49,7 +49,7 @@
           <Transition
             mode="out-in"
             enter-to-class="opacity-100"
-            enter-from-class="opacity-0 -scale-x-[25%] motion-reduce:scale-x-100"
+            enter-from-class="opacity-0 -scale-x-25 motion-reduce:scale-x-100"
             enter-active-class="duration-500"
             leave-to-class="opacity-0"
             leave-from-class="opacity-100"
@@ -88,7 +88,7 @@
                   <img
                     src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
                     alt="coin"
-                    class="inline w-4 h-4 align-middle drop-shadow-sm"
+                    class="inline w-4 h-4 align-middle drop-shadow-xs"
                   />
                   {{ isNew(design) ? 0 : UNLOCK_COST }}
                 </div>
@@ -98,7 +98,7 @@
           </Transition>
 
           <!-- DESCRIPTION SECTION -->
-          <div :class="['relative w-full @md:w-[360px] space-y-4 px-4 pb-4 rounded-sm text-text']">
+          <div :class="['relative w-full @md:w-[360px] space-y-4 px-4 pb-4 rounded-xs text-text']">
             <div class="flex items-start float-right mt-4 gap-x-2">
               <!-- SELECTION INDICATOR -->
               <span
@@ -125,7 +125,7 @@
                 }"
                 :class="[
                   'flex items-center gap-2 px-2 text-sm rounded-md transition-colors pointer-events-auto',
-                  'focus:outline-none focus-visible:outline-none',
+                  'focus:outline-hidden focus-visible:outline-hidden',
                   'focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-2',
                   isLiked(design)
                     ? 'text-primary hover:text-primary/80'
@@ -170,7 +170,7 @@
           <img
             src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
             alt="coin"
-            class="inline w-8 h-8 drop-shadow-sm"
+            class="inline w-8 h-8 drop-shadow-xs"
           />
           <ArrowRightIcon class="inline w-5 h-5 mx-2" />
           <LockOpenIcon class="w-8 h-auto" />

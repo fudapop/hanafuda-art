@@ -41,7 +41,7 @@
       <div class="flex items-center justify-between mb-2">
         <h4 class="text-sm font-medium text-text-secondary">Saved Games</h4>
         <button
-          class="px-2 py-1 text-xs font-medium text-red-600 transition-colors border border-red-300 rounded hover:bg-red-50 hover:border-red-400"
+          class="px-2 py-1 text-xs font-medium text-red-600 transition-colors border border-red-300 rounded-sm hover:bg-red-50 hover:border-red-400"
           @click="handleClearAllSaves"
           title="Delete all saved games"
         >
@@ -52,7 +52,7 @@
         <div
           v-for="save in savedGames.slice(0, 5)"
           :key="save.key"
-          class="flex items-center justify-between gap-2 p-2 border rounded border-border bg-background"
+          class="flex items-center justify-between gap-2 p-2 border rounded-sm border-border bg-background"
         >
           <div class="flex flex-col flex-1 min-w-0">
             <span class="text-xs font-medium truncate text-text">
@@ -64,14 +64,14 @@
           </div>
           <div class="flex gap-1">
             <button
-              class="px-2 py-1 text-xs font-medium transition-colors border rounded border-border bg-background text-text hover:bg-surface"
+              class="px-2 py-1 text-xs font-medium transition-colors border rounded-sm border-border bg-background text-text hover:bg-surface"
               @click="handleLoadSave(save.key)"
               title="Load this save"
             >
               Load
             </button>
             <button
-              class="px-2 py-1 text-xs font-medium text-red-600 transition-colors border border-red-300 rounded hover:bg-red-50 hover:border-red-400"
+              class="px-2 py-1 text-xs font-medium text-red-600 transition-colors border border-red-300 rounded-sm hover:bg-red-50 hover:border-red-400"
               @click="handleDeleteSave(save.key)"
               title="Delete this save"
             >

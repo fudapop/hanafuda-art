@@ -12,7 +12,7 @@
     />
     <label
       :for="ratingId"
-      class="absolute flex inset-0 m-auto pl-[1.5ch] -top-2 justify-between pointer-events-none text-3xl rounded-sm peer-focus-visible:ring-2 peer-focus-visible:ring-primary"
+      class="absolute flex inset-0 m-auto pl-[1.5ch] -top-2 justify-between pointer-events-none text-3xl rounded-xs peer-focus-visible:ring-2 peer-focus-visible:ring-primary"
     >
       <span
         v-for="n in getRange(modelValue)"

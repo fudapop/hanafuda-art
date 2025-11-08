@@ -18,7 +18,7 @@
         <div
           :class="[
             active ? 'border-primary ring-1 ring-primary' : 'border-border',
-            'relative flex cursor-pointer rounded-sm border bg-surface p-4 shadow-sm focus:outline-none',
+            'relative flex cursor-pointer rounded-xs border bg-surface p-4 shadow-xs focus:outline-hidden',
           ]"
         >
           <span class="flex flex-1">
@@ -53,7 +53,7 @@
             :class="[
               active ? 'border' : 'border-2',
               checked ? 'border-primary' : 'border-transparent',
-              'pointer-events-none absolute -inset-px rounded-sm',
+              'pointer-events-none absolute -inset-px rounded-xs',
             ]"
             aria-hidden="true"
           />

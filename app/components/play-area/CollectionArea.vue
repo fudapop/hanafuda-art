@@ -3,7 +3,7 @@
     <div
       :class="[
         'grid grid-rows-1 grid-cols-[repeat(4,max-content)] gap-x-8 [--card-height:60px] w-max mx-auto',
-        isMobileLandscape && 'w-36 !gap-x-0 !grid-rows-2 !grid-cols-2 absolute right-12',
+        isMobileLandscape && 'w-36 gap-x-0! grid-rows-2! grid-cols-2! absolute right-12',
       ]"
     >
       <ul
@@ -18,7 +18,7 @@
       >
         <template v-if="coll[type].size > 0">
           <span
-            class="uppercase absolute top-1 left-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
+            class="uppercase absolute top-1 left-0 z-1 whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
           >
             <span class="mr-1 text-xs align-middle">
               {{ coll[type].size }}
@@ -60,7 +60,7 @@
         <img
           :src="playerAvatar"
           loading="lazy"
-          class="w-24 h-24 border rounded-full border-border drop-shadow-sm"
+          class="w-24 h-24 border rounded-full border-border drop-shadow-xs"
         />
         <span class="text-2xl font-bold">
           {{ t('common.labels.collection') }}
@@ -76,7 +76,7 @@
         >
           <span
             v-show="coll[type].size > 0"
-            class="uppercase absolute -top-1 left-0 z-[1] whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
+            class="uppercase absolute -top-1 left-0 z-1 whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
           >
             <span class="mr-1 text-xs align-middle">
               {{ coll[type].size }}

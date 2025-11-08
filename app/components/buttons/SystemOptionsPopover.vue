@@ -34,7 +34,7 @@
         ref="panelRef"
         :class="[
           'mt-0 p-4 rounded-lg rounded-tr-none',
-          'bg-black/30 dark:bg-white/10 backdrop-blur-sm border border-white/20',
+          'bg-black/30 dark:bg-white/10 backdrop-blur-xs border border-white/20',
           'group shadow-lg min-w-[200px]',
           'absolute right-0',
         ]"
@@ -120,7 +120,7 @@
                 'w-full px-3 py-2 pl-8 rounded-md transition-all duration-200 appearance-none',
                 'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
                 'text-white text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
-                'focus:outline-none focus-visible:outline-none focus-visible:border-white focus-visible:ring-inset focus-visible:ring-primary',
+                'focus:outline-hidden focus-visible:outline-hidden focus-visible:border-white focus-visible:ring-inset focus-visible:ring-primary',
               ]"
               :title="t('settings.actions.selectLanguage')"
             >
@@ -144,7 +144,7 @@
           >
             <Icon
               name="ic:round-info"
-              class="flex-shrink-0 inline w-4 h-4 mr-1"
+              class="shrink-0 inline w-4 h-4 mr-1"
             />
             <p>{{ t('settings.notices.languageChangeNotice') }}</p>
           </div>
@@ -204,7 +204,7 @@
               <div class="flex items-center gap-2">
                 <Icon
                   name="ic:round-music-note"
-                  class="flex-shrink-0 w-3 h-3 text-white/70"
+                  class="shrink-0 w-3 h-3 text-white/70"
                 />
                 <div class="overflow-hidden">
                   <span

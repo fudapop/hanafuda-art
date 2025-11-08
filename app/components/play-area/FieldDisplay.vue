@@ -35,7 +35,7 @@
           :key="`${index}-${card}`"
           :class="{
             'card drop-shadow-md overflow-hidden cursor-pointer transition-all relative': true,
-            'drop-shadow-xl -translate-y-1 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse':
+            'drop-shadow-xl -translate-y-1 z-20 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 dark:after:border-yellow-200 after:rounded-[inherit] after:animate-pulse':
               matchedCards?.includes(card),
             '-translate-y-1 drop-shadow-xl': selectedCard === card,
             'pointer-events-none staged': cs.staged.has(card),
@@ -56,7 +56,7 @@
         <template v-else>
           <div
             v-show="isThirdRow(index) ? thirdRowIsOccupied : true"
-            class="z-0 h-[--card-height] aspect-[--card-aspect] rounded-[--card-radius] border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
+            class="z-0 h-(--card-height) aspect-(--card-aspect) rounded-(--card-radius) border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
           >
             <span class="sr-only">empty field slot</span>
 
