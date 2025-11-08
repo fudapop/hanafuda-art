@@ -51,8 +51,8 @@ nuxtApp.hook('page:finish', () => {
 // Initialize audio
 const audio = useAudio()
 
-// Provide audio controls globally
-provide('audio', audio)
+// Provide audio instance via Nuxt for cross-plugin and component access
+nuxtApp.provide('audio', audio)
 
 onMounted(async () => {
   // Initialize audio with background music

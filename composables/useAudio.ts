@@ -1,5 +1,20 @@
 import { useStorage } from '@vueuse/core'
 
+interface LegacySystemPreferences {
+  volume: number
+  isMuted: boolean
+}
+
+interface AudioSettings {
+  volume: number
+  isDisabled: boolean
+}
+
+interface SystemPreferences extends LegacySystemPreferences {
+  bgm: AudioSettings
+  sfx: AudioSettings
+}
+
 export const useAudio = () => {
   const config = useRuntimeConfig()
 
@@ -117,7 +132,7 @@ export const useAudio = () => {
   const currentTrack = ref<string | null>(null)
 
   // Load preferences from localStorage with separate BGM and SFX controls
-  const systemPreferences = useStorage('hanafuda-system-preferences', {
+  const systemPreferences = useStorage<SystemPreferences>('hanafuda-system-preferences', {
     bgm: {
       volume: 0.2,
       isDisabled: false,
@@ -151,10 +166,10 @@ export const useAudio = () => {
     systemPreferences.value.sfx.isDisabled = false
   }
 
-  const bgmVolume = ref(systemPreferences.value.bgm?.volume ?? 0.25)
-  const bgmDisabled = ref(systemPreferences.value.bgm?.isDisabled ?? false)
-  const sfxVolume = ref(systemPreferences.value.sfx?.volume ?? 0.25)
-  const sfxDisabled = ref(systemPreferences.value.sfx?.isDisabled ?? false)
+  const bgmVolume: Ref<number> = ref(systemPreferences.value.bgm?.volume ?? 0.25)
+  const bgmDisabled: Ref<boolean> = ref(systemPreferences.value.bgm?.isDisabled ?? false)
+  const sfxVolume: Ref<number> = ref(systemPreferences.value.sfx?.volume ?? 0.25)
+  const sfxDisabled: Ref<boolean> = ref(systemPreferences.value.sfx?.isDisabled ?? false)
 
   // Helper to get the currently active audio element
   const currentAudioRef = computed(() => (isUsingA.value ? audioRefA : audioRefB))
@@ -181,7 +196,7 @@ export const useAudio = () => {
             }
             return true
           })
-          .catch((error) => {
+          .catch((error: unknown) => {
             console.warn('Failed to resume AudioContext:', error)
             return false
           })
@@ -288,7 +303,7 @@ export const useAudio = () => {
       // Audio loaded successfully - no need to log this
     })
 
-    ref.value.addEventListener('error', (e) => {
+    ref.value.addEventListener('error', (e: unknown) => {
       console.error('Audio loading error:', e)
     })
   }
@@ -343,6 +358,21 @@ export const useAudio = () => {
       updateMediaSessionState(false)
     }
   }
+
+  // Pause audio without resetting shouldBePlaying (for visibility changes)
+  const pauseAudioPreservingState = () => {
+    if (audioRefA.value && !audioRefA.value.paused) {
+      audioRefA.value.pause()
+    }
+    if (audioRefB.value && !audioRefB.value.paused) {
+      audioRefB.value.pause()
+    }
+    isPlaying.value = false
+    updateMediaSessionState(false)
+  }
+
+  // Note: Visibility change handling is done in plugins/audio-visibility.client.ts
+  // This keeps the listener setup separate and ensures it runs on client-side only
 
   // Stop audio with fade-out (active only)
   const stopAudio = (fadeDuration: number = 2) => {
@@ -595,19 +625,19 @@ export const useAudio = () => {
   }
 
   // Watch and save changes to localStorage
-  watch(bgmVolume, (newVolume) => {
+  watch(bgmVolume, (newVolume: number) => {
     systemPreferences.value.bgm.volume = newVolume
   })
 
-  watch(bgmDisabled, (newDisabledState) => {
+  watch(bgmDisabled, (newDisabledState: boolean) => {
     systemPreferences.value.bgm.isDisabled = newDisabledState
   })
 
-  watch(sfxVolume, (newVolume) => {
+  watch(sfxVolume, (newVolume: number) => {
     systemPreferences.value.sfx.volume = newVolume
   })
 
-  watch(sfxDisabled, (newDisabledState) => {
+  watch(sfxDisabled, (newDisabledState: boolean) => {
     systemPreferences.value.sfx.isDisabled = newDisabledState
   })
 
@@ -671,6 +701,7 @@ export const useAudio = () => {
 
     // State
     isPlaying: readonly(isPlaying),
+    shouldBePlaying: readonly(shouldBePlaying), // Expose for visibility handling
     hasUserInteracted: readonly(hasUserInteracted),
     currentTrack: readonly(currentTrack),
     currentTrackName: readonly(computed(getCurrentTrackName)),
@@ -698,6 +729,7 @@ export const useAudio = () => {
     initAudio,
     playAudio,
     pauseAudio,
+    pauseAudioPreservingState, // For visibility changes
     stopAudio,
     fadeInAudio,
     fadeOutAudio,

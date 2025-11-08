@@ -15,7 +15,7 @@ const { roundCounter, roundOver, getCurrent } = storeToRefs(useGameDataStore())
 
 const gameIsStarted = useState('start', () => false)
 
-const audio = inject('audio') as ReturnType<typeof useAudio>
+const audio = useNuxtApp().$audio as ReturnType<typeof useAudio>
 
 const { BGM, SFX } = audio
 
