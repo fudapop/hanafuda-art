@@ -270,7 +270,6 @@
 
 <script setup lang="ts">
 import { onClickOutside, useColorMode, useCycleList, useFullscreen, useStorage } from '@vueuse/core'
-import { inject } from 'vue'
 import { useAudio } from '~/composables/useAudio'
 
 type ColorMode = 'auto' | 'dark' | 'light'
@@ -352,7 +351,7 @@ watchEffect(() => {
 })
 
 // Audio functionality - use the global audio instance from app.vue
-const audio = inject('audio') as ReturnType<typeof useAudio>
+const audio = useNuxtApp().$audio as ReturnType<typeof useAudio>
 
 if (!audio) {
   throw new Error('Audio instance not found. Make sure it is provided in app.vue')

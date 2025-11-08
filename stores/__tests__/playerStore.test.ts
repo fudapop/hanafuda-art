@@ -1,5 +1,5 @@
-import { beforeEach, it, expect } from 'vitest'
-import { setActivePinia, createPinia } from 'pinia'
+import { createPinia, setActivePinia } from 'pinia'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { usePlayerStore } from '../playerStore'
 
 describe('PlayerStore', () => {
