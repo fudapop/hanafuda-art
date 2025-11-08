@@ -35,7 +35,7 @@
  */
 
 import { defineStore } from 'pinia'
-import { type PlayerKey } from '~/stores/playerStore'
+import { type PlayerKey } from '~~/stores/playerStore'
 import { type CardName, DECK, shuffle } from '~/utils/cards'
 
 type PlayerCardSet = Record<PlayerKey, Set<CardName>>

@@ -1,10 +1,10 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useStoreManager } from '~/composables/useStoreManager'
-import { useCardStore } from '~/stores/cardStore'
-import { useConfigStore } from '~/stores/configStore'
-import { useGameDataStore } from '~/stores/gameDataStore'
-import { usePlayerStore } from '~/stores/playerStore'
+import { useCardStore } from '~~/stores/cardStore'
+import { useConfigStore } from '~~/stores/configStore'
+import { useGameDataStore } from '~~/stores/gameDataStore'
+import { usePlayerStore } from '~~/stores/playerStore'
 
 describe('useStoreManager', () => {
   beforeEach(() => {
@@ -75,7 +75,7 @@ describe('useStoreManager', () => {
     expect(() => JSON.parse(serialized.gameData)).not.toThrow()
     expect(() => JSON.parse(serialized.players)).not.toThrow()
     expect(() => JSON.parse(serialized.config)).not.toThrow()
-    
+
     // Verify cards data is encrypted (should have encryptedData property, not data)
     const cardsData = JSON.parse(serialized.cards)
     expect(cardsData).toHaveProperty('encryptedData')
@@ -125,20 +125,20 @@ describe('useStoreManager', () => {
     const gameDataStore = useGameDataStore()
     const playerStore = usePlayerStore()
     const configStore = useConfigStore()
-    
+
     // Generate the same salt that would be used in the real system
     const saltComponents = [
       'test-game-id',
-      '1',           // roundCounter
-      '1',           // turnCounter
-      'select',      // turnPhase
-      'p1',          // activePlayer.id
-      '1',           // bonusMultiplier
-      '3',           // maxRounds
-      'allow'        // allowViewingsYaku
+      '1', // roundCounter
+      '1', // turnCounter
+      'select', // turnPhase
+      'p1', // activePlayer.id
+      '1', // bonusMultiplier
+      '3', // maxRounds
+      'allow', // allowViewingsYaku
     ]
     const salt = saltComponents.join('|')
-    
+
     const encryptedCards = await cardStore.exportSerializedState(salt, 'test-game-id')
 
     const mockStorageData = JSON.stringify({
@@ -207,25 +207,29 @@ describe('useStoreManager', () => {
 
   it('should protect against card state tampering', async () => {
     const cardStore = useCardStore()
-    
+
     // Export current state to get proper encrypted format
     cardStore.dealCards()
     const exported = await cardStore.exportSerializedState(undefined, 'test-game-id')
     const exportedData = JSON.parse(exported)
-    
+
     expect(exportedData).toHaveProperty('encryptedData')
     expect(exportedData).toHaveProperty('hash')
     expect(exportedData).toHaveProperty('hashAlgorithm', 'fnv1a-mixed')
     expect(exportedData).toHaveProperty('version', '1.0.0')
-    
+
     // Test that tampering is detected - modify encrypted data
     const tamperedData = {
       ...exportedData,
-      encryptedData: exportedData.encryptedData.slice(0, -10) + 'tampered' // Tamper with encrypted data
+      encryptedData: exportedData.encryptedData.slice(0, -10) + 'tampered', // Tamper with encrypted data
       // Keep original hash - this should fail verification
     }
-    
-    const success = await cardStore.importSerializedState(JSON.stringify(tamperedData), undefined, 'test-game-id')
+
+    const success = await cardStore.importSerializedState(
+      JSON.stringify(tamperedData),
+      undefined,
+      'test-game-id',
+    )
     expect(success).toBe(false)
   })
 
@@ -233,20 +237,20 @@ describe('useStoreManager', () => {
     const { serializeGameState, deserializeGameState } = useStoreManager()
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
-    
+
     // Set up initial state
     cardStore.dealCards()
     gameDataStore.startRound()
-    
+
     // Serialize the complete game state
     const serialized = await serializeGameState()
     const parsedState = JSON.parse(JSON.stringify(serialized))
-    
+
     // Tamper with non-card data (change round counter)
     const tamperedGameData = JSON.parse(parsedState.gameData)
     tamperedGameData.roundCounter = 999 // Change round counter
     parsedState.gameData = JSON.stringify(tamperedGameData)
-    
+
     // Try to restore - should fail because card hash was created with original round counter
     const success = await deserializeGameState(parsedState)
     expect(success).toBe(false)
@@ -256,21 +260,21 @@ describe('useStoreManager', () => {
     const { serializeGameState, deserializeGameState } = useStoreManager()
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
-    
+
     // Set up initial state
     cardStore.dealCards()
     gameDataStore.startRound()
-    
+
     // Serialize the complete game state
     const serialized = await serializeGameState()
     const parsedState = JSON.parse(JSON.stringify(serialized))
-    
+
     // Tamper with player data (change active player)
     const tamperedPlayerData = JSON.parse(parsedState.players)
     tamperedPlayerData.players.p1.isActive = false
     tamperedPlayerData.players.p2.isActive = true
     parsedState.players = JSON.stringify(tamperedPlayerData)
-    
+
     // Try to restore - should fail because card hash includes player active state
     const success = await deserializeGameState(parsedState)
     expect(success).toBe(false)
