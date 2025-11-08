@@ -2,7 +2,7 @@
   <div class="relative w-full h-16 px-4 py-2">
     <div :class="['w-full h-full mx-auto flex', isPlayer1 ? 'items-end' : 'items-start']">
       <div class="flex space-x-2 sm:space-x-4">
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
           <img
             v-if="user"
             class="w-12 h-12 mx-auto transition-all border-2 rounded-full lg:w-24 lg:h-24 border-border"
@@ -37,7 +37,7 @@
                 <img
                   src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
                   alt="coin"
-                  class="w-4 h-4 mx-1 lg:w-8 lg:h-8 drop-shadow-sm"
+                  class="w-4 h-4 mx-1 lg:w-8 lg:h-8 drop-shadow-xs"
                 />
                 <NumberAnimation
                   ref="number1"

@@ -22,7 +22,7 @@
             'drop-shadow-xl -translate-y-2 z-20': matchedCards?.includes(card),
             'scale-105 -translate-y-4 drop-shadow-xl z-10': selectedCard === card,
             'pointer-events-none staged': cs.staged.has(card),
-            '-translate-y-2 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 after:dark:border-yellow-200 after:rounded-[inherit] after:animate-pulse':
+            '-translate-y-2 after:absolute after:inset-0 after:w-full after:h-full after:border-4 after:border-indigo-400 dark:after:border-yellow-200 after:rounded-[inherit] after:animate-pulse':
               showMatchHint(card),
           }"
           :title="card.replace(/-\d?/g, ' ')"

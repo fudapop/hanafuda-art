@@ -16,10 +16,10 @@
     >
       <HeadlessPopoverPanel
         v-slot="{ close }"
-        class="fixed z-50 overflow-hidden inset-x-3 mx-auto max-w-[640px] rounded-lg [@media(max-height:_500px)]:inset-y-3 top-12 shadow-lg bg-background ring-1 ring-border ring-opacity-5 focus:outline-none"
+        class="fixed z-50 overflow-hidden inset-x-3 mx-auto max-w-[640px] rounded-lg [@media(max-height:_500px)]:inset-y-3 top-12 shadow-lg bg-background ring-1 ring-border ring-opacity-5 focus:outline-hidden"
       >
         <div
-          class="flex items-center justify-between px-6 py-4 border-b shadow-sm bg-border border-border"
+          class="flex items-center justify-between px-6 py-4 border-b shadow-xs bg-border border-border"
         >
           <h3 class="text-lg font-semibold tracking-wide text-text w-max">
             {{ t('menu.avatarSelect.title') }}
@@ -37,7 +37,7 @@
             <div
               v-for="a in premiumAvatars"
               :key="a.url"
-              class="relative w-16 overflow-hidden [@media(min-height:500px)]:sm:w-24 aspect-square drop-shadow-sm cursor-pointer rounded-full"
+              class="relative w-16 overflow-hidden [@media(min-height:500px)]:sm:w-24 aspect-square drop-shadow-xs cursor-pointer rounded-full"
             >
               <img
                 :src="a.url"
@@ -59,7 +59,7 @@
               :key="url"
               :src="url"
               alt="user avatar"
-              :class="`w-16 h-auto [@media(min-height:500px)]:sm:w-24 rounded-full drop-shadow-sm cursor-pointer ${
+              :class="`w-16 h-auto [@media(min-height:500px)]:sm:w-24 rounded-full drop-shadow-xs cursor-pointer ${
                 url === modelValue ? 'ring-2 ring-offset-2 ring-primary' : ''
               }`"
               @click="() => handleClick(url, close)"

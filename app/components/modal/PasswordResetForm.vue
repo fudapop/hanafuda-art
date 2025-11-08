@@ -1,7 +1,7 @@
 <template>
   <Modal :open="open">
     <template #title
-      ><span class="[text-wrap:balance] text-xl">
+      ><span class="text-balance text-xl">
         {{ t('auth.passwordReset.title') }}
       </span></template
     >

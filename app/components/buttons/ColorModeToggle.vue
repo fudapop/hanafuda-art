@@ -14,17 +14,17 @@
     <Icon
       v-if="state === 'dark'"
       name="ic:outline-dark-mode"
-      class="w-6 h-6 drop-shadow-sm"
+      class="w-6 h-6 drop-shadow-xs"
     />
     <Icon
       v-else-if="state === 'light'"
       name="ic:outline-light-mode"
-      class="w-6 h-6 drop-shadow-sm"
+      class="w-6 h-6 drop-shadow-xs"
     />
     <Icon
       v-else
       name="ic:round-monitor"
-      class="w-6 h-6 drop-shadow-sm hover:text-yellow-300"
+      class="w-6 h-6 drop-shadow-xs hover:text-yellow-300"
     />
     <span class="sr-only">{{ state }}</span>
   </button>

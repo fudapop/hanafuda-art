@@ -23,7 +23,7 @@
         <!-- Safe action: Save & Exit - Green/positive color -->
         <button
           type="button"
-          class="px-4 py-2 text-sm font-semibold tracking-wide transition-colors rounded-sm bg-hanafuda-green hover:bg-hanafuda-green/90"
+          class="px-4 py-2 text-sm font-semibold tracking-wide transition-colors rounded-xs bg-hanafuda-green hover:bg-hanafuda-green/90"
           @click="$emit('save')"
           :disabled="isSaving"
         >
@@ -32,7 +32,7 @@
         <!-- Destructive action: Forfeit - Red/danger styling -->
         <button
           type="button"
-          class="px-4 py-2 text-sm font-medium tracking-wide text-red-500 transition-colors duration-300 border border-red-300 rounded-sm hover:bg-red-50 hover:border-red-400"
+          class="px-4 py-2 text-sm font-medium tracking-wide text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400"
           @click="$emit('forfeit')"
         >
           {{ t('game.actions.forfeitAndExit') }}

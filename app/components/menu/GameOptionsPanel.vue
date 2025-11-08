@@ -41,7 +41,7 @@
               >
                 <HeadlessDialogPanel
                   :unmount="false"
-                  class="w-screen h-[100dvh] max-w-2xl pointer-events-auto"
+                  class="w-screen h-dvh max-w-2xl pointer-events-auto"
                 >
                   <div
                     class="flex flex-col h-full border-l shadow-xl bg-hanafuda-brown border-border"
@@ -67,7 +67,7 @@
                         </div>
 
                         <!-- Simple tab navigation -->
-                        <div class="flex flex-shrink-0 bg-surface">
+                        <div class="flex shrink-0 bg-surface">
                           <button
                             v-for="(tab, index) in tabs"
                             :key="tab"
@@ -93,7 +93,7 @@
                             type="button"
                             :class="[
                               'bg-hanafuda-brown p-4 border-t border-t-surface text-surface hover:text-white',
-                              'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                              'focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2',
                               currentTabIndex === tabs.length - 1 && 'rounded-tl',
                             ]"
                             @click="closeOptions"

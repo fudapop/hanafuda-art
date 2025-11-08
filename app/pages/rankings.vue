@@ -36,7 +36,7 @@
             </p>
             <button
               @click="fetchLeaderboard"
-              class="px-4 py-2 mt-4 text-white transition-colors bg-red-600 rounded hover:bg-red-700"
+              class="px-4 py-2 mt-4 text-white transition-colors bg-red-600 rounded-sm hover:bg-red-700"
             >
               {{ t('rankings.retry') }}
             </button>
@@ -91,7 +91,7 @@
                     :key="player.uid"
                     :class="[
                       'hover:bg-surface-variant/50 transition-colors',
-                      index < 3 ? 'bg-gradient-to-r from-transparent to-primary/5' : '',
+                      index < 3 ? 'bg-linear-to-r from-transparent to-primary/5' : '',
                     ]"
                   >
                     <td class="px-6 py-4 whitespace-nowrap">

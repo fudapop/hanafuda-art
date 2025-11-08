@@ -4,7 +4,7 @@
   >
     <!-- Dark overlay for dark mode -->
     <div
-      class="absolute inset-0 z-20 duration-300 dark:bg-gradient-to-r dark:from-black/30 dark:via-black/10 dark:to-black/30"
+      class="absolute inset-0 z-20 duration-300 dark:bg-linear-to-r dark:from-black/30 dark:via-black/10 dark:to-black/30"
     />
     <div class="fixed inset-0 -z-20">
       <img
@@ -21,7 +21,7 @@
       class="fixed left-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-[32vw] h-[80vh]"
     >
       <div
-        class="static bg-transparent rounded-full aspect-[3/4] w-full h-full flex items-center justify-center overflow-hidden inert"
+        class="static bg-transparent rounded-full aspect-3/4 w-full h-full flex items-center justify-center overflow-hidden inert"
       >
         <img
           src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/flowers-landing1.webp"
@@ -35,7 +35,7 @@
       class="fixed right-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-[32vw] h-[80vh]"
     >
       <div
-        class="bg-transparent rounded-full aspect-[3/4] w-full h-full flex items-center justify-center overflow-hidden inert"
+        class="bg-transparent rounded-full aspect-3/4 w-full h-full flex items-center justify-center overflow-hidden inert"
       >
         <img
           src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/flowers-landing2.webp"
@@ -68,8 +68,8 @@
         <button
           v-if="hasSavedGame"
           :class="[
-            'play-now-button rounded-sm mt-6 sm:mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
-            'bg-gradient-to-b from-green-100 to-green-200 dark:from-green-200 dark:to-green-300',
+            'play-now-button rounded-xs mt-6 sm:mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+            'bg-linear-to-b from-green-100 to-green-200 dark:from-green-200 dark:to-green-300',
             'text-[#23221c] font-bold text-lg',
             'hover:from-green-200 hover:to-green-300 dark:hover:from-green-300 dark:hover:to-green-400',
             'active:from-green-300 active:to-green-400',
@@ -86,8 +86,8 @@
         <button
           v-else
           :class="[
-            'play-now-button rounded-sm mt-6 sm:mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
-            'bg-gradient-to-b from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300',
+            'play-now-button rounded-xs mt-6 sm:mt-12 border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+            'bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300',
             'text-[#23221c] font-bold text-lg',
             'hover:from-amber-200 hover:to-amber-300 dark:hover:from-amber-300 dark:hover:to-amber-400',
             'active:from-amber-300 active:to-amber-400',
@@ -109,7 +109,7 @@
           </div>
           <div class="flex gap-2">
             <button
-              class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-sm hover:bg-red-50 hover:border-red-400"
+              class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400"
               @click="deleteSave"
               :title="t('game.actions.deleteSave')"
             >
@@ -120,7 +120,7 @@
 
         <!-- Options Button - Show for everyone -->
         <button
-          class="min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-sm sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
+          class="min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
           @click="() => openOptions()"
         >
           {{ t('common.actions.options') }}
@@ -129,7 +129,7 @@
         <!-- Leaderboard Button - Only for authenticated users -->
         <button
           v-if="!isGuest"
-          class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-sm sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
+          class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
           @click="goToRankings"
         >
           {{ t('rankings.title') }}
@@ -138,7 +138,7 @@
         <!-- Sign In Button - For guests (replaces Rankings) -->
         <button
           v-if="isGuest"
-          class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-sm sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
+          class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
           @click="goToLogin"
         >
           {{ t('common.actions.signIn') }}

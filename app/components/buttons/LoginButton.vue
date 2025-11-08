@@ -16,7 +16,7 @@
     </button>
     <div
       v-if="error"
-      class="absolute inset-0 px-8 py-4 mx-auto text-lg border-red-500 rounded-sm"
+      class="absolute inset-0 px-8 py-4 mx-auto text-lg border-red-500 rounded-xs"
     >
       {{ error }}
     </div>

@@ -3,7 +3,7 @@
     <div class="isolate">
       <div
         v-show="showLoader"
-        class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-[1]"
+        class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-1"
       >
         <CardsLoader />
       </div>
@@ -64,7 +64,7 @@
       <div
         :class="[
           'absolute -bottom-4 inset-x-0 pb-8',
-          'transition-all duration-200 origin-left [&_ul]:scale-90 [&_ul]:sm:scale-100',
+          'transition-all duration-200 origin-left [&_ul]:scale-90 sm:[&_ul]:scale-100',
           players.p2.isActive && 'opacity-80',
           isMobile && 'landscape:translate-y-8',
         ]"
@@ -260,13 +260,13 @@ const checkDeal = () => {
       }
       // Game round is reset if win condition exists on the field
       if (result?.player === 'field') {
-        console.debug(`Revealed ${result.completedYaku[0].name.toUpperCase()}. Resetting...`)
+        console.debug(`Revealed ${result.completedYaku[0]?.name.toUpperCase()}. Resetting...`)
         cs.reset()
         startRound()
         return
       }
       // Add cards from the winner's hand to their collection for display in the results modal
-      cs.stageForCollection(result.completedYaku[0].cards)
+      cs.stageForCollection(result.completedYaku[0]?.cards ?? [])
       cs.collectCards(hand.name as PlayerKey)
       break
     }

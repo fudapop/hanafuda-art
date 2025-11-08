@@ -42,7 +42,7 @@
         class="px-6 mt-4 text-text"
       >
         <fieldset
-          class="pt-4 pb-8 border-t border-b rounded-sm border-t-border border-b-border sm:pb-2"
+          class="pt-4 pb-8 border-t border-b rounded-xs border-t-border border-b-border sm:pb-2"
         >
           <div class="grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>{{ t('feedback.categories.animationSmoothness') }}</p>
@@ -93,7 +93,7 @@
             id="comment-box"
             rows="3"
             v-model="comments.message"
-            class="w-full p-2 border rounded-sm text-text bg-background border-border placeholder:text-text-secondary placeholder:opacity-50"
+            class="w-full p-2 border rounded-xs text-text bg-background border-border placeholder:text-text-secondary placeholder:opacity-50"
             :disabled="submitted"
             :placeholder="t('feedback.comments.placeholder')"
           />

@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import tailwindcss from '@tailwindcss/vite'
 
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 const seoMeta = JSON.parse(readFileSync(resolve('./seo-meta.json'), 'utf-8'))
@@ -149,7 +150,6 @@ export default defineNuxtConfig({
   },
   modules: [
     '@pinia/nuxt',
-    'nuxt-icon',
     'nuxt-headlessui',
     '@nuxt/image',
     '@nuxt/test-utils/module',
@@ -161,14 +161,8 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     'nuxt-charts',
     '@vite-pwa/nuxt',
+    '@nuxt/icon',
   ],
-  postcss: {
-    plugins: {
-      'tailwindcss/nesting': {},
-      'tailwindcss': {},
-      'autoprefixer': {},
-    },
-  },
   posthog: {
     disabled: !isProduction,
     proxy: !isProduction,
@@ -296,6 +290,7 @@ export default defineNuxtConfig({
       include: ['class-variance-authority', 'reka-ui', 'lucide-vue-next', 'clsx', 'tailwind-merge'],
       exclude: ['better-sqlite3'],
     },
+    plugins: [tailwindcss()],
   },
   vuefire: {
     auth: true,

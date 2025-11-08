@@ -52,7 +52,7 @@
         <div class="static h-16 lg:scale-y-[2] origin-bottom transition-transform">
           <img
             src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/player_bar_bottom.webp"
-            class="flex-shrink-0 w-full h-full"
+            class="shrink-0 w-full h-full"
             alt="Bottom decorative border"
           />
         </div>
@@ -62,7 +62,7 @@
     <!-- Main game area -->
     <div class="relative flex items-center justify-center w-full h-full game-content">
       <div
-        class="absolute inset-0 z-20 duration-300 dark:bg-gradient-to-r dark:from-black/30 dark:via-black/10 dark:to-black/30"
+        class="absolute inset-0 z-20 duration-300 dark:bg-linear-to-r dark:from-black/30 dark:via-black/10 dark:to-black/30"
       ></div>
       <!-- Side decorative flowers -->
       <Transition
