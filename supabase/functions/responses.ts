@@ -1,4 +1,4 @@
-import { corsHeaders } from './cors.ts'
+import { corsHeaders } from './cors.js'
 
 const createResponse = (data: unknown, status: number) =>
   new Response(data ? JSON.stringify(data) : null, {

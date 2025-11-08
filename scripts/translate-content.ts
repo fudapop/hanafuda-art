@@ -32,7 +32,7 @@ import {
   setupWorkingDirectory,
   TranslationMode,
   validateTargetLocales,
-} from './translation-utils.ts'
+} from './translation-utils.js'
 
 // Initialize Genkit with the Google AI plugin
 const ai = genkit({

@@ -30,7 +30,7 @@ import {
   setupWorkingDirectory,
   TranslationMode,
   validateTargetLocales,
-} from './translation-utils.ts'
+} from './translation-utils.js'
 
 type JsonValue = string | number | boolean | null | JsonObject | JsonValue[]
 type JsonObject = { [key: string]: JsonValue }

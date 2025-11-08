@@ -39,9 +39,9 @@
  */
 
 import { defineStore } from 'pinia'
-import { useCardStore } from '~/stores/cardStore'
-import { useConfigStore } from '~/stores/configStore'
-import { type PlayerKey, usePlayerStore } from '~/stores/playerStore'
+import { useCardStore } from '~~/stores/cardStore'
+import { useConfigStore } from '~~/stores/configStore'
+import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
 import type { CardName } from '~/utils/cards'
 import { consoleLogColor, getRandomString } from '~/utils/myUtils'
 import type { CompletedYaku, YakuName } from '~/utils/yaku'
