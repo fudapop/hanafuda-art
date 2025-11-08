@@ -32,10 +32,10 @@
             <div class="fixed inset-y-0 right-0 flex max-w-full pointer-events-none sm:pl-16">
               <HeadlessTransitionChild
                 as="template"
-                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enter="transition-transform ease-in-out duration-500 sm:duration-700"
                 enter-from="translate-x-full"
                 enter-to="translate-x-0"
-                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leave="transition-transform duration-500 sm:duration-700"
                 leave-from="translate-x-0"
                 leave-to="translate-x-full"
               >
@@ -67,17 +67,19 @@
                         </div>
 
                         <!-- Simple tab navigation -->
-                        <div class="flex flex-shrink-0">
+                        <div class="flex flex-shrink-0 bg-surface">
                           <button
                             v-for="(tab, index) in tabs"
                             :key="tab"
-                            :class="{
-                              'flex items-center justify-center gap-2 w-full py-4 px-4 text-sm font-medium leading-5 transition-colors': true,
-                              'border-r border-surface': true,
-                              'bg-accent/20 text-primary bg-surface': currentTabIndex === index,
-                              'text-surface hover:text-white hover:bg-accent/10 border-t':
-                                currentTabIndex !== index,
-                            }"
+                            :class="[
+                              'flex items-center justify-center gap-2 w-full py-4 px-4 text-sm font-medium leading-5 transition-colors',
+                              'border-r border-surface',
+                              currentTabIndex === index
+                                ? 'text-primary bg-surface'
+                                : 'text-surface hover:text-white hover:bg-hanafuda-brown/80 border-t bg-hanafuda-brown',
+                              currentTabIndex === index + 1 && 'rounded-tr',
+                              currentTabIndex === index - 1 && 'rounded-tl',
+                            ]"
                             @click="() => openOptions(tab)"
                           >
                             <slot :name="`tab-icon-${index + 1}`">
@@ -89,7 +91,11 @@
                           </button>
                           <button
                             type="button"
-                            class="p-4 border-t border-t-surface text-surface hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            :class="[
+                              'bg-hanafuda-brown p-4 border-t border-t-surface text-surface hover:text-white',
+                              'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                              currentTabIndex === tabs.length - 1 && 'rounded-tl',
+                            ]"
                             @click="closeOptions"
                           >
                             <span class="sr-only">{{ t('common.actions.close') }}</span>
