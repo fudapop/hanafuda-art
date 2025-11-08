@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### UI & Experience Improvements
+- **Smart Audio Pause**: Background music now automatically pauses when you switch to another tab or minimize the window, and resumes when you return to the game. This helps conserve system resources and provides a better experience when multitasking.
+
 ## [2025.11.1] - 2025-11-03
 
 ### New Features
