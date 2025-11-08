@@ -1,5 +1,10 @@
 # Dziennik zmian
 
+## [Niewydane]
+
+### Ulepszenia UI i doświadczenia
+- **Inteligentna pauza audio**: Muzyka w tle automatycznie zatrzymuje się, gdy przełączasz się na inną kartę lub minimalizujesz okno, i wznawia się, gdy wracasz do gry. Pomaga to oszczędzać zasoby systemowe i zapewnia lepsze wrażenia podczas wielozadaniowości.
+
 ## [2025.11.1] - 2025-11-03
 
 ### Nowe funkcje
