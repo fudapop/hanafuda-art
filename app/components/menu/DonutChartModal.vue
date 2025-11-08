@@ -25,9 +25,9 @@
             :data="data"
             :categories="categories"
             :height="260"
-            :radius="80"
+            :radius="5"
             :arc-width="20"
-            :pad-angle="0.05"
+            :pad-angle="0.02"
           />
           <div
             v-if="centerData?.name && centerData?.value"
@@ -98,7 +98,7 @@ const dateRange = computed(() => {
 
 <style>
 :root {
-  --vis-donut-background-color: transparent;
+  --vis-donut-background-color: transparent !important;
 }
 
 /* Hide tooltip from charts */

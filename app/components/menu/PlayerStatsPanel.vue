@@ -19,14 +19,9 @@
             {{ user.stats.totalCardsCaptured }}
           </div>
           <div class="shrink-0 -mr-1">
-            <DonutChart
-              hide-legend
+            <DonutChartMini
               :data="cardsChartData"
               :categories="cardsChartCategories"
-              :height="50"
-              :radius="20"
-              :arc-width="6"
-              :pad-angle="0.05"
             />
           </div>
         </div>
@@ -48,14 +43,9 @@
             v-if="yakuChartData.length > 0"
             class="shrink-0 -mr-1"
           >
-            <DonutChart
-              hide-legend
+            <DonutChartMini
               :data="yakuChartData"
               :categories="yakuChartCategories"
-              :height="50"
-              :radius="20"
-              :arc-width="6"
-              :pad-angle="0.05"
             />
           </div>
         </div>
@@ -79,14 +69,9 @@
             v-if="totalKoikoiCalls > 0"
             class="shrink-0 -mr-1"
           >
-            <DonutChart
-              hide-legend
+            <DonutChartMini
               :data="koikoiChartData"
               :categories="koikoiChartCategories"
-              :height="50"
-              :radius="20"
-              :arc-width="6"
-              :pad-angle="0.05"
             />
           </div>
         </div>
@@ -267,7 +252,7 @@
                 <div
                   class="w-2 h-2 rounded-full shrink-0"
                   :style="{
-                    backgroundColor: yakuChartCategories[t(`game.yaku.${yaku.key}`)].color,
+                    backgroundColor: yakuChartCategories[t(`game.yaku.${yaku.key}`)]!.color,
                   }"
                 />
                 <strong class="text-text text-sm">{{ t(`game.yaku.${yaku.key}`) }}</strong>
@@ -367,25 +352,28 @@ const yakuList = computed(() =>
 const yakuChartData = computed(() => yakuList.value.map((yaku) => yaku.value))
 
 const yakuChartLabels = computed(() =>
-  yakuList.value.map((yaku, idx) => ({
-    name: t(`game.yaku.${yaku.key}`),
-    color: [
-      '#ef4444', // red-500
-      '#f97316', // orange-500
-      '#f59e0b', // amber-500
-      '#eab308', // yellow-500
-      '#84cc16', // lime-500
-      '#22c55e', // green-500
-      '#10b981', // emerald-500
-      '#14b8a6', // teal-500
-      '#06b6d4', // cyan-500
-      '#0ea5e9', // sky-500
-      '#3b82f6', // blue-500
-      '#6366f1', // indigo-500
-      '#8b5cf6', // violet-500
-      '#a855f7', // purple-500
-    ][idx % 14],
-  })),
+  yakuList.value.map(
+    (yaku, idx) =>
+      ({
+        name: t(`game.yaku.${yaku.key}`),
+        color: [
+          '#ef4444', // red-500
+          '#f97316', // orange-500
+          '#f59e0b', // amber-500
+          '#eab308', // yellow-500
+          '#84cc16', // lime-500
+          '#22c55e', // green-500
+          '#10b981', // emerald-500
+          '#14b8a6', // teal-500
+          '#06b6d4', // cyan-500
+          '#0ea5e9', // sky-500
+          '#3b82f6', // blue-500
+          '#6366f1', // indigo-500
+          '#8b5cf6', // violet-500
+          '#a855f7', // purple-500
+        ][idx % 14],
+      }) as { name: string; color: string },
+  ),
 )
 
 const yakuChartCategories = computed(() =>
