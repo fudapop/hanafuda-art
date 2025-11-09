@@ -1,5 +1,5 @@
 <template>
-  <div class="relative">
+  <div class="relative max-w-screen overflow-x-hidden">
     <!-- YAKU LIST VIEW -->
     <div
       v-if="viewMode === 'list'"
@@ -137,7 +137,7 @@
     <!-- CARDS GRID VIEW -->
     <div
       v-else
-      class="p-8 isolate h-full w-max mx-auto overflow-y-auto"
+      :class="['p-8 isolate h-full w-max mx-auto overflow-y-auto text-text', currentDesign]"
     >
       <template v-if="gridMode === 'default'">
         <div class="grid grid-cols-4 sm:grid-cols-8 gap-0.5">
@@ -151,7 +151,12 @@
                 'after:absolute after:inset-0 after:bg-black/60',
             ]"
           >
-            <div class="w-20 sm:w-16 h-auto">
+            <div
+              :class="[
+                'w-20 sm:w-16 h-auto rounded-(--card-radius) overflow-hidden',
+                currentDesign,
+              ]"
+            >
               <CardImage
                 :card="cardName"
                 :src="cardMap.get(cardName)"
@@ -173,13 +178,10 @@
           <div
             v-for="(arr, i) in cardsByMonth"
             :key="`month-arr-${i}`"
-            class="flex flex-col items-center gap-2"
+            class="flex flex-col items-center gap-2 py-4"
           >
             <span>{{ getMonthName(i) }}</span>
-            <ListGrid
-              :cols="4"
-              :rows="1"
-            >
+            <div class="grid grid-cols-4 gap-0">
               <div
                 v-for="cardName in arr"
                 :key="cardName"
@@ -190,7 +192,12 @@
                     'after:absolute after:inset-0 after:bg-black/60',
                 ]"
               >
-                <div class="w-20 sm:w-16 h-auto">
+                <div
+                  :class="[
+                    'w-20 sm:w-16 h-auto rounded-(--card-radius) overflow-hidden',
+                    currentDesign,
+                  ]"
+                >
                   <CardImage
                     :card="cardName"
                     :src="cardMap.get(cardName)"
@@ -205,7 +212,7 @@
                   class="absolute z-50 w-5 h-5 text-red-400 top-1 left-1"
                 />
               </div>
-            </ListGrid>
+            </div>
           </div>
         </div>
       </template>
@@ -214,13 +221,10 @@
           <div
             v-for="[cardType, arr] in cardsByType"
             :key="`type-arr-${cardType}`"
-            class="flex flex-col items-center gap-2"
+            class="flex flex-col items-center gap-2 py-4"
           >
             <span class="capitalize">{{ t(`game.cardTypes.${cardType}`) }}</span>
-            <ListGrid
-              :cols="5"
-              :rows="1"
-            >
+            <div class="grid grid-cols-5 gap-0.5">
               <div
                 v-for="cardName in arr"
                 :key="cardName"
@@ -231,7 +235,12 @@
                     'after:absolute after:inset-0 after:bg-black/60',
                 ]"
               >
-                <div class="w-20 sm:w-16 h-auto">
+                <div
+                  :class="[
+                    'w-16 sm:w-20 h-auto rounded-(--card-radius) overflow-hidden',
+                    currentDesign,
+                  ]"
+                >
                   <CardImage
                     :card="cardName"
                     :src="cardMap.get(cardName)"
@@ -246,7 +255,7 @@
                   class="absolute z-50 w-5 h-5 text-red-400 top-1 left-1"
                 />
               </div>
-            </ListGrid>
+            </div>
           </div>
         </div>
       </template>
@@ -316,10 +325,11 @@ import {
   ExclamationCircleIcon,
   XCircleIcon,
 } from '@heroicons/vue/20/solid'
+import { useStorage } from '@vueuse/core'
+import { type CardName } from '~/utils/cards'
+import { type Yaku, teyaku, viewingYaku } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
-import { type CardName, getCardsOfMonth } from '~/utils/cards'
-import { type Yaku, teyaku, viewingYaku } from '~/utils/yaku'
 
 const { currentDesign, getCardUrlMap, getDesignInfo } = useCardDesign()
 
@@ -356,27 +366,42 @@ const getMonthName = (n: number) => {
   })
 }
 
-const viewModes = ['list', 'grid'] as const
-const gridModes = ['default', 'month', 'type'] as const
-const viewFilter = ref(false)
-const viewModeIndex = ref<number>(0)
-const gridModeIndex = ref<number>(0)
-const viewMode = computed(() => viewModes[viewModeIndex.value] ?? 'list')
-const gridMode = computed(() => gridModes[gridModeIndex.value] ?? 'default')
-const openAll = ref(false)
+interface CollectionViewSettings {
+  viewModeIndex: number
+  gridModeIndex: number
+  viewFilter: boolean
+  openAll: boolean
+}
+
+const settings = useStorage<CollectionViewSettings>(
+  'collection-view-settings',
+  {
+    viewModeIndex: 0,
+    gridModeIndex: 0,
+    viewFilter: false,
+    openAll: false,
+  },
+  localStorage,
+  { deep: true, mergeDefaults: true },
+)
+
+const viewMode = computed(() => ['list', 'grid'][settings.value.viewModeIndex])
+const gridMode = computed(() => ['default', 'month', 'type'][settings.value.gridModeIndex])
+const viewFilter = computed(() => settings.value.viewFilter)
+const openAll = computed(() => settings.value.openAll)
 
 const toggleView = () => {
-  viewModeIndex.value = (viewModeIndex.value + 1) % viewModes.length
+  settings.value.viewModeIndex = (settings.value.viewModeIndex + 1) % 2
 }
 
 const toggleGrid = () => {
-  gridModeIndex.value = (gridModeIndex.value + 1) % gridModes.length
+  settings.value.gridModeIndex = (settings.value.gridModeIndex + 1) % 3
 }
 const toggleFilter = () => {
-  viewFilter.value = !viewFilter.value
+  settings.value.viewFilter = !settings.value.viewFilter
 }
 const toggleOpenAll = () => {
-  openAll.value = !openAll.value
+  settings.value.openAll = !settings.value.openAll
 }
 
 const playerHas = toValue(computed(() => (card: CardName) => cs.collection.p1.has(card)))

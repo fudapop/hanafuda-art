@@ -227,7 +227,7 @@
 }
 
 .sabling-art {
-  --card-radius: 5%;
+  --card-radius: 0.5rem;
   --card-border-w: 1px;
   --card-border-color: midnightblue;
   --card-aspect: 2/3;

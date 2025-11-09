@@ -7,9 +7,8 @@
       @click="toggleOptions"
     >
       <span class="sr-only">Options</span>
-      <Icon
-        name="heroicons:ellipsis-vertical"
-        class="w-5 h-5 text-white"
+      <EllipsisVertical
+        class="size-4 text-white"
         aria-hidden="true"
       />
     </button>
@@ -120,6 +119,7 @@
 
 <script setup lang="ts">
 import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { EllipsisVertical } from 'lucide-vue-next'
 import { type GameOptionsTab } from '~/composables/useOptionsPanel'
 
 const { tabs } = defineProps<{
