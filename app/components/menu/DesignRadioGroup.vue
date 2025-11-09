@@ -240,6 +240,7 @@ import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import { useToast } from 'vue-toastification'
 import DesignDescription from './DesignDescription.vue'
+import type { CardName } from '~/utils/cards'
 
 type CardDesign = (typeof DESIGNS)[number]
 
@@ -329,16 +330,13 @@ const { current: currentProfile } = useProfile()
 const userIsGuest = computed(() => currentProfile.value?.isGuest === true)
 const userLiked = toValue(computed(() => currentUser?.value?.designs.liked))
 
-const likesCount = reactive<Map<CardDesign, number>>(new Map())
 const isLiked = (design: CardDesign) => userLiked?.includes(design)
 const handleLike = (design: CardDesign) => {
   if (!userLiked) return
   if (isLiked(design)) {
     userLiked.splice(userLiked.indexOf(design), 1)
-    likesCount.set(design, likesCount.get(design)! - 1)
   } else {
     userLiked.push(design)
-    likesCount.set(design, likesCount.get(design)! + 1)
   }
 }
 
@@ -397,7 +395,8 @@ onMounted(() => {
     } else if (userIsGuest.value) {
       currentDesign.value = defaultDesign
     } else {
-      currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || defaultDesign
+      currentDesign.value =
+        unlocked.value?.find((d: CardName) => userLiked?.includes(d)) || defaultDesign
     }
   } else if (storedDesign && !isStoredDesignAvailable && storedDesign !== currentDesign.value) {
     // If stored design is not available but current is set, clear the invalid stored design
