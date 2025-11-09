@@ -378,11 +378,11 @@ function shuffle(deck: CardName[]): CardName[] {
 }
 
 function getCardsOfType(cards: CardName[], cardType: CardType): CardName[] {
-  return cards.filter((card) => CARDS[card].type === cardType)
+  return cards.filter((card) => CARDS[card]?.type === cardType)
 }
 
 function getCardsOfMonth(cards: CardName[], month: number): CardName[] {
-  return cards.filter((card) => CARDS[card].month === month)
+  return cards.filter((card) => CARDS[card]?.month === month)
 }
 
 function sortByType(cards: CardName[]): Record<string, CardName[]> {
@@ -395,7 +395,7 @@ function sortByType(cards: CardName[]): Record<string, CardName[]> {
 }
 
 function matchByMonth(cards: CardName[], matching: CardName): CardName[] {
-  const matches = getCardsOfMonth(cards, CARDS[matching].month)
+  const matches = getCardsOfMonth(cards, CARDS[matching]?.month ?? 0)
   return matches
 }
 

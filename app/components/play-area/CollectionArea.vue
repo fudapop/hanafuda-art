@@ -34,74 +34,7 @@
         </template>
       </ul>
     </div>
-    <!-- <div class="flex justify-end"> -->
-    <button
-      v-if="hasCards"
-      :title="`View ${t('common.labels.collection')}`"
-      :class="['my-2 z-30 absolute right-4', player === 'p1' && 'bottom-full']"
-      @click="modalOpen = true"
-    >
-      <span class="sr-only">{{ t('common.labels.collection') }}</span>
-      <MagnifyingGlassPlusIcon
-        class="w-6 h-6 stroke-2 stroke-text"
-        aria-hidden
-      />
-    </button>
-    <!-- </div> -->
   </div>
-
-  <Modal
-    :open="modalOpen"
-    ref="modalRef"
-    :title="t('common.labels.collection')"
-  >
-    <template #title>
-      <div class="flex flex-col items-center gap-2">
-        <img
-          :src="playerAvatar"
-          loading="lazy"
-          class="w-24 h-24 border rounded-full border-border drop-shadow-xs"
-        />
-        <span class="text-2xl font-bold">
-          {{ t('common.labels.collection') }}
-        </span>
-      </div>
-    </template>
-    <template #description>
-      <div class="grid gap-1 [--card-height:140px] px-8 py-4 w-screen">
-        <ul
-          v-for="type in cardTypes"
-          :key="type"
-          class="relative flex flex-wrap h-full max-w-full py-2"
-        >
-          <span
-            v-show="coll[type] && coll[type].size > 0"
-            class="uppercase absolute -top-1 left-0 z-1 whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
-          >
-            <span class="mr-1 text-xs align-middle">
-              {{ coll[type]?.size ?? 0 }}
-            </span>
-            {{ t(`game.cardTypes.${type}`) }}
-          </span>
-          <CardList
-            :cards="coll[type] ?? []"
-            :stack="true"
-          />
-        </ul>
-      </div>
-    </template>
-    <template #actions>
-      <div class="flex justify-center w-full py-8">
-        <button
-          type="button"
-          class="sec-btn"
-          @click="modalOpen = false"
-        >
-          Close
-        </button>
-      </div>
-    </template>
-  </Modal>
 </template>
 
 <script setup lang="ts">
