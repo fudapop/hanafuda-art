@@ -1,20 +1,40 @@
 <template>
   <ContentLayout>
-    <div class="min-h-screen">
+    <div class="min-h-screen isolate">
       <!-- Header -->
       <header
         :class="[
-          'sticky top-0',
+          'sticky top-0 z-10',
           'px-4 py-6 min-h-20 lg:py-8 bg-[url(https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/player_bar.webp)] bg-cover bg-bottom lg:px-8',
         ]"
       >
         <h1 class="text-lg font-bold text-center text-white lg:text-3xl">
-          🏆 {{ t('rankings.title') }} -
-          <span class="capitalize">{{ t(`rankings.filters.${selectedFilter}`) }}</span>
+          🏆 {{ t('rankings.title') }}
         </h1>
       </header>
 
-      <main class="mx-auto overflow-auto max-w-screen lg:px-8 touch-pan-x touch-pan-y">
+      <!-- Filter Options -->
+      <div
+        class="flex flex-wrap items-center justify-center gap-4 mb-6 sticky top-24 rounded-md mx-auto w-full p-4 backdrop-blur-sm z-10 bg-background/30"
+      >
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="filter in filterOptions"
+            :key="filter.value"
+            @click="selectedFilter = filter.value"
+            :class="[
+              'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+              selectedFilter === filter.value
+                ? 'bg-primary text-white'
+                : 'text-text hover:bg-primary/50',
+            ]"
+          >
+            {{ t(filter.label) }}
+          </button>
+        </div>
+      </div>
+
+      <main class="mx-auto overflow-auto max-w-screen lg:px-8 touch-pan-x touch-pan-y isolate">
         <!-- Loading State -->
         <div
           v-if="loading"
@@ -48,245 +68,44 @@
           v-else
           class="max-w-4xl px-4 py-8 mx-auto"
         >
-          <!-- Filter Options -->
-          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div class="flex flex-wrap gap-2">
-              <button
-                v-for="filter in filterOptions"
-                :key="filter.value"
-                @click="selectedFilter = filter.value"
-                :class="[
-                  'px-4 py-2 rounded-md text-sm font-medium transition-colors',
-                  selectedFilter === filter.value
-                    ? 'bg-primary text-white'
-                    : 'text-text hover:bg-primary/50',
-                ]"
-              >
-                {{ t(filter.label) }}
-              </button>
-            </div>
-            <!-- <div class="text-sm text-text-secondary">{{ filteredLeaderboard.length }} players</div> -->
+          <!-- User's Record Card -->
+          <div class="max-w-sm place-content-center mx-auto">
+            <PlayerRankingCard
+              v-if="currentUserPlayer"
+              :player="currentUserPlayer"
+              :rank="currentUserRank"
+              :selected-filter="selectedFilter"
+              :is-current-user="true"
+            />
           </div>
 
-          <!-- Leaderboard Table -->
-          <div class="mx-auto rounded-md shadow-lg h-max w-max bg-background dark:bg-surface">
-            <div class="hidden sm:block">
-              <!-- Desktop Table -->
-              <table class="w-full">
-                <thead class="border-b bg-surface-variant dark:bg-surface border-border">
-                  <tr class="*:px-6 *:py-4 text-sm font-medium tracking-wider uppercase text-text">
-                    <th class="text-left">{{ t('rankings.table.rank') }}</th>
-                    <th class="text-left">{{ t('rankings.table.player') }}</th>
-                    <th class="text-center">{{ t('rankings.table.games') }}</th>
-                    <th class="text-center">{{ t('rankings.table.wins') }}</th>
-                    <th class="text-center">{{ t('rankings.table.losses') }}</th>
-                    <th class="text-center">{{ t('rankings.table.draws') }}</th>
-                    <th class="text-center">{{ t('rankings.table.winRate') }}</th>
-                    <th class="text-center">{{ t('rankings.table.coins') }}</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-border">
-                  <tr
-                    v-for="(player, index) in filteredLeaderboard"
-                    :key="player.uid"
-                    :class="[
-                      'hover:bg-surface-variant/50 transition-colors',
-                      index < 3 ? 'bg-linear-to-r from-transparent to-primary/5' : '',
-                    ]"
-                  >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <span class="text-sm font-medium text-text"> #{{ index + 1 }} </span>
-                        <span
-                          v-if="index === 0"
-                          class="ml-2 text-2xl"
-                          >🥇</span
-                        >
-                        <span
-                          v-else-if="index === 1"
-                          class="ml-2 text-2xl"
-                          >🥈</span
-                        >
-                        <span
-                          v-else-if="index === 2"
-                          class="ml-2 text-2xl"
-                          >🥉</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <img
-                          :src="player.avatar"
-                          :alt="player.username"
-                          class="w-10 h-10 mr-3 rounded-full"
-                          @error="handleImageError"
-                        />
-                        <div>
-                          <div class="text-sm font-medium text-text">
-                            {{ player.username }}
-                          </div>
-                          <div
-                            v-if="player.isGuest"
-                            class="text-xs text-text-secondary"
-                          >
-                            {{ t('rankings.player.guest') }}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                      <span class="text-sm text-text">{{ player.totalGames }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                      <span class="text-sm font-medium text-green-600 dark:text-green-400">
-                        {{ player.record.win }}
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                      <span class="text-sm font-medium text-red-600 dark:text-red-400">
-                        {{ player.record.loss }}
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                      <span class="text-sm text-text-secondary">{{ player.record.draw }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                      <div class="flex items-center justify-center">
-                        <div
-                          :class="[
-                            'px-2 py-1 rounded-full text-xs font-medium',
-                            player.winRate >= 70
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                              : player.winRate >= 40
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-                          ]"
-                        >
-                          {{ player.winRate.toFixed(1) }}%
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                      <div class="flex items-center justify-center">
-                        <span class="text-sm text-text">{{
-                          player.record.coins.toLocaleString()
-                        }}</span>
-                        <img
-                          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
-                          alt="coin"
-                          class="w-4 h-4 ml-1"
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Mobile Cards -->
+          <!-- Leaderboard Ranking Cards -->
+          <div class="mx-auto h-max w-max mt-12">
             <div
               v-if="filteredLeaderboard.length > 0"
-              class="py-8 mx-4 space-y-4 sm:hidden"
+              class="py-8 mx-4 grid sm:grid-cols-2 gap-12"
             >
-              <div
+              <!-- Player Card -->
+              <PlayerRankingCard
                 v-for="(player, index) in filteredLeaderboard"
                 :key="player.uid"
-                :class="[
-                  'bg-white dark:bg-surface rounded-lg border border-border p-4',
-                  index < 3 ? 'ring-2 ring-primary border-none' : '',
-                ]"
-              >
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center">
-                    <span
-                      v-if="index === 0"
-                      class="mr-2 text-xl"
-                      >🥇</span
-                    >
-                    <span
-                      v-else-if="index === 1"
-                      class="mr-2 text-xl"
-                      >🥈</span
-                    >
-                    <span
-                      v-else-if="index === 2"
-                      class="mr-2 text-xl"
-                      >🥉</span
-                    >
-                    <span class="mr-3 text-lg font-bold text-text">#{{ index + 1 }}</span>
-                    <img
-                      :src="player.avatar"
-                      :alt="player.username"
-                      class="w-8 h-8 mr-2 rounded-full"
-                      @error="handleImageError"
-                    />
-                    <div>
-                      <div class="font-medium text-text">{{ player.username }}</div>
-                      <div
-                        v-if="player.isGuest"
-                        class="text-xs text-text-secondary"
-                      >
-                        {{ t('rankings.player.guestShort') }}
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    :class="[
-                      'px-2 py-1 rounded-full text-xs font-medium',
-                      player.winRate >= 70
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                        : player.winRate >= 40
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-                    ]"
-                  >
-                    {{ player.winRate.toFixed(1) }}%
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                  <div class="text-center">
-                    <div class="text-text-secondary">{{ t('rankings.table.coins') }}</div>
-                    <div class="flex items-center justify-center font-medium text-text">
-                      {{ player.record.coins.toLocaleString() }}
-                      <img
-                        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
-                        alt="coin"
-                        class="w-3 h-3 ml-1"
-                      />
-                    </div>
-                  </div>
-                  <div class="text-center">
-                    <div class="text-text-secondary">{{ t('rankings.table.games') }}</div>
-                    <div class="font-medium text-text">{{ player.totalGames }}</div>
-                  </div>
-                  <div class="text-center">
-                    <div class="text-text-secondary">{{ t('rankings.table.wins') }}</div>
-                    <div class="font-medium text-green-600 dark:text-green-400">
-                      {{ player.record.win }}
-                    </div>
-                  </div>
-                  <div class="text-center">
-                    <div class="text-text-secondary">{{ t('rankings.table.losses') }}</div>
-                    <div class="font-medium text-red-600 dark:text-red-400">
-                      {{ player.record.loss }}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                :player="player"
+                :rank="index + 1"
+                :selected-filter="selectedFilter"
+                :is-current-user="player.uid === currentUserPlayer?.uid"
+              />
             </div>
-          </div>
 
-          <!-- Empty State -->
-          <div
-            v-if="filteredLeaderboard.length === 0"
-            class="py-12 text-center"
-          >
-            <p class="mb-4 text-lg text-text-secondary">{{ t('rankings.empty.noPlayers') }}</p>
-            <p class="text-sm text-text-secondary">
-              {{ t('rankings.empty.beTheFirst') }}
-            </p>
+            <!-- Empty State -->
+            <div
+              v-if="filteredLeaderboard.length === 0"
+              class="py-12 text-center"
+            >
+              <p class="mb-4 text-lg text-text-secondary">{{ t('rankings.empty.noPlayers') }}</p>
+              <p class="text-sm text-text-secondary">
+                {{ t('rankings.empty.beTheFirst') }}
+              </p>
+            </div>
           </div>
         </div>
       </main>
@@ -333,13 +152,42 @@ interface FilterOption {
 }
 
 const LIMIT = 50
-const MIN_GAMES = 10
+const MIN_GAMES = 100
 
 // Reactive state
 const loading = ref(true)
 const error = ref(false)
 const leaderboard = ref<LeaderboardPlayer[]>([])
 const selectedFilter = ref('overall')
+
+// Current user's record
+const user = useProfile().current
+
+// Convert current user to LeaderboardPlayer format
+const currentUserPlayer = computed<LeaderboardPlayer | null>(() => {
+  if (!user.value?.uid || !user.value?.record) return null
+
+  const record = { ...user.value.record }
+  // Adjust for coins spent (same calculation as in fetchLeaderboard)
+  record.coins += Math.max((user.value.designs?.unlocked?.length || 0) - 3, 0) * 500
+  const totalGames = record.win + record.loss + record.draw
+
+  // Only show if user has played at least one game
+  if (totalGames === 0) return null
+
+  const winRate = totalGames > 0 ? (record.win / totalGames) * 100 : 0
+
+  return {
+    uid: user.value.uid,
+    username: user.value.username || 'Anonymous Player',
+    avatar: user.value.avatar || '/avatars/flat-crane.webp',
+    record,
+    totalGames,
+    winRate,
+    lastUpdated: user.value.lastUpdated,
+    isGuest: user.value.isGuest || false,
+  }
+})
 
 // Filter options
 const filterOptions: FilterOption[] = [
@@ -349,11 +197,11 @@ const filterOptions: FilterOption[] = [
   { label: 'rankings.filters.winrate', value: 'winrate' },
 ]
 
-// Computed properties
-const filteredLeaderboard = computed(() => {
+// Helper function to get sorted leaderboard (without limit)
+const getSortedLeaderboard = (filter: string) => {
   let sorted = [...leaderboard.value]
 
-  switch (selectedFilter.value) {
+  switch (filter) {
     case 'active':
       sorted = sorted
         .filter((p) => p.totalGames >= MIN_GAMES)
@@ -392,7 +240,22 @@ const filteredLeaderboard = computed(() => {
       break
   }
 
-  return sorted.slice(0, LIMIT)
+  return sorted
+}
+
+// Computed properties
+const filteredLeaderboard = computed(() => {
+  return getSortedLeaderboard(selectedFilter.value).slice(0, LIMIT)
+})
+
+// Calculate current user's rank based on selected filter
+const currentUserRank = computed(() => {
+  if (!user.value?.uid) return null
+
+  const sorted = getSortedLeaderboard(selectedFilter.value)
+  const index = sorted.findIndex((p) => p.uid === user.value?.uid)
+
+  return index >= 0 ? index + 1 : null
 })
 
 // Methods
@@ -438,11 +301,6 @@ const fetchLeaderboard = async () => {
   } finally {
     loading.value = false
   }
-}
-
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement
-  img.src = '/avatars/flat-crane.webp' // TODO: change to default avatar
 }
 
 // Initialize
