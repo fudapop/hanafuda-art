@@ -11,7 +11,7 @@ import { useGameDataStore } from '~~/stores/gameDataStore'
 
 const { koikoiIsCalled, getCaller } = useDecisionHandler()
 
-const { roundCounter, roundOver, getCurrent } = storeToRefs(useGameDataStore())
+const { roundCounter, roundOver, getCurrent, eventHistory } = storeToRefs(useGameDataStore())
 
 const gameIsStarted = useState('start', () => false)
 
@@ -20,20 +20,27 @@ const audio = useNuxtApp().$audio as ReturnType<typeof useAudio>
 const { BGM, SFX } = audio
 
 const cleanupCoinSfx = watch(roundOver, (newRoundOver) => {
-  if (newRoundOver && getCurrent.value.result.winner === 'p1') {
+  if (newRoundOver && getCurrent.value?.result?.winner) {
     audio.playSfx(SFX.coin)
   }
 })
 
 const cleanupCardSfx = watch(
-  () => getCurrent.value.phase,
-  (newPhase) => {
-    if (newPhase === 'draw') {
-      audio.playSfx(SFX.card3)
-    } else if (newPhase === 'collect') {
-      audio.playSfx(SFX.card2)
+  eventHistory,
+  () => {
+    const lastEntry = eventHistory.value.at(-1)
+    if (!lastEntry) return
+    if ('action' in lastEntry) {
+      if (lastEntry.action === 'discard') {
+        audio.playSfx(SFX.card3)
+      } else if (lastEntry.action === 'match') {
+        audio.playSfx(SFX.card2)
+      } else if (lastEntry.action === 'draw') {
+        audio.playSfx(SFX.card1)
+      }
     }
   },
+  { deep: true },
 )
 const cleanupBgm = watch(
   [koikoiIsCalled, roundCounter, gameIsStarted],
@@ -44,7 +51,7 @@ const cleanupBgm = watch(
       const caller = getCaller.value
       audio.playSfx(SFX.slash)
       if (caller === 'p2') {
-        audio.crossfadeTo(BGM.koikoi1, 1.2)
+        audio.crossfadeTo(BGM.koikoi1, 1.5)
       } else if (caller === 'p1') {
         audio.crossfadeTo(BGM.koikoi2, 1.2)
       }
