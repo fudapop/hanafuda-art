@@ -1,5 +1,5 @@
 <template>
-  <div class="grid">
+  <div class="grid pb-12 overflow-x-hidden">
     <div
       id="user-info"
       class="grid p-4 mx-3"
