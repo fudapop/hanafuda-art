@@ -6,6 +6,7 @@ export default defineVitestConfig({
     setupFiles: ['./test-setup.ts'],
     includeSource: ['**/__tests__/**/*.{js,ts}'],
     exclude: ['node_modules', '__checks__'],
+    environment: 'nuxt',
     environmentOptions: {
       nuxt: {
         mock: {

@@ -322,7 +322,7 @@ export const useStoreManager = () => {
       return false
     }
 
-    return await loadGameFromStorage(saves[0].key)
+    return await loadGameFromStorage(saves[0]?.key || '')
   }
 
   /**
@@ -332,7 +332,7 @@ export const useStoreManager = () => {
     const [major, minor] = version.split('.').map(Number)
     const [currentMajor, currentMinor] = '1.0.0'.split('.').map(Number)
 
-    return major === currentMajor && minor <= currentMinor
+    return major === currentMajor && (minor ?? 0) <= (currentMinor ?? 0)
   }
 
   return {
