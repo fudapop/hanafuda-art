@@ -2,8 +2,25 @@
 
 ## [Niewydane]
 
-### Ulepszenia UI i doświadczenia
+### Nowe funkcje
 - **Inteligentna pauza audio**: Muzyka w tle automatycznie zatrzymuje się, gdy przełączasz się na inną kartę lub minimalizujesz okno, i wznawia się, gdy wracasz do gry. Pomaga to oszczędzać zasoby systemowe i zapewnia lepsze wrażenia podczas wielozadaniowości.
+- **Ulepszony interfejs kolekcji kart**: Kolekcja kart zawiera teraz widoki siatki i podgląd arkusza kart, ułatwiając przeglądanie i przeglądanie kolekcji.
+- **Ulepszona strona rankingów**: Strona rankingów zawiera teraz nowe wykresy i wyświetla pozycję bieżącego gracza, zapewniając lepszy kontekst dla twojej pozycji.
+- **Ulepszone czasowanie efektów dźwiękowych**: Efekty dźwiękowe odtwarzają się teraz z lepszym czasowaniem dla bardziej responsywnego doświadczenia audio.
+
+### Ulepszenia UI i doświadczenia użytkownika
+- **Aktualizacje strony rankingów**: Zaktualizowano kolory i układ na stronie rankingów dla lepszej spójności wizualnej i czytelności.
+- **Ulepszenia wykresów statystyk**: Naprawiono kolory tła wykresów kołowych i poprawiono wypełnienie segmentów wykresów dla lepszej przejrzystości wizualnej.
+- **Stylizacja panelu opcji**: Ulepszono stylizację nawigacji zakładek w panelu opcji gry dla bardziej dopracowanego interfejsu.
+- **Udoskonalenia animacji kart**: Wyodrębniono style animacji kart do globalnej klasy narzędziowej dla lepszej spójności i łatwości utrzymania.
+
+### Naprawione błędy
+- **Naprawa nakładki modala**: Naprawiono składnię stylu nieprzezroczystości nakładki modala dla prawidłowego renderowania.
+- **Bezpieczeństwo typów i linki artystów**: Poprawiono bezpieczeństwo typów i naprawiono problemy z widocznością linków artystów.
+
+### Ulepszenia wydajności i techniczne
+- **Konsolidacja zestawów ikon**: Skonsolidowano zestawy ikon i zaktualizowano konfigurację dla lepszej organizacji i wsparcia offline.
+- **Aktualizacje frameworków**: Zaktualizowano do Nuxt v4 i Tailwind CSS v4 dla lepszej wydajności, lepszego doświadczenia deweloperskiego i dostępu do najnowszych funkcji.
 
 ## [2025.11.1] - 2025-11-03
 
