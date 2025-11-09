@@ -9,23 +9,27 @@
         ]"
       >
         <h1 class="text-lg font-bold text-center text-white lg:text-3xl">
-          🏆 {{ t('rankings.title') }}
+          {{ t('rankings.title') }}
         </h1>
       </header>
 
       <!-- Filter Options -->
       <div
-        class="flex flex-wrap items-center justify-center gap-4 mb-6 sticky top-24 rounded-md mx-auto w-full p-4 backdrop-blur-sm z-10 bg-background/30"
+        :class="[
+          'flex flex-wrap items-center justify-center mb-6 w-full p-4',
+          'sticky mx-auto backdrop-blur-sm z-10 bg-background/30',
+          isMobile ? 'top-20' : 'top-20 lg:top-25',
+        ]"
       >
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-1">
           <button
             v-for="filter in filterOptions"
             :key="filter.value"
             @click="selectedFilter = filter.value"
             :class="[
-              'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+              'px-3 py-2 rounded-md text-sm font-medium transition-colors w-[80px] sm:w-[150px]',
               selectedFilter === filter.value
-                ? 'bg-primary text-white'
+                ? 'bg-primary/80 text-white'
                 : 'text-text hover:bg-primary/50',
             ]"
           >
@@ -34,7 +38,7 @@
         </div>
       </div>
 
-      <main class="mx-auto overflow-auto max-w-screen lg:px-8 touch-pan-x touch-pan-y isolate">
+      <main class="mx-auto overflow-y-auto max-w-screen lg:px-8 touch-pan-y isolate">
         <!-- Loading State -->
         <div
           v-if="loading"
@@ -66,10 +70,10 @@
         <!-- Leaderboard Content -->
         <div
           v-else
-          class="max-w-4xl px-4 py-8 mx-auto"
+          class="max-w-4xl py-8 mx-auto"
         >
           <!-- User's Record Card -->
-          <div class="max-w-sm place-content-center mx-auto">
+          <div class="max-w-sm place-content-center mx-auto px-4">
             <PlayerRankingCard
               v-if="currentUserPlayer"
               :player="currentUserPlayer"
@@ -79,21 +83,27 @@
             />
           </div>
 
+          <div class="bg-border/50 w-3/4 mx-auto h-px mt-12 mb-4" />
+
           <!-- Leaderboard Ranking Cards -->
-          <div class="mx-auto h-max w-max mt-12">
+          <div class="mx-auto h-max w-max max-w-screen">
             <div
               v-if="filteredLeaderboard.length > 0"
-              class="py-8 mx-4 grid sm:grid-cols-2 gap-12"
+              class="py-8 mx-4 grid sm:grid-cols-2 gap-12 max-w-screen"
             >
               <!-- Player Card -->
-              <PlayerRankingCard
+              <div
                 v-for="(player, index) in filteredLeaderboard"
                 :key="player.uid"
-                :player="player"
-                :rank="index + 1"
-                :selected-filter="selectedFilter"
-                :is-current-user="player.uid === currentUserPlayer?.uid"
-              />
+                class="flex justify-center w-full"
+              >
+                <PlayerRankingCard
+                  :player="player"
+                  :rank="index + 1"
+                  :selected-filter="selectedFilter"
+                  :is-current-user="player.uid === currentUserPlayer?.uid"
+                />
+              </div>
             </div>
 
             <!-- Empty State -->
@@ -115,6 +125,11 @@
 
 <script setup lang="ts">
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
+import { useScreenOrientation } from '@vueuse/core'
+
+const { orientation } = useScreenOrientation()
+const { isMobile } = useDevice()
+const isMobileLandscape = computed(() => isMobile && orientation.value?.includes('landscape'))
 
 const { t } = useI18n()
 
