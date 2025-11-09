@@ -169,14 +169,14 @@
     >
       <template #legend>
         <!-- Legend with Card Types -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="flex items-start gap-3">
+        <div class="grid grid-cols-2 gap-y-4 gap-x-12">
+          <div class="flex items-center gap-3">
             <Icon
-              name="material-symbols:sunny"
-              class="w-8 h-8 text-yellow-500 shrink-0"
+              name="ic:outline-light-mode"
+              class="text-yellow-500 text-lg"
             />
             <div class="flex-1">
-              <div class="flex items-center justify-between mb-1">
+              <div class="grid grid-cols-2 items-center">
                 <strong class="text-text capitalize">{{ t('game.cardTypes.brights') }}</strong>
                 <span class="text-lg font-bold text-text">{{
                   user.stats.cardsCaptured_bright
@@ -184,13 +184,13 @@
               </div>
             </div>
           </div>
-          <div class="flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <Icon
-              name="lucide:panda"
-              class="w-8 h-8 text-orange-500 shrink-0"
+              name="mdi:bird"
+              class="text-orange-500 text-lg"
             />
             <div class="flex-1">
-              <div class="flex items-center justify-between mb-1">
+              <div class="grid grid-cols-2 items-center">
                 <strong class="text-text capitalize">{{ t('game.cardTypes.animals') }}</strong>
                 <span class="text-lg font-bold text-text">{{
                   user.stats.cardsCaptured_animal
@@ -198,13 +198,13 @@
               </div>
             </div>
           </div>
-          <div class="flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <Icon
-              name="game-icons:scroll-unfurled"
-              class="w-8 h-8 text-red-500 shrink-0"
+              name="mdi:script"
+              class="text-red-500 text-lg"
             />
             <div class="flex-1">
-              <div class="flex items-center justify-between mb-1">
+              <div class="grid grid-cols-2 items-center">
                 <strong class="text-text capitalize">{{ t('game.cardTypes.ribbons') }}</strong>
                 <span class="text-lg font-bold text-text">{{
                   user.stats.cardsCaptured_ribbon
@@ -212,13 +212,13 @@
               </div>
             </div>
           </div>
-          <div class="flex items-start gap-3">
+          <div class="flex items-center gap-3">
             <Icon
-              name="ph:plant-fill"
-              class="w-8 h-8 text-green-600 shrink-0"
+              name="mdi:flower"
+              class="text-green-600 text-lg"
             />
             <div class="flex-1">
-              <div class="flex items-center justify-between mb-1">
+              <div class="grid grid-cols-2 items-center">
                 <strong class="text-text capitalize">{{ t('game.cardTypes.plains') }}</strong>
                 <span class="text-lg font-bold text-text">{{
                   user.stats.cardsCaptured_plain

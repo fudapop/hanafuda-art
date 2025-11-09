@@ -7,8 +7,7 @@
     <template #title>
       <div class="flex flex-col items-center justify-between px-8 sm:flex-row">
         <div class="flex flex-col items-center sm:flex-row gap-x-2">
-          <Icon
-            name="heroicons:megaphone"
+          <MegaphoneIcon
             class="w-6 h-6 text-primary"
             aria-hidden
           />
@@ -85,10 +84,7 @@
       >
         <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
           <span class="flex items-center gap-1">
-            <Icon
-              name="heroicons:eye"
-              class="w-4 h-4"
-            />
+            <Icon name="mdi:eye-outline" />
             {{ impressions[currentAnnouncement.id]?.views || 0 }}
             <span class="sr-only">{{ t('announcements.metrics.views') }}</span>
           </span>
@@ -105,8 +101,8 @@
             @click="handleLike"
           >
             <Icon
-              :name="isLiked(currentAnnouncement.id) ? 'heroicons:heart-solid' : 'heroicons:heart'"
-              class="w-4 h-4"
+              :name="isLiked(currentAnnouncement.id) ? 'mdi:heart' : 'mdi:heart-outline'"
+              class="text-sm"
             />
             <span class="sr-only">{{
               isLiked(currentAnnouncement.id)
@@ -139,8 +135,8 @@
           "
         >
           <Icon
-            name="heroicons:chevron-left"
-            class="w-4 h-4"
+            name="mdi:chevron-left"
+            class="text-sm"
           />
           {{ t('common.actions.previous') }}
         </button>
@@ -177,8 +173,8 @@
         >
           {{ t('common.actions.next') }}
           <Icon
-            name="heroicons:chevron-right"
-            class="w-4 h-4"
+            name="mdi:chevron-right"
+            class="text-sm"
           />
         </button>
       </div>
@@ -191,7 +187,7 @@
           v-posthog-capture="{
             event: 'dismiss_announcement',
             properties: {
-              announcement: currentAnnouncement.title,
+              announcement: currentAnnouncement?.title,
             },
           }"
         >
@@ -204,7 +200,7 @@
           v-posthog-capture="{
             event: 'dont_show_again_announcement',
             properties: {
-              announcement: currentAnnouncement.title,
+              announcement: currentAnnouncement?.title,
             },
           }"
         >
@@ -221,7 +217,7 @@
     >
       <Icon
         name="mdi:restore"
-        class="w-5 h-5 text-white"
+        class="text-sm text-white"
         aria-hidden
       />
       <span class="sr-only"> Reset Announcements </span>
@@ -230,6 +226,7 @@
 </template>
 
 <script setup lang="ts">
+import { MegaphoneIcon } from '@heroicons/vue/20/solid'
 import { useAnnouncements } from '~/composables/useAnnouncements'
 
 const { isMobile } = useDevice()

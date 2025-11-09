@@ -44,7 +44,7 @@
           <template #tab-icon-1>
             <Icon
               name="mdi:cards-variant"
-              class="w-5 h-5"
+              class="text-base"
               aria-hidden="true"
             />
           </template>
@@ -55,7 +55,7 @@
           <template #tab-icon-2>
             <Icon
               name="mdi:cards-outline"
-              class="w-5 h-5"
+              class="text-base"
               aria-hidden="true"
             />
           </template>
@@ -66,7 +66,7 @@
           <template #tab-icon-3>
             <Icon
               name="mdi:gamepad-variant"
-              class="w-5 h-5"
+              class="text-base"
               aria-hidden="true"
             />
           </template>
@@ -76,8 +76,8 @@
           </template>
           <template #tab-icon-4>
             <Icon
-              name="heroicons:user"
-              class="w-5 h-5"
+              name="ic:round-account-circle"
+              class="text-base"
               aria-hidden="true"
             />
           </template>
