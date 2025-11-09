@@ -1,6 +1,6 @@
 <template>
   <div class="my-4 space-y-2 cursor-default group">
-    <div class="relative">
+    <div class="flex items-center justify-between pr-4">
       <h3 class="text-lg font-semibold tracking-wide text-gray-900 dark:text-white">
         {{ info.title }}
         <span v-if="isNew">✨</span>
@@ -8,12 +8,14 @@
       <button
         :class="[
           'cursor-pointer text-xl text-text-secondary',
-          'absolute right-2 -top-8',
-          isMobile ? 'block' : 'hidden group-hover:block',
+          isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         ]"
         @click="() => (open = true)"
       >
-        <Icon name="mdi:magnify-expand" />
+        <Icon
+          name="mdi:magnify-expand"
+          class="text-lg mt-2"
+        />
         <span class="sr-only">View Cards</span>
       </button>
     </div>
@@ -50,7 +52,7 @@
         </template>
         <template #description>
           <div class="px-4">
-            <p class="text-balance">
+            <p class="text-balance text-text">
               {{ info.description }}
             </p>
             <p
@@ -82,7 +84,12 @@
         </template>
         <template #actions>
           <div class="w-max mx-auto my-8">
-            <button class="sec-btn">Close</button>
+            <button
+              class="sec-btn cursor-pointer"
+              @click="open = false"
+            >
+              {{ t('common.actions.close') }}
+            </button>
           </div>
         </template>
       </Modal>
@@ -91,15 +98,11 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
-
 const { isMobile } = useDevice()
-
+const { t } = useI18n()
 const { design, isNew = false } = defineProps<{ design: CardDesign; isNew?: boolean }>()
 
 const modalRef = ref(null)
 const open = ref(false)
 const info = computed(() => useCardDesign().getDesignInfo(design))
-
-onClickOutside(modalRef, () => (open.value = false))
 </script>

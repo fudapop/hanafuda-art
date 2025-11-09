@@ -98,18 +98,18 @@
           </Transition>
 
           <!-- DESCRIPTION SECTION -->
-          <div :class="['relative w-full @md:w-[360px] space-y-4 px-4 pb-4 rounded-xs text-text']">
-            <div class="flex items-start float-right mt-4 gap-x-2">
+          <div :class="['relative w-full @md:w-[360px] space-y-2 px-4 pb-4 rounded-xs text-text']">
+            <div class="flex items-center float-right mt-6 gap-x-2">
               <!-- SELECTION INDICATOR -->
               <span
                 v-if="checked"
                 aria-label="{{ t('common.states.selected') }}"
-                class="w-6 h-6"
+                class=""
               >
                 <span class="sr-only">{{ t('common.states.selected') }}</span>
                 <CheckCircleIcon
                   aria-hidden
-                  class="w-full h-full text-primary"
+                  class="size-5 text-primary"
                 />
               </span>
               <!-- LIKE BUTTON -->
@@ -134,11 +134,11 @@
               >
                 <HeartSolidIcon
                   v-if="isLiked(design)"
-                  class="w-6 h-6"
+                  class="size-5"
                 />
                 <HeartOutlineIcon
                   v-else
-                  class="w-6 h-6"
+                  class="size-5"
                 />
               </button>
             </div>
@@ -236,11 +236,11 @@ import {
   LockClosedIcon,
   LockOpenIcon,
 } from '@heroicons/vue/20/solid'
-import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
+import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { useToast } from 'vue-toastification'
-import DesignDescription from './DesignDescription.vue'
 import type { CardName } from '~/utils/cards'
+import DesignDescription from './DesignDescription.vue'
 
 type CardDesign = (typeof DESIGNS)[number]
 
