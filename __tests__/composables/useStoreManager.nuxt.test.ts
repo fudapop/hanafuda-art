@@ -1,10 +1,10 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useStoreManager } from '~/composables/useStoreManager'
-import { useCardStore } from '~~/stores/cardStore'
-import { useConfigStore } from '~~/stores/configStore'
-import { useGameDataStore } from '~~/stores/gameDataStore'
-import { usePlayerStore } from '~~/stores/playerStore'
+import { useStoreManager } from '../../app/composables/useStoreManager'
+import { useCardStore } from '../../stores/cardStore'
+import { useConfigStore } from '../../stores/configStore'
+import { useGameDataStore } from '../../stores/gameDataStore'
+import { usePlayerStore } from '../../stores/playerStore'
 
 describe('useStoreManager', () => {
   beforeEach(() => {

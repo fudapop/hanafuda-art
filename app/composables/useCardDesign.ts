@@ -1,7 +1,6 @@
 import CARD_DESIGNS from '~/assets/designInfo.json'
-import { type CardSizeOptions, useConfigStore } from '~~/stores/configStore'
 import { type CardName, DECK } from '~/utils/cards'
-import { useSupabase } from './useSupabase'
+import { type CardSizeOptions, useConfigStore } from '~~/stores/configStore'
 
 export type DesignInfo = {
   name: string
@@ -30,12 +29,9 @@ const DESIGNS = (Object.keys(CARD_DESIGNS) as CardDesign[]).filter(
 
 type CardMap = Map<CardName, string>
 
-const supabase = ref<ReturnType<typeof useSupabase> | null>(null)
-
 export const useCardDesign = () => {
-  if (!supabase.value) {
-    supabase.value = useSupabase()
-  }
+  const { supabaseUrl } = useRuntimeConfig().public
+  const bucketUrl = `${supabaseUrl}/storage/v1/render/image/public/static`
   const currentDesign: Ref<CardDesign> = useState('design', () => 'cherry-version')
 
   /**
@@ -57,25 +53,14 @@ export const useCardDesign = () => {
   }
 
   const getCardUrl = (cardName: CardName, design?: CardDesign): string => {
-    if (!supabase.value) {
-      throw new Error('Supabase not initialized')
-    }
     const designName = design ?? currentDesign.value
     const designInfo = getDesignInfo(designName)
-    const path = `cards/${designName}/${cardName}.${designInfo.formatExt || 'webp'}`
-    const {
-      data: { publicUrl },
-    } = supabase.value.storage.from('static').getPublicUrl(path, {
-      transform: {
-        width: 120,
-        resize: 'contain',
-      },
+    const path = `${bucketUrl}/cards/${designName}/${cardName}.${designInfo.formatExt || 'webp'}`
+    const query = new URLSearchParams({
+      width: '120',
+      resize: 'contain',
     })
-    if (!publicUrl) {
-      console.error(`Card URL not found for ${cardName} in ${designName}`)
-      return ''
-    }
-    return publicUrl
+    return `${path}?${query.toString()}`
   }
 
   /**

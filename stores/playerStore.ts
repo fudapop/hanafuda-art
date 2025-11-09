@@ -1,10 +1,10 @@
 /**
  * @fileoverview Player Store
- * 
+ *
  * Manages player-specific data and turn management for Hanafuda gameplay.
  * Handles player identification, active/inactive states, dealer rotation,
  * and bonus multipliers for scoring calculations.
- * 
+ *
  * Features:
  * - Two-player game support (p1, p2)
  * - Active player tracking and turn switching
@@ -12,31 +12,32 @@
  * - Bonus multiplier for koi-koi scoring
  * - Player name customization
  * - Serializable state for persistence
- * 
+ *
  * Player States:
  * - isActive: Currently taking their turn
  * - isDealer: Deals cards and goes first in new rounds
- * 
+ *
  * @example
  * ```typescript
  * const playerStore = usePlayerStore()
- * 
+ *
  * // Get current active player
  * const current = playerStore.activePlayer
  * console.log(`${current.name} is taking their turn`)
- * 
+ *
  * // Switch turns
  * playerStore.toggleActivePlayer()
- * 
+ *
  * // Set new dealer after round
  * playerStore.reset('p2') // p2 becomes new dealer
- * 
+ *
  * // Increment koi-koi bonus
  * playerStore.incrementBonus()
  * ```
  */
 
 import { defineStore } from 'pinia'
+import { computed, reactive, ref } from 'vue'
 
 /** Player identifier type */
 export type PlayerKey = 'p1' | 'p2'
@@ -145,22 +146,22 @@ export const usePlayerStore = defineStore('players', () => {
   function reset(newDealer?: PlayerKey | null) {
     bonusMultiplier.value = 1
     // newDealer = newDealer ?? winningPlayer.value;
-    
+
     // If no newDealer specified, reset to initial state (p1 active and dealer)
     const dealerToSet = newDealer || 'p1'
-    
+
     playerList.value.forEach((p) => {
       p.isDealer = p.id === dealerToSet
       p.isActive = p.id === dealerToSet
     })
-    
+
     console.debug(`Player store reset: ${dealerToSet} is now active and dealer`)
   }
 
   function exportSerializedState(): string {
     const serializable = {
       players: { ...players },
-      bonusMultiplier: bonusMultiplier.value
+      bonusMultiplier: bonusMultiplier.value,
     }
     return JSON.stringify(serializable)
   }
@@ -168,15 +169,15 @@ export const usePlayerStore = defineStore('players', () => {
   function importSerializedState(serializedState: string): boolean {
     try {
       const data = JSON.parse(serializedState)
-      
+
       // Validate structure
       if (!data.players || typeof data.bonusMultiplier !== 'number') {
         throw new Error('Invalid player store state structure')
       }
-      
+
       Object.assign(players, data.players)
       bonusMultiplier.value = data.bonusMultiplier
-      
+
       return true
     } catch (error) {
       console.error('Failed to import player store state:', error)
