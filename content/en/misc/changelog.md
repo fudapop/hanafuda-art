@@ -2,8 +2,25 @@
 
 ## [Unreleased]
 
-### UI & Experience Improvements
+### New Features
 - **Smart Audio Pause**: Background music now automatically pauses when you switch to another tab or minimize the window, and resumes when you return to the game. This helps conserve system resources and provides a better experience when multitasking.
+- **Enhanced Card Collection UI**: Card collection now features grid views and a card sheet preview, making it easier to browse and examine your collection.
+- **Improved Rankings Page**: Rankings page now includes new charts and displays the current player's position, providing better context for your standing.
+- **Improved Sound Effect Timing**: Sound effects now play with better timing for a more responsive audio experience.
+
+### UI & Experience Improvements
+- **Rankings Page Updates**: Updated colors and layout on the rankings page for improved visual consistency and readability.
+- **Stats Chart Improvements**: Fixed donut chart background colors and improved chart segment padding for better visual clarity.
+- **Options Panel Styling**: Enhanced tab navigation styling in the game options panel for a more polished interface.
+- **Card Animation Refinements**: Extracted card animation styles to a global utility class for better consistency and maintainability.
+
+### Bug Fixes
+- **Modal Overlay Fix**: Fixed modal overlay opacity style syntax for proper rendering.
+- **Type Safety & Artist Links**: Improved type safety and fixed artist link visibility issues.
+
+### Performance & Technical Improvements
+- **Icon Sets Consolidation**: Consolidated icon sets and updated configuration for better organization and offline support.
+- **Framework Upgrades**: Upgraded to Nuxt v4 and Tailwind CSS v4 for improved performance, better developer experience, and access to the latest features.
 
 ## [2025.11.1] - 2025-11-03
 
