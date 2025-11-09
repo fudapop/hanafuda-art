@@ -16,7 +16,7 @@
         @dblclick="modalOpen = true"
         @dbltap="modalOpen = true"
       >
-        <template v-if="coll[type].size > 0">
+        <template v-if="coll[type] && coll[type].size > 0">
           <span
             class="uppercase absolute top-1 left-0 z-1 whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
           >
@@ -75,16 +75,16 @@
           class="relative flex flex-wrap h-full max-w-full py-2"
         >
           <span
-            v-show="coll[type].size > 0"
+            v-show="coll[type] && coll[type].size > 0"
             class="uppercase absolute -top-1 left-0 z-1 whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-lg"
           >
             <span class="mr-1 text-xs align-middle">
-              {{ coll[type].size }}
+              {{ coll[type]?.size ?? 0 }}
             </span>
             {{ t(`game.cardTypes.${type}`) }}
           </span>
           <CardList
-            :cards="coll[type]"
+            :cards="coll[type] ?? []"
             :stack="true"
           />
         </ul>
@@ -114,7 +114,6 @@ import { useGameDataStore } from '~~/stores/gameDataStore'
 import { type PlayerKey } from '~~/stores/playerStore'
 import { type CardName, sortByType } from '~/utils/cards'
 import { checkAll, type CompletedYaku, YAKU, type YakuName } from '~/utils/yaku'
-import { useProfile } from '~/composables/useProfile'
 
 export type CompletionEvent = {
   player: PlayerKey
@@ -164,19 +163,19 @@ const cRibbons = computed(() => collection.value.ribbons)
 const cPlains = computed(() => collection.value.plains)
 
 const updateCollection = () => {
-  cBrights.value.forEach((card) => coll.brights.add(card))
-  cAnimals.value.forEach((card) => coll.animals.add(card))
-  cRibbons.value.forEach((card) => coll.ribbons.add(card))
-  cPlains.value.forEach((card) => coll.plains.add(card))
+  cBrights.value?.forEach((card) => coll.brights?.add(card))
+  cAnimals.value?.forEach((card) => coll.animals?.add(card))
+  cRibbons.value?.forEach((card) => coll.ribbons?.add(card))
+  cPlains.value?.forEach((card) => coll.plains?.add(card))
 }
 
 const resetCollection = () => {
   // Stats tracking is now centralized in useStatsTracking composable
   // Just clear the visual collection display
-  coll.brights.clear()
-  coll.animals.clear()
-  coll.ribbons.clear()
-  coll.plains.clear()
+  coll.brights?.clear()
+  coll.animals?.clear()
+  coll.ribbons?.clear()
+  coll.plains?.clear()
 }
 
 /**

@@ -181,13 +181,15 @@ export const useGameDataStore = defineStore('gameData', () => {
   function nextPhase() {
     // Loop through phases; select -> draw -> select -> etc...
     const i = (PHASES.indexOf(turnPhase.value) + 1) % PHASES.length
-    turnPhase.value = PHASES[i]
+    const next = PHASES[i]
+    if (!next) return
+    turnPhase.value = next
     // console.debug("SWITCHED PHASE >>>", getCurrent.value.phase);
-    if (turnPhase.value === 'select') {
+    if (next === 'select') {
       usePlayerStore().toggleActivePlayer()
       if (usePlayerStore().activePlayer.isDealer) _incrementTurn()
     }
-    return PHASES[i]
+    return next
   }
 
   function checkCurrentPhase(phase: TurnPhase) {
@@ -229,7 +231,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   }
 
   function nextRound() {
-    const { winner } = getCurrent.value.result
+    const { winner } = getCurrent.value?.result ?? { winner: null }
     usePlayerStore().reset(winner)
     useCardStore().reset()
     roundOver.value = false
