@@ -271,3 +271,170 @@
     rotate: 360deg;
   }
 }
+
+@utility animated-cards-container {
+  /* // Outer wrapper for all cards */
+  position: relative;
+  /* // Get control of the positioning */
+  margin: 50px auto;
+  /* // Centers it on page */
+  height: 100px;
+  /* // height of each card */
+  aspect-ratio: var(--card-aspect);
+  font-size: 30px;
+  /* //size of number */
+  line-height: 38px;
+  /* //affects vert position of number */
+  font-weight: bold;
+  /* //font weight */
+
+  .animated-card {
+    /* // Common styles for all cards */
+    position: absolute;
+    /* //Position all cards on top of each other */
+    width: 100%;
+    /* //Expand to fill the parent's width */
+    height: 100%;
+    /* //Expand to fill the parent's height */
+    /* animation-iteration-count: infinite; */
+    /* animation-direction: alternate-reverse; */
+    overflow: hidden;
+    animation-fill-mode: forwards;
+    animation-duration: 2s;
+  }
+
+  .looping {
+    height: 60;
+
+    .animated-card {
+      /* //Expand to fill the parent's height */
+      animation-iteration-count: infinite;
+      animation-direction: alternate-reverse;
+      animation-fill-mode: unset;
+    }
+  }
+
+  p {
+    /* // style and position the message below */
+    font-size: 0.5em;
+    position: absolute;
+    bottom: -45px;
+    left: -13px;
+    margin: 0;
+  }
+
+  /* // Move and rotate each card */
+  /* // Translate moves x and sometimes y */
+  .one {
+    animation-name: anim-one;
+  }
+
+  .two {
+    animation-name: anim-two;
+  }
+
+  .three {
+    animation-name: anim-three;
+  }
+
+  .four {
+    animation-name: anim-five;
+  }
+
+  .five {
+    animation-name: anim-eight;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animated-card {
+      animation-duration: 0s;
+    }
+    .one {
+      animation-name: none;
+      transform: translate(-30px, 5px) rotate(-45deg);
+    }
+    .two {
+      animation-name: none;
+      transform: translate(-15px) rotate(-25deg);
+    }
+    .three {
+      animation-name: none;
+      transform: rotate(-5deg);
+    }
+    .four {
+      animation-name: none;
+      transform: translate(15px, 5px) rotate(15deg);
+    }
+    .five {
+      animation-name: none;
+      transform: translate(28px, 14px) rotate(35deg);
+    }
+  }
+}
+
+@keyframes anim-one {
+  from {
+    transform: translate(0) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-30px, 5px) rotate(-45deg);
+  }
+
+  /* to {
+      transform: translate(0) rotate(0deg);
+    } */
+}
+@keyframes anim-two {
+  from {
+    transform: translate(0) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-15px) rotate(-25deg);
+  }
+
+  /* to {
+      transform: translate(0) rotate(0deg);
+    } */
+}
+@keyframes anim-five {
+  from {
+    transform: translate(0) rotate(0deg);
+  }
+
+  to {
+    transform: translate(15px, 5px) rotate(15deg);
+  }
+
+  /* to {
+            transform: translate(0) rotate(0deg);
+          } */
+}
+
+@keyframes anim-three {
+  from {
+    transform: translate(0) rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-5deg);
+  }
+
+  /* to {
+            transform: translate(0) rotate(0deg);
+          } */
+}
+@keyframes anim-eight {
+  from {
+    transform: translate(0) rotate(0deg);
+  }
+
+  to {
+    transform: translate(28px, 14px) rotate(35deg);
+  }
+
+  /* to {
+      transform: translate(0) rotate(0deg);
+    } */
+}
