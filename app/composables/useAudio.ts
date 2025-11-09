@@ -62,8 +62,13 @@ export const useAudio = () => {
 
     const tryNextSource = () => {
       if (currentSourceIndex < sources.length) {
-        audio.src = sources[currentSourceIndex]
+        const nextSource = sources[currentSourceIndex]
+        if (nextSource) {
+          audio.src = nextSource
+        }
         currentSourceIndex++
+      } else {
+        console.warn('No more sources to try. Audio element will not be loaded.')
       }
     }
 
