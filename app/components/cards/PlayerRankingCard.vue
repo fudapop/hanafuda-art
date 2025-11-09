@@ -112,7 +112,7 @@
           </span>
           <div class="flex items-center gap-x-2 font-medium text-text">
             <Icon
-              name="material-symbols:handshake"
+              name="ic:round-handshake"
               class="text-yellow-500"
             />
             {{ player.record.draw.toLocaleString() }}

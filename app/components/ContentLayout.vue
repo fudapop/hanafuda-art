@@ -3,15 +3,16 @@
     <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
       <GameBackgroundImages />
     </div>
-    <button class="fixed w-10 h-10 game-ui-btn top-4 left-4 z-20 place-content-center">
-      <NuxtLink :to="localeRoute('/')">
-        <Icon
-          name="mdi:arrow-left"
-          class="size-6 mt-1.5 text-white transition-transform duration-300"
-        />
-        <span class="sr-only">{{ t('navigation.backToTitleScreen') }}</span>
-      </NuxtLink>
-    </button>
+    <NuxtLink
+      class="fixed game-ui-btn top-4 left-4 z-20"
+      :to="localeRoute('/')"
+    >
+      <Icon
+        name="mdi:arrow-left"
+        class="text-white"
+      />
+      <span class="sr-only">{{ t('navigation.backToTitleScreen') }}</span>
+    </NuxtLink>
     <slot />
   </div>
 </template>

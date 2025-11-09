@@ -13,7 +13,7 @@
     >
       <Icon
         name="ic:round-settings"
-        class="w-5 h-5 text-white transition-transform duration-300"
+        class="text-white transition-transform duration-300"
         :class="{ 'rotate-90': isExpanded }"
       />
       <span class="text-sm font-medium text-white sr-only">{{ t('common.labels.settings') }}</span>
@@ -47,7 +47,7 @@
           <button
             @click="handleColorModeClick"
             :class="[
-              'flex items-center gap-2 w-full px-3 py-2 rounded-md transition-all duration-200',
+              'flex items-center gap-1 w-full px-3 py-2 rounded-md transition-all duration-200',
               'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
               'text-white hover:text-yellow-300',
             ]"
@@ -56,17 +56,14 @@
             <Icon
               v-if="colorModeState === 'dark'"
               name="ic:outline-dark-mode"
-              class="w-4 h-4"
             />
             <Icon
               v-else-if="colorModeState === 'light'"
               name="ic:outline-light-mode"
-              class="w-4 h-4"
             />
             <Icon
               v-else
               name="ic:round-monitor"
-              class="w-4 h-4"
             />
             <span class="text-sm capitalize">{{ t(`settings.colorMode.${colorModeState}`) }}</span>
           </button>
@@ -84,7 +81,7 @@
           <button
             @click="toggle"
             :class="[
-              'flex items-center gap-2 w-full px-3 py-2 rounded-md transition-all duration-200',
+              'flex items-center gap-1 w-full px-3 py-2 rounded-md transition-all duration-200',
               'bg-black/10 dark:bg-white/10 hover:bg-white/15 border border-white/20',
               'text-white hover:text-yellow-300',
             ]"
@@ -93,12 +90,10 @@
             <Icon
               v-if="isFullscreen"
               name="ic:outline-fullscreen-exit"
-              class="w-4 h-4"
             />
             <Icon
               v-else
               name="ic:outline-fullscreen"
-              class="w-4 h-4"
             />
             <span class="text-sm capitalize">{{
               isFullscreen ? t('common.labels.exitFullscreen') : t('common.labels.fullscreen')
@@ -135,7 +130,7 @@
             </select>
             <Icon
               name="ic:round-language"
-              class="absolute w-4 h-4 transform -translate-y-1/2 pointer-events-none left-2 top-1/2 text-white/70"
+              class="absolute transform -translate-y-1/2 pointer-events-none left-3 top-1/2 text-white/70"
             />
           </div>
           <div
@@ -144,7 +139,7 @@
           >
             <Icon
               name="ic:round-info"
-              class="shrink-0 inline w-4 h-4 mr-1"
+              class="shrink-0 inline mr-1"
             />
             <p>{{ t('settings.notices.languageChangeNotice') }}</p>
           </div>
@@ -170,10 +165,7 @@
                   bgmDisabled ? t('settings.actions.enableBgm') : t('settings.actions.disableBgm')
                 "
               >
-                <Icon
-                  :name="bgmDisabled ? 'ic:round-volume-off' : 'ic:round-volume-up'"
-                  class="w-4 h-4"
-                />
+                <Icon :name="bgmDisabled ? 'ic:round-volume-off' : 'ic:round-volume-up'" />
               </button>
 
               <div class="flex-1">
@@ -204,7 +196,7 @@
               <div class="flex items-center gap-2">
                 <Icon
                   name="ic:round-music-note"
-                  class="shrink-0 w-3 h-3 text-white/70"
+                  class="shrink-0 text-white/70"
                 />
                 <div class="overflow-hidden">
                   <span
@@ -236,10 +228,7 @@
                   sfxDisabled ? t('settings.actions.enableSfx') : t('settings.actions.disableSfx')
                 "
               >
-                <Icon
-                  :name="sfxDisabled ? 'ic:round-volume-off' : 'ic:round-volume-up'"
-                  class="w-4 h-4"
-                />
+                <Icon :name="sfxDisabled ? 'ic:round-volume-off' : 'ic:round-volume-up'" />
               </button>
 
               <div class="flex-1">

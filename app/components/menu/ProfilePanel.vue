@@ -169,7 +169,7 @@
           <div class="flex items-center gap-4">
             <div class="shrink-0">
               <Icon
-                name="material-symbols:handshake"
+                name="ic:round-handshake"
                 class="w-10 h-10 text-yellow-500 mt-0.5"
               />
             </div>
@@ -228,7 +228,7 @@
           <div class="flex items-center gap-4">
             <div class="shrink-0">
               <Icon
-                name="material-symbols:handshake"
+                name="ic:round-handshake"
                 class="w-10 h-10 text-yellow-500 mt-0.5"
               />
             </div>

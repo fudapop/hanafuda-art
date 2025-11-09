@@ -148,6 +148,12 @@ export default defineNuxtConfig({
     locales: localization.locales,
     strategy: 'prefix_and_default',
   },
+  icon: {
+    provider: 'none',
+    clientBundle: {
+      scan: true,
+    },
+  },
   modules: [
     '@pinia/nuxt',
     'nuxt-headlessui',
