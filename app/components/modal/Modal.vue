@@ -17,7 +17,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div class="fixed inset-0 transition-opacity opacity-50 bg-hanafuda-brown" />
+        <div class="fixed inset-0 transition-colors duration-300 bg-hanafuda-brown/50" />
       </HeadlessTransitionChild>
 
       <div
