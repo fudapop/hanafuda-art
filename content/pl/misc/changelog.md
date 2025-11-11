@@ -3,6 +3,16 @@
 ## [Niewydane]
 
 ### Nowe funkcje
+- **Animowany okrzyk KOI-KOI**: Dodano animowany komponent okrzyku, który wyświetla się, gdy gracz wywołuje "KOI-KOI", zawierający awatar gracza i animowaną ikonę monety dla bardziej angażującego doświadczenia wizualnego.
+
+### Naprawione błędy
+- **Link logowania**: Naprawiono problem z linkiem logowania.
+- **Runda po dobraniu**: Naprawiono postęp rundy po dobraniu kart.
+- **Kolejność wyświetlania arkusza kart**: Naprawiono kolejność wyświetlania kart w arkuszu kart i poprawiono widoczność ikony wyzwalacza.
+
+## [2025.11.2] - 2025-11-09
+
+### Nowe funkcje
 - **Inteligentna pauza audio**: Muzyka w tle automatycznie zatrzymuje się, gdy przełączasz się na inną kartę lub minimalizujesz okno, i wznawia się, gdy wracasz do gry. Pomaga to oszczędzać zasoby systemowe i zapewnia lepsze wrażenia podczas wielozadaniowości.
 - **Ulepszony interfejs kolekcji kart**: Kolekcja kart zawiera teraz widoki siatki i podgląd arkusza kart, ułatwiając przeglądanie i przeglądanie kolekcji.
 - **Ulepszona strona rankingów**: Strona rankingów zawiera teraz nowe wykresy i wyświetla pozycję bieżącego gracza, zapewniając lepszy kontekst dla twojej pozycji.
