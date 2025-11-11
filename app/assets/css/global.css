@@ -56,6 +56,37 @@
   --color-hanafuda-brown: hsl(30 7% 51%);
   --color-hanafuda-purple: hsl(270 35% 56%);
   --color-hanafuda-green: hsl(150 30% 56%);
+
+  --animate-stamp: stamp 0.3s ease-in;
+
+  @keyframes stamp {
+    from {
+      opacity: 0;
+      scale: 2;
+    }
+
+    75% {
+      scale: 1.75;
+      opacity: 0.25;
+    }
+
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  --animate-fade-in-up: fadeInUp 1500ms ease-in-out forwards;
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      translate: 0 -20%;
+    }
+    to {
+      opacity: 1;
+      translate: 0 -60%;
+    }
+  }
 }
 
 @utility card {
@@ -251,24 +282,6 @@
   to {
     translate: 8px 0;
     opacity: 0;
-  }
-}
-
-@keyframes stamp {
-  from {
-    opacity: 0;
-    scale: 2;
-  }
-
-  75% {
-    scale: 1.75;
-    opacity: 0.25;
-  }
-
-  to {
-    opacity: 1;
-    scale: 1;
-    rotate: 360deg;
   }
 }
 
