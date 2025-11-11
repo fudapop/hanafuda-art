@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
-import tailwindcss from '@tailwindcss/vite'
 
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 const seoMeta = JSON.parse(readFileSync(resolve('./seo-meta.json'), 'utf-8'))
@@ -169,6 +169,18 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt',
     '@nuxt/icon',
   ],
+  nitro: {
+    routeRules: {
+      '/about': { ssr: true },
+      '/': { ssr: false },
+      '/sign-in': { ssr: false },
+      '/rankings': { ssr: false },
+      '/privacy': { ssr: false },
+      '/terms': { ssr: false },
+      '/changelog': { ssr: false },
+      '/attributions': { ssr: false },
+    },
+  },
   posthog: {
     disabled: !isProduction,
     proxy: !isProduction,
@@ -290,7 +302,7 @@ export default defineNuxtConfig({
   shadcn: {
     prefix: 'ui',
   },
-  ssr: false,
+  // ssr: false,
   vite: {
     optimizeDeps: {
       include: ['class-variance-authority', 'reka-ui', 'lucide-vue-next', 'clsx', 'tailwind-merge'],

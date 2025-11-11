@@ -10,7 +10,7 @@ import {
   type UserCredential,
 } from 'firebase/auth'
 import { useI18n } from 'vue-i18n'
-import { useToast } from 'vue-toastification'
+import { toast } from 'vue-sonner'
 
 export const useAuth = () => {
   const PROVIDERS = {
@@ -22,7 +22,6 @@ export const useAuth = () => {
 
   const auth = useFirebaseAuth()!
   const error = ref()
-  const toast = useToast()
   const { t } = useI18n()
   const { $clientPosthog } = useNuxtApp()
 
@@ -35,7 +34,7 @@ export const useAuth = () => {
       return true
     } catch (err) {
       toast.error(`${t('auth.messages.unableToCreateAccount')}\n${(err as Error).message}`, {
-        timeout: 8000,
+        duration: 8000,
       })
       error.value = err
       return false
@@ -50,9 +49,7 @@ export const useAuth = () => {
       $clientPosthog?.capture('login', { method: 'email' })
       return true
     } catch (err) {
-      toast.error(t('auth.messages.invalidEmailOrPassword'), {
-        timeout: 8000,
-      })
+      toast.error(t('auth.messages.invalidEmailOrPassword'), { duration: 8000 })
       error.value = err
       return false
     }
@@ -118,9 +115,7 @@ export const useAuth = () => {
       toast.success(t('auth.messages.passwordResetSent', { email }))
       return true
     } catch (err) {
-      toast.error(t('auth.messages.unableToSendPasswordReset'), {
-        timeout: 8000,
-      })
+      toast.error(t('auth.messages.unableToSendPasswordReset'), { duration: 8000 })
       console.error(err)
       error.value = err
       return false

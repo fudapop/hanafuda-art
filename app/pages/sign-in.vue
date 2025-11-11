@@ -77,7 +77,7 @@
   </ContentLayout>
 </template>
 <script setup lang="ts">
-import { useToast } from 'vue-toastification'
+import { toast } from 'vue-sonner'
 
 const { t, locale } = useI18n()
 const pageTitle = computed(() => `${t('game.title')} | ${t('pages.signIn')}`)
@@ -97,7 +97,6 @@ const localeRoute = useLocaleRoute()
 const { isMobile } = useDevice()
 
 const { current: currentUser } = useProfile()
-const toast = useToast()
 const loggingIn = ref<boolean>(true)
 
 const { $clientPosthog } = useNuxtApp()
@@ -115,7 +114,7 @@ const identifyUser = () => {
 
 const handleLoginSuccess = () => {
   loggingIn.value = true
-  toast.success(t('auth.messages.youreSignedIn'), { timeout: 2000 })
+  toast.success(t('auth.messages.youreSignedIn'), { duration: 2000 })
   identifyUser()
   navigateTo(localeRoute('/'))
 }

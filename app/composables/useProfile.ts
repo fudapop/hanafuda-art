@@ -70,9 +70,8 @@ export const useProfile = () => {
       if (import.meta.client) {
         try {
           await nextTick()
-          const { useToast } = await import('vue-toastification')
-          const toast = useToast()
-          toast.success('Progress saved successfully!', { timeout: 3000 })
+          const { toast } = await import('vue-sonner')
+          toast.success('Progress saved successfully!', { duration: 3000 })
         } catch (toastError) {
           console.warn('Failed to show toast notification:', toastError)
         }

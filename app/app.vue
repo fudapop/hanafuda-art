@@ -13,6 +13,7 @@
         <SakuraLoader v-if="loading" />
       </Transition>
     </div>
+    <Toaster />
     <SystemOptionsPopover />
     <NuxtPwaManifest />
     <NuxtPage />
@@ -20,10 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import Toast, { POSITION } from 'vue-toastification'
-import 'vue-toastification/dist/index.css'
 import { vClickDisabled } from '~/utils/directives/vClickDisabled'
 import { vHide } from '~/utils/directives/vHide'
+import { Toaster } from 'vue-sonner'
 
 const loading = ref(false)
 const nuxtApp = useNuxtApp()
@@ -31,14 +31,6 @@ const vueApp = nuxtApp.vueApp
 
 vueApp.directive('hide', vHide)
 vueApp.directive('click-disabled', vClickDisabled)
-
-vueApp.use(Toast, {
-  position: POSITION.TOP_CENTER,
-  timeout: 2000,
-  transition: 'Vue-Toastification__bounce',
-  maxToasts: 20,
-  newestOnTop: true,
-})
 
 nuxtApp.hook('page:start', () => {
   loading.value = true
