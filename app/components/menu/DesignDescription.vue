@@ -13,7 +13,7 @@
         @click="() => (open = true)"
       >
         <Icon
-          name="mdi:magnify-expand"
+          name="mdi:magnify"
           class="text-lg mt-2"
         />
         <span class="sr-only">View Cards</span>
@@ -69,7 +69,7 @@
             </p>
             <p
               v-if="info.contributor"
-              class="mt-4"
+              class="mt-4 text-text"
             >
               Contributed by
               <a
