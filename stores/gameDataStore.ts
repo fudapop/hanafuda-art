@@ -39,12 +39,12 @@
  */
 
 import { defineStore } from 'pinia'
-import { useCardStore } from '~~/stores/cardStore'
-import { useConfigStore } from '~~/stores/configStore'
-import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
 import type { CardName } from '~/utils/cards'
 import { consoleLogColor, getRandomString } from '~/utils/myUtils'
 import type { CompletedYaku, YakuName } from '~/utils/yaku'
+import { useCardStore } from '~~/stores/cardStore'
+import { useConfigStore } from '~~/stores/configStore'
+import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
 
 /** Result data for a completed round */
 export type RoundResult = {
@@ -231,7 +231,8 @@ export const useGameDataStore = defineStore('gameData', () => {
   }
 
   function nextRound() {
-    const { winner } = getCurrent.value?.result ?? { winner: null }
+    // Get the winner of the current round or the last round
+    const winner = getCurrent.value?.result?.winner ?? getPreviousResult.value?.winner ?? null
     usePlayerStore().reset(winner)
     useCardStore().reset()
     roundOver.value = false
