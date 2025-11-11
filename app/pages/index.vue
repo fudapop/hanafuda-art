@@ -78,6 +78,13 @@
         </div>
       </div>
 
+      <!-- KOI-KOI SHOUT -->
+      <Shout
+        v-if="shoutTimeout && getCaller !== null"
+        :called-by="getCaller"
+        msg="KOI KOI"
+      />
+
       <!-- ACTION LOG -->
       <EventLog />
 
@@ -98,12 +105,12 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { POSITION, useToast } from 'vue-toastification'
+import { useToast } from 'vue-toastification'
 import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
+import { checkForWin } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
-import { checkForWin } from '~/utils/yaku'
 
 definePageMeta({
   requiresAuth: true,
@@ -144,10 +151,19 @@ const gameStart = useState('start')
 
 const toast = useToast()
 
-const { decisionIsPending, makeDecision, callStop, koikoiIsCalled, stopIsCalled, cleanup } =
-  useDecisionHandler()
+const {
+  decisionIsPending,
+  makeDecision,
+  callStop,
+  koikoiIsCalled,
+  stopIsCalled,
+  cleanup,
+  getCaller,
+} = useDecisionHandler()
 
 const handleDecision = async () => await makeDecision()
+
+const shoutTimeout = ref<NodeJS.Timeout | null>(null)
 
 // Initialize stats tracking (automatically watches for round completion)
 useStatsTracking()
@@ -183,10 +199,9 @@ const handleKoikoi = () => {
   console.debug('>>> Called KOI-KOI')
   ps.incrementBonus()
   showModal.value = false
-  toast(t('game.actions.koikoiWasCalled'), {
-    timeout: 2000,
-    position: POSITION.TOP_CENTER,
-  })
+  shoutTimeout.value = setTimeout(() => {
+    shoutTimeout.value = null
+  }, 2000)
 }
 
 // Closing the round results modal
@@ -367,9 +382,8 @@ onBeforeUnmount(() => {
   ds.endRound()
   ds.nextRound()
   handleClose()
+  if (shoutTimeout.value) clearTimeout(shoutTimeout.value)
   cleanup()
-  // Clear stored data
-  // sessionStorage?.removeItem("new-hanafuda");
 })
 
 onMounted(() => {
