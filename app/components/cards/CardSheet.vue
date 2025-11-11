@@ -19,9 +19,9 @@ interface Props {
 const props = defineProps<Props>()
 
 const { currentDesign, getCardUrlMap, getDesignInfo } = useCardDesign()
-const cardMap = computed(() => getCardUrlMap(currentDesign.value))
+const cardMap = computed(() => getCardUrlMap(props.design ?? currentDesign.value))
 const cardArray = computed(() => {
-  const { arrangement } = getDesignInfo()
+  const { arrangement } = getDesignInfo(props.design ?? currentDesign.value)
   return (arrangement?.orderByName ?? Array.from(cardMap.value.keys())) as CardName[]
 })
 </script>
