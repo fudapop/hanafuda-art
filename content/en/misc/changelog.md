@@ -3,6 +3,16 @@
 ## [Unreleased]
 
 ### New Features
+- **Animated KOI-KOI Shout**: Added an animated shout component that displays when a player calls "KOI-KOI", featuring the player's avatar and an animated coin icon for a more engaging visual experience.
+
+### Bug Fixes
+- **Sign-In Link**: Fixed an issue with the sign-in link.
+- **Round After Draw**: Fixed round progression after drawing cards.
+- **Card Sheet Display Order**: Fixed the display order of cards in the card sheet and corrected the trigger icon visibility.
+
+## [2025.11.2] - 2025-11-09
+
+### New Features
 - **Smart Audio Pause**: Background music now automatically pauses when you switch to another tab or minimize the window, and resumes when you return to the game. This helps conserve system resources and provides a better experience when multitasking.
 - **Enhanced Card Collection UI**: Card collection now features grid views and a card sheet preview, making it easier to browse and examine your collection.
 - **Improved Rankings Page**: Rankings page now includes new charts and displays the current player's position, providing better context for your standing.
