@@ -486,7 +486,8 @@
     "empty": {
       "noPlayers": "Aucun joueur trouvé",
       "beTheFirst": "Soyez le premier à jouer et à apparaître dans le classement !"
-    }
+    },
+    "minimumGamesNote": "Les joueurs doivent avoir joué au moins {minGames} parties pour apparaître dans ce classement."
   },
   "pages": {
     "changelog": "Journal des modifications",

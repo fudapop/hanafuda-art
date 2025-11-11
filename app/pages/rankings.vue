@@ -38,6 +38,18 @@
         </div>
       </div>
 
+      <!-- Minimum Games Note -->
+      <div
+        v-if="selectedFilter === 'winrate'"
+        class="max-w-4xl px-4 mx-auto mb-4 text-text"
+      >
+        <Alert variant="default">
+          <AlertDescription class="text-center">
+            {{ t('rankings.minimumGamesNote', { minGames: MIN_GAMES }) }}
+          </AlertDescription>
+        </Alert>
+      </div>
+
       <main class="mx-auto overflow-y-auto max-w-screen lg:px-8 touch-pan-y isolate">
         <!-- Loading State -->
         <div
@@ -89,7 +101,7 @@
           <div class="mx-auto h-max w-max max-w-screen">
             <div
               v-if="filteredLeaderboard.length > 0"
-              class="py-8 mx-4 grid sm:grid-cols-2 gap-12 max-w-screen"
+              class="py-8 mx-4 grid lg:grid-cols-2 gap-12 max-w-screen"
             >
               <!-- Player Card -->
               <div
@@ -125,11 +137,8 @@
 
 <script setup lang="ts">
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
-import { useScreenOrientation } from '@vueuse/core'
 
-const { orientation } = useScreenOrientation()
 const { isMobile } = useDevice()
-const isMobileLandscape = computed(() => isMobile && orientation.value?.includes('landscape'))
 
 const { t } = useI18n()
 
@@ -167,7 +176,7 @@ interface FilterOption {
 }
 
 const LIMIT = 50
-const MIN_GAMES = 100
+const MIN_GAMES = 50
 
 // Reactive state
 const loading = ref(true)
@@ -218,9 +227,7 @@ const getSortedLeaderboard = (filter: string) => {
 
   switch (filter) {
     case 'active':
-      sorted = sorted
-        .filter((p) => p.totalGames >= MIN_GAMES)
-        .sort((a, b) => b.totalGames - a.totalGames)
+      sorted = sorted.sort((a, b) => b.totalGames - a.totalGames)
       break
     case 'winrate':
       sorted = sorted.filter((p) => p.totalGames >= MIN_GAMES).sort((a, b) => b.winRate - a.winRate)

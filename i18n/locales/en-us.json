@@ -486,7 +486,8 @@
     "empty": {
       "noPlayers": "No players found",
       "beTheFirst": "Be the first to play and appear on the leaderboard!"
-    }
+    },
+    "minimumGamesNote": "Players must have played at least {minGames} games to appear in this ranking."
   },
   "pages": {
     "changelog": "Changelog",

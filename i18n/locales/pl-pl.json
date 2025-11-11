@@ -486,7 +486,8 @@
     "empty": {
       "noPlayers": "Nie znaleziono graczy",
       "beTheFirst": "Bądź pierwszym, który zagra i pojawi się w rankingu!"
-    }
+    },
+    "minimumGamesNote": "Aby pojawić się w tym rankingu, gracze muszą rozegrać co najmniej {minGames} gier."
   },
   "pages": {
     "changelog": "Dziennik Zmian",

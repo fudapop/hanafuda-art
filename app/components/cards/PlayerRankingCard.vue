@@ -8,7 +8,7 @@
     ]"
   >
     <!-- Player Info -->
-    <div class="flex items-center justify-between mb-3 w-full">
+    <div class="flex items-center justify-between mb-3 w-full px-2">
       <div class="flex items-center">
         <span class="mr-3 text-2xl font-bold text-text">
           {{ rank ? `#${rank}` : '—' }}
@@ -32,9 +32,9 @@
     </div>
 
     <!-- Win-Loss-Draw Record Card -->
-    <div class="w-full grid grid-cols-2 items-center max-w-xs py-8">
+    <div class="w-full grid grid-cols-2 gap-x-8 items-center max-w-sm py-4 px-2">
       <!-- Left Column -->
-      <div class="grid grid-cols-2 place-items-start gap-2">
+      <div class="grid grid-cols-2 place-items-start gap-y-2 gap-x-8">
         <!-- Coins -->
         <div
           :class="[

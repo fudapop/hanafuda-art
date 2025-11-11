@@ -486,7 +486,8 @@
     "empty": {
       "noPlayers": "プレイヤーが見つかりません",
       "beTheFirst": "最初にプレイしてリーダーボードに表示されましょう！"
-    }
+    },
+    "minimumGamesNote": "このランキングに表示されるには、少なくとも{minGames}ゲームをプレイする必要があります。"
   },
   "pages": {
     "changelog": "変更履歴",
