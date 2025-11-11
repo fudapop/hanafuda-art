@@ -180,7 +180,7 @@ onMounted(() => {
 })
 
 const goToLogin = () => {
-  const route = localeRoute({ name: 'sign-in', query: { signup: 'true' } })
+  const route = localeRoute({ name: 'sign-in' })
   if (route) {
     navigateTo(route.fullPath)
   }
