@@ -1,6 +1,6 @@
 # Dziennik zmian
 
-## [Niewydane]
+## [2025.11.3] - 2025-11-11
 
 ### Nowe funkcje
 - **Animowany okrzyk KOI-KOI**: Dodano animowany komponent okrzyku, który wyświetla się, gdy gracz wywołuje "KOI-KOI", zawierający awatar gracza i animowaną ikonę monety dla bardziej angażującego doświadczenia wizualnego.

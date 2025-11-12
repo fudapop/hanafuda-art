@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2025.11.3] - 2025-11-11
 
 ### New Features
 - **Animated KOI-KOI Shout**: Added an animated shout component that displays when a player calls "KOI-KOI", featuring the player's avatar and an animated coin icon for a more engaging visual experience.
