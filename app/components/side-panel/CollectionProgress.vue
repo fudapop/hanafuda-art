@@ -262,7 +262,7 @@
     </div>
 
     <!-- VIEW TOGGLE BUTTON$ -->
-    <div class="fixed bottom-20 right-3 z-50 space-y-2">
+    <div class="fixed bottom-20 right-3 z-100 space-y-2">
       <button
         class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
         @click="toggleView"

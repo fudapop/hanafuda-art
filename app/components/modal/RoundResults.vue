@@ -100,10 +100,10 @@
   <h4 class="my-4 text-text-secondary dark:text-text-secondary">
     {{ t('common.labels.total') }}:
     <span class="text-base font-semibold sm:text-lg text-text"
-      >{{ lastRoundResult.score }} {{ t('common.labels.points') }}</span
+      >{{ lastRoundResult?.score }} {{ t('common.labels.points') }}</span
     >
     <span
-      v-if="lastRoundResult.score && bonusMultiplier > 1"
+      v-if="lastRoundResult?.score && bonusMultiplier > 1"
       class="max-sm:block sm:ml-8"
     >
       {{ t('game.results.koiKoiBonus') }}:
@@ -121,10 +121,10 @@
 <script setup lang="ts">
 import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import { storeToRefs } from 'pinia'
+import { type CompletedYaku } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { usePlayerStore } from '~~/stores/playerStore'
-import { type CompletedYaku } from '~/utils/yaku'
 
 const { t } = useI18n()
 

@@ -294,9 +294,6 @@ export default defineNuxtConfig({
       supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
     },
   },
-  shadcn: {
-    prefix: 'ui',
-  },
   ssr: false,
   vite: {
     optimizeDeps: {

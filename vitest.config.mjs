@@ -5,7 +5,7 @@ export default defineVitestConfig({
     globals: true,
     setupFiles: ['./test-setup.ts'],
     includeSource: ['**/__tests__/**/*.{js,ts}'],
-    exclude: ['node_modules', '__checks__'],
+    exclude: ['**/node_modules', '__checks__'],
     environment: 'nuxt',
     environmentOptions: {
       nuxt: {
