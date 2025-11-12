@@ -113,11 +113,18 @@ export const useAnnouncements = async () => {
   const newAnnouncements = computed(() => {
     if (dontShowAnnouncements.value) return []
 
-    return announcements.value.filter(
-      (announcement) =>
-        Date.now() >= new Date(announcement.date).getTime() &&
-        !dismissedAnnouncements.value.includes(announcement.id),
-    )
+    const now = Date.now()
+    return announcements.value.filter((announcement) => {
+      const announcementDate = new Date(announcement.date).getTime()
+      // Calculate expiresAt as 2 weeks (14 days) after the date
+      const expiresAt = announcementDate + 14 * 24 * 60 * 60 * 1000
+
+      return (
+        now >= announcementDate &&
+        now < expiresAt &&
+        !dismissedAnnouncements.value.includes(announcement.id)
+      )
+    })
   })
 
   // Check if there are new announcements to show
@@ -138,8 +145,8 @@ export const useAnnouncements = async () => {
           .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
           .split('::')
         impressions.value[announcementId] = {
-          date,
-          title,
+          date: String(date),
+          title: String(title),
           views: 0,
           likes: 0,
         }
@@ -195,8 +202,8 @@ export const useAnnouncements = async () => {
           .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
           .split('::')
         impressions.value[announcementId] = {
-          date,
-          title,
+          date: String(date),
+          title: String(title),
           views: 0,
           likes: 0,
         }

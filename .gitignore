@@ -28,6 +28,7 @@ assets/HNFD*
 WARP.md
 CLAUDE.md
 GEMINI.md
+archive/
 
 # Local env files
 .env
