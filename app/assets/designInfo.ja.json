@@ -1,0 +1,83 @@
+{
+  "cherry-version": {
+    "title": "チェリーバージョン",
+    "description": "ホノルル、ハワイ在住のイラストレーター兼グラフィックデザイナー、Parish Cherryによるデザイン！",
+    "urlDescription": "Parish Cherryのポートフォリオをチェック！"
+  },
+  "sabling-art": {
+    "title": "サブリングアート",
+    "description": "フリーランスイラストレーターSablingがデザインしたポケモン花札デッキ！",
+    "urlDescription": "@SablingArtからこのデッキやその他を購入！"
+  },
+  "otwarte-karty": {
+    "title": "オープンカード花札",
+    "description": "このデッキは、標準デザインと100%互換性を保ちながら、新しい人にとって可能な限り親しみやすいように設計されています！",
+    "urlDescription": "Instagramで@otwartekarty.plをフォロー！"
+  },
+  "shou-suisaiga": {
+    "title": "小水彩画",
+    "description": "DiscordユーザーVulumeによるデザイン！",
+    "urlDescription": "花札Discordに参加！"
+  },
+  "vaporwave": {
+    "title": "ヴェイパーウェーブ",
+    "description": "DiscordユーザーHeavenlysomeによるデザイン！",
+    "urlDescription": "花札Discordに参加！"
+  },
+  "hanamaki": {
+    "title": "花巻",
+    "description": "昭和後期に鶴田が制作した花札デザイン。",
+    "urlDescription": "日本トランプ博物館でより多くの伝統的なデザインを見る。"
+  },
+  "hana-awase": {
+    "title": "花合わせ",
+    "description": "パーマーの「花合わせ」（1891年）で見つかった明治中期の花札。",
+    "urlDescription": "インターネットアーカイブでコレクションの詳細を見る。"
+  },
+  "kinbotan": {
+    "title": "金牡丹",
+    "description": "ウィンドミルが制作したこの「金牡丹」版は、日本の初代総理大臣がかつて所有していたオリジナルデッキのレプリカです。"
+  },
+  "post-card": {
+    "title": "ポストカード",
+    "description": "田中三昌によるこのパターンのポストカードは1906年に発行されました。",
+    "creator": "田中三昌",
+    "urlDescription": "日本トランプ博物館でこのコレクションについて読む。"
+  },
+  "modern": {
+    "title": "2012モダン",
+    "description": "Sarah Thomasがこの美しいモダン花札セットをデザインし、2012年に成功したKickstarterを開始しました！",
+    "urlDescription": "ModernHanafuda.netで旅を振り返る！"
+  },
+  "koinobori": {
+    "title": "こいのぼり",
+    "description": "IndianWolf Studios LLCがお届けするこいのぼり花札！",
+    "urlDescription": "Kickstarterでプロジェクトを支援！"
+  },
+  "hanami": {
+    "title": "花見",
+    "description": "IndianWolf Studios LLCのJason Johnsonがデザインし、Inner Hue Art Studio LLCのAntonietta Fazio-Johnsonがイラストを担当した花見花札！",
+    "urlDescription": "IndianWolf Studiosからこのデッキやその他を購入！"
+  },
+  "moon-rabbit": {
+    "title": "月うさぎオリジナル",
+    "description": "Kelsey Cretcherがデザイン・イラストを担当した月うさぎ花札！",
+    "urlDescription": "DeviantArtでKelseyの作品をもっと見る！"
+  },
+  "nishiki-fuda": {
+    "title": "錦札",
+    "description": "大阪のEstudio ArtesのHanakoによるデザイン！",
+    "urlDescription": "オンラインストアからこのデッキやその他を購入！"
+  },
+  "flash-black": {
+    "title": "フラッシュブラック",
+    "description": "花札フラッシュとgamedesign.jpの伝統的なデザイン！",
+    "urlDescription": "オンラインで無料プレイ！"
+  },
+  "ramen-red": {
+    "title": "ラーメンレッド",
+    "description": "花札こいこいラーメンで見られるクラシックなデザイン！",
+    "urlDescription": "無料でダウンロードしてプレイ！"
+  }
+}
+

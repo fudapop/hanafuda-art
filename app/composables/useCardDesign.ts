@@ -1,5 +1,6 @@
 import CARD_DESIGNS from '~/assets/designInfo.json'
 import { type CardName, DECK } from '~/utils/cards'
+import { getLocalizedDesignInfoSync } from '~/utils/designInfo'
 import { type CardSizeOptions, useConfigStore } from '~~/stores/configStore'
 
 export type DesignInfo = {
@@ -31,8 +32,38 @@ type CardMap = Map<CardName, string>
 
 export const useCardDesign = () => {
   const { supabaseUrl } = useRuntimeConfig().public
+  const { locale } = useI18n()
   const bucketUrl = `${supabaseUrl}/storage/v1/render/image/public/static`
   const currentDesign: Ref<CardDesign> = useState('design', () => 'cherry-version')
+
+  // Cache for localized design info
+  const localizedDesigns = useState<Record<string, Record<string, DesignInfo>>>(
+    'localizedDesigns',
+    () => ({}),
+  )
+
+  // Reactive localized design info that updates when locale changes
+  const localizedDesignsMap = ref<Record<string, DesignInfo>>({})
+
+  // Load and cache localized design info for current locale
+  const loadLocalizedDesigns = async () => {
+    const currentLocale = locale.value || 'en'
+
+    if (!localizedDesigns.value[currentLocale]) {
+      localizedDesigns.value[currentLocale] = await getLocalizedDesignInfoSync(currentLocale)
+    }
+
+    localizedDesignsMap.value = localizedDesigns.value[currentLocale]
+  }
+
+  // Watch locale changes and reload design info
+  watch(
+    locale,
+    () => {
+      loadLocalizedDesigns()
+    },
+    { immediate: true },
+  )
 
   /**
    *
@@ -45,7 +76,9 @@ export const useCardDesign = () => {
    */
   const getDesignInfo = (designName?: CardDesign): DesignInfo => {
     const design = designName ?? currentDesign.value
-    const info = CARD_DESIGNS[design]
+    // Use localized info if available, otherwise fall back to base
+    const info = localizedDesignsMap.value[design] || CARD_DESIGNS[design]
+
     if (!info) {
       throw new Error(`Design info not found for design: ${design}`)
     }

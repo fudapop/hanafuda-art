@@ -1,0 +1,83 @@
+{
+  "cherry-version": {
+    "title": "Версия Cherry",
+    "description": "Дизайн от Parish Cherry, иллюстратора и графического дизайнера из Гонолулу, Гавайи!",
+    "urlDescription": "Посмотрите портфолио Parish Cherry!"
+  },
+  "sabling-art": {
+    "title": "Sabling Art",
+    "description": "Колода Pokemon hanafuda, разработанная внештатным иллюстратором Sabling!",
+    "urlDescription": "Купите эту колоду и другие у @SablingArt!"
+  },
+  "otwarte-karty": {
+    "title": "OpenCards Hanafuda",
+    "description": "Эта колода разработана так, чтобы быть максимально дружелюбной для новых людей, оставаясь на 100% совместимой со стандартным дизайном!",
+    "urlDescription": "Подпишитесь на @otwartekarty.pl в Instagram!"
+  },
+  "shou-suisaiga": {
+    "title": "Shou Suisaiga",
+    "description": "Дизайн от пользователя Discord Vulume!",
+    "urlDescription": "Присоединяйтесь к Discord серверу Hanafuda!"
+  },
+  "vaporwave": {
+    "title": "Vaporwave",
+    "description": "Дизайн от пользователя Discord Heavenlysome!",
+    "urlDescription": "Присоединяйтесь к Discord серверу Hanafuda!"
+  },
+  "hanamaki": {
+    "title": "Hanamaki",
+    "description": "Дизайн hanafuda, созданный Цурутой в конце периода Сёва.",
+    "urlDescription": "Посмотрите больше традиционных дизайнов в Музее игральных карт Японии."
+  },
+  "hana-awase": {
+    "title": "Hana-awase",
+    "description": "Hanafuda периода Мэйдзи, найденная в \"Hana-awase\" Палмера (1891).",
+    "urlDescription": "Посмотрите больше из коллекции в Internet Archive."
+  },
+  "kinbotan": {
+    "title": "Kin-botan",
+    "description": "Это издание \"Золотого Пиона\", произведенное Windmill, является репликой оригинальной колоды, когда-то принадлежавшей первому премьер-министру Японии."
+  },
+  "post-card": {
+    "title": "Открытка",
+    "description": "Открытки с этим узором от Танаки Сансё были выпущены в 1906 году.",
+    "creator": "Tanaka Sansho",
+    "urlDescription": "Прочитайте об этой коллекции в Музее игральных карт Японии."
+  },
+  "modern": {
+    "title": "Современная 2012",
+    "description": "Sarah Thomas разработала этот красивый набор Современных Hanafuda и запустила свой успешный Kickstarter в 2012 году!",
+    "urlDescription": "Вернитесь к путешествию на ModernHanafuda.net!"
+  },
+  "koinobori": {
+    "title": "Koinobori",
+    "description": "Koinobori Hanafuda от IndianWolf Studios LLC!",
+    "urlDescription": "Поддержите их проект на Kickstarter!"
+  },
+  "hanami": {
+    "title": "Hanami",
+    "description": "Hanami Hanafuda, разработанные Джейсоном Джонсоном из IndianWolf Studios LLC и иллюстрированные Антонеттой Фацио-Джонсон из Inner Hue Art Studio LLC!",
+    "urlDescription": "Купите эту колоду и другие в IndianWolf Studios!"
+  },
+  "moon-rabbit": {
+    "title": "Moon Rabbit Original",
+    "description": "Карты Moon Rabbit Hanafuda, разработанные и иллюстрированные Келси Кретчер!",
+    "urlDescription": "Найдите больше от Келси на DeviantArt!"
+  },
+  "nishiki-fuda": {
+    "title": "Nishiki Fuda",
+    "description": "Дизайн от Ханако из Estudio Artes в Осаке, Япония!",
+    "urlDescription": "Купите эту колоду и другие в их интернет-магазине!"
+  },
+  "flash-black": {
+    "title": "Flash Black",
+    "description": "Традиционный дизайн из Hanafuda Flash и gamedesign.jp!",
+    "urlDescription": "Играйте бесплатно онлайн!"
+  },
+  "ramen-red": {
+    "title": "Ramen Red",
+    "description": "Классический дизайн, видимый в Hanafuda Koi-Koi Ramen!",
+    "urlDescription": "Скачайте и играйте бесплатно!"
+  }
+}
+

@@ -18,10 +18,10 @@
  *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-json.ts --force
  */
 
-import { parseArgs } from 'jsr:@std/cli/parse-args'
-import { existsSync } from 'jsr:@std/fs/exists'
-import { googleAI } from 'npm:@genkit-ai/googleai'
-import { genkit, z } from 'npm:genkit'
+import { googleAI } from '@genkit-ai/googleai'
+import { parseArgs } from '@std/cli/parse-args'
+import { existsSync } from '@std/fs/exists'
+import { genkit, z } from 'genkit'
 import {
   formatLocaleList,
   getDefaultSourceLocale,
@@ -30,7 +30,7 @@ import {
   setupWorkingDirectory,
   TranslationMode,
   validateTargetLocales,
-} from './translation-utils.js'
+} from './translation-utils.ts'
 
 type JsonValue = string | number | boolean | null | JsonObject | JsonValue[]
 type JsonObject = { [key: string]: JsonValue }

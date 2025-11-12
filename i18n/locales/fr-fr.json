@@ -1,0 +1,509 @@
+{
+  "common": {
+    "actions": {
+      "playNow": "JOUER MAINTENANT",
+      "options": "OPTIONS",
+      "signUp": "S'INSCRIRE",
+      "signIn": "SE CONNECTER",
+      "signOut": "SE DÉCONNECTER",
+      "close": "Fermer",
+      "cancel": "Annuler",
+      "back": "Retour",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "submit": "Envoyer",
+      "send": "Envoyer",
+      "save": "Sauvegarder",
+      "saving": "Sauvegarde en cours...",
+      "loading": "Chargement...",
+      "delete": "Supprimer",
+      "confirm": "Confirmer",
+      "continue": "Continuer",
+      "gotIt": "Compris !",
+      "yes": "Oui",
+      "no": "Non",
+      "like": "J'aime",
+      "unlike": "Je n'aime plus",
+      "showTable": "Afficher la table",
+      "saveGame": "Sauvegarder la partie",
+      "loadGame": "Charger la partie",
+      "retry": "Réessayer"
+    },
+    "labels": {
+      "appName": "FudaPop",
+      "loading": "Chargement...",
+      "justAMoment": "Un instant...",
+      "coin": "pièce",
+      "coins": "pièces",
+      "points": "points",
+      "round": "Manche",
+      "rounds": "manches",
+      "player": "Joueur",
+      "collection": "Collection",
+      "settings": "Paramètres",
+      "theme": "Thème",
+      "fullscreen": "Plein écran",
+      "exitFullscreen": "Quitter le plein écran",
+      "language": "Langue",
+      "music": "Musique",
+      "total": "Total",
+      "win": "Victoire",
+      "lose": "Défaite",
+      "draw": "Égalité"
+    },
+    "states": {
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "locked": "Verrouillé",
+      "unlocked": "Déverrouillé",
+      "new": "Nouveau",
+      "current": "Actuel",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "selected": "Sélectionné"
+    }
+  },
+  "menu": {
+    "options": {
+      "title": "Options",
+      "tabs": {
+        "deck": "Jeu de cartes",
+        "yaku": "Liste des Yaku",
+        "settings": "Paramètres",
+        "profile": "Profil"
+      }
+    },
+    "avatarSelect": {
+      "title": "Choisissez votre avatar"
+    }
+  },
+  "navigation": {
+    "backToTitleScreen": "Retour à l'écran titre",
+    "continueAsGuest": "Continuer en tant qu'invité",
+    "signInToExistingAccount": "Se connecter à un compte existant →"
+  },
+  "guest": {
+    "welcome": "Bienvenue, {username} !",
+    "progressSavedLocally": "Votre progression est sauvegardée uniquement sur cet appareil. Connectez-vous pour sauvegarder sur tous vos appareils."
+  },
+  "auth": {
+    "fields": {
+      "emailAddress": "Adresse e-mail",
+      "password": "Mot de passe"
+    },
+    "options": {
+      "rememberMe": "Se souvenir de moi",
+      "forgotPassword": "Mot de passe oublié ?"
+    },
+    "links": {
+      "iDontHaveAccount": "Je n'ai pas de compte",
+      "iAlreadyHaveAccount": "J'ai déjà un compte",
+      "orContinueWith": "ou continuer avec"
+    },
+    "providers": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "passwordReset": {
+      "title": "Réinitialiser votre mot de passe ?",
+      "description": "Un lien pour changer votre mot de passe sera envoyé si un compte associé existe."
+    },
+    "passwordRequirements": {
+      "title": "Le mot de passe doit contenir au moins :",
+      "sixCharacters": "6 caractères",
+      "oneNumber": "1 chiffre",
+      "oneUppercase": "1 lettre majuscule",
+      "oneLowercase": "1 lettre minuscule",
+      "oneSpecialCharacter": "1 caractère spécial"
+    },
+    "notices": {
+      "signInRequired": "La connexion est requise pour sauvegarder votre profil."
+    },
+    "messages": {
+      "unableToCreateAccount": "Impossible de créer un compte.",
+      "invalidEmailOrPassword": "E-mail ou mot de passe invalide. Veuillez réessayer.",
+      "unableToLinkAccount": "Impossible de lier votre compte.",
+      "unableToSignIn": "Impossible de se connecter. Veuillez réessayer plus tard.",
+      "passwordResetSent": "L'e-mail de réinitialisation du mot de passe a été envoyé à {email}.",
+      "unableToSendPasswordReset": "Impossible d'envoyer l'e-mail de réinitialisation du mot de passe.",
+      "accountLinked": "Compte lié ! Vous devrez peut-être actualiser votre navigateur pour mettre à jour votre profil.",
+      "youreSignedIn": "Vous êtes connecté ! Amusez-vous bien !",
+      "progressSaved": "Bienvenue ! Votre progression a été sauvegardée sur votre compte.",
+      "failedToLinkAccount": "Échec de la liaison du compte. Veuillez réessayer.",
+      "failedToCreateGuest": "Échec de la création du profil invité. Veuillez actualiser la page.",
+      "logoutError": "Échec de la déconnexion. Veuillez réessayer.",
+      "youHaveBeenSignedOut": "Vous avez été déconnecté."
+    }
+  },
+  "profile": {
+    "info": {
+      "lastUpdated": "Dernière mise à jour :",
+      "playerRecord": "Historique du joueur"
+    },
+    "stats": {
+      "wins": "victoires",
+      "losses": "défaites",
+      "draws": "égalités",
+      "totalYakuCompleted": "Yaku complétés",
+      "totalCardsCaptured": "Cartes capturées",
+      "totalRoundsPlayed": "Manches jouées",
+      "koikoiCalls": "Appels Koi-Koi",
+      "totalCalls": "Appels totaux",
+      "koikoiSuccess": "Succès",
+      "koikoiFail": "Échec",
+      "koikoiStack": "Pile",
+      "koikoiReversal": "Renversements",
+      "cardsCapturedByType": "Cartes par type",
+      "detailedStats": "Statistiques détaillées",
+      "gameplayStats": "Statistiques de jeu",
+      "yakuBreakdown": "Répartition des Yaku",
+      "roundsBreakdown": "Répartition des manches",
+      "gamesCompleted": "Parties terminées",
+      "gamesBreakdown": "Répartition des parties"
+    },
+    "sync": {
+      "status": "Statut de synchronisation",
+      "synced": "Synchronisé",
+      "pendingChanges": "Modifications en attente",
+      "syncing": "Synchronisation en cours...",
+      "error": "Erreur de synchronisation",
+      "lastSynced": "Dernière synchronisation :",
+      "never": "Jamais"
+    },
+    "help": {
+      "koikoiStats": {
+        "title": "Explication des statistiques Koi-Koi",
+        "success": "Vous avez appelé Koi-Koi et gagné la manche",
+        "fail": "Vous avez appelé Koi-Koi mais perdu la manche (défaite ou égalité)",
+        "stack": "Vous avez appelé Koi-Koi plusieurs fois dans une seule manche",
+        "reversal": "L'adversaire a appelé Koi-Koi, mais vous avez gagné la manche"
+      }
+    }
+  },
+  "game": {
+    "title": "Hanafuda Koi-Koi",
+    "ui": {
+      "statusBar": {
+        "roundCounter": "Manche {current} / {max}"
+      }
+    },
+    "actions": {
+      "makeYourCall": "Faites votre appel...",
+      "opponentDeciding": "Votre adversaire est en train de décider...",
+      "calledStop": "a appelé stop.",
+      "koikoiWasCalled": "Koi-Koi a été appelé !",
+      "koikoi": "Koi-Koi",
+      "stop": "Stop",
+      "saveAndExit": "Sauvegarder et quitter",
+      "forfeitAndExit": "Abandonner et quitter",
+      "resumeGame": "Reprendre la partie",
+      "deleteSave": "Supprimer la sauvegarde"
+    },
+    "results": {
+      "theRoundIsADraw": "La manche est une égalité.",
+      "youWin": "VOUS GAGNEZ !",
+      "youLose": "VOUS PERDEZ...",
+      "draw": "ÉGALITÉ",
+      "luckyHand": "Main chanceuse",
+      "fourOfAKindFourPairs": "Carré / Quatre paires",
+      "gotDealtA": "a reçu un",
+      "koiKoiBonus": "Bonus Koi-Koi"
+    },
+    "cardTypes": {
+      "bright": "brillante",
+      "animal": "animal",
+      "ribbon": "ruban",
+      "plain": "simple",
+      "brights": "brillantes",
+      "animals": "animaux",
+      "ribbons": "rubans",
+      "plains": "simples"
+    },
+    "yaku": {
+      "gokou": "Cinq Brillantes",
+      "shikou": "Quatre Brillantes",
+      "ame-shikou": "Quatre Brillantes de Pluie (3 quelconques + Homme de Pluie)",
+      "sankou": "Trois Brillantes (3 quelconques sauf Homme de Pluie)",
+      "hanami-zake": "Vue des Fleurs",
+      "tsukimi-zake": "Vue de la Lune",
+      "ino-shika-chou": "Sanglier, Cerf et Papillon",
+      "aka-tan": "Rubans de Poésie Rouges",
+      "ao-tan": "Rubans Bleus",
+      "tan-zaku": "5 Rubans quelconques (+1pt / supplémentaire)",
+      "tane-zaku": "5 Animaux quelconques (+1pt / supplémentaire)",
+      "kasu": "10 Simples quelconques (+1pt / supplémentaire)",
+      "kuttsuki": "4 paires en main",
+      "teshi": "Carré en main",
+      "tsuki-fuda": "Cartes du Mois",
+      "requiresAtLeastOneOther": "Nécessite au moins un autre Yaku complété (pas {notYaku})"
+    },
+    "warnings": {
+      "leavingGame": "Quitter la partie...",
+      "gameWillBeForfeited": "La partie sera abandonnée et la progression ne sera pas sauvegardée. Êtes-vous sûr de vouloir quitter ?",
+      "yesLeaveGame": "Oui, quitter la partie",
+      "noKeepPlaying": "Non, continuer à jouer",
+      "chooseHowToExit": "Choisissez comment quitter la partie. Les sauvegardes sont temporaires et supprimées une fois reprises."
+    },
+    "saveInfo": {
+      "lastSaved": "Dernière sauvegarde : {lastSaved}"
+    },
+    "confirmations": {
+      "deleteSave": "Êtes-vous sûr de vouloir supprimer votre partie sauvegardée ? Cette action est irréversible."
+    }
+  },
+  "settings": {
+    "actions": {
+      "toggleColorMode": "Changer le mode de couleur",
+      "toggleFullscreen": "Activer/Désactiver le plein écran",
+      "selectLanguage": "Sélectionner la langue",
+      "enableBgm": "Activer la musique de fond",
+      "disableBgm": "Désactiver la musique de fond",
+      "enableSfx": "Activer les effets sonores",
+      "disableSfx": "Désactiver les effets sonores"
+    },
+    "gameplay": {
+      "title": "Règles de jeu",
+      "gameLength": "Durée de la partie",
+      "moonFlowerViewing": "Vue de la Lune/des Fleurs",
+      "wildCardSakeCup": "Coupe de Saké (Carte Sauvage)",
+      "wildCardSakeCupDescription": "La coupe de saké compte comme un type animal et un type simple.",
+      "doubleOverSeven": "Doubler au-delà de sept",
+      "doubleOverSevenDescription": "Double le score si la valeur combinée des Yaku est de 7 points ou plus.",
+      "otherVariations": "Autres variations",
+      "readAboutThisRule": "En savoir plus sur cette règle sur fudawiki.org",
+      "viewingOptions": {
+        "allow": "La complétion est scorée normalement.",
+        "limited": "Nécessite un autre Yaku complété pour marquer des points.",
+        "none": "Aucun point n'est marqué pour la complétion."
+      }
+    },
+    "interface": {
+      "title": "Interface",
+      "cardLabels": "Étiquettes de cartes",
+      "cardLabelsDescription": "Inclure les étiquettes de coin de carte pour faciliter l'appariement.",
+      "cardSize": "Taille des cartes",
+      "cardSizeDescription": "Sélectionnez la taille qui convient le mieux à votre écran.",
+      "sizes": {
+        "small": "Petite",
+        "normal": "Normale",
+        "large": "Grande"
+      }
+    },
+    "audio": {
+      "bgm": "Musique de fond",
+      "sfx": "Effets sonores",
+      "bgmVolume": "Volume de la musique de fond",
+      "sfxVolume": "Volume des effets sonores",
+      "mute": "Muet",
+      "unmute": "Activer le son",
+      "volume": "Volume",
+      "enabled": "Activé",
+      "disabled": "Désactivé"
+    },
+    "colorMode": {
+      "dark": "Sombre",
+      "light": "Clair",
+      "auto": "Auto"
+    },
+    "notices": {
+      "settingsLocked": "Certains paramètres sont verrouillés pendant une partie.",
+      "languageChangeNotice": "La langue ne peut être modifiée que sur l'écran titre."
+    }
+  },
+  "deck": {
+    "selectADeck": "Sélectionner un jeu de cartes",
+    "tradeCoins": "Échanger {cost} pièces pour utiliser ce jeu de cartes ?",
+    "noKeepCoins": "Non, garder mes pièces.",
+    "yesUnlockIt": "Oui, le déverrouiller !",
+    "limitedTimeOffer": "✨ OFFRE À DURÉE LIMITÉE ✨",
+    "artBy": "Art par {creator} →",
+    "notices": {
+      "youDontHaveEnoughCoins": "Vous n'avez pas encore assez de pièces...",
+      "youHaveUnlocked": "Vous avez déverrouillé un nouveau jeu de cartes !"
+    }
+  },
+  "feedback": {
+    "thankYouForPlaying": "Merci d'avoir joué !",
+    "howWasExperience": "Comment était votre expérience ?",
+    "feedbackSubmitted": "Votre commentaire a été envoyé. Merci !",
+    "categories": {
+      "animationSmoothness": "Fluidité de l'animation",
+      "easeOfControls": "Facilité des commandes",
+      "imageQuality": "Qualité de l'image",
+      "soundQuality": "Qualité du son"
+    },
+    "comments": {
+      "title": "Commentaires",
+      "type": "Type de commentaire",
+      "types": {
+        "idea": "💡 idée",
+        "error": "🪲 erreur",
+        "other": "💬 autre"
+      },
+      "descriptions": {
+        "idea": "Comment pouvons-nous améliorer le jeu, ou que souhaiteriez-vous voir ensuite ?",
+        "error": "Avez-vous rencontré des bugs ? Veuillez décrire le problème.",
+        "other": "Vos commentaires sont grandement appréciés ! 🙏🏽"
+      },
+      "placeholder": "Saisissez votre commentaire ici..."
+    }
+  },
+  "announcements": {
+    "whatsNewTitle": "Nouveautés dans Hanafuda Koi-Koi !",
+    "dismiss": "Compris !",
+    "dontShowAgain": "Ne plus afficher",
+    "resetAnnouncements": "Réinitialiser les annonces",
+    "metrics": {
+      "views": "vues",
+      "likes": "j'aime"
+    }
+  },
+  "collection": {
+    "viewCollection": "Voir {title}",
+    "yourCollection": "Votre collection",
+    "opponentCollection": "Collection de l'adversaire",
+    "viewCards": "Voir les cartes"
+  },
+  "signup": {
+    "prompt": {
+      "title": "Vous avez des pièces ! Que diriez-vous de 500 de plus ?",
+      "description": "Vos pièces peuvent être utilisées pour déverrouiller de nouveaux designs de cartes et avatars. Cependant, les profils invités ne peuvent pas être sauvegardés.",
+      "question": "Connectez-vous pour sauvegarder votre profil et recevoir 500 pièces supplémentaires ?"
+    },
+    "actions": {
+      "noThanksDeleteMe": "Non merci, supprimez-moi",
+      "yesGimmeCoins": "Oui, donnez-moi des pièces !"
+    }
+  },
+  "footer": {
+    "links": {
+      "changelog": "Journal des modifications",
+      "attributions": "Attributions",
+      "termsOfUse": "Conditions d'utilisation",
+      "privacyPolicy": "Politique de confidentialité"
+    },
+    "actions": {
+      "viewChangelog": "Voir le journal des modifications",
+      "viewAttributions": "Voir les attributions",
+      "viewTermsOfUse": "Voir les conditions d'utilisation",
+      "viewPrivacyPolicy": "Voir la politique de confidentialité"
+    },
+    "credits": {
+      "backgroundArtBy": "Art et design de fond par",
+      "developedBy": "Développé par"
+    },
+    "copyright": {
+      "fullNotice": "© {year} FudaPop. Tous droits réservés."
+    }
+  },
+  "errors": {
+    "http": {
+      "badRequest": "Mauvaise requête",
+      "internalServerError": "Erreur interne du serveur"
+    },
+    "browser": {
+      "fullscreenNotSupported": "Le plein écran n'est pas pris en charge par ce navigateur."
+    },
+    "timeout": {
+      "functionCallTimedOut": "L'appel de fonction ({name}) a expiré."
+    }
+  },
+  "cache": {
+    "status": {
+      "caching": "Mise en cache de {design} : {progress}%",
+      "completedCaching": "Mise en cache de {design} terminée",
+      "cachingCards": "Mise en cache des cartes..."
+    },
+    "error": "Erreur : {error}"
+  },
+  "datetime": {
+    "months": {
+      "january": "Janvier",
+      "february": "Février",
+      "march": "Mars",
+      "april": "Avril",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre",
+      "december": "Décembre"
+    }
+  },
+  "hanafuda": {
+    "flowers": {
+      "pine": "Pin",
+      "plum": "Prunier",
+      "cherry": "Cerisier",
+      "wisteria": "Glycine",
+      "iris": "Iris",
+      "peony": "Pivoine",
+      "bushClover": "Trèfle des buissons",
+      "susuki": "Herbe Susuki",
+      "chrysanthemum": "Chrysanthème",
+      "maple": "Érable",
+      "willow": "Saule",
+      "paulownia": "Paulownia"
+    }
+  },
+  "accessibility": {
+    "navigation": {
+      "skipToContent": "Passer au contenu",
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu"
+    },
+    "actions": {
+      "closePanel": "Fermer le panneau"
+    }
+  },
+  "rankings": {
+    "title": "Classements",
+    "pageTitle": "Nouveau Hanafuda | Classements",
+    "failedToLoad": "Échec du chargement des données du classement. Veuillez réessayer plus tard.",
+    "retry": "Réessayer",
+    "filters": {
+      "overall": "Général",
+      "active": "Les plus actifs",
+      "wins": "Plus de victoires",
+      "winrate": "Meilleur taux de victoire"
+    },
+    "table": {
+      "rank": "Rang",
+      "player": "Joueur",
+      "games": "Parties",
+      "wins": "Victoires",
+      "losses": "Défaites",
+      "draws": "Égalités",
+      "winRate": "Taux de victoire",
+      "coins": "Pièces"
+    },
+    "player": {
+      "guest": "Joueur invité",
+      "guestShort": "Invité"
+    },
+    "empty": {
+      "noPlayers": "Aucun joueur trouvé",
+      "beTheFirst": "Soyez le premier à jouer et à apparaître dans le classement !"
+    }
+  },
+  "pages": {
+    "changelog": "Journal des modifications",
+    "attributions": "Attributions des artistes",
+    "privacy": "Politique de confidentialité",
+    "rankings": "Classements",
+    "signIn": "Se connecter",
+    "terms": "Conditions d'utilisation",
+    "home": "Accueil"
+  },
+  "pageDescriptions": {
+    "changelog": "Journal des modifications pour {appName}",
+    "attributions": "Attributions des artistes pour {appName}",
+    "privacy": "Politique de confidentialité pour {appName}",
+    "rankings": "Classements des joueurs pour {appName}",
+    "signIn": "Connectez-vous à votre compte {appName}",
+    "terms": "Conditions d'utilisation pour {appName}",
+    "home": "Jouez au jeu de cartes japonais Hanafuda Koi-Koi contre un adversaire IA."
+  }
+}

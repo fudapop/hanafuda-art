@@ -5,8 +5,8 @@
  * Provides a single source of truth for supported locales and shared functionality.
  */
 
-import { existsSync } from 'jsr:@std/fs/exists'
-import { dirname, fromFileUrl, join } from 'jsr:@std/path'
+import { existsSync } from '@std/fs/exists'
+import { dirname, fromFileUrl, join } from '@std/path'
 
 /**
  * Locale configuration interface

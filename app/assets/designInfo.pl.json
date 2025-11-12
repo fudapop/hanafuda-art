@@ -1,0 +1,83 @@
+{
+  "cherry-version": {
+    "title": "Wersja Cherry",
+    "description": "Projekt autorstwa Parish Cherry, ilustratorki i graficzki z Honolulu na Hawajach!",
+    "urlDescription": "Sprawdź portfolio Parish Cherry!"
+  },
+  "sabling-art": {
+    "title": "Sabling Art",
+    "description": "Talia Pokemon hanafuda zaprojektowana przez niezależną ilustratorkę Sabling!",
+    "urlDescription": "Kup tę talię i więcej od @SablingArt!"
+  },
+  "otwarte-karty": {
+    "title": "Otwarte Karty",
+    "description": "Ta talia została zaprojektowana tak, aby była jak najbardziej przyjazna dla nowych osób, zachowując 100% zgodność ze standardowym wzorem!",
+    "urlDescription": "Śledź @otwartekarty.pl na Instagramie!"
+  },
+  "shou-suisaiga": {
+    "title": "Shou Suisaiga",
+    "description": "Projekt autorstwa użytkownika Discord Vulume!",
+    "urlDescription": "Dołącz do serwera Discord Hanafuda!"
+  },
+  "vaporwave": {
+    "title": "Vaporwave",
+    "description": "Projekt autorstwa użytkownika Discord Heavenlysome!",
+    "urlDescription": "Dołącz do serwera Discord Hanafuda!"
+  },
+  "hanamaki": {
+    "title": "Hanamaki",
+    "description": "Projekt hanafuda wykonany przez Tsurutę w późnym okresie Showa.",
+    "urlDescription": "Zobacz więcej tradycyjnych projektów w Muzeum Kart do Gry w Japonii."
+  },
+  "hana-awase": {
+    "title": "Hana-awase",
+    "description": "Hanafuda z okresu Meiji znaleziona w \"Hana-awase\" Palmera (1891).",
+    "urlDescription": "Zobacz więcej z kolekcji w Internet Archive."
+  },
+  "kinbotan": {
+    "title": "Kin-botan",
+    "description": "Ta edycja \"Złotej Piwonii\" wyprodukowana przez Windmill jest repliką oryginalnej talii, która niegdyś należała do pierwszego premiera Japonii."
+  },
+  "post-card": {
+    "title": "Pocztówka",
+    "description": "Pocztówki z tym wzorem autorstwa Tanaki Sansho zostały wydane w 1906 roku.",
+    "creator": "Tanaka Sansho",
+    "urlDescription": "Przeczytaj o tej kolekcji w Muzeum Kart do Gry w Japonii."
+  },
+  "modern": {
+    "title": "Modern 2012",
+    "description": "Sarah Thomas zaprojektowała ten piękny zestaw Modern Hanafuda i uruchomiła swój udany Kickstarter w 2012 roku!",
+    "urlDescription": "Powróć do podróży na ModernHanafuda.net!"
+  },
+  "koinobori": {
+    "title": "Koinobori",
+    "description": "Koinobori Hanafuda dostarczone przez IndianWolf Studios LLC!",
+    "urlDescription": "Wesprzyj ich projekt na Kickstarter!"
+  },
+  "hanami": {
+    "title": "Hanami",
+    "description": "Hanami Hanafuda zaprojektowane przez Jasona Johnsona z IndianWolf Studios LLC i zilustrowane przez Antoniettę Fazio-Johnson z Inner Hue Art Studio LLC!",
+    "urlDescription": "Kup tę talię i więcej od IndianWolf Studios!"
+  },
+  "moon-rabbit": {
+    "title": "Moon Rabbit Original",
+    "description": "Karty Moon Rabbit Hanafuda zaprojektowane i zilustrowane przez Kelsey Cretcher!",
+    "urlDescription": "Znajdź więcej od Kelsey na DeviantArt!"
+  },
+  "nishiki-fuda": {
+    "title": "Nishiki Fuda",
+    "description": "Projekt autorstwa Hanako z Estudio Artes w Osace, Japonia!",
+    "urlDescription": "Kup tę talię i inne z ich sklepu internetowego!"
+  },
+  "flash-black": {
+    "title": "Flash Black",
+    "description": "Tradycyjny projekt z Hanafuda Flash i gamedesign.jp!",
+    "urlDescription": "Graj za darmo online!"
+  },
+  "ramen-red": {
+    "title": "Ramen Red",
+    "description": "Klasyczny projekt widoczny w Hanafuda Koi-Koi Ramen!",
+    "urlDescription": "Pobierz i graj za darmo!"
+  }
+}
+

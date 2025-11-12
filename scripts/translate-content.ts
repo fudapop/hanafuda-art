@@ -21,18 +21,18 @@
  *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --dry-run --include "content/en" --locales "ja,pl"
  */
 
-import { parseArgs } from 'jsr:@std/cli/parse-args'
-import { existsSync } from 'jsr:@std/fs/exists'
-import { dirname, join } from 'jsr:@std/path'
-import { googleAI } from 'npm:@genkit-ai/googleai'
-import { genkit, z } from 'npm:genkit'
+import { googleAI } from '@genkit-ai/googleai'
+import { parseArgs } from '@std/cli/parse-args'
+import { existsSync } from '@std/fs/exists'
+import { dirname, join } from '@std/path'
+import { genkit, z } from 'genkit'
 import {
   formatLocaleList,
   getSupportedTargetLocales,
   setupWorkingDirectory,
   TranslationMode,
   validateTargetLocales,
-} from './translation-utils.js'
+} from './translation-utils.ts'
 
 // Initialize Genkit with the Google AI plugin
 const ai = genkit({

@@ -28,6 +28,13 @@
       "language": "ru-RU",
       "file": "ru-ru.json",
       "dir": "ltr"
+    },
+    {
+      "name": "Français",
+      "code": "fr",
+      "language": "fr-FR",
+      "file": "fr-fr.json",
+      "dir": "ltr"
     }
   ]
 }

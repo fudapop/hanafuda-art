@@ -7,11 +7,11 @@
  *
  */
 
-import { parseArgs } from 'jsr:@std/cli/parse-args'
-import { load } from 'jsr:@std/dotenv'
-import { exists } from 'jsr:@std/fs/exists'
-import { join } from 'jsr:@std/path/join'
-import { createClient } from 'jsr:@supabase/supabase-js'
+import { parseArgs } from '@std/cli/parse-args'
+import { load } from '@std/dotenv'
+import { exists } from '@std/fs/exists'
+import { join } from '@std/path/join'
+import { createClient } from '@supabase/supabase-js'
 
 /**
  * Configuration and environment setup

@@ -1,7 +1,14 @@
 {
   "imports": {
-    "@std/path": "jsr:@std/path@1.1.1"
+    "@std/path": "jsr:@std/path@1.1.1",
+    "@std/cli": "jsr:@std/cli",
+    "@std/fs": "jsr:@std/fs",
+    "@genkit-ai/googleai": "npm:@genkit-ai/googleai",
+    "genkit": "npm:genkit",
+    "@std/dotenv": "jsr:@std/dotenv",
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@^2"
   },
+  "nodeModulesDir": "auto",
   "tasks": {
     "upload-to-static": "deno run --allow-read --allow-write --allow-env --allow-net --allow-run ./upload-to-static.ts",
     "translate-content": "export $(cat ../.env | grep GEMINI_API_KEY | tr -d ' \t\r\n') && deno run --allow-read --allow-write --allow-env --allow-net --allow-run --allow-sys ./translate-content.ts",
