@@ -286,6 +286,11 @@ const fetchLeaderboard = async () => {
     loading.value = true
     error.value = false
 
+    // Wait for Firebase auth to initialize before attempting to fetch
+    // This ensures auth state is ready, even if user is not authenticated
+    // getCurrentUser() returns null if not authenticated, but waits for auth to initialize
+    await getCurrentUser()
+
     const db = getFirestore()
     const usersRef = collection(db, 'users')
     const snapshot = await getDocs(usersRef)
@@ -296,7 +301,8 @@ const fetchLeaderboard = async () => {
       const data = doc.data()
       const record = data.record || { win: 0, loss: 0, draw: 0, coins: 0 }
       // Adjust for coins spent
-      record.coins += Math.max(data.designs.unlocked.length - 3, 0) * 500
+      const unlockedLength = data.designs?.unlocked?.length || 0
+      record.coins += Math.max(unlockedLength - 3, 0) * 500
       const totalGames = record.win + record.loss + record.draw
 
       // Only include players who have played at least one game
@@ -317,8 +323,16 @@ const fetchLeaderboard = async () => {
     })
 
     leaderboard.value = players
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error fetching leaderboard:', err)
+
+    // Check if it's a permissions error
+    if (err?.code === 'permission-denied' || err?.message?.includes('permissions')) {
+      console.warn(
+        'Firestore permissions error - leaderboard may require authentication or updated security rules',
+      )
+    }
+
     error.value = true
   } finally {
     loading.value = false

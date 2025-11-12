@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
-import tailwindcss from '@tailwindcss/vite'
 
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 const seoMeta = JSON.parse(readFileSync(resolve('./seo-meta.json'), 'utf-8'))
@@ -102,30 +102,37 @@ export default defineNuxtConfig({
     {
       path: '~/components',
       pathPrefix: false,
+      extensions: ['.vue'],
     },
     {
       path: '~/components/buttons',
       pathPrefix: false,
+      extensions: ['.vue'],
     },
     {
       path: '~/components/cards',
       pathPrefix: false,
+      extensions: ['.vue'],
     },
     {
       path: '~/components/modal',
       pathPrefix: false,
+      extensions: ['.vue'],
     },
     {
       path: '~/components/menu',
       pathPrefix: false,
+      extensions: ['.vue'],
     },
     {
       path: '~/components/play-area',
       pathPrefix: false,
+      extensions: ['.vue'],
     },
     {
       path: '~/components/side-panel',
       pathPrefix: false,
+      extensions: ['.vue'],
     },
   ],
   css: ['~/assets/css/card-styles.css', '~/assets/css/global.css'],

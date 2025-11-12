@@ -105,7 +105,6 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useToast } from 'vue-toastification'
 import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
 import { checkForWin } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
@@ -148,8 +147,6 @@ const autoOpponent: Ref<boolean> = useOpponent()
 const showModal = ref(false)
 const showLoader = ref(false)
 const gameStart = useState('start')
-
-const toast = useToast()
 
 const {
   decisionIsPending,

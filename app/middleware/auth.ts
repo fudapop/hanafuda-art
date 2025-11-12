@@ -1,7 +1,6 @@
-// middleware/auth.ts
-import { getCurrentUser } from 'vuefire'
-
 export default defineNuxtRouteMiddleware(async (to, from) => {
+  if (!import.meta.client) return
+  const { getCurrentUser } = await import('vuefire')
   const user = await getCurrentUser()
 
   // Get fresh composable instances for each middleware run

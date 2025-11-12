@@ -238,14 +238,13 @@ import {
 } from '@heroicons/vue/20/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
-import { useToast } from 'vue-toastification'
 import type { CardName } from '~/utils/cards'
 import DesignDescription from './DesignDescription.vue'
+import { toast } from 'vue-sonner'
 
 type CardDesign = (typeof DESIGNS)[number]
 
 const { DESIGNS, currentDesign, getDesignInfo } = useCardDesign()
-const toast = useToast()
 const { t } = useI18n()
 
 const isNew = (design: CardDesign) => {
@@ -299,7 +298,7 @@ const handleUnlock = (design: CardDesign) => {
   if (coins.value === undefined || !unlocked.value) return
   if (!isNew(design) && coins.value < UNLOCK_COST) {
     toast.dismiss(toastId)
-    toastId = toast.info(t('deck.notices.youDontHaveEnoughCoins'), { timeout: 6000 })
+    toastId = toast.info(t('deck.notices.youDontHaveEnoughCoins'), { duration: 6000 })
     clearTimeout(timeoutId)
     timeoutId = setTimeout(() => {
       currentDesign.value = initialDesign!
@@ -320,7 +319,7 @@ const confirmUnlock = () => {
   if (!newUnlock.value) return
   coins.value -= newUnlock.value.cost
   unlocked.value.push(newUnlock.value.design)
-  toast.success(t('deck.notices.youHaveUnlocked'), { timeout: 5000 })
+  toast.success(t('deck.notices.youHaveUnlocked'), { duration: 5000 })
   currentDesign.value = newUnlock.value.design
   newUnlock.value = null
   initialDesign = currentDesign.value
