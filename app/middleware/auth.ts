@@ -31,7 +31,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   } else {
     // No Firebase user - ensure a guest profile exists on non-auth routes
     // Do nothing on the sign-in page to avoid immediate creation after logout
-    if (to.path !== '/sign-in') {
+    // Check for sign-in route regardless of locale
+    const isSignInRoute = to.path.includes('/sign-in')
+
+    if (!isSignInRoute) {
       try {
         const { createLocalGuestProfile } = await import('~/composables/usePlayerProfile')
         const { loadLocalGuestProfile } = useProfile()

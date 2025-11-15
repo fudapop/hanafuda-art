@@ -1,15 +1,5 @@
 import type { User } from 'firebase/auth'
 import { useAvatar } from '~/composables/useAvatar'
-import { useConfigStore, type GameSettings } from '~~/stores/configStore'
-import type {
-  LocalProfileStore,
-  PlayerProfile,
-  SyncAdapter,
-  SyncMetadata,
-  SyncOptions,
-  SyncResult,
-  SyncStatus,
-} from '~/types/profile'
 import {
   calculateGameRecord,
   createDefaultProfile,
@@ -20,6 +10,16 @@ import {
 import type { PlayerStatsKey } from '~/utils/stats'
 import { updateStatsWithOps, verifyStatsIntegrity } from '~/utils/stats'
 import { resolveConflict as resolveProfileConflict, type ConflictResolution } from '~/utils/sync'
+import { useConfigStore, type GameSettings } from '~~/stores/configStore'
+import type {
+  LocalProfileStore,
+  PlayerProfile,
+  SyncAdapter,
+  SyncMetadata,
+  SyncOptions,
+  SyncResult,
+  SyncStatus,
+} from '~~/types/profile'
 
 // In-memory fallback store for tests / environments without IndexedDB
 const memoryStores = {
@@ -316,7 +316,7 @@ export const usePlayerProfile = () => {
       p1Avatar.value,
     )
 
-    if (profile.value.settings) {
+    if (profile.value?.settings) {
       const config = useConfigStore()
       config.loadUserSettings(profile.value.settings as unknown as GameSettings)
     }
@@ -333,7 +333,7 @@ export const usePlayerProfile = () => {
     )
 
     // Load settings into configStore
-    if (profile.value.settings) {
+    if (profile.value?.settings) {
       const config = useConfigStore()
       config.loadUserSettings(profile.value.settings as unknown as GameSettings)
     }
@@ -590,7 +590,7 @@ export const usePlayerProfile = () => {
     profile.value = await createDefaultProfile(guestProfile, p1Avatar.value)
 
     // Load settings into configStore
-    if (profile.value.settings) {
+    if (profile.value?.settings) {
       const config = useConfigStore()
       config.loadUserSettings(profile.value.settings as unknown as GameSettings)
     }

@@ -29,6 +29,7 @@ export const useProfile = () => {
    */
   const transferGuestToAuthProfile = async (user: any) => {
     let transferSucceeded = false
+    let pullFailed = false
     try {
       // Step 1: Pull remote profile if it exists
       let remoteProfile = null
@@ -43,37 +44,61 @@ export const useProfile = () => {
           console.info('Found existing authenticated profile in Firestore', {
             remoteCoins: remoteProfile.record.coins,
           })
+        } else {
+          console.info('No remote profile found - first time login or new user')
         }
-      } catch (pullError) {
-        console.warn('Failed to check remote profile:', pullError)
-        // Continue - might be first time user, no remote profile yet
+      } catch (pullError: any) {
+        console.error('Failed to fetch remote profile:', pullError)
+        pullFailed = true
+
+        // CRITICAL: Don't proceed with guest transfer if we couldn't verify remote state
+        // This prevents overwriting existing remote profiles with guest data
+        if (import.meta.client) {
+          try {
+            const { toast } = await import('vue-sonner')
+            toast.error(
+              'Failed to fetch your profile. Please check your connection and try again.',
+              {
+                duration: 5000,
+              },
+            )
+          } catch (toastError) {
+            console.warn('Failed to show toast notification:', toastError)
+          }
+        }
+
+        // Try to load profile normally without transferring guest data
+        await playerProfile.getProfile(user)
+        return
       }
 
-      // Step 2: Transfer/merge guest profile
-      // Pass remote profile so it merges with it (if exists)
-      // If no remote profile, it creates new from guest + signup bonus
-      await playerProfile.transferGuestProfile(user, remoteProfile || undefined)
-      transferSucceeded = true
-      console.info('Guest profile transferred successfully')
+      // Step 2: Transfer/merge guest profile ONLY if we successfully checked remote
+      if (!pullFailed) {
+        // Pass remote profile so it merges with it (if exists)
+        // If no remote profile, it creates new from guest + signup bonus
+        await playerProfile.transferGuestProfile(user, remoteProfile || undefined)
+        transferSucceeded = true
+        console.info('Guest profile transferred successfully')
 
-      // Step 3: Push final merged profile back to remote
-      try {
-        await playerProfile.syncPush()
-        console.info('Merged profile synced to remote')
-      } catch (syncError) {
-        console.warn('Failed to sync merged profile to remote:', syncError)
-        // Continue with local profile - allows offline play
-        // Local transfer already succeeded, no recovery needed
-      }
-
-      // Step 4: Show success notification
-      if (import.meta.client) {
+        // Step 3: Push final merged profile back to remote
         try {
-          await nextTick()
-          const { toast } = await import('vue-sonner')
-          toast.success('Progress saved successfully!', { duration: 3000 })
-        } catch (toastError) {
-          console.warn('Failed to show toast notification:', toastError)
+          await playerProfile.syncPush()
+          console.info('Merged profile synced to remote')
+        } catch (syncError) {
+          console.warn('Failed to sync merged profile to remote:', syncError)
+          // Continue with local profile - allows offline play
+          // Local transfer already succeeded, no recovery needed
+        }
+
+        // Step 4: Show success notification
+        if (import.meta.client) {
+          try {
+            await nextTick()
+            const { toast } = await import('vue-sonner')
+            toast.success('Progress saved successfully!', { duration: 3000 })
+          } catch (toastError) {
+            console.warn('Failed to show toast notification:', toastError)
+          }
         }
       }
     } catch (error) {
