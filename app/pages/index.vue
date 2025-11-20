@@ -80,8 +80,8 @@
 
       <!-- KOI-KOI SHOUT -->
       <Shout
-        v-if="shoutTimeout && getCaller !== null"
-        :called-by="getCaller"
+        :show="!!shoutTimeout && getCaller !== null"
+        :called-by="getCaller!"
         msg="KOI KOI"
       />
 

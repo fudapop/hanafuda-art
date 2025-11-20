@@ -120,7 +120,7 @@
         v-else
         class="relative h-full isolate"
       >
-        <NewStartScreen @start-game="gameStart = true" />
+        <StartScreen @start-game="gameStart = true" />
       </div>
     </Transition>
 
