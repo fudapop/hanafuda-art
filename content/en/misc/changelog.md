@@ -1,5 +1,20 @@
 # Changelog
 
+## [2025.11.4] - 2025-11-20
+
+### New Features
+- **French Language Support**: Added comprehensive French (fr) language support with full translations for all game content, menus, user interface elements, and localized card design information. French-speaking players can now enjoy the complete game experience in their native language.
+- **Enhanced Toast Notifications**: Replaced the notification system with Sonner toast notifications, providing a more polished and consistent notification experience throughout the game.
+
+### UI & Experience Improvements
+- **Rankings Page Clarification**: Added a minimum games requirement note to the best-win-rate ranking, helping players understand the criteria for appearing on leaderboards.
+
+### Bug Fixes
+- **Guest Profile Protection**: Fixed an issue where guest profiles could be overwritten when remote profile fetch operations failed. Guest profiles are now properly protected during authentication processes.
+
+### Performance & Technical Improvements
+- **Component Library Updates**: Updated shadcn-nuxt to version 2.3.2 and resolved related component issues for improved stability and compatibility.
+
 ## [2025.11.3] - 2025-11-11
 
 ### New Features

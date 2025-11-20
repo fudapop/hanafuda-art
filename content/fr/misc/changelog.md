@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## [2025.11.4] - 2025-11-20
+
+### Nouvelles fonctionnalités
+- **Support de la langue française**: Ajout d'un support complet de la langue française (fr) avec des traductions complètes pour tout le contenu du jeu, les menus, les éléments de l'interface utilisateur et les informations de design de cartes localisées. Les joueurs francophones peuvent maintenant profiter de l'expérience de jeu complète dans leur langue maternelle.
+- **Notifications toast améliorées**: Remplacement du système de notification par des notifications toast Sonner, offrant une expérience de notification plus raffinée et cohérente dans tout le jeu.
+
+### Améliorations de l'interface et de l'expérience
+- **Clarification de la page des classements**: Ajout d'une note sur l'exigence de nombre minimum de parties pour le classement du meilleur taux de victoire, aidant les joueurs à comprendre les critères pour apparaître sur les classements.
+
+### Corrections de bugs
+- **Protection du profil invité**: Correction d'un problème où les profils invités pouvaient être écrasés lorsque les opérations de récupération de profil à distance échouaient. Les profils invités sont maintenant correctement protégés pendant les processus d'authentification.
+
+### Améliorations des performances et techniques
+- **Mises à jour de la bibliothèque de composants**: Mise à jour de shadcn-nuxt vers la version 2.3.2 et résolution des problèmes de composants associés pour une stabilité et une compatibilité améliorées.
+
 ## [2025.11.3] - 2025-11-11
 
 ### Nouvelles fonctionnalités

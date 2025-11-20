@@ -1,5 +1,20 @@
 # Dziennik zmian
 
+## [2025.11.4] - 2025-11-20
+
+### Nowe funkcje
+- **Obsługa języka francuskiego**: Dodano kompleksowe wsparcie dla języka francuskiego (fr) z pełnymi tłumaczeniami dla całej zawartości gry, menu, elementów interfejsu użytkownika i zlokalizowanych informacji o projektach kart. Gracze francuskojęzyczni mogą teraz cieszyć się pełnym doświadczeniem gry w swoim języku ojczystym.
+- **Ulepszone powiadomienia toast**: Zastąpiono system powiadomień powiadomieniami toast Sonner, zapewniając bardziej dopracowane i spójne doświadczenie powiadomień w całej grze.
+
+### Ulepszenia interfejsu i doświadczenia
+- **Wyjaśnienie strony rankingów**: Dodano notatkę o wymaganym minimum gier dla rankingu najlepszego wskaźnika zwycięstw, pomagając graczom zrozumieć kryteria pojawiania się na listach rankingowych.
+
+### Naprawione błędy
+- **Ochrona profilu gościa**: Naprawiono problem, w którym profile gości mogły być nadpisywane, gdy operacje pobierania profilu zdalnego nie powiodły się. Profile gości są teraz prawidłowo chronione podczas procesów uwierzytelniania.
+
+### Ulepszenia wydajności i techniczne
+- **Aktualizacje biblioteki komponentów**: Zaktualizowano shadcn-nuxt do wersji 2.3.2 i rozwiązano powiązane problemy z komponentami w celu poprawy stabilności i kompatybilności.
+
 ## [2025.11.3] - 2025-11-11
 
 ### Nowe funkcje
