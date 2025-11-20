@@ -22,7 +22,7 @@
       </HeadlessTransitionChild>
 
       <!-- PANEL -->
-      <div
+      <HeadlessDialogPanel
         v-if="!modalHidden && !isOptionsOpen"
         class="fixed inset-0 overflow-y-auto transition-opacity duration-300"
       >
@@ -45,7 +45,7 @@
             </div>
           </HeadlessTransitionChild>
         </div>
-      </div>
+      </HeadlessDialogPanel>
     </HeadlessTransitionRoot>
     <Teleport to="body">
       <div
@@ -56,29 +56,22 @@
           class="w-48 game-ui-btn place-content-center"
           @click="() => openOptions('yaku')"
         >
-          <span class="mr-1">
-            <Icon
-              class="inline w-8 h-8 pb-1"
-              name="mdi:cards-outline"
-            />
-            {{ t('menu.options.tabs.yaku') }}
-          </span>
+          <Icon name="mdi:cards-outline" />
+          {{ t('menu.options.tabs.yaku') }}
         </button>
         <button
-          class="w-48 game-ui-btn place-content-center"
+          :class="['w-48 game-ui-btn place-content-center', modalHidden && 'animate-pulse']"
           @click="toggleModal"
         >
-          <span :class="['mr-1', modalHidden && 'animate-pulse']">
-            <EyeSlashIcon
-              class="inline w-8 h-8 pb-1"
-              v-if="modalHidden"
-            />
-            <EyeIcon
-              class="inline w-8 h-8 pb-1"
-              v-else
-            />
-            {{ t('common.actions.showTable') }}
-          </span>
+          <Icon
+            v-if="modalHidden"
+            name="mdi:eye-off-outline"
+          />
+          <Icon
+            v-else
+            name="mdi:eye-outline"
+          />
+          {{ t('common.actions.showTable') }}
         </button>
       </div>
     </Teleport>
@@ -86,7 +79,6 @@
 </template>
 
 <script setup lang="ts">
-import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 
 const { t } = useI18n()

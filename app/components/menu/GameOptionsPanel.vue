@@ -52,7 +52,7 @@
                     <div class="flex-1 min-h-0">
                       <div class="flex flex-col h-full">
                         <!-- Tab content -->
-                        <div class="flex-1 min-h-0 overflow-hidden bg-surface">
+                        <div class="flex-1 min-h-0 overflow-hidden bg-surface pb-12">
                           <div
                             v-for="(tab, index) in tabs"
                             :key="tab"
@@ -66,44 +66,58 @@
                         </div>
 
                         <!-- Simple tab navigation -->
-                        <div class="flex shrink-0 bg-surface">
-                          <button
-                            v-for="(tab, index) in tabs"
-                            :key="tab"
-                            :class="[
-                              'flex items-center justify-center gap-2 w-full py-4 px-4 text-sm font-medium leading-5 transition-colors',
-                              'border-r border-surface',
-                              currentTabIndex === index
-                                ? 'text-primary bg-surface'
-                                : 'text-surface hover:text-white hover:bg-hanafuda-brown/80 border-t bg-hanafuda-brown',
-                              currentTabIndex === index + 1 && 'rounded-tr',
-                              currentTabIndex === index - 1 && 'rounded-tl',
-                            ]"
-                            @click="() => openOptions(tab)"
+                        <Teleport to="body">
+                          <HeadlessTransitionChild
+                            as="template"
+                            enter="transition-transform ease-in-out duration-500 sm:duration-700"
+                            enter-from="translate-x-full"
+                            enter-to="translate-x-0"
+                            leave="transition-transform duration-500 sm:duration-700"
+                            leave-from="translate-x-0"
+                            leave-to="translate-x-full"
                           >
-                            <slot :name="`tab-icon-${index + 1}`">
-                              <!-- Fallback content if no icon slot is provided -->
-                            </slot>
-                            <span class="capitalize sr-only sm:not-sr-only">{{
-                              t(`menu.options.tabs.${tab}`)
-                            }}</span>
-                          </button>
-                          <button
-                            type="button"
-                            :class="[
-                              'bg-hanafuda-brown p-4 border-t border-t-surface text-surface hover:text-white',
-                              'focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2',
-                              currentTabIndex === tabs.length - 1 && 'rounded-tl',
-                            ]"
-                            @click="closeOptions"
-                          >
-                            <span class="sr-only">{{ t('common.actions.close') }}</span>
-                            <XMarkIcon
-                              class="w-6 h-6"
-                              aria-hidden="true"
-                            />
-                          </button>
-                        </div>
+                            <div
+                              class="cursor-pointer fixed bottom-0 right-0 w-full max-w-2xl flex shrink-0 bg-transparent z-100 rounded-t-md overflow-hidden"
+                            >
+                              <button
+                                v-for="(tab, index) in tabs"
+                                :key="tab"
+                                :class="[
+                                  'flex items-center justify-center gap-2 w-full py-4 px-4 text-sm font-medium leading-5 transition-colors',
+                                  'border-r text-white',
+                                  currentTabIndex === index
+                                    ? 'bg-hanafuda-brown border-t rounded-t-md'
+                                    : 'text-white/80 hover:text-white hover:bg-hanafuda-brown/80 bg-black/50 backdrop-blur-xs',
+                                  currentTabIndex === index + 1 && 'rounded-tr-md',
+                                  currentTabIndex === index - 1 && 'rounded-tl-md',
+                                ]"
+                                @click="() => openOptions(tab)"
+                              >
+                                <slot :name="`tab-icon-${index + 1}`">
+                                  <!-- Fallback content if no icon slot is provided -->
+                                </slot>
+                                <span class="capitalize sr-only sm:not-sr-only">{{
+                                  t(`menu.options.tabs.${tab}`)
+                                }}</span>
+                              </button>
+                              <button
+                                type="button"
+                                :class="[
+                                  'bg-black/50 hover:bg-hanafuda-brown backdrop-blur-xs py-4 px-6 text-white/80 hover:text-white',
+                                  'focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                                  currentTabIndex === tabs.length - 1 && 'rounded-tl-md',
+                                ]"
+                                @click="closeOptions"
+                              >
+                                <span class="sr-only">{{ t('common.actions.close') }}</span>
+                                <XMarkIcon
+                                  class="w-6 h-6"
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            </div>
+                          </HeadlessTransitionChild>
+                        </Teleport>
                       </div>
                     </div>
                   </div>

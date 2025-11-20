@@ -98,11 +98,12 @@
 </template>
 
 <script setup lang="ts">
+const { getDesignInfo } = useCardDesign()
 const { isMobile } = useDevice()
 const { t } = useI18n()
 const { design, isNew = false } = defineProps<{ design: CardDesign; isNew?: boolean }>()
 
 const modalRef = ref(null)
 const open = ref(false)
-const info = computed(() => useCardDesign().getDesignInfo(design))
+const info = computed(() => getDesignInfo(design))
 </script>

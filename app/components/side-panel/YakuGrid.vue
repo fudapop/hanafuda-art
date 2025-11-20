@@ -90,7 +90,7 @@
           @click="focusedYaku = yaku"
         >
           <MagnifyingGlassIcon class="w-4 h-4" />
-          <span class="sr-only">{{ t('common.actions.viewCards') }}</span>
+          <span class="sr-only">{{ t('collection.viewCards') }}</span>
         </button>
       </div>
     </li>

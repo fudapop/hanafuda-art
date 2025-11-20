@@ -93,7 +93,7 @@
                     '[&:nth-child(n+11):nth-child(-n+20)]:ml-4',
                     viewFilter &&
                       (opponentHas(card) || playerHas(card)) &&
-                      'after:absolute after:inset-0 after:bg-black/60',
+                      'after:absolute after:inset-0 after:bg-black/60 after:rounded-(--card-radius)',
                   ]"
                 >
                   <CardImage
@@ -137,7 +137,10 @@
     <!-- CARDS GRID VIEW -->
     <div
       v-else
-      :class="['p-8 isolate h-full w-max mx-auto overflow-y-auto text-text', currentDesign]"
+      :class="[
+        'p-8 isolate h-full w-max max-w-full mx-auto overflow-y-auto touch-pan-y text-text',
+        currentDesign,
+      ]"
     >
       <template v-if="gridMode === 'default'">
         <div class="grid grid-cols-4 sm:grid-cols-8 gap-0.5">
@@ -148,15 +151,10 @@
               'relative size-max',
               viewFilter &&
                 (opponentHas(cardName) || playerHas(cardName)) &&
-                'after:absolute after:inset-0 after:bg-black/60',
+                'after:absolute after:inset-0 after:bg-black/60 after:rounded-(--card-radius)',
             ]"
           >
-            <div
-              :class="[
-                'w-20 sm:w-16 h-auto rounded-(--card-radius) overflow-hidden',
-                currentDesign,
-              ]"
-            >
+            <div :class="['w-16 h-auto rounded-(--card-radius) overflow-hidden', currentDesign]">
               <CardImage
                 :card="cardName"
                 :src="cardMap.get(cardName)"
@@ -174,14 +172,14 @@
         </div>
       </template>
       <template v-if="gridMode === 'month'">
-        <div class="grid sm:grid-cols-2 gap-4">
+        <div class="w-full flex flex-wrap gap-4 justify-center">
           <div
             v-for="(arr, i) in cardsByMonth"
             :key="`month-arr-${i}`"
             class="flex flex-col items-center gap-2 py-4"
           >
             <span>{{ getMonthName(i) }}</span>
-            <div class="grid grid-cols-4 gap-0">
+            <div class="flex w-full">
               <div
                 v-for="cardName in arr"
                 :key="cardName"
@@ -189,14 +187,11 @@
                   'relative size-max',
                   viewFilter &&
                     (opponentHas(cardName) || playerHas(cardName)) &&
-                    'after:absolute after:inset-0 after:bg-black/60',
+                    'after:absolute after:inset-0 after:bg-black/60 after:rounded-(--card-radius)',
                 ]"
               >
                 <div
-                  :class="[
-                    'w-20 sm:w-16 h-auto rounded-(--card-radius) overflow-hidden',
-                    currentDesign,
-                  ]"
+                  :class="['w-16 h-auto rounded-(--card-radius) overflow-hidden', currentDesign]"
                 >
                   <CardImage
                     :card="cardName"
@@ -217,14 +212,14 @@
         </div>
       </template>
       <template v-if="gridMode === 'type'">
-        <div class="grid gap-4">
+        <div class="w-full grid gap-4">
           <div
             v-for="[cardType, arr] in cardsByType"
             :key="`type-arr-${cardType}`"
-            class="flex flex-col items-center gap-2 py-4"
+            class="flex flex-col gap-2 py-4"
           >
             <span class="capitalize">{{ t(`game.cardTypes.${cardType}`) }}</span>
-            <div class="grid grid-cols-5 gap-0.5">
+            <div class="flex flex-wrap">
               <div
                 v-for="cardName in arr"
                 :key="cardName"
@@ -232,14 +227,11 @@
                   'relative size-max',
                   viewFilter &&
                     (opponentHas(cardName) || playerHas(cardName)) &&
-                    'after:absolute after:inset-0 after:bg-black/60',
+                    'after:absolute after:inset-0 after:bg-black/60 after:rounded-(--card-radius)',
                 ]"
               >
                 <div
-                  :class="[
-                    'w-16 sm:w-20 h-auto rounded-(--card-radius) overflow-hidden',
-                    currentDesign,
-                  ]"
+                  :class="['w-16 h-auto rounded-(--card-radius) overflow-hidden', currentDesign]"
                 >
                   <CardImage
                     :card="cardName"
@@ -262,59 +254,64 @@
     </div>
 
     <!-- VIEW TOGGLE BUTTON$ -->
-    <div class="fixed bottom-20 right-3 z-100 space-y-2">
-      <button
-        class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
-        @click="toggleView"
+    <Teleport to="body">
+      <div
+        v-if="currentTab === 'yaku'"
+        class="fixed bottom-20 right-3 z-100 space-y-2"
       >
-        <Icon
+        <button
+          class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
+          @click="toggleView"
+        >
+          <Icon
+            v-if="viewMode === 'grid'"
+            name="mdi:view-list"
+          />
+          <Icon
+            v-if="viewMode === 'list'"
+            name="mdi:grid-large"
+          />
+          <span class="sr-only">Toggle View</span>
+        </button>
+        <button
+          class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
+          @click="toggleFilter"
+        >
+          <Icon
+            v-if="viewFilter"
+            name="mdi:filter-off"
+          />
+          <Icon
+            v-else
+            name="mdi:filter"
+          />
+          <span class="sr-only">Toggle Filter</span>
+        </button>
+        <button
           v-if="viewMode === 'grid'"
-          name="mdi:view-list"
-        />
-        <Icon
+          class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
+          @click="toggleGrid"
+        >
+          <Icon name="mdi:view-grid-plus" />
+          <span class="sr-only">Toggle Display Mode</span>
+        </button>
+        <button
           v-if="viewMode === 'list'"
-          name="mdi:grid-large"
-        />
-        <span class="sr-only">Toggle View</span>
-      </button>
-      <button
-        class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
-        @click="toggleFilter"
-      >
-        <Icon
-          v-if="viewFilter"
-          name="mdi:filter-off"
-        />
-        <Icon
-          v-else
-          name="mdi:filter"
-        />
-        <span class="sr-only">Toggle Filter</span>
-      </button>
-      <button
-        v-if="viewMode === 'grid'"
-        class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
-        @click="toggleGrid"
-      >
-        <Icon name="mdi:view-grid-plus" />
-        <span class="sr-only">Toggle Display Mode</span>
-      </button>
-      <button
-        v-if="viewMode === 'list'"
-        class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
-        @click="toggleOpenAll"
-      >
-        <Icon
-          v-if="openAll"
-          name="mdi:chevron-up"
-        />
-        <Icon
-          v-else
-          name="mdi:chevron-down"
-        />
-        <span class="sr-only">Expand/Collapse</span>
-      </button>
-    </div>
+          class="game-ui-btn opacity-80 hover:opacity-100 text-white/80 bg-black/50 text-2xl"
+          @click="toggleOpenAll"
+        >
+          <Icon
+            v-if="openAll"
+            name="mdi:chevron-up"
+          />
+          <Icon
+            v-else
+            name="mdi:chevron-down"
+          />
+          <span class="sr-only">Expand/Collapse</span>
+        </button>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -332,6 +329,7 @@ import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
 
 const { currentDesign, getCardUrlMap, getDesignInfo } = useCardDesign()
+const { currentTab } = useOptionsPanel()
 
 const cardMap = computed(() => getCardUrlMap(currentDesign.value))
 const cardArray = computed(() => {

@@ -1,5 +1,8 @@
 <template>
-  <div class="fixed inset-0 flex items-center justify-center bg-black/50">
+  <div
+    v-show="show"
+    class="fixed inset-0 flex items-center justify-center bg-black/50 z-999"
+  >
     <div class="relative w-full h-full">
       <!-- AVATAR pan up and fade in -->
       <div class="center">
@@ -28,6 +31,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
+  show: boolean
   calledBy: 'p1' | 'p2'
   msg: string
 }>()

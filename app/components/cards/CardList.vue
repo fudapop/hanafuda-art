@@ -32,8 +32,8 @@
 </template>
 
 <script setup lang="ts">
-import { useCardStore } from '~~/stores/cardStore'
 import { type CardName } from '~/utils/cards'
+import { useCardStore } from '~~/stores/cardStore'
 
 const {
   cards,

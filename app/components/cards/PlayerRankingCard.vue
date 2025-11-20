@@ -48,7 +48,7 @@
           </span>
           <div class="flex items-center gap-x-2 font-medium text-text">
             <img
-              src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
+              src="/images/coin.webp"
               alt="coin"
               :class="selectedFilter === 'overall' ? 'size-5' : 'size-4'"
             />

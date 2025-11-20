@@ -1,18 +1,18 @@
 <template>
   <div class="relative w-full h-16 px-4 py-2">
-    <div :class="['w-full h-full mx-auto flex', isPlayer1 ? 'items-end' : 'items-start']">
+    <div :class="['size-full mx-auto flex', isPlayer1 ? 'items-end' : 'items-start']">
       <div class="flex space-x-2 sm:space-x-4">
         <div class="shrink-0">
           <img
             v-if="user"
-            class="w-12 h-12 mx-auto transition-all border-2 rounded-full lg:w-24 lg:h-24 border-border"
+            class="size-12 mx-auto transition-all border-2 rounded-full lg:size-24 border-border"
             :src="user.avatar"
             :alt="user.username"
           />
           <img
             v-else
             :src="p2Avatar"
-            class="w-12 h-12 mx-auto transition-all border-2 rounded-full lg:w-24 lg:h-24 border-border"
+            class="size-12 mx-auto transition-all border-2 rounded-full lg:size-24 border-border"
           />
         </div>
         <div :class="['flex flex-col', isPlayer1 ? 'justify-end' : 'justify-start']">
@@ -24,20 +24,22 @@
           </p>
           <div
             :class="[
-              'flex text-lg gap-x-4  text-white/90',
-              isMobileLandscape ? 'flex-col text-sm gap-y-1' : 'lg:text-3xl ',
+              'flex text-sm gap-x-4  text-white/90',
+              isMobileLandscape ? 'flex-col text-xs gap-y-1' : 'sm:text-lg lg:text-3xl ',
             ]"
           >
             <p class="flex items-center font-bold gap-x-2">
-              {{ user?.username || `${t('common.labels.player')} ${playerNum}` }}
+              <span class="">{{
+                user?.username || `${t('common.labels.player')} ${playerNum}`
+              }}</span>
               <span
                 class="flex items-center"
                 v-memo="[ds.roundOver, gameStart]"
               >
                 <img
-                  src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
+                  src="/images/coin.webp"
                   alt="coin"
-                  class="w-4 h-4 mx-1 lg:w-8 lg:h-8 drop-shadow-xs"
+                  class="size-4 mx-1 lg:size-8 drop-shadow-xs"
                 />
                 <NumberAnimation
                   ref="number1"

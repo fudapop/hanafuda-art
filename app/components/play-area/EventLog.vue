@@ -2,7 +2,7 @@
   <!-- Vertical panel group -->
   <UiResizablePanelGroup
     direction="vertical"
-    class="fixed left-0 max-w-sm min-w-xs top-16 lg:top-32 max-h-[50vh] pointer-events-none"
+    class="fixed left-0 max-w-sm min-w-xs top-16 lg:top-32 max-h-[50vh] pointer-events-none z-998"
     @mouseenter="isMouseOver = true"
     @mouseleave="isMouseOver = false"
   >

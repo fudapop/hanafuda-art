@@ -15,7 +15,7 @@
         class="flex items-center font-semibold tracking-wide text-text gap-x-2 whitespace-nowrap"
       >
         <img
-          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
+          src="/images/coin.webp"
           alt="coin"
           class="w-5 h-5 drop-shadow-xs"
         />
@@ -86,7 +86,7 @@
                   class="absolute inset-x-0 mx-auto text-sm font-semibold tracking-wide transition-all opacity-0 text-text w-max bottom-4 group-hover:opacity-100 group-hover:-translate-y-2"
                 >
                   <img
-                    src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
+                    src="/images/coin.webp"
                     alt="coin"
                     class="inline w-4 h-4 align-middle drop-shadow-xs"
                   />
@@ -168,7 +168,7 @@
       <template #image>
         <div :class="[newUnlock?.design, 'flex items-center text-text justify-center']">
           <img
-            src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
+            src="/images/coin.webp"
             alt="coin"
             class="inline w-8 h-8 drop-shadow-xs"
           />
@@ -238,9 +238,8 @@ import {
 } from '@heroicons/vue/20/solid'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
-import type { CardName } from '~/utils/cards'
-import DesignDescription from './DesignDescription.vue'
 import { toast } from 'vue-sonner'
+import DesignDescription from './DesignDescription.vue'
 
 type CardDesign = (typeof DESIGNS)[number]
 
@@ -394,8 +393,7 @@ onMounted(() => {
     } else if (userIsGuest.value) {
       currentDesign.value = defaultDesign
     } else {
-      currentDesign.value =
-        unlocked.value?.find((d: CardName) => userLiked?.includes(d)) || defaultDesign
+      currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || defaultDesign
     }
   } else if (storedDesign && !isStoredDesignAvailable && storedDesign !== currentDesign.value) {
     // If stored design is not available but current is set, clear the invalid stored design

@@ -41,7 +41,7 @@
       <!-- Minimum Games Note -->
       <div
         v-if="selectedFilter === 'winrate'"
-        class="max-w-4xl px-4 mx-auto mb-4 text-text"
+        class="max-w-4xl px-4 mx-auto mb-4 text-text flex justify-center"
       >
         <Alert variant="default">
           <AlertDescription class="text-center">

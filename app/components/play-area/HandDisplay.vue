@@ -3,7 +3,7 @@
     <li
       v-for="(card, index) in displayedCards.filter((card) => card)"
       :key="index"
-      class="relative inline-flex -ml-4 transition-all duration-300 origin-center first:ml-0"
+      class="relative inline-flex -ml-4 transition-all duration-300 origin-center first:ml-0 pointer-events-auto"
     >
       <Transition
         appear
@@ -49,11 +49,11 @@
 
 <script setup lang="ts">
 import { useCardDesign } from '~/composables/useCardDesign'
+import { type CardName } from '~/utils/cards'
 import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
-import { type CardName } from '~/utils/cards'
 
 const { id } = defineProps<{ id: PlayerKey }>()
 

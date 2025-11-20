@@ -29,7 +29,7 @@
               easing="linear"
             />
             <img
-              src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
+              src="/images/coin.webp"
               alt="coin"
               class="inline w-5 h-5 mb-1 ml-1 drop-shadow-xs"
             />

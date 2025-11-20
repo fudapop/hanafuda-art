@@ -25,7 +25,7 @@
         class="fixed inset-0 z-10 overflow-y-auto"
       >
         <div
-          class="flex items-end justify-center min-h-full pt-8 text-center sm:items-center sm:px-8"
+          class="flex items-end justify-center min-h-full py-16 text-center sm:items-center sm:px-8"
           :class="isMobile ? 'portrait:h-max portrait:my-auto portrait:p-0' : ''"
         >
           <HeadlessTransitionChild

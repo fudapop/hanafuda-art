@@ -5,7 +5,7 @@
     >
     <template #image>
       <img
-        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
+        src="/images/coin.webp"
         alt="coin"
         class="w-8 h-8 mx-auto drop-shadow-xs"
       />

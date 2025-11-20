@@ -1,5 +1,5 @@
 <template>
-  <div class="grid pb-12 overflow-x-hidden">
+  <div class="flex flex-col pb-12 overflow-x-hidden">
     <div
       id="user-info"
       class="grid p-4 mx-3"
@@ -45,7 +45,7 @@
             class="flex items-center justify-center px-4 gap-x-2 sm:justify-start"
           >
             <img
-              src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/coin.webp"
+              src="/images/coin.webp"
               alt="coin"
               class="w-5 h-5"
             />
@@ -67,7 +67,7 @@
           <!-- Sync Status (for authenticated users only) -->
           <div
             v-if="!user?.isGuest"
-            class="px-4 mt-2"
+            class="mx-auto"
           >
             <SyncStatusIndicator />
           </div>
@@ -100,27 +100,29 @@
     </div>
 
     <!-- Games & Rounds Played -->
-    <div
-      v-if="user?.record"
-      class="mx-2 my-3 grid sm:grid-cols-2 gap-3"
-    >
-      <HorizontalBarStatCard
-        icon="mdi:trophy"
-        :label="t('profile.stats.gamesCompleted')"
-        :wins="user.record.win"
-        :losses="user.record.loss"
-        :draws="user.record.draw"
-        @click="showGamesModal = true"
-      />
+    <div class="flex-1">
+      <div
+        v-if="user?.record"
+        class="mx-2 my-3 grow grid sm:grid-cols-2 gap-3"
+      >
+        <HorizontalBarStatCard
+          icon="mdi:trophy"
+          :label="t('profile.stats.gamesCompleted')"
+          :wins="user.record.win"
+          :losses="user.record.loss"
+          :draws="user.record.draw"
+          @click="showGamesModal = true"
+        />
 
-      <HorizontalBarStatCard
-        icon="mdi:gamepad-variant"
-        :label="t('profile.stats.totalRoundsPlayed')"
-        :wins="user.stats.roundsPlayed_win"
-        :losses="user.stats.roundsPlayed_loss"
-        :draws="user.stats.roundsPlayed_draw"
-        @click="showRoundsModal = true"
-      />
+        <HorizontalBarStatCard
+          icon="mdi:gamepad-variant"
+          :label="t('profile.stats.totalRoundsPlayed')"
+          :wins="user.stats.roundsPlayed_win"
+          :losses="user.stats.roundsPlayed_loss"
+          :draws="user.stats.roundsPlayed_draw"
+          @click="showRoundsModal = true"
+        />
+      </div>
     </div>
 
     <!-- Detailed Stats -->
