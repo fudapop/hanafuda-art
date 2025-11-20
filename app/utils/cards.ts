@@ -400,16 +400,16 @@ function matchByMonth(cards: CardName[], matching: CardName): CardName[] {
 }
 
 export {
-  DECK,
-  TEST_DECKS,
-  CARDS,
   CARD_TYPES,
+  CARDS,
+  DECK,
+  getCardsOfMonth,
+  getCardsOfType,
+  matchByMonth,
+  shuffle,
+  sortByType,
+  TEST_DECKS,
   type CardName,
   type CardType,
   type FlowerCard,
-  shuffle,
-  sortByType,
-  matchByMonth,
-  getCardsOfMonth,
-  getCardsOfType,
 }

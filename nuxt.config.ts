@@ -139,7 +139,7 @@ export default defineNuxtConfig({
   devServer: {
     port: 8888,
   },
-  devtools: { enabled: true },
+  devtools: { enabled: true, vueDevTools: true },
   i18n: {
     autoDeclare: true,
     baseUrl: 'https://newhanafuda.art',
@@ -293,6 +293,9 @@ export default defineNuxtConfig({
     private: {
       supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
     },
+  },
+  shadcn: {
+    prefix: 'ui',
   },
   ssr: false,
   vite: {
