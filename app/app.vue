@@ -13,7 +13,7 @@
         <SakuraLoader v-if="loading" />
       </Transition>
     </div>
-    <Sonner
+    <Toaster
       rich-colors
       :theme="toastTheme"
       close-button
@@ -26,10 +26,11 @@
 </template>
 
 <script setup lang="ts">
+import { useColorMode } from '@vueuse/core'
+import 'vue-sonner/style.css'
 import { vClickDisabled } from '~/utils/directives/vClickDisabled'
 import { vHide } from '~/utils/directives/vHide'
-import 'vue-sonner/style.css'
-import { useColorMode } from '@vueuse/core'
+import { Toaster } from './components/ui/sonner'
 
 const loading = ref(false)
 const nuxtApp = useNuxtApp()
