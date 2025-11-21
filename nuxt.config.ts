@@ -87,9 +87,10 @@ export default defineNuxtConfig({
           type: 'image/webp',
         },
         {
-          rel: 'stylesheet',
+          rel: 'preload',
           as: 'style',
           href: 'https://fonts.googleapis.com/css2?family=Potta+One&display=swap',
+          onload: "this.rel = 'stylesheet'",
         },
       ],
       meta: seoMeta,
