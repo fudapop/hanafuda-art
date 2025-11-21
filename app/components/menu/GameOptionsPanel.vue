@@ -52,12 +52,12 @@
                     <div class="flex-1 min-h-0">
                       <div class="flex flex-col h-full">
                         <!-- Tab content -->
-                        <div class="flex-1 min-h-0 overflow-hidden bg-surface pb-12">
+                        <div class="flex-1 min-h-0 overflow-hidden bg-surface">
                           <div
                             v-for="(tab, index) in tabs"
                             :key="tab"
                             :class="[
-                              'h-full overflow-y-auto touch-pan-y',
+                              'h-full overflow-y-auto touch-pan-y pb-12',
                               currentTabIndex === index ? 'block' : 'hidden',
                             ]"
                           >
@@ -86,10 +86,11 @@
                                   'flex items-center justify-center gap-2 w-full py-4 px-4 text-sm font-medium leading-5 transition-colors',
                                   'border-r text-white',
                                   currentTabIndex === index
-                                    ? 'bg-hanafuda-brown border-t rounded-t-md'
-                                    : 'text-white/80 hover:text-white hover:bg-hanafuda-brown/80 bg-black/50 backdrop-blur-xs',
+                                    ? 'border-t border-border bg-surface text-primary! rounded-t-md'
+                                    : 'text-white/80 hover:text-white hover:bg-hanafuda-brown bg-hanafuda-brown/80 backdrop-blur-xs',
                                   currentTabIndex === index + 1 && 'rounded-tr-md',
                                   currentTabIndex === index - 1 && 'rounded-tl-md',
+                                  index === 0 && 'border-l border-border',
                                 ]"
                                 @click="() => openOptions(tab)"
                               >
@@ -103,7 +104,7 @@
                               <button
                                 type="button"
                                 :class="[
-                                  'bg-black/50 hover:bg-hanafuda-brown backdrop-blur-xs py-4 px-6 text-white/80 hover:text-white',
+                                  'bg-hanafuda-brown/90 hover:bg-hanafuda-brown backdrop-blur-xs py-4 px-6 text-white/80 hover:text-white',
                                   'focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2',
                                   currentTabIndex === tabs.length - 1 && 'rounded-tl-md',
                                 ]"
