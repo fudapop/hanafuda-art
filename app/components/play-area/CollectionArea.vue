@@ -38,15 +38,14 @@
 </template>
 
 <script setup lang="ts">
-import { MagnifyingGlassPlusIcon } from '@heroicons/vue/24/outline'
 import { onClickOutside, useScreenOrientation } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
+import { type CardName, sortByType } from '~/utils/cards'
+import { checkAll, type CompletedYaku, YAKU, type YakuName } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { type PlayerKey } from '~~/stores/playerStore'
-import { type CardName, sortByType } from '~/utils/cards'
-import { checkAll, type CompletedYaku, YAKU, type YakuName } from '~/utils/yaku'
 
 export type CompletionEvent = {
   player: PlayerKey
@@ -79,6 +78,7 @@ const ds = useGameDataStore()
 const { roundOver, roundCounter: month } = storeToRefs(ds)
 const cs = useCardStore()
 const config = useConfigStore()
+const { getDesignInfo } = useCardDesign()
 
 const cardTypes = ['brights', 'animals', 'ribbons', 'plains'] as const
 const coll: Record<string, Set<CardName>> = reactive({
@@ -133,31 +133,36 @@ let lastCompleted: Set<YakuName> = new Set([])
 onMounted(() => {
   updateCollection()
 
-  watchEffect(() => {
-    if (config.maxRounds !== 12) {
-      updateTsukiFuda(0)
-      consoleLogColor('TSUKI-FUDA not available for this game.', 'skyblue')
-      return
-    }
+  watch(
+    [month, () => config.maxRounds],
+    () => {
+      if (config.maxRounds !== 12) {
+        updateTsukiFuda(0)
+        consoleLogColor('TSUKI-FUDA not available for this game.', 'skyblue')
+        return
+      }
 
-    // Display cards as arranged by artist
-    const { getDesignInfo } = useCardDesign()
-    const rearrange = (cards: CardName[]) => {
-      const { arrangement } = getDesignInfo()
-      if (arrangement?.reversed) {
-        return cards.toReversed()
+      // Display cards as arranged by artist
+      const rearrange = (cards: CardName[]) => {
+        const { arrangement } = getDesignInfo()
+        if (arrangement?.reversed) {
+          return cards.toReversed()
+        }
+        if (arrangement?.orderByName) {
+          // Create a map for O(1) lookups
+          const cardSet = new Set(cards)
+          // Only iterate arrangement once, filter out non-existent cards
+          return arrangement.orderByName.filter((name) =>
+            cardSet.has(name as CardName),
+          ) as CardName[]
+        }
+        return cards
       }
-      if (arrangement?.orderByName) {
-        // Create a map for O(1) lookups
-        const cardSet = new Set(cards)
-        // Only iterate arrangement once, filter out non-existent cards
-        return arrangement.orderByName.filter((name) => cardSet.has(name as CardName)) as CardName[]
-      }
-      return cards
-    }
-    updateTsukiFuda(month.value, rearrange)
-    consoleLogColor('TSUKI-FUDA: ' + YAKU['tsuki-fuda'].cards.join(', '), 'skyblue')
-  })
+      updateTsukiFuda(month.value, rearrange)
+      consoleLogColor('TSUKI-FUDA: ' + YAKU['tsuki-fuda'].cards.join(', '), 'skyblue')
+    },
+    { immediate: true },
+  )
 
   watch(roundOver, () => {
     if (roundOver.value) {
