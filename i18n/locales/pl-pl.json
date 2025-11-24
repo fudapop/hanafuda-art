@@ -10,7 +10,7 @@
       "cancel": "Anuluj",
       "back": "Wstecz",
       "previous": "Poprzedni",
-      "next": "Następny",
+      "next": "Dalej",
       "submit": "Prześlij",
       "send": "Wyślij",
       "save": "Zapisz",
@@ -35,7 +35,7 @@
       "justAMoment": "Proszę czekać...",
       "coin": "moneta",
       "coins": "monety",
-      "points": "punkty",
+      "points": "pkt.",
       "round": "Runda",
       "rounds": "rundy",
       "player": "Gracz",
@@ -68,13 +68,13 @@
       "title": "Opcje",
       "tabs": {
         "deck": "Talia",
-        "yaku": "Lista Yaku",
+        "yaku": "Lista yaku",
         "settings": "Ustawienia",
         "profile": "Profil"
       }
     },
     "avatarSelect": {
-      "title": "Wybierz swojego awatara"
+      "title": "Wybierz swój avatar"
     }
   },
   "navigation": {
@@ -117,7 +117,7 @@
       "oneSpecialCharacter": "1 znak specjalny"
     },
     "notices": {
-      "signInRequired": "Logowanie jest wymagane, aby zapisać profil."
+      "signInRequired": "Aby zapisać profil należy się zalogować."
     },
     "messages": {
       "unableToCreateAccount": "Nie można utworzyć konta.",
@@ -126,7 +126,7 @@
       "unableToSignIn": "Nie można się zalogować. Spróbuj ponownie później.",
       "passwordResetSent": "E-mail resetujący hasło został wysłany na {email}.",
       "unableToSendPasswordReset": "Nie można wysłać e-maila resetującego hasło.",
-      "accountLinked": "Konto powiązane! Może być konieczne odświeżenie przeglądarki, aby zaktualizować profil.",
+      "accountLinked": "Konto powiązane! Aby zaktualizować profil, może być konieczne odświeżenie przeglądarki.",
       "youreSignedIn": "Jesteś zalogowany! Baw się dobrze!",
       "progressSaved": "Witaj z powrotem! Twój postęp został zapisany na Twoim koncie.",
       "failedToLinkAccount": "Nie udało się powiązać konta. Spróbuj ponownie.",
@@ -144,11 +144,11 @@
       "wins": "wygrane",
       "losses": "przegrane",
       "draws": "remisy",
-      "totalYakuCompleted": "Ukończone Yaku",
-      "totalCardsCaptured": "Złapane Karty",
-      "totalRoundsPlayed": "Rozegrane Rundy",
-      "koikoiCalls": "Wywołania Koi-Koi",
-      "totalCalls": "Całkowite Wywołania",
+      "totalYakuCompleted": "Złożone yaku",
+      "totalCardsCaptured": "Zdobyte karty",
+      "totalRoundsPlayed": "Rozegrane rundy",
+      "koikoiCalls": "Zadeklarowane koi-koi",
+      "totalCalls": "Wszystkie wywołania",
       "koikoiSuccess": "Sukces",
       "koikoiFail": "Niepowodzenie",
       "koikoiStack": "Stos",
@@ -156,7 +156,7 @@
       "cardsCapturedByType": "Karty według Typu",
       "detailedStats": "Szczegółowe Statystyki",
       "gameplayStats": "Statystyki Rozgrywki",
-      "yakuBreakdown": "Podział Yaku",
+      "yakuBreakdown": "Podział yaku",
       "roundsBreakdown": "Podział Rund",
       "gamesCompleted": "Rozegrane Gry",
       "gamesBreakdown": "Podział Gier"
@@ -172,11 +172,11 @@
     },
     "help": {
       "koikoiStats": {
-        "title": "Wyjaśnienie Statystyk Koi-Koi",
-        "success": "Wywołałeś Koi-Koi i wygrałeś rundę",
-        "fail": "Wywołałeś Koi-Koi, ale przegrałeś rundę (przegrana lub remis)",
-        "stack": "Wywołałeś Koi-Koi wielokrotnie w jednej rundzie",
-        "reversal": "Przeciwnik wywołał Koi-Koi, ale ty wygrałeś rundę"
+        "title": "Wyjaśnienie statystyk koi-koi",
+        "success": "Zadeklarowałeś koi-koi i wygrałeś rundę",
+        "fail": "Zadeklarowałeś koi-koi, ale przegrałeś rundę (przegrana lub remis)",
+        "stack": "Wywołałeś koi-koi wielokrotnie w jednej rundzie",
+        "reversal": "Przeciwnik wywołał koi-koi, ale ty wygrałeś rundę"
       }
     }
   },
@@ -190,9 +190,9 @@
     "actions": {
       "makeYourCall": "Podejmij decyzję...",
       "opponentDeciding": "Przeciwnik się zastanawia...",
-      "calledStop": "powiedział stop.",
-      "koikoiWasCalled": "Koi-Koi zostało wywołane!",
-      "koikoi": "Koi-Koi",
+      "calledStop": "deklaruje stop.",
+      "koikoiWasCalled": "Zadeklarowano koi-koi!",
+      "koikoi": "koi-koi",
       "stop": "Stop",
       "saveAndExit": "Zapisz i wyjdź",
       "forfeitAndExit": "Poddaj się i wyjdź",
@@ -204,30 +204,30 @@
       "youWin": "WYGRYWASZ!",
       "youLose": "PRZEGRYWASZ...",
       "draw": "REMIS",
-      "luckyHand": "Szczęśliwa ręka",
-      "fourOfAKindFourPairs": "Kareta / Cztery pary",
-      "gotDealtA": "otrzymałeś",
-      "koiKoiBonus": "Bonus Koi-Koi"
+      "luckyHand": "szczęśliwą rękę",
+      "fourOfAKindFourPairs": "Pełen miesiąc / Cztery pary",
+      "gotDealtA": "otrzymujesz",
+      "koiKoiBonus": "Bonus koi-koi"
     },
     "cardTypes": {
-      "bright": "jasna",
+      "bright": "światło",
       "animal": "zwierzę",
       "ribbon": "wstążka",
       "plain": "zwykła",
-      "brights": "jasne",
+      "brights": "światła",
       "animals": "zwierzęta",
       "ribbons": "wstążki",
       "plains": "zwykłe"
     },
     "yaku": {
-      "gokou": "Pięć jasnych",
-      "shikou": "Cztery jasne",
-      "ame-shikou": "Deszczowe cztery jasne (dowolne 3 + Człowiek deszczu)",
-      "sankou": "Trzy jasne (dowolne 3 oprócz Człowieka deszczu)",
+      "gokou": "Pięć świateł",
+      "shikou": "Cztery światła",
+      "ame-shikou": "Deszczowe cztery światła (dowolne 3 + Postać w deszczu)",
+      "sankou": "Trzy światła (dowolne 3 oprócz Postaci w deszczu)",
       "hanami-zake": "Oglądanie kwiatów",
       "tsukimi-zake": "Oglądanie księżyca",
       "ino-shika-chou": "Dzik, jeleń i motyl",
-      "aka-tan": "Czerwone wstążki poetyckie",
+      "aka-tan": "Czerwone znaczone wstążki",
       "ao-tan": "Niebieskie wstążki",
       "tan-zaku": "Dowolne 5 wstążek (+1pkt / dodatkowa)",
       "tane-zaku": "Dowolne 5 zwierząt (+1pkt / dodatkowe)",
@@ -265,10 +265,10 @@
       "title": "Zasady rozgrywki",
       "gameLength": "Długość gry",
       "moonFlowerViewing": "Oglądanie księżyca/kwiatów",
-      "wildCardSakeCup": "Uniwersalna karta sake",
-      "wildCardSakeCupDescription": "Kielich sake liczy się jako typ zwierzęcy i zwykły.",
-      "doubleOverSeven": "Podwójne ponad siedem",
-      "doubleOverSevenDescription": "Podwój wynik, jeśli łączna wartość yaku wynosi 7 punktów lub więcej.",
+      "wildCardSakeCup": "Czarka jako joker",
+      "wildCardSakeCupDescription": "Czarka do sake liczy się jako karta zwierzęcia oraz zwykła.",
+      "doubleOverSeven": "Dublowanie wyniku powyżej 7 punktów",
+      "doubleOverSevenDescription": "Podwaja wynik, jeśli łączna wartość yaku wynosi 7 punktów lub więcej.",
       "otherVariations": "Inne warianty",
       "readAboutThisRule": "Przeczytaj o tej zasadzie na fudawiki.org",
       "viewingOptions": {
@@ -280,7 +280,7 @@
     "interface": {
       "title": "Interfejs",
       "cardLabels": "Etykiety kart",
-      "cardLabelsDescription": "Dołącz etykiety narożników kart, aby pomóc w dopasowywaniu.",
+      "cardLabelsDescription": "Pokaż etykiety na narożnikach kart, aby pomóc w dopasowywaniu.",
       "cardSize": "Rozmiar kart",
       "cardSizeDescription": "Wybierz rozmiar najlepszy dla twojego ekranu.",
       "sizes": {
@@ -324,7 +324,7 @@
   },
   "feedback": {
     "thankYouForPlaying": "Dziękujemy za grę!",
-    "howWasExperience": "Jak było twoje doświadczenie?",
+    "howWasExperience": "Jak Ci się używało tej aplikacji?",
     "feedbackSubmitted": "Twoja opinia została wysłana. Dziękujemy!",
     "categories": {
       "animationSmoothness": "Płynność animacji",
@@ -341,9 +341,9 @@
         "other": "💬 inne"
       },
       "descriptions": {
-        "idea": "Jak możemy ulepszyć grę lub co chciałbyś zobaczyć następne?",
+        "idea": "Jak możemy ulepszyć grę lub co chcesz żebyśmy do niej dodali?",
         "error": "Czy napotkałeś jakieś błędy? Opisz problem.",
-        "other": "Twoja opinia jest bardzo ceniona! 🙏🏽"
+        "other": "Bardzo cenimy Twoją opinię! 🙏🏽"
       },
       "placeholder": "Wprowadź swój komentarz tutaj..."
     }
@@ -366,25 +366,25 @@
   },
   "signup": {
     "prompt": {
-      "title": "Masz monety! Co powiesz na 500 więcej?",
-      "description": "Twoje monety można użyć do odblokowania nowych wzorów kart i awatarów. Jednak profile gości nie mogą być zapisane.",
+      "title": "Masz monety! Co powiesz na dodatkowe 500?",
+      "description": "Swoich monet możesz użyć do odblokowania nowych wzorów kart i awatarów. Jednak profile gości nie mogą być zapisane.",
       "question": "Zalogować się, aby zapisać profil i otrzymać dodatkowe 500 monet?"
     },
     "actions": {
       "noThanksDeleteMe": "Nie, dzięki, usuń mnie",
-      "yesGimmeCoins": "Tak, chcę monety!"
+      "yesGimmeCoins": "Tak, daj monety!"
     }
   },
   "footer": {
     "links": {
       "changelog": "Dziennik zmian",
-      "attributions": "Autorstwa",
-      "termsOfUse": "Warunki użytkowania",
-      "privacyPolicy": "Polityka prywatności"
+      "attributions": "Autorstwo",
+      "termsOfUse": "Warunki Użytkowania",
+      "privacyPolicy": "Polityka Prywatności"
     },
     "actions": {
       "viewChangelog": "Zobacz dziennik zmian",
-      "viewAttributions": "Zobacz autorstwa",
+      "viewAttributions": "Zobacz autorstwo",
       "viewTermsOfUse": "Zobacz warunki użytkowania",
       "viewPrivacyPolicy": "Zobacz politykę prywatności"
     },
@@ -433,20 +433,20 @@
     }
   },
   "hanafuda": {
-    "flowers": {
-      "pine": "Sosna",
-      "plum": "Śliwka",
-      "cherry": "Wiśnia",
-      "wisteria": "Glicynia",
-      "iris": "Irys",
-      "peony": "Piwonia",
-      "bushClover": "Koniczyna krzaczasta",
-      "susuki": "Trawa susuki",
-      "chrysanthemum": "Chryzantema",
-      "maple": "Klon",
-      "willow": "Wierzba",
-      "paulownia": "Paulownia"
-    }
+	"flowers": {
+		"pine": "Sosna",
+		"plum": "Morela",
+		"cherry": "Wiśnia",
+		"wisteria": "Wisteria",
+		"iris": "Irys",
+		"peony": "Piwonia",
+		"bushClover": "Lespedeza",
+		"susuki": "Trawa słoniowa",
+		"chrysanthemum": "Chryzantema",
+		"maple": "Klon",
+		"willow": "Wierzba",
+		"paulownia": "Pawłownia"
+	}
   },
   "accessibility": {
     "navigation": {
@@ -491,7 +491,7 @@
   },
   "pages": {
     "changelog": "Dziennik Zmian",
-    "attributions": "Uznania dla Artystów",
+    "attributions": "Uznania autorstwa",
     "privacy": "Polityka Prywatności",
     "rankings": "Rankingi",
     "signIn": "Zaloguj się",
@@ -500,7 +500,7 @@
   },
   "pageDescriptions": {
     "changelog": "Dziennik zmian dla {appName}",
-    "attributions": "Uznania dla artystów dla {appName}",
+    "attributions": "Uznanie autorstwa dla {appName}",
     "privacy": "Polityka prywatności dla {appName}",
     "rankings": "Rankingi graczy dla {appName}",
     "signIn": "Zaloguj się na swoje konto {appName}",
