@@ -175,8 +175,8 @@
         "title": "Wyjaśnienie statystyk koi-koi",
         "success": "Zadeklarowałeś koi-koi i wygrałeś rundę",
         "fail": "Zadeklarowałeś koi-koi, ale przegrałeś rundę (przegrana lub remis)",
-        "stack": "Wywołałeś koi-koi wielokrotnie w jednej rundzie",
-        "reversal": "Przeciwnik wywołał koi-koi, ale ty wygrałeś rundę"
+        "stack": "Zadeklarowałeś koi-koi wielokrotnie w jednej rundzie",
+        "reversal": "Przeciwnik zadeklarował koi-koi, ale ty wygrałeś rundę"
       }
     }
   },
