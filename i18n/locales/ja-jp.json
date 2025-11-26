@@ -197,7 +197,9 @@
       "saveAndExit": "保存して終了",
       "forfeitAndExit": "降参して終了",
       "resumeGame": "ゲームを再開",
-      "deleteSave": "セーブデータを削除"
+      "deleteSave": "セーブデータを削除",
+      "resumeMatch": "対局を再開",
+      "newMatch": "新規対局"
     },
     "results": {
       "theRoundIsADraw": "このラウンドは引き分けです。",
@@ -249,6 +251,13 @@
     },
     "confirmations": {
       "deleteSave": "セーブデータを削除してもよろしいですか？この操作は元に戻せません。"
+    },
+    "modes": {
+      "singlePlayer": "一人用",
+      "multiplayer": "多人数用"
+    },
+    "messages": {
+      "comingSoon": "近日公開"
     }
   },
   "settings": {

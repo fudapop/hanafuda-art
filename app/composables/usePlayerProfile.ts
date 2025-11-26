@@ -1,5 +1,6 @@
 import type { User } from 'firebase/auth'
 import { useAvatar } from '~/composables/useAvatar'
+import { getDexBeeDb } from '~/composables/useDexBee'
 import {
   calculateGameRecord,
   createDefaultProfile,
@@ -57,42 +58,8 @@ let storeInstance: LocalProfileStore | null = null
 async function getStore(): Promise<LocalProfileStore> {
   if (storeInstance) return storeInstance
   try {
-    // Use dexbee-js schema-based init
-    const { DexBee, eq, defineSchema } = await import('dexbee-js')
-    const schema = defineSchema({
-      version: 3,
-      tables: {
-        playerProfiles: {
-          schema: {
-            uid: { type: 'string', required: true },
-            email: { type: 'string' },
-            avatar: { type: 'string', required: true },
-            username: { type: 'string', required: true },
-            record: { type: 'object', required: true },
-            lastUpdated: { type: 'date', required: true },
-            designs: { type: 'object', required: true },
-            settings: { type: 'object' },
-            flags: { type: 'object', required: true },
-            isGuest: { type: 'boolean' },
-            stats: { type: 'object' },
-          },
-          primaryKey: 'uid',
-          indexes: [{ name: 'email_idx', keyPath: 'email', unique: false }],
-        },
-        syncMetadata: {
-          schema: {
-            uid: { type: 'string', required: true },
-            lastSyncedAt: { type: 'date' },
-            lastSyncError: { type: 'string' },
-            pendingChanges: { type: 'boolean', required: true },
-            syncVersion: { type: 'number', required: true },
-          },
-          primaryKey: 'uid',
-        },
-      },
-    })
-    const db = DexBee.create('newhanafuda', schema)
-    await db.connect()
+    const { eq } = await import('dexbee-js')
+    const db = await getDexBeeDb()
     const table = db.table('playerProfiles')
     const metaTable = db.table('syncMetadata')
     storeInstance = {

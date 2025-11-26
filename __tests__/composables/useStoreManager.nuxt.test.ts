@@ -1,16 +1,40 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useStoreManager } from '../../app/composables/useStoreManager'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { IDBFactory, IDBKeyRange } from 'fake-indexeddb'
 import { useCardStore } from '../../stores/cardStore'
 import { useConfigStore } from '../../stores/configStore'
 import { useGameDataStore } from '../../stores/gameDataStore'
 import { usePlayerStore } from '../../stores/playerStore'
 
 describe('useStoreManager', () => {
-  beforeEach(() => {
+  // Store reference to fake IndexedDB to ensure we only clean up the fake one
+  let fakeIndexedDB: IDBFactory
+
+  // Helper function to get useStoreManager with fresh module cache
+  const getStoreManager = async () => {
+    const { useStoreManager } = await import('../../app/composables/useStoreManager')
+    return useStoreManager()
+  }
+
+  beforeEach(async () => {
     setActivePinia(createPinia())
 
-    // Mock localStorage for Node.js environment
+    // Always replace with fake IndexedDB for tests to ensure isolation
+    // This prevents any risk of affecting the real database
+    fakeIndexedDB = new IDBFactory()
+    globalThis.indexedDB = fakeIndexedDB
+    globalThis.IDBKeyRange = IDBKeyRange
+
+    // Reset module-level caches to ensure fresh connections
+    // This is necessary because getDexBeeDb() and getGameSaveStore() cache their instances
+    // We need to clear these caches so they reconnect to the new fake IndexedDB
+    vi.resetModules()
+    // Re-import modules to get fresh instances with cleared caches
+    // This ensures getDexBeeDb() will create a new connection to our fake IndexedDB
+    await import('../../app/composables/useDexBee')
+    await import('../../app/composables/useStoreManager')
+
+    // Mock localStorage for Node.js environment (used by some tests and migration code)
     Object.defineProperty(globalThis, 'localStorage', {
       value: {
         getItem: vi.fn(),
@@ -18,6 +42,7 @@ describe('useStoreManager', () => {
         removeItem: vi.fn(),
         key: vi.fn(),
         length: 0,
+        clear: vi.fn(),
       },
       writable: true,
     })
@@ -44,11 +69,61 @@ describe('useStoreManager', () => {
     })
   })
 
+  afterEach(async () => {
+    // Clean up saved game data first using the store manager API
+    // This ensures both IndexedDB and in-memory fallback stores are cleared
+    // This is safe because useStoreManager will use the fake IndexedDB we set up
+    try {
+      const { deleteSavedGame } = await getStoreManager()
+      await deleteSavedGame('hanafuda-save-single').catch(() => {
+        // Ignore if save doesn't exist
+      })
+      await deleteSavedGame('hanafuda-save-multiplayer').catch(() => {
+        // Ignore if save doesn't exist
+      })
+    } catch (error) {
+      // Ignore errors - cleanup is best effort
+    }
+
+    // Clean up IndexedDB database after each test to prevent test pollution
+    // SAFETY: Only clean up the fake IndexedDB instance we created in beforeEach
+    // This ensures we never touch the real database
+    // Additional safety: verify we're in a test environment
+    if (
+      process.env.NODE_ENV === 'test' &&
+      fakeIndexedDB &&
+      globalThis.indexedDB === fakeIndexedDB
+    ) {
+      try {
+        // Delete the database used by DexBee in the fake IndexedDB
+        // This will force a fresh connection in the next test
+        await new Promise<void>((resolve, reject) => {
+          const deleteRequest = fakeIndexedDB.deleteDatabase('newhanafuda')
+          deleteRequest.onsuccess = () => resolve()
+          deleteRequest.onerror = () => {
+            // If database doesn't exist, that's fine - just resolve
+            if (deleteRequest.error?.name === 'NotFoundError') {
+              resolve()
+            } else {
+              reject(deleteRequest.error)
+            }
+          }
+          deleteRequest.onblocked = () => {
+            // If blocked, wait a bit and try again
+            setTimeout(() => resolve(), 100)
+          }
+        })
+      } catch (error) {
+        // Ignore errors during cleanup - test isolation is best effort
+      }
+    }
+  })
+
   it('should serialize game state correctly', async () => {
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
 
-    const { serializeGameState } = useStoreManager()
+    const { serializeGameState } = await getStoreManager()
 
     // Set up some test data
     cardStore.dealCards()
@@ -86,7 +161,7 @@ describe('useStoreManager', () => {
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
 
-    const { serializeGameState, deserializeGameState } = useStoreManager()
+    const { serializeGameState, deserializeGameState } = await getStoreManager()
 
     // Set up initial state
     cardStore.dealCards()
@@ -117,80 +192,47 @@ describe('useStoreManager', () => {
     expect(Array.from(cardStore.hand.p1)).toEqual(originalP1Hand)
   })
 
-  it('should handle localStorage save and load', async () => {
-    const { saveGameToStorage, loadGameFromStorage } = useStoreManager()
+  it('should handle persistent save and load via IndexedDB-backed storage', async () => {
+    const { saveGameToStorage, loadGameFromStorage, deleteSavedGame } = await getStoreManager()
 
-    // Generate a properly encrypted card store state for testing with salt
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
-    const playerStore = usePlayerStore()
-    const configStore = useConfigStore()
 
-    // Generate the same salt that would be used in the real system
-    const saltComponents = [
-      'test-game-id',
-      '1', // roundCounter
-      '1', // turnCounter
-      'select', // turnPhase
-      'p1', // activePlayer.id
-      '1', // bonusMultiplier
-      '3', // maxRounds
-      'allow', // allowViewingsYaku
-    ]
-    const salt = saltComponents.join('|')
+    try {
+      // Set up some deterministic state
+      cardStore.dealCards()
+      gameDataStore.startRound()
+      const originalGameId = gameDataStore.gameId
+      const originalPhase = gameDataStore.turnPhase
+      const originalP1Hand = Array.from(cardStore.hand.p1)
 
-    const encryptedCards = await cardStore.exportSerializedState(salt, 'test-game-id')
+      // Save to persistent storage (IndexedDB via DexBee)
+      const key = await saveGameToStorage()
+      expect(key).toBe('hanafuda-save-single')
 
-    const mockStorageData = JSON.stringify({
-      version: '1.0.0',
-      timestamp: Date.now(),
-      gameId: 'test-game-id',
-      cards: encryptedCards,
-      gameData: JSON.stringify({
-        gameId: 'test-game-id',
-        roundHistory: [],
-        roundCounter: 1,
-        turnCounter: 1,
-        turnPhase: 'select',
-        roundOver: false,
-        gameOver: false,
-        eventHistory: [],
-      }),
-      players: JSON.stringify({
-        players: {
-          p1: { id: 'p1', name: 'Player 1', isActive: true, isDealer: true },
-          p2: { id: 'p2', name: 'Player 2', isActive: false, isDealer: false },
-        },
-        bonusMultiplier: 1,
-      }),
-      config: JSON.stringify({
-        maxRounds: 3,
-        allowViewingsYaku: 'allow',
-        doubleScoreOverSeven: false,
-        sakeIsWildCard: false,
-        cardLabels: false,
-        cardSizeMultiplier: 1.0,
-        settingsLoaded: true,
-      }),
-    })
+      // Reset stores to different state
+      cardStore.reset()
+      gameDataStore.reset()
+      expect(cardStore.hand.p1.size).toBe(0)
+      expect(gameDataStore.turnPhase).toBe('select')
 
-    // Mock localStorage.setItem and getItem
-    vi.mocked(localStorage.setItem).mockImplementation(() => {})
-    vi.mocked(localStorage.getItem).mockReturnValue(mockStorageData)
-
-    // Test save
-    const key = await saveGameToStorage('test-key')
-    expect(localStorage.setItem).toHaveBeenCalledWith('test-key', expect.any(String))
-    expect(key).toBe('test-key')
-
-    // Test load
-    const success = await loadGameFromStorage('test-key')
-    expect(localStorage.getItem).toHaveBeenCalledWith('test-key')
-    expect(success).toBe(true)
+      // Load from persistent storage (IndexedDB via DexBee)
+      const success = await loadGameFromStorage('hanafuda-save-single')
+      expect(success).toBe(true)
+      expect(gameDataStore.gameId).toBe(originalGameId)
+      expect(gameDataStore.turnPhase).toBe(originalPhase)
+      expect(Array.from(cardStore.hand.p1)).toEqual(originalP1Hand)
+    } finally {
+      // Clean up: remove the saved game data to prevent test pollution
+      // This ensures cleanup even if the test fails
+      await deleteSavedGame('hanafuda-save-single').catch(() => {
+        // Ignore if save doesn't exist or already deleted
+      })
+    }
   })
 
   it('should handle invalid localStorage data gracefully', async () => {
-    const { loadGameFromStorage } = useStoreManager()
+    const { loadGameFromStorage } = await getStoreManager()
 
     // Test with invalid JSON
     vi.mocked(localStorage.getItem).mockReturnValue('invalid json')
@@ -234,7 +276,7 @@ describe('useStoreManager', () => {
   })
 
   it('should detect cross-store tampering with associated data salt', async () => {
-    const { serializeGameState, deserializeGameState } = useStoreManager()
+    const { serializeGameState, deserializeGameState } = await getStoreManager()
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
 
@@ -257,7 +299,7 @@ describe('useStoreManager', () => {
   })
 
   it('should detect tampering when player data is modified', async () => {
-    const { serializeGameState, deserializeGameState } = useStoreManager()
+    const { serializeGameState, deserializeGameState } = await getStoreManager()
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
 

@@ -197,7 +197,9 @@
       "saveAndExit": "Сохранить и выйти",
       "forfeitAndExit": "Сдаться и выйти",
       "resumeGame": "Продолжить игру",
-      "deleteSave": "Удалить сохранение"
+      "deleteSave": "Удалить сохранение",
+      "resumeMatch": "Продолжить матч",
+      "newMatch": "Новый матч"
     },
     "results": {
       "theRoundIsADraw": "Раунд завершился вничью.",
@@ -249,6 +251,13 @@
     },
     "confirmations": {
       "deleteSave": "Вы уверены, что хотите удалить сохраненную игру? Это действие нельзя отменить."
+    },
+    "modes": {
+      "singlePlayer": "Одиночная игра",
+      "multiplayer": "Мультиплеер"
+    },
+    "messages": {
+      "comingSoon": "Скоро"
     }
   },
   "settings": {

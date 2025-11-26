@@ -330,24 +330,24 @@ watch(gameStart, async () => {
       isResuming: false,
       saveKey: '',
       saveData: null as any,
+      mode: 'single' as 'single' | 'multiplayer',
     }))
 
-    if (resumeState.value.isResuming && resumeState.value.saveData) {
-      // Load saved state directly without calling startRound()
+    if (resumeState.value.isResuming) {
+      // Game state already loaded by StartScreen's loadGameFromStorage()
+      // Just need to handle cleanup
       try {
-        const { deserializeGameState, deleteSavedGame } = useStoreManager()
-        const success = await deserializeGameState(resumeState.value.saveData)
+        const { deleteSavedGame } = useStoreManager()
 
-        if (success) {
-          // Clear the save since we're now actively playing
-          if (resumeState.value.saveKey) {
-            deleteSavedGame(resumeState.value.saveKey)
-          }
-        } else {
-          console.error('Failed to restore save state')
+        // Clear the save only for single-player mode (anti-scumming)
+        // Multiplayer saves persist until game is completed
+        if (resumeState.value.saveKey && resumeState.value.mode === 'single') {
+          console.info(`Deleting single-player save after resume: ${resumeState.value.saveKey}`)
+          await deleteSavedGame(resumeState.value.saveKey)
+          console.info('Single-player save deleted successfully')
         }
       } catch (error) {
-        console.error('Error during save restore:', error)
+        console.error('Error during save cleanup:', error)
       }
 
       // Clear the resume state
@@ -355,6 +355,7 @@ watch(gameStart, async () => {
         isResuming: false,
         saveKey: '',
         saveData: null,
+        mode: 'single',
       }
 
       showLoader.value = false

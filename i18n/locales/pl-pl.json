@@ -197,7 +197,9 @@
       "saveAndExit": "Zapisz i wyjdź",
       "forfeitAndExit": "Poddaj się i wyjdź",
       "resumeGame": "Wznów grę",
-      "deleteSave": "Usuń zapis"
+      "deleteSave": "Usuń zapis",
+      "resumeMatch": "Wznów Mecz",
+      "newMatch": "Nowy Mecz"
     },
     "results": {
       "theRoundIsADraw": "Runda kończy się remisem.",
@@ -249,6 +251,13 @@
     },
     "confirmations": {
       "deleteSave": "Czy na pewno chcesz usunąć zapis gry? Tej czynności nie można cofnąć."
+    },
+    "modes": {
+      "singlePlayer": "Jeden Gracz",
+      "multiplayer": "Wielu Graczy"
+    },
+    "messages": {
+      "comingSoon": "Wkrótce"
     }
   },
   "settings": {
