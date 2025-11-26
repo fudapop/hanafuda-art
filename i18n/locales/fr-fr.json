@@ -197,7 +197,9 @@
       "saveAndExit": "Sauvegarder et quitter",
       "forfeitAndExit": "Abandonner et quitter",
       "resumeGame": "Reprendre la partie",
-      "deleteSave": "Supprimer la sauvegarde"
+      "deleteSave": "Supprimer la sauvegarde",
+      "resumeMatch": "Reprendre la partie",
+      "newMatch": "Nouvelle partie"
     },
     "results": {
       "theRoundIsADraw": "La manche est une égalité.",
@@ -249,6 +251,13 @@
     },
     "confirmations": {
       "deleteSave": "Êtes-vous sûr de vouloir supprimer votre partie sauvegardée ? Cette action est irréversible."
+    },
+    "modes": {
+      "singlePlayer": "Joueur unique",
+      "multiplayer": "Multijoueur"
+    },
+    "messages": {
+      "comingSoon": "Bientôt disponible"
     }
   },
   "settings": {

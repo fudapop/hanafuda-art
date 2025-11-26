@@ -182,6 +182,10 @@
   },
   "game": {
     "title": "Hanafuda Koi-Koi",
+    "modes": {
+      "singlePlayer": "Single Player",
+      "multiplayer": "Multiplayer"
+    },
     "ui": {
       "statusBar": {
         "roundCounter": "Round {current} / {max}"
@@ -197,7 +201,12 @@
       "saveAndExit": "Save & Exit",
       "forfeitAndExit": "Forfeit & Exit",
       "resumeGame": "Resume Game",
+      "resumeMatch": "Resume Match",
+      "newMatch": "New Match",
       "deleteSave": "Delete Save"
+    },
+    "messages": {
+      "comingSoon": "Coming Soon"
     },
     "results": {
       "theRoundIsADraw": "The round is a draw.",
@@ -245,7 +254,7 @@
       "chooseHowToExit": "Choose how to exit the game. Saves are temporary and deleted when resumed."
     },
     "saveInfo": {
-      "lastSaved": "Last saved: {lastSaved}"
+      "lastSaved": "Last saved"
     },
     "confirmations": {
       "deleteSave": "Are you sure you want to delete your saved game? This action cannot be undone."

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center gap-4 px-4 py-6 mx-2 border-t bg-surface border-t-border">
     <h3 class="text-lg font-semibold text-text">Game State Management</h3>
-    
+
     <div class="flex flex-wrap items-center justify-center gap-3">
       <button
         class="px-4 py-2 text-sm font-medium transition-colors rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
@@ -10,7 +10,7 @@
       >
         {{ isSaving ? 'Saving...' : 'Quick Save' }}
       </button>
-      
+
       <button
         class="px-4 py-2 text-sm font-medium transition-colors border rounded-md border-border bg-background text-text hover:bg-surface"
         @click="handleQuickLoad"
@@ -18,15 +18,17 @@
       >
         {{ isLoading ? 'Loading...' : 'Quick Load' }}
       </button>
-      
+
       <button
         class="px-4 py-2 text-sm font-medium transition-colors border rounded-md border-border bg-background text-text hover:bg-surface"
         @click="handleExportGame"
       >
         Export Game
       </button>
-      
-      <label class="px-4 py-2 text-sm font-medium transition-colors border rounded-md cursor-pointer border-border bg-background text-text hover:bg-surface">
+
+      <label
+        class="px-4 py-2 text-sm font-medium transition-colors border rounded-md cursor-pointer border-border bg-background text-text hover:bg-surface"
+      >
         Import Game
         <input
           type="file"
@@ -36,8 +38,11 @@
         />
       </label>
     </div>
-    
-    <div v-if="savedGames.length > 0" class="w-full">
+
+    <div
+      v-if="savedGames.length > 0"
+      class="w-full"
+    >
       <div class="flex items-center justify-between mb-2">
         <h4 class="text-sm font-medium text-text-secondary">Saved Games</h4>
         <button
@@ -55,9 +60,7 @@
           class="flex items-center justify-between gap-2 p-2 border rounded-sm border-border bg-background"
         >
           <div class="flex flex-col flex-1 min-w-0">
-            <span class="text-xs font-medium truncate text-text">
-              Game: {{ save.gameId }}
-            </span>
+            <span class="text-xs font-medium truncate text-text"> Game: {{ save.gameId }} </span>
             <span class="text-xs text-text-secondary">
               {{ new Date(save.timestamp).toLocaleString() }}
             </span>
@@ -81,8 +84,12 @@
         </div>
       </div>
     </div>
-    
-    <div v-if="statusMessage" class="text-sm" :class="statusMessageClass">
+
+    <div
+      v-if="statusMessage"
+      class="text-sm"
+      :class="statusMessageClass"
+    >
       {{ statusMessage }}
     </div>
   </div>
@@ -97,7 +104,7 @@ const {
   importGameState,
   listSavedGames,
   loadGameFromStorage,
-  deleteSavedGame
+  deleteSavedGame,
 } = useStoreManager()
 
 const isSaving = ref(false)
@@ -105,7 +112,39 @@ const isLoading = ref(false)
 const statusMessage = ref('')
 const statusMessageClass = ref('text-text-secondary')
 
-const savedGames = ref(listSavedGames())
+const savedGames = ref<Array<{ key: string; timestamp: number; gameId: string }>>([])
+
+// Polling state
+const isPolling = ref(true)
+const pollingInProgress = ref(false)
+
+// Polling loop for saved games
+const pollSavedGames = async () => {
+  while (isPolling.value) {
+    if (!pollingInProgress.value) {
+      pollingInProgress.value = true
+      try {
+        savedGames.value = await listSavedGames()
+      } catch (error) {
+        console.error('Failed to poll saved games:', error)
+      } finally {
+        pollingInProgress.value = false
+      }
+    }
+    await sleep(5000)
+  }
+}
+
+onMounted(async () => {
+  // Initial load
+  savedGames.value = await listSavedGames()
+  // Start polling
+  pollSavedGames()
+})
+
+onUnmounted(() => {
+  isPolling.value = false
+})
 
 const showStatus = (message: string, isError = false, isWarning = false) => {
   statusMessage.value = message
@@ -116,17 +155,20 @@ const showStatus = (message: string, isError = false, isWarning = false) => {
   } else {
     statusMessageClass.value = 'text-green-500'
   }
-  
-  setTimeout(() => {
-    statusMessage.value = ''
-  }, isWarning ? 5000 : 3000) // Show warnings longer
+
+  setTimeout(
+    () => {
+      statusMessage.value = ''
+    },
+    isWarning ? 5000 : 3000,
+  ) // Show warnings longer
 }
 
 const handleQuickSave = async () => {
   isSaving.value = true
   try {
     const saveKey = await quickSave()
-    savedGames.value = listSavedGames()
+    savedGames.value = await listSavedGames()
     showStatus('Game saved successfully!')
   } catch (error) {
     console.error('Save failed:', error)
@@ -178,16 +220,16 @@ const handleLoadSave = async (saveKey: string) => {
   }
 }
 
-const handleDeleteSave = (saveKey: string) => {
+const handleDeleteSave = async (saveKey: string) => {
   // Find the save to show confirmation details
-  const save = savedGames.value.find(s => s.key === saveKey)
+  const save = savedGames.value.find((s) => s.key === saveKey)
   const saveDate = save ? new Date(save.timestamp).toLocaleString() : 'Unknown'
-  
+
   if (confirm(`Delete save from ${saveDate}?\n\nThis action cannot be undone.`)) {
     try {
-      const success = deleteSavedGame(saveKey)
+      const success = await deleteSavedGame(saveKey)
       if (success) {
-        savedGames.value = listSavedGames() // Refresh the list
+        savedGames.value = await listSavedGames() // Refresh the list
         showStatus('Save deleted successfully!')
       } else {
         showStatus('Failed to delete save', true)
@@ -199,19 +241,19 @@ const handleDeleteSave = (saveKey: string) => {
   }
 }
 
-const handleClearAllSaves = () => {
+const handleClearAllSaves = async () => {
   const saveCount = savedGames.value.length
-  
+
   if (confirm(`Delete all ${saveCount} saved games?\n\nThis action cannot be undone.`)) {
     try {
       let deletedCount = 0
       for (const save of savedGames.value) {
-        if (deleteSavedGame(save.key)) {
+        if (await deleteSavedGame(save.key)) {
           deletedCount++
         }
       }
-      
-      savedGames.value = listSavedGames() // Refresh the list
+
+      savedGames.value = await listSavedGames() // Refresh the list
       if (deletedCount === saveCount) {
         showStatus(`All ${saveCount} saves deleted successfully!`)
       } else if (deletedCount > 0) {
@@ -256,19 +298,8 @@ const handleImportGame = async (event: Event) => {
       showStatus('Failed to import game', true)
     }
   }
-  
+
   // Reset the input
   target.value = ''
 }
-
-// Refresh saved games list periodically
-onMounted(() => {
-  const interval = setInterval(() => {
-    savedGames.value = listSavedGames()
-  }, 5000)
-  
-  onUnmounted(() => {
-    clearInterval(interval)
-  })
-})
 </script>

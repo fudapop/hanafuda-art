@@ -63,87 +63,161 @@
       />
       <h1 class="sr-only">{{ t('game.title') }}</h1>
 
-      <div class="flex flex-col items-center gap-3 sm:gap-4 mt-12">
-        <!-- Resume Game Button - shown when save exists -->
-        <div
-          v-if="hasSavedGame"
-          class="flex flex-col items-center"
-        >
-          <button
-            :class="[
-              'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
-              'bg-linear-to-b from-green-100 to-green-200 dark:from-green-200 dark:to-green-300',
-              'text-[#23221c] font-bold text-lg',
-              'hover:from-green-200 hover:to-green-300 dark:hover:from-green-300 dark:hover:to-green-400',
-              'active:from-green-300 active:to-green-400',
-              'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
-              isMobile ? 'landscape:mt-8' : '',
-            ]"
-            @click="resumeGame"
-            :disabled="isLoading"
-          >
-            {{ isLoading ? t('common.actions.loading') : t('game.actions.resumeGame') }}
-          </button>
+      <div class="flex flex-col items-center gap-6 sm:gap-8 mt-12">
+        <!-- Single Player Section -->
+        <div class="flex flex-col items-center gap-3">
+          <h2 class="text-sm font-semibold tracking-wide uppercase text-text-secondary">
+            {{ t('game.modes.singlePlayer') }}
+          </h2>
 
-          <!-- Game State Management Panel - only show when save exists -->
-          <div class="flex flex-col items-center gap-2 mt-4">
-            <div class="text-xs text-text-secondary">
-              {{ t('game.saveInfo.lastSaved') }}: {{ formatSaveDate(lastSave?.timestamp) }}
-            </div>
-            <div class="flex gap-2">
+          <!-- Resume Single Player Button -->
+          <div
+            v-if="hasSinglePlayerSave"
+            class="flex flex-col items-center"
+          >
+            <button
+              :class="[
+                'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+                'bg-linear-to-b from-green-100 to-green-200 dark:from-green-200 dark:to-green-300',
+                'text-[#23221c] font-bold text-lg',
+                'hover:from-green-200 hover:to-green-300 dark:hover:from-green-300 dark:hover:to-green-400',
+                'active:from-green-300 active:to-green-400',
+                'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
+              ]"
+              @click="resumeSinglePlayerGame"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? t('common.actions.loading') : t('game.actions.resumeGame') }}
+            </button>
+
+            <!-- Save Info -->
+            <div class="flex flex-col items-center gap-2 mt-3">
+              <div class="text-xs text-text-secondary">
+                {{ t('game.saveInfo.lastSaved') }}:
+                {{ formatSaveDate(singlePlayerSave?.timestamp) }}
+              </div>
               <button
-                class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400"
-                @click="deleteSave"
+                class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400 dark:hover:bg-red-950/30"
+                @click="deleteSinglePlayerSave"
                 :title="t('game.actions.deleteSave')"
               >
                 {{ t('common.actions.delete') }}
               </button>
             </div>
           </div>
+
+          <!-- New Single Player Button -->
+          <button
+            v-else
+            :class="[
+              'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+              'bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300',
+              'text-[#23221c] font-bold text-lg',
+              'hover:from-amber-200 hover:to-amber-300 dark:hover:from-amber-300 dark:hover:to-amber-400',
+              'active:from-amber-300 active:to-amber-400',
+              'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
+            ]"
+            @click="startNewSinglePlayerGame"
+            :disabled="isLoading"
+          >
+            {{ t('common.actions.playNow') }}
+          </button>
         </div>
 
-        <!-- Play Now Button - shown when no save exists -->
-        <button
-          v-else
-          :class="[
-            'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
-            'bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300',
-            'text-[#23221c] font-bold text-lg',
-            'hover:from-amber-200 hover:to-amber-300 dark:hover:from-amber-300 dark:hover:to-amber-400',
-            'active:from-amber-300 active:to-amber-400',
-            'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
-            isMobile ? 'landscape:mt-0' : '',
-          ]"
-          @click="startNewGame"
-        >
-          {{ t('common.actions.playNow') }}
-        </button>
-
-        <!-- Options Button - Show for everyone -->
-        <button
-          class="min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
-          @click="() => openOptions()"
-        >
-          {{ t('common.actions.options') }}
-        </button>
-
-        <!-- Leaderboard Button - Only for authenticated users -->
-        <button
+        <!-- Multiplayer Section -->
+        <div
           v-if="!isGuest"
-          class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
-          @click="goToRankings"
+          class="flex flex-col items-center gap-3"
         >
-          {{ t('rankings.title') }}
-        </button>
+          <h2 class="text-sm font-semibold tracking-wide uppercase text-text-secondary">
+            {{ t('game.modes.multiplayer') }}
+          </h2>
 
-        <!-- Sign In Button - For guests (replaces Rankings) -->
-        <button
-          v-if="isGuest"
-          class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
-          @click="goToLogin"
-        >
-          {{ t('common.actions.signIn') }}
-        </button>
+          <!-- Resume Multiplayer Button -->
+          <div
+            v-if="hasMultiplayerSave"
+            class="flex flex-col items-center"
+          >
+            <button
+              :class="[
+                'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+                'bg-linear-to-b from-blue-100 to-blue-200 dark:from-blue-200 dark:to-blue-300',
+                'text-[#23221c] font-bold text-lg',
+                'hover:from-blue-200 hover:to-blue-300 dark:hover:from-blue-300 dark:hover:to-blue-400',
+                'active:from-blue-300 active:to-blue-400',
+                'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
+              ]"
+              @click="resumeMultiplayerGame"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? t('common.actions.loading') : t('game.actions.resumeMatch') }}
+            </button>
+
+            <!-- Save Info -->
+            <div class="flex flex-col items-center gap-2 mt-3">
+              <div class="text-xs text-text-secondary">
+                {{ t('game.saveInfo.lastSaved') }}: {{ formatSaveDate(multiplayerSave?.timestamp) }}
+              </div>
+              <button
+                class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400 dark:hover:bg-red-950/30"
+                @click="deleteMultiplayerSave"
+                :title="t('game.actions.deleteSave')"
+              >
+                {{ t('common.actions.delete') }}
+              </button>
+            </div>
+          </div>
+
+          <!-- New Multiplayer Button -->
+          <button
+            v-else
+            :class="[
+              'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+              'bg-linear-to-b from-purple-100 to-purple-200 dark:from-purple-200 dark:to-purple-300',
+              'text-[#23221c] font-bold text-lg',
+              'hover:from-purple-200 hover:to-purple-300 dark:hover:from-purple-300 dark:hover:to-purple-400',
+              'active:from-purple-300 active:to-purple-400',
+              'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
+              'opacity-50 cursor-not-allowed',
+            ]"
+            @click="startNewMultiplayerGame"
+            disabled
+            :title="t('game.messages.comingSoon')"
+          >
+            {{ t('game.actions.newMatch') }}
+          </button>
+          <div class="text-xs italic text-text-secondary/70">
+            {{ t('game.messages.comingSoon') }}
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <!-- Options Button - Show for everyone -->
+          <button
+            class="min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
+            @click="() => openOptions()"
+          >
+            {{ t('common.actions.options') }}
+          </button>
+
+          <!-- Leaderboard Button - Only for authenticated users -->
+          <button
+            v-if="!isGuest"
+            class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
+            @click="goToRankings"
+          >
+            {{ t('rankings.title') }}
+          </button>
+
+          <!-- Sign In Button - For guests (replaces Rankings) -->
+          <button
+            v-if="isGuest"
+            class="uppercase min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
+            @click="goToLogin"
+          >
+            {{ t('common.actions.signIn') }}
+          </button>
+        </div>
       </div>
     </div>
     <div class="fixed bottom-0 z-50 w-full">
@@ -169,17 +243,38 @@ const { orientation } = useScreenOrientation()
 const isGuest = computed(() => currentProfile.value?.isGuest === true)
 
 // Game save management
-const { listSavedGames, deleteSavedGame } = useStoreManager()
+const { listSavedGames, deleteSavedGame, loadGameFromStorage } = useStoreManager()
 const isLoading = ref(false)
 
-// Check for saved games (only use the most recent one)
-const savedGames = ref(listSavedGames())
+// Check for saved games (separate single-player and multiplayer)
+const savedGames = ref<
+  Array<{
+    key: string
+    timestamp: number
+    gameId: string
+    mode: 'single' | 'multiplayer'
+    p1?: string | null
+    p2?: string | null
+    activePlayer?: string | null
+  }>
+>([])
+
+// Separate saves by mode
+const singlePlayerSave = computed(() => savedGames.value.find((s) => s.mode === 'single') || null)
+const multiplayerSave = computed(
+  () => savedGames.value.find((s) => s.mode === 'multiplayer') || null,
+)
+
+const hasSinglePlayerSave = computed(() => singlePlayerSave.value !== null)
+const hasMultiplayerSave = computed(() => multiplayerSave.value !== null)
+
+// For backward compatibility
 const hasSavedGame = computed(() => savedGames.value.length > 0)
 const lastSave = computed(() => savedGames.value[0] || null)
 
 // Check for saved games on mount only
-onMounted(() => {
-  savedGames.value = listSavedGames()
+onMounted(async () => {
+  savedGames.value = await listSavedGames()
 })
 
 const goToLogin = () => {
@@ -194,8 +289,8 @@ const goToRankings = () => {
 }
 
 // Game save handlers
-const resumeGame = async () => {
-  if (!lastSave.value) return
+const resumeSinglePlayerGame = async () => {
+  if (!singlePlayerSave.value) return
 
   isLoading.value = true
   try {
@@ -204,24 +299,24 @@ const resumeGame = async () => {
       isResuming: false,
       saveKey: '',
       saveData: null as any,
+      mode: 'single' as 'single' | 'multiplayer',
     }))
 
-    // Pre-load the save data but don't apply it yet
-    const serializedData = localStorage.getItem(lastSave.value.key)
-    if (serializedData) {
-      const gameState = JSON.parse(serializedData)
-
-      // Store the save data and key for later loading
+    // Load the save data from IndexedDB
+    const success = await loadGameFromStorage(singlePlayerSave.value.key)
+    if (success) {
+      // Store the save key and mode for later deletion after resume
       resumeState.value = {
         isResuming: true,
-        saveKey: lastSave.value.key,
-        saveData: gameState,
+        saveKey: singlePlayerSave.value.key,
+        saveData: null, // Data already loaded into stores
+        mode: 'single',
       }
 
       // Start the game - it will handle the deferred loading
       emit('start-game')
     } else {
-      console.error('Failed to find saved game data')
+      console.error('Failed to load saved game data')
     }
   } catch (error) {
     console.error('Error preparing resume:', error)
@@ -230,11 +325,47 @@ const resumeGame = async () => {
   }
 }
 
-const startNewGame = () => {
-  // Clear any existing saves when starting new game (single save slot)
-  if (hasSavedGame.value && lastSave.value) {
-    deleteSavedGame(lastSave.value.key)
-    savedGames.value = listSavedGames()
+const resumeMultiplayerGame = async () => {
+  if (!multiplayerSave.value) return
+
+  isLoading.value = true
+  try {
+    // Set global state to indicate we're resuming from save
+    const resumeState = useState('resume-save', () => ({
+      isResuming: false,
+      saveKey: '',
+      saveData: null as any,
+      mode: 'single' as 'single' | 'multiplayer',
+    }))
+
+    // Load the save data from IndexedDB
+    const success = await loadGameFromStorage(multiplayerSave.value.key)
+    if (success) {
+      // Store the save key and mode (multiplayer saves persist)
+      resumeState.value = {
+        isResuming: true,
+        saveKey: multiplayerSave.value.key,
+        saveData: null, // Data already loaded into stores
+        mode: 'multiplayer',
+      }
+
+      // Start the game - it will handle the deferred loading
+      emit('start-game')
+    } else {
+      console.error('Failed to load saved game data')
+    }
+  } catch (error) {
+    console.error('Error preparing resume:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const startNewSinglePlayerGame = async () => {
+  // Clear any existing single-player save when starting new game
+  if (hasSinglePlayerSave.value && singlePlayerSave.value) {
+    await deleteSavedGame(singlePlayerSave.value.key)
+    savedGames.value = await listSavedGames()
   }
 
   // Clear resume state to ensure normal game initialization
@@ -242,28 +373,51 @@ const startNewGame = () => {
     isResuming: false,
     saveKey: '',
     saveData: null as any,
+    mode: 'single' as 'single' | 'multiplayer',
   }))
 
   resumeState.value = {
     isResuming: false,
     saveKey: '',
     saveData: null,
+    mode: 'single',
   }
 
-  console.debug('Starting new game - will initialize clean state')
+  console.debug('Starting new single-player game - will initialize clean state')
   emit('start-game')
 }
 
-const deleteSave = () => {
-  if (!lastSave.value) return
+const startNewMultiplayerGame = async () => {
+  // TODO: Implement multiplayer matchmaking/setup
+  console.warn('Multiplayer matchmaking not yet implemented')
+}
+
+const deleteSinglePlayerSave = async () => {
+  if (!singlePlayerSave.value) return
 
   if (confirm(t('game.confirmations.deleteSave'))) {
-    const success = deleteSavedGame(lastSave.value.key)
+    const success = await deleteSavedGame(singlePlayerSave.value.key)
     if (success) {
-      savedGames.value = listSavedGames()
+      savedGames.value = await listSavedGames()
     }
   }
 }
+
+const deleteMultiplayerSave = async () => {
+  if (!multiplayerSave.value) return
+
+  if (confirm(t('game.confirmations.deleteSave'))) {
+    const success = await deleteSavedGame(multiplayerSave.value.key)
+    if (success) {
+      savedGames.value = await listSavedGames()
+    }
+  }
+}
+
+// Backward compatibility handlers
+const resumeGame = resumeSinglePlayerGame
+const startNewGame = startNewSinglePlayerGame
+const deleteSave = deleteSinglePlayerSave
 
 const formatSaveDate = (timestamp?: number) => {
   if (!timestamp) return ''

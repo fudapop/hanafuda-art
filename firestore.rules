@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /feedback/{document=**} {
+      allow create: if true;
+    }
+
+    match /announcement_impressions/{document=**} {
+      allow read, update, create: if true;
+    }
+
+    match /users/{userId} {
+      // User can read and create/update/delete only their own profile document
+      allow read, write: if request.auth != null && userId == 'u_' + request.auth.uid;
+    }
+
+    // NEW: per-user game saves
+    match /game_saves/{saveId} {
+      // Only the owner can read their saves
+      allow read: if request.auth != null
+                  && resource.data.uid == request.auth.uid;
+
+      // Only the owner can create/update their saves
+      allow create, update: if request.auth != null
+                            && request.resource.data.uid == request.auth.uid;
+
+      // Only the owner can delete their saves
+      allow delete: if request.auth != null
+                    && resource.data.uid == request.auth.uid;
+    }
+
+    // NEW: shared multiplayer game states
+    match /multiplayer_games/{gameId} {
+      // Helper function to check if user is a participant
+      function isParticipant() {
+        return request.auth.uid == resource.data.p1
+            || request.auth.uid == resource.data.p2;
+      }
+
+      function isRequestParticipant() {
+        return request.auth.uid == request.resource.data.p1
+            || request.auth.uid == request.resource.data.p2;
+      }
+
+      // Participants can read their games
+      allow read: if request.auth != null && isParticipant();
+
+      // Any authenticated user can create a game (matchmaking)
+      allow create: if request.auth != null
+                    && isRequestParticipant()
+                    && request.resource.data.mode == 'multiplayer'
+                    && request.resource.data.p1 is string
+                    && request.resource.data.p2 is string
+                    && request.resource.data.activePlayer is string;
+
+      // Only the active player can update the game
+      allow update: if request.auth != null
+                    && isParticipant()
+                    && request.auth.uid == resource.data.activePlayer
+                    && request.resource.data.mode == 'multiplayer'
+                    && request.resource.data.p1 == resource.data.p1
+                    && request.resource.data.p2 == resource.data.p2;
+
+      // Participants can delete their games
+      allow delete: if request.auth != null && isParticipant();
+    }
+  }
+}
+

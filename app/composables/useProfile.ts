@@ -90,7 +90,20 @@ export const useProfile = () => {
           // Local transfer already succeeded, no recovery needed
         }
 
-        // Step 4: Show success notification
+        // Step 4: Sync game saves (transfer guest saves to authenticated account)
+        try {
+          const { useStoreManager } = await import('~/composables/useStoreManager')
+          const storeManager = useStoreManager()
+          storeManager.initializeSync()
+          // Transfer guest saves to authenticated account and push to remote
+          await storeManager.syncPush(user.uid, true)
+          console.info('Game saves transferred and synced after guest transfer')
+        } catch (saveSyncError) {
+          console.warn('Failed to sync game saves after guest transfer:', saveSyncError)
+          // Non-critical - saves will sync on next save operation
+        }
+
+        // Step 5: Show success notification
         if (import.meta.client) {
           try {
             await nextTick()
@@ -181,6 +194,17 @@ export const useProfile = () => {
               console.info('Loading existing authenticated profile')
               await playerProfile.getProfile(user)
               await playerProfile.syncPull()
+
+              // Sync game saves on login
+              try {
+                const { useStoreManager } = await import('~/composables/useStoreManager')
+                const storeManager = useStoreManager()
+                storeManager.initializeSync()
+                await storeManager.syncPull(user.uid)
+                console.info('Game saves synced on login')
+              } catch (saveSyncError) {
+                console.warn('Failed to sync game saves on login:', saveSyncError)
+              }
             } else {
               // No local profile at all - check remote first before creating new
               try {
@@ -195,6 +219,17 @@ export const useProfile = () => {
                   // No profile anywhere - create new and push to remote
                   await playerProfile.getProfile(user)
                   await playerProfile.syncPush()
+                }
+
+                // Sync game saves on login
+                try {
+                  const { useStoreManager } = await import('~/composables/useStoreManager')
+                  const storeManager = useStoreManager()
+                  storeManager.initializeSync()
+                  await storeManager.syncPull(user.uid)
+                  console.info('Game saves synced on login')
+                } catch (saveSyncError) {
+                  console.warn('Failed to sync game saves on login:', saveSyncError)
                 }
               } catch (error) {
                 console.error('Error checking remote profile:', error)
@@ -213,6 +248,15 @@ export const useProfile = () => {
           } else {
             // Authenticated profile already loaded - ensure sync is active
             initializeSync()
+
+            // Initialize game saves sync
+            try {
+              const { useStoreManager } = await import('~/composables/useStoreManager')
+              const storeManager = useStoreManager()
+              storeManager.initializeSync()
+            } catch (saveSyncError) {
+              console.warn('Failed to initialize game saves sync:', saveSyncError)
+            }
           }
         }
       } finally {

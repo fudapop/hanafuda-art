@@ -1,4 +1,5 @@
 import type { CardDesign } from '~/composables/useCardDesign'
+import type { SerializedGameState } from '~/composables/useStoreManager'
 import type { PlayerStats } from '~/utils/stats'
 
 export interface PlayerRecord {
@@ -125,4 +126,44 @@ export interface SyncResult {
   remote: PlayerProfile | null
   merged?: PlayerProfile
   action: 'pulled' | 'pushed' | 'merged' | 'skipped'
+}
+
+export type GameMode = 'single' | 'multiplayer'
+
+export interface GameSaveRecord {
+  id: string
+  uid: string
+  saveKey: string
+  gameState: SerializedGameState
+  timestamp: Date
+  gameId: string
+  mode: GameMode
+  p1?: string | null // Player 1 uid (null for single-player)
+  p2?: string | null // Player 2 uid (null for single-player)
+  activePlayer?: string | null // Current turn player uid (null for single-player)
+}
+
+/**
+ * Shared multiplayer game document stored in Firestore
+ * Collection: multiplayer_games
+ * Document ID: ${gameId}
+ */
+export interface MultiplayerGame {
+  gameId: string
+  gameState: SerializedGameState
+  mode: 'multiplayer'
+  p1: string // Player 1 uid
+  p2: string // Player 2 uid
+  activePlayer: string // Current turn player uid
+  lastUpdated: Date
+  createdAt: Date
+}
+
+export interface LocalGameSaveStore {
+  init(): Promise<void>
+  get(uid: string, saveKey: string): Promise<GameSaveRecord | null>
+  list(uid: string): Promise<GameSaveRecord[]>
+  set(save: GameSaveRecord): Promise<void>
+  remove(uid: string, saveKey: string): Promise<void>
+  clear(uid: string): Promise<void> // Clear all saves for user
 }

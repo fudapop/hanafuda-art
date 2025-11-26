@@ -59,7 +59,7 @@
             <QuestionMarkCircleIcon
               class="inline w-5 h-5 mb-1 ml-1 cursor-pointer text-text-secondary hover:text-primary"
             />
-            <span class="sr-only">Read about scoring on fudawiki.org</span>
+            <span class="sr-only">{{ t('settings.gameplay.readAboutThisRule') }}</span>
           </a>
         </div>
         <div class="space-y-4">
