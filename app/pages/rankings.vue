@@ -5,7 +5,7 @@
       <header
         :class="[
           'sticky top-0 z-10',
-          'px-4 py-6 min-h-20 lg:py-8 bg-[url(https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/player_bar.webp)] bg-cover bg-bottom lg:px-8',
+          'px-4 py-6 min-h-20 lg:py-8 bg-[url(/images/player-bar-1280.webp)] bg-cover bg-bottom lg:px-8',
         ]"
       >
         <h1 class="text-lg font-bold text-center text-white lg:text-3xl">

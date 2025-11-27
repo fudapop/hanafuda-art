@@ -8,12 +8,36 @@
     />
     <div class="fixed inset-0 -z-20">
       <img
-        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/bg-landing.webp"
+        src="/images/bg-landing-1920.webp"
+        srcset="
+          /images/bg-landing-640.webp   640w,
+          /images/bg-landing-768.webp   768w,
+          /images/bg-landing-1024.webp 1024w,
+          /images/bg-landing-1280.webp 1280w,
+          /images/bg-landing-1536.webp 1536w,
+          /images/bg-landing-1920.webp 1920w
+        "
         class="absolute z-5 object-cover w-full h-full dark:invert animate-ping [animation-duration:10s] motion-reduce:animate-none"
+        width="1920"
+        height="1091"
+        sizes="(min-width: 1536px) 100vw, (min-width: 1280px) 75vw, (min-width: 768px) 50vw, 100vw"
+        alt="animated background overlay"
       />
       <img
-        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/bg-landing.webp"
+        src="/images/bg-landing-1920.webp"
+        srcset="
+          /images/bg-landing-640.webp   640w,
+          /images/bg-landing-768.webp   768w,
+          /images/bg-landing-1024.webp 1024w,
+          /images/bg-landing-1280.webp 1280w,
+          /images/bg-landing-1536.webp 1536w,
+          /images/bg-landing-1920.webp 1920w
+        "
         class="object-cover w-full h-full dark:invert"
+        width="1920"
+        height="1091"
+        sizes="(min-width: 1536px) 100vw, (min-width: 1280px) 75vw, (min-width: 768px) 50vw, 100vw"
+        alt="background-image"
       />
     </div>
     <!-- Left Oval -->
@@ -24,9 +48,20 @@
         class="static bg-transparent rounded-full aspect-3/4 w-full h-full flex items-center justify-center overflow-hidden inert"
       >
         <img
-          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/flowers-landing1.webp"
+          src="/images/flowers-landing1-704.webp"
+          srcset="
+            /images/flowers-landing1-128.webp 128w,
+            /images/flowers-landing1-192.webp 192w,
+            /images/flowers-landing1-256.webp 256w,
+            /images/flowers-landing1-384.webp 384w,
+            /images/flowers-landing1-512.webp 512w,
+            /images/flowers-landing1-704.webp 704w
+          "
           class="object-contain w-full h-full transition-opacity duration-300 opacity-0 lg:opacity-100"
-          loading="lazy"
+          width="704"
+          height="1080"
+          sizes="32vw"
+          alt=""
         />
       </div>
     </div>
@@ -38,9 +73,20 @@
         class="bg-transparent rounded-full aspect-3/4 w-full h-full flex items-center justify-center overflow-hidden inert"
       >
         <img
-          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/flowers-landing2.webp"
+          src="/images/flowers-landing2-704.webp"
+          srcset="
+            /images/flowers-landing2-128.webp 128w,
+            /images/flowers-landing2-192.webp 192w,
+            /images/flowers-landing2-256.webp 256w,
+            /images/flowers-landing2-384.webp 384w,
+            /images/flowers-landing2-512.webp 512w,
+            /images/flowers-landing2-704.webp 704w
+          "
           class="object-contain w-full h-full transition-opacity duration-300 opacity-0 lg:opacity-100"
-          loading="lazy"
+          width="704"
+          height="1080"
+          sizes="32vw"
+          alt=""
         />
       </div>
     </div>
@@ -54,143 +100,153 @@
       ]"
     >
       <img
-        src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/logo-title.webp"
+        src="/images/logo-title-180.webp"
+        srcset="
+          /images/logo-title-100.webp 100w,
+          /images/logo-title-120.webp 120w,
+          /images/logo-title-180.webp 180w,
+          /images/logo-title-240.webp 240w,
+          /images/logo-title-360.webp 360w
+        "
         :class="[
           'w-[100px] mb-1 sm:w-[120px] sm:mb-2',
           isMobile ? 'landscape:w-[25dvh]' : 'md:w-[180px]',
         ]"
         :alt="t('game.title')"
+        sizes="(min-width: 768px) 180px, (min-width: 640px) 120px, 100px"
       />
       <h1 class="sr-only">{{ t('game.title') }}</h1>
 
       <div class="flex flex-col items-center gap-6 sm:gap-8 mt-12">
-        <!-- Single Player Section -->
-        <div class="flex flex-col items-center gap-3">
-          <h2 class="text-sm font-semibold tracking-wide uppercase text-text-secondary">
-            {{ t('game.modes.singlePlayer') }}
-          </h2>
+        <div class="flex flex-col md:flex-row md:items-start items-center gap-6">
+          <!-- Single Player Section -->
+          <div class="flex flex-col items-center gap-3">
+            <h2 class="text-sm font-semibold tracking-wide uppercase text-text-secondary">
+              {{ t('game.modes.singlePlayer') }}
+            </h2>
 
-          <!-- Resume Single Player Button -->
-          <div
-            v-if="hasSinglePlayerSave"
-            class="flex flex-col items-center"
-          >
+            <!-- Resume Single Player Button -->
+            <div
+              v-if="hasSinglePlayerSave"
+              class="flex flex-col items-center"
+            >
+              <button
+                :class="[
+                  'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+                  'bg-linear-to-b from-green-100 to-green-200 dark:from-green-200 dark:to-green-300',
+                  'text-[#23221c] font-bold text-lg',
+                  'hover:from-green-200 hover:to-green-300 dark:hover:from-green-300 dark:hover:to-green-400',
+                  'active:from-green-300 active:to-green-400',
+                  'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
+                ]"
+                @click="resumeSinglePlayerGame"
+                :disabled="isLoading"
+              >
+                {{ isLoading ? t('common.actions.loading') : t('game.actions.resumeGame') }}
+              </button>
+
+              <!-- Save Info -->
+              <div class="flex flex-col items-center gap-2 mt-3">
+                <div class="text-xs text-text-secondary">
+                  {{ t('game.saveInfo.lastSaved') }}:
+                  {{ formatSaveDate(singlePlayerSave?.timestamp) }}
+                </div>
+                <button
+                  class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400 dark:hover:bg-red-950/30"
+                  @click="deleteSinglePlayerSave"
+                  :title="t('game.actions.deleteSave')"
+                >
+                  {{ t('common.actions.delete') }}
+                </button>
+              </div>
+            </div>
+
+            <!-- New Single Player Button -->
             <button
+              v-else
               :class="[
                 'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
-                'bg-linear-to-b from-green-100 to-green-200 dark:from-green-200 dark:to-green-300',
+                'bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300',
                 'text-[#23221c] font-bold text-lg',
-                'hover:from-green-200 hover:to-green-300 dark:hover:from-green-300 dark:hover:to-green-400',
-                'active:from-green-300 active:to-green-400',
+                'hover:from-amber-200 hover:to-amber-300 dark:hover:from-amber-300 dark:hover:to-amber-400',
+                'active:from-amber-300 active:to-amber-400',
                 'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
               ]"
-              @click="resumeSinglePlayerGame"
+              @click="startNewSinglePlayerGame"
               :disabled="isLoading"
             >
-              {{ isLoading ? t('common.actions.loading') : t('game.actions.resumeGame') }}
+              {{ t('common.actions.playNow') }}
             </button>
-
-            <!-- Save Info -->
-            <div class="flex flex-col items-center gap-2 mt-3">
-              <div class="text-xs text-text-secondary">
-                {{ t('game.saveInfo.lastSaved') }}:
-                {{ formatSaveDate(singlePlayerSave?.timestamp) }}
-              </div>
-              <button
-                class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400 dark:hover:bg-red-950/30"
-                @click="deleteSinglePlayerSave"
-                :title="t('game.actions.deleteSave')"
-              >
-                {{ t('common.actions.delete') }}
-              </button>
-            </div>
           </div>
 
-          <!-- New Single Player Button -->
-          <button
-            v-else
-            :class="[
-              'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
-              'bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300',
-              'text-[#23221c] font-bold text-lg',
-              'hover:from-amber-200 hover:to-amber-300 dark:hover:from-amber-300 dark:hover:to-amber-400',
-              'active:from-amber-300 active:to-amber-400',
-              'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
-            ]"
-            @click="startNewSinglePlayerGame"
-            :disabled="isLoading"
-          >
-            {{ t('common.actions.playNow') }}
-          </button>
-        </div>
-
-        <!-- Multiplayer Section -->
-        <div
-          v-if="!isGuest"
-          class="flex flex-col items-center gap-3"
-        >
-          <h2 class="text-sm font-semibold tracking-wide uppercase text-text-secondary">
-            {{ t('game.modes.multiplayer') }}
-          </h2>
-
-          <!-- Resume Multiplayer Button -->
+          <!-- Multiplayer Section -->
           <div
-            v-if="hasMultiplayerSave"
-            class="flex flex-col items-center"
+            v-if="!isGuest"
+            class="flex flex-col items-center gap-3"
           >
+            <h2 class="text-sm font-semibold tracking-wide uppercase text-text-secondary">
+              {{ t('game.modes.multiplayer') }}
+            </h2>
+
+            <!-- Resume Multiplayer Button -->
+            <div
+              v-if="hasMultiplayerSave"
+              class="flex flex-col items-center"
+            >
+              <button
+                :class="[
+                  'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
+                  'bg-linear-to-b from-blue-100 to-blue-200 dark:from-blue-200 dark:to-blue-300',
+                  'text-[#23221c] font-bold text-lg',
+                  'hover:from-blue-200 hover:to-blue-300 dark:hover:from-blue-300 dark:hover:to-blue-400',
+                  'active:from-blue-300 active:to-blue-400',
+                  'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
+                ]"
+                @click="resumeMultiplayerGame"
+                :disabled="isLoading"
+              >
+                {{ isLoading ? t('common.actions.loading') : t('game.actions.resumeMatch') }}
+              </button>
+
+              <!-- Save Info -->
+              <div class="flex flex-col items-center gap-2 mt-3">
+                <div class="text-xs text-text-secondary">
+                  {{ t('game.saveInfo.lastSaved') }}:
+                  {{ formatSaveDate(multiplayerSave?.timestamp) }}
+                </div>
+                <button
+                  class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400 dark:hover:bg-red-950/30"
+                  @click="deleteMultiplayerSave"
+                  :title="t('game.actions.deleteSave')"
+                >
+                  {{ t('common.actions.delete') }}
+                </button>
+              </div>
+            </div>
+
+            <!-- New Multiplayer Button -->
             <button
+              v-else
               :class="[
                 'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
-                'bg-linear-to-b from-blue-100 to-blue-200 dark:from-blue-200 dark:to-blue-300',
+                'bg-linear-to-b from-purple-100 to-purple-200 dark:from-purple-200 dark:to-purple-300',
                 'text-[#23221c] font-bold text-lg',
-                'hover:from-blue-200 hover:to-blue-300 dark:hover:from-blue-300 dark:hover:to-blue-400',
-                'active:from-blue-300 active:to-blue-400',
+                'hover:from-purple-200 hover:to-purple-300 dark:hover:from-purple-300 dark:hover:to-purple-400',
+                'active:from-purple-300 active:to-purple-400',
                 'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
+                'opacity-50 cursor-not-allowed',
               ]"
-              @click="resumeMultiplayerGame"
-              :disabled="isLoading"
+              @click="startNewMultiplayerGame"
+              disabled
+              :title="t('game.messages.comingSoon')"
             >
-              {{ isLoading ? t('common.actions.loading') : t('game.actions.resumeMatch') }}
+              {{ t('game.actions.newMatch') }}
             </button>
-
-            <!-- Save Info -->
-            <div class="flex flex-col items-center gap-2 mt-3">
-              <div class="text-xs text-text-secondary">
-                {{ t('game.saveInfo.lastSaved') }}: {{ formatSaveDate(multiplayerSave?.timestamp) }}
-              </div>
-              <button
-                class="px-3 py-1 text-xs font-medium text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400 dark:hover:bg-red-950/30"
-                @click="deleteMultiplayerSave"
-                :title="t('game.actions.deleteSave')"
-              >
-                {{ t('common.actions.delete') }}
-              </button>
+            <div class="text-xs italic text-text-secondary/70">
+              {{ t('game.messages.comingSoon') }}
             </div>
           </div>
-
-          <!-- New Multiplayer Button -->
-          <button
-            v-else
-            :class="[
-              'play-now-button rounded-xs border-2 border-[#23221c] shadow-md hover:border-primary transition-all duration-200 min-w-[120px] sm:min-w-[150px] h-[50px] sm:h-[55px] p-3',
-              'bg-linear-to-b from-purple-100 to-purple-200 dark:from-purple-200 dark:to-purple-300',
-              'text-[#23221c] font-bold text-lg',
-              'hover:from-purple-200 hover:to-purple-300 dark:hover:from-purple-300 dark:hover:to-purple-400',
-              'active:from-purple-300 active:to-purple-400',
-              'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
-              'opacity-50 cursor-not-allowed',
-            ]"
-            @click="startNewMultiplayerGame"
-            disabled
-            :title="t('game.messages.comingSoon')"
-          >
-            {{ t('game.actions.newMatch') }}
-          </button>
-          <div class="text-xs italic text-text-secondary/70">
-            {{ t('game.messages.comingSoon') }}
-          </div>
         </div>
-
         <div class="flex flex-col gap-1">
           <!-- Options Button - Show for everyone -->
           <button
