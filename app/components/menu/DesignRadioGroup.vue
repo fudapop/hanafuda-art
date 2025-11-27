@@ -4,7 +4,10 @@
     as="div"
     class="relative w-full @container px-4"
   >
-    <div class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-xs bg-surface">
+    <div
+      v-if="!!currentProfile"
+      class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-xs bg-surface"
+    >
       <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-text">
         {{ t('deck.selectADeck') }}
         <p class="ml-2 text-sm font-medium text-text-secondary whitespace-nowrap">
@@ -31,7 +34,7 @@
           'group rounded-xs focus-visible:ring-1 focus-visible:ring-offset-2 focus-visible:ring-primary',
         ]"
         :value="design"
-        :disabled="!unlocked?.includes(design)"
+        :disabled="!!currentProfile && !unlocked?.includes(design)"
         v-posthog-capture="{
           event: 'view_design',
           properties: {
@@ -42,7 +45,7 @@
         <div
           :class="[
             'grid w-full rounded-[inherit] @lg:grid-cols-[200px_1fr] place-items-center grid-rows-[200px_1fr] @lg:grid-rows-1 relative',
-            checked ? 'ring-2 ring-primary' : 'ring-0',
+            currentProfile && checked ? 'ring-2 ring-primary' : 'ring-0',
           ]"
         >
           <!-- CARD DISPLAY -->
@@ -102,8 +105,8 @@
             <div class="flex items-center float-right mt-6 gap-x-2">
               <!-- SELECTION INDICATOR -->
               <span
-                v-if="checked"
-                aria-label="{{ t('common.states.selected') }}"
+                v-if="currentProfile && checked"
+                :aria-label="t('common.states.selected')"
                 class=""
               >
                 <span class="sr-only">{{ t('common.states.selected') }}</span>
@@ -114,8 +117,9 @@
               </span>
               <!-- LIKE BUTTON -->
               <button
+                v-if="!!currentProfile"
                 type="button"
-                aria-label="{{ t('common.actions.like') }}"
+                :aria-label="t('common.actions.like')"
                 @click="() => handleLike(design)"
                 v-posthog-capture="{
                   event: isLiked(design) ? 'unlike_design' : 'like_design',
@@ -239,19 +243,9 @@ import {
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 import { toast } from 'vue-sonner'
-import DesignDescription from './DesignDescription.vue'
 
-type CardDesign = (typeof DESIGNS)[number]
-
-const { DESIGNS, currentDesign, getDesignInfo } = useCardDesign()
+const { DESIGNS, currentDesign, getDesignInfo, saveDesignToStorage, isNew } = useCardDesign()
 const { t } = useI18n()
-
-const isNew = (design: CardDesign) => {
-  const { releaseDate } = getDesignInfo(design)
-  if (!releaseDate) return false
-  const isRecent = new Date().getTime() - new Date(releaseDate).getTime() < 1000 * 60 * 60 * 24 * 14
-  return isRecent
-}
 
 const sortedDesigns = computed(() => {
   const newDesigns: CardDesign[] = []
@@ -273,18 +267,23 @@ const sortedDesigns = computed(() => {
   return [...newDesigns, ...oldDesigns, ...lockedDesigns]
 })
 
+const { current: currentProfile } = useProfile()
+const isGuestProfile = computed(
+  () => !currentProfile.value || currentProfile.value?.isGuest === true,
+)
+
 const UNLOCK_COST = 500
-const currentUser = useProfile().current
+
 const coins = computed({
-  get: () => currentUser?.value?.record.coins ?? 0,
+  get: () => currentProfile?.value?.record.coins ?? 0,
   set: (value) => {
-    if (!currentUser) return
-    if (!currentUser.value) return
-    currentUser.value.record.coins = Number(value)
+    if (!currentProfile) return
+    if (!currentProfile.value) return
+    currentProfile.value.record.coins = Number(value)
   },
 })
 
-const unlocked = computed(() => currentUser?.value?.designs.unlocked)
+const unlocked = computed(() => currentProfile?.value?.designs.unlocked)
 const newUnlock: Ref<{ design: CardDesign; cost: number } | null> = ref(null)
 
 let initialDesign: CardDesign | undefined
@@ -324,9 +323,7 @@ const confirmUnlock = () => {
   initialDesign = currentDesign.value
 }
 
-const { current: currentProfile } = useProfile()
-const userIsGuest = computed(() => currentProfile.value?.isGuest === true)
-const userLiked = toValue(computed(() => currentUser?.value?.designs.liked))
+const userLiked = toValue(computed(() => currentProfile?.value?.designs.liked))
 
 const isLiked = (design: CardDesign) => userLiked?.includes(design)
 const handleLike = (design: CardDesign) => {
@@ -338,73 +335,26 @@ const handleLike = (design: CardDesign) => {
   }
 }
 
-// localStorage key for design persistence
-const DESIGN_STORAGE_KEY = 'hanafuda-selected-design'
-
-// Get stored design from localStorage
-const getStoredDesign = (): CardDesign | null => {
-  if (import.meta.client) {
-    try {
-      const stored = localStorage.getItem(DESIGN_STORAGE_KEY)
-      return stored && DESIGNS.includes(stored as CardDesign) ? (stored as CardDesign) : null
-    } catch (error) {
-      console.warn('Failed to read design from localStorage:', error)
-      return null
-    }
-  }
-  return null
-}
-
-// Save design to localStorage
-const saveDesignToStorage = (design: CardDesign) => {
-  if (import.meta.client) {
-    try {
-      localStorage.setItem(DESIGN_STORAGE_KEY, design)
-    } catch (error) {
-      console.warn('Failed to save design to localStorage:', error)
-    }
-  }
-}
-
-// Watch for design changes and persist to localStorage
-watch(
-  currentDesign,
-  (newDesign) => {
-    if (newDesign) {
-      saveDesignToStorage(newDesign)
-    }
-  },
-  { immediate: false },
-)
-
 onMounted(() => {
-  // Try to get design from localStorage first
-  const storedDesign = getStoredDesign()
-
-  // Check if stored design is available to the user
-  const isStoredDesignAvailable = storedDesign && unlocked.value?.includes(storedDesign)
-
-  if (!currentDesign.value || currentDesign.value === 'cherry-version') {
-    const defaultDesign = unlocked.value?.find(isNew) || 'cherry-version'
-
-    if (isStoredDesignAvailable) {
-      // Use stored design if it's available
-      currentDesign.value = storedDesign
-    } else if (userIsGuest.value) {
-      currentDesign.value = defaultDesign
-    } else {
-      currentDesign.value = unlocked.value?.find((d) => userLiked?.includes(d)) || defaultDesign
-    }
-  } else if (storedDesign && !isStoredDesignAvailable && storedDesign !== currentDesign.value) {
-    // If stored design is not available but current is set, clear the invalid stored design
-    saveDesignToStorage(currentDesign.value)
-  }
+  // Watch for design changes and persist to localStorage
+  watch(
+    currentDesign,
+    (newDesign) => {
+      if (newDesign) {
+        saveDesignToStorage(newDesign)
+      }
+    },
+    { immediate: false },
+  )
 })
 
 onUnmounted(() => {
-  if (initialDesign) {
+  if (!currentProfile.value) {
+    currentDesign.value = SYSTEM_DEFAULT_DESIGN
+  } else if (initialDesign) {
     currentDesign.value = initialDesign
   }
+  saveDesignToStorage(currentDesign.value)
   if (timeoutId) {
     clearTimeout(timeoutId)
     timeoutId = undefined

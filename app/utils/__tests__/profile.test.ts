@@ -74,7 +74,15 @@ describe('sanitizeProfile', () => {
 
     const sanitized = sanitizeProfile(profile)
 
-    expect(sanitized.settings).toEqual({})
+    // validateSettings now returns default settings instead of empty object
+    expect(sanitized.settings).toEqual({
+      rounds: 3,
+      viewings: 'allow',
+      double: false,
+      wild: false,
+      labels: false,
+      cardSize: 1.0,
+    })
   })
 })
 

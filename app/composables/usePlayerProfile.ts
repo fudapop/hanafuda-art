@@ -5,6 +5,7 @@ import {
   calculateGameRecord,
   createDefaultProfile,
   generateRandomUsername,
+  mergeSettings,
   sanitizeFirestoreData,
   sanitizeProfile,
 } from '~/utils/profile'
@@ -26,6 +27,10 @@ import type {
 const memoryStores = {
   byId: new Map<string, PlayerProfile>(),
   syncMetaById: new Map<string, SyncMetadata>(),
+}
+
+const getCurrentGameSettings = (config: ReturnType<typeof useConfigStore>): GameSettings => {
+  return { ...config.getCurrentSettings }
 }
 
 const createMemoryStore = (): LocalProfileStore => {
@@ -151,6 +156,7 @@ export async function deleteGuestProfile(): Promise<void> {
 export async function createLocalGuestProfile(username?: string): Promise<PlayerProfile> {
   // Use a fresh random avatar for guests to avoid leaking previous auth photo
   const { getRandomAvatarUrl } = useAvatar()
+  const config = useConfigStore()
   const store = await getStore()
 
   // Check if guest profile already exists
@@ -170,6 +176,8 @@ export async function createLocalGuestProfile(username?: string): Promise<Player
       username: username || generateRandomUsername(),
       record: { coins: 0, win: 0, draw: 0, loss: 0 }, // Guests start with 0 coins
       isGuest: true,
+      // Seed guest profile settings from any pre-game configuration the user chose
+      settings: getCurrentGameSettings(config),
     },
     getRandomAvatarUrl((a) => !a.includes('gamblers')),
   )
@@ -285,7 +293,7 @@ export const usePlayerProfile = () => {
 
     if (profile.value?.settings) {
       const config = useConfigStore()
-      config.loadUserSettings(profile.value.settings as unknown as GameSettings)
+      config.loadUserSettings(profile.value.settings)
     }
   }
 
@@ -302,7 +310,7 @@ export const usePlayerProfile = () => {
     // Load settings into configStore
     if (profile.value?.settings) {
       const config = useConfigStore()
-      config.loadUserSettings(profile.value.settings as unknown as GameSettings)
+      config.loadUserSettings(profile.value.settings)
     }
 
     void setLocalData()
@@ -367,6 +375,7 @@ export const usePlayerProfile = () => {
         // Merge stats properly using the utility function
         const { mergePlayerStats } = await import('~/utils/stats')
         const mergedStats = await mergePlayerStats(guestProfile.stats, existingAuthProfile.stats)
+        const mergedSettings = mergeSettings(existingAuthProfile.settings, guestProfile.settings)
 
         const mergedProfile: PlayerProfile = {
           ...existingAuthProfile,
@@ -379,6 +388,8 @@ export const usePlayerProfile = () => {
           },
           // Merge stats using dedicated helper function
           stats: mergedStats,
+          // Merge settings so guest-selected preferences are preserved
+          settings: mergedSettings,
           // Update flags
           flags: {
             ...existingAuthProfile.flags,
@@ -559,7 +570,7 @@ export const usePlayerProfile = () => {
     // Load settings into configStore
     if (profile.value?.settings) {
       const config = useConfigStore()
-      config.loadUserSettings(profile.value.settings as unknown as GameSettings)
+      config.loadUserSettings(profile.value.settings)
     }
   }
 

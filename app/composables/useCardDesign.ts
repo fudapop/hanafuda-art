@@ -28,6 +28,11 @@ const DESIGNS = (Object.keys(CARD_DESIGNS) as CardDesign[]).filter(
   (design) => CARD_DESIGNS[design].name !== 'ramen-red',
 )
 
+export const SYSTEM_DEFAULT_DESIGN = 'cherry-version' as const satisfies CardDesign
+
+// localStorage key for design persistence
+export const DESIGN_STORAGE_KEY = 'hanafuda-selected-design'
+
 type CardMap = Map<CardName, string>
 
 export const useCardDesign = () => {
@@ -154,6 +159,39 @@ export const useCardDesign = () => {
     )
   }
 
+  // Get stored design from localStorage
+  const getStoredDesign = (): CardDesign | null => {
+    if (import.meta.client) {
+      try {
+        const stored = localStorage.getItem(DESIGN_STORAGE_KEY)
+        return stored && DESIGNS.includes(stored as CardDesign) ? (stored as CardDesign) : null
+      } catch (error) {
+        console.warn('Failed to read design from localStorage:', error)
+        return null
+      }
+    }
+    return null
+  }
+
+  // Save design to localStorage
+  const saveDesignToStorage = (design: CardDesign) => {
+    if (import.meta.client) {
+      try {
+        localStorage.setItem(DESIGN_STORAGE_KEY, design)
+      } catch (error) {
+        console.warn('Failed to save design to localStorage:', error)
+      }
+    }
+  }
+
+  const isNew = (design: CardDesign) => {
+    const { releaseDate } = getDesignInfo(design)
+    if (!releaseDate) return false
+    const isRecent =
+      new Date().getTime() - new Date(releaseDate).getTime() < 1000 * 60 * 60 * 24 * 14
+    return isRecent
+  }
+
   return {
     preloadCardImageCache,
     getCardUrlMap,
@@ -162,5 +200,8 @@ export const useCardDesign = () => {
     getDesignInfo,
     applyCardSizeMultiplier,
     DESIGNS,
+    getStoredDesign,
+    saveDesignToStorage,
+    isNew,
   }
 }

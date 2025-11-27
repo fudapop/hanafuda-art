@@ -1,6 +1,7 @@
 import type { CardDesign } from '~/composables/useCardDesign'
 import type { SerializedGameState } from '~/composables/useStoreManager'
 import type { PlayerStats } from '~/utils/stats'
+import type { GameSettings } from '~~/stores/configStore'
 
 export interface PlayerRecord {
   coins: number
@@ -29,7 +30,7 @@ export interface PlayerProfile {
   record: PlayerRecord
   lastUpdated: Date
   designs: PlayerDesigns
-  settings: Record<string, unknown>
+  settings: GameSettings | undefined
   flags: PlayerFlags
   isGuest?: boolean
   stats: PlayerStats

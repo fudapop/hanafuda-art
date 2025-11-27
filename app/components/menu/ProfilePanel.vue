@@ -4,7 +4,7 @@
       id="user-info"
       class="grid p-4 mx-3"
     >
-      <div class="sm:grid sm:grid-cols-2 sm:px-8 order-1">
+      <div :class="user ? 'sm:grid sm:grid-cols-2 sm:px-8 order-1' : ''">
         <!-- Avatar -->
         <div
           v-if="user"
@@ -24,53 +24,67 @@
 
         <!-- START User Info Panel-->
         <div class="flex flex-col justify-center text-center sm:text-left sm:items-start gap-y-2">
-          <!-- Username -->
-          <div class="relative h-10">
-            <input
-              ref="usernameInputRef"
-              class="w-full h-full text-lg font-semibold border-none rounded-xs peer text-text bg-surface focus:bg-background focus:outline-hidden focus-visible:outline-hidden ring-1 ring-border focus-visible:ring-primary"
-              type="text"
-              v-model="usernameInputVal"
-              @keyup.enter="handleInputEnter"
-              autofocus
-            />
-            <PencilSquareIcon
-              class="pointer-events-none absolute bottom-0 right-0 w-5 h-5 mr-1 mb-2.5 opacity-50 text-text-secondary peer-hover:opacity-100 peer-focus:hidden"
-            />
-          </div>
+          <template v-if="user">
+            <!-- Username -->
+            <div class="relative h-10">
+              <input
+                ref="usernameInputRef"
+                class="w-full h-full text-lg font-semibold border-none rounded-xs peer text-text bg-surface focus:bg-background focus:outline-hidden focus-visible:outline-hidden ring-1 ring-border focus-visible:ring-primary"
+                type="text"
+                v-model="usernameInputVal"
+                @keyup.enter="handleInputEnter"
+                autofocus
+              />
+              <PencilSquareIcon
+                class="pointer-events-none absolute bottom-0 right-0 w-5 h-5 mr-1 mb-2.5 opacity-50 text-text-secondary peer-hover:opacity-100 peer-focus:hidden"
+              />
+            </div>
 
-          <!-- Player Coins -->
-          <div
-            v-if="user?.record"
-            class="flex items-center justify-center px-4 gap-x-2 sm:justify-start"
-          >
-            <img
-              src="/images/coin.webp"
-              alt="coin"
-              class="w-5 h-5"
-            />
-            <p class="text-lg font-semibold select-none text-text">
-              {{ user.record.coins }}
-            </p>
-          </div>
+            <!-- Player Coins -->
+            <div
+              v-if="user.record"
+              class="flex items-center justify-center px-4 gap-x-2 sm:justify-start"
+            >
+              <img
+                src="/images/coin.webp"
+                alt="coin"
+                class="w-5 h-5"
+              />
+              <p class="text-lg font-semibold select-none text-text">
+                {{ user.record.coins }}
+              </p>
+            </div>
 
-          <!-- Last Played -->
-          <div v-if="user">
-            <p class="px-4 text-text">
-              {{ t('profile.info.lastUpdated') }}
-              <span class="block mt-1 text-sm text-text-secondary">{{
-                useDateFormat(user.lastUpdated, 'MMM-DD-YYYY HH:mm').value
-              }}</span>
-            </p>
-          </div>
+            <!-- Last Played -->
+            <div>
+              <p class="px-4 text-text">
+                {{ t('profile.info.lastUpdated') }}
+                <span class="block mt-1 text-sm text-text-secondary">{{
+                  useDateFormat(user.lastUpdated, 'MMM-DD-YYYY HH:mm').value
+                }}</span>
+              </p>
+            </div>
 
-          <!-- Sync Status (for authenticated users only) -->
-          <div
-            v-if="!user?.isGuest"
-            class="mx-auto"
-          >
-            <SyncStatusIndicator />
-          </div>
+            <!-- Sync Status (for authenticated users only) -->
+            <div
+              v-if="!user.isGuest"
+              class="mx-auto"
+            >
+              <SyncStatusIndicator />
+            </div>
+          </template>
+
+          <!-- Empty profile state (no guest or authenticated profile yet) -->
+          <template v-else>
+            <div class="flex flex-col w-full col-span-2">
+              <p class="px-4 text-sm text-text-secondary text-center">
+                {{ t('auth.notices.signInRequired') }}
+              </p>
+              <p class="px-4 mt-2 text-xs text-text-secondary/80 text-center">
+                {{ t('guest.progressSavedLocally') }}
+              </p>
+            </div>
+          </template>
         </div>
         <!-- END User Info Panel-->
       </div>
