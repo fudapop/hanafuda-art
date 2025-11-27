@@ -13,7 +13,10 @@
     <!-- Allows interaction when game not started -->
     <Teleport to="body">
       <!-- EXIT BUTTON -->
-      <div class="fixed w-max top-16 right-4">
+      <div
+        v-if="gameStart"
+        class="fixed w-max top-16 right-4"
+      >
         <button
           id="exit-button"
           type="button"
@@ -189,7 +192,6 @@ import { GAME_OPTIONS_TABS } from '~/composables/useOptionsPanel'
 import { usePlayerStore } from '~~/stores/playerStore'
 
 const { currentDesign } = useCardDesign()
-const { logout } = useAuth()
 const { t } = useI18n()
 const { $clientPosthog } = useNuxtApp()
 
@@ -207,19 +209,9 @@ const player1Inactive = computed(() => gameStart.value && !players.value.p1.isAc
 const feedbackSubmitted = computed(() => user.value?.flags?.hasSubmittedFeedback)
 const signupDeclined = useStorage('hanafuda-signup-declined', false, sessionStorage)
 
-const localeRoute = useLocaleRoute()
-
 const handlePressExit = async () => {
-  if (!gameStart.value) {
-    await logout()
-    const route = localeRoute({ name: 'sign-in', query: { exit: 'true' } })
-    if (route) {
-      navigateTo(route.fullPath)
-    }
-  } else {
-    $clientPosthog?.capture('exit_game')
-    leavingGame.value = true
-  }
+  $clientPosthog?.capture('exit_game')
+  leavingGame.value = true
 }
 
 const handleSaveAndExit = async () => {

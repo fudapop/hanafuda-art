@@ -138,40 +138,22 @@ export const useProfile = () => {
 
   if (!authWatcher.value) {
     authWatcher.value = onAuthStateChanged(getAuth(), async (user) => {
-      // Prevent re-entry while handling auth change
-      if (isHandlingAuth.value) {
-        console.info('Auth handler already running, skipping')
-        return
-      }
-
-      isHandlingAuth.value = true
-
       try {
+        // Prevent re-entry while handling auth change
+        if (isHandlingAuth.value) {
+          console.info('Auth handler already running, skipping')
+          return
+        }
+
+        isHandlingAuth.value = true
+
         if (user === null) {
-          // No Firebase user - guest mode
-          // Check if we need to create/load guest profile
-          if (!playerProfile.current.value) {
-            // Don't create guest immediately after logout
-            if (justLoggedOut.value) {
-              console.info('Just logged out, skipping guest creation')
-              justLoggedOut.value = false
-              return
-            }
-
-            const { createLocalGuestProfile } = await import('~/composables/usePlayerProfile')
-            const hasGuest = await playerProfile.hasLocalProfile('guest_profile')
-
-            if (hasGuest) {
-              // Load existing guest profile
-              const guestProfile = await createLocalGuestProfile()
-              await playerProfile.loadLocalGuestProfile(guestProfile)
-              console.info('Guest profile loaded')
-            } else {
-              // Create new guest profile
-              const guestProfile = await createLocalGuestProfile()
-              await playerProfile.loadLocalGuestProfile(guestProfile)
-              console.info('New guest profile created')
-            }
+          // No Firebase user - leave profile state unset.
+          // Guest profiles are now created lazily by the start screen
+          // when the player begins a game while not signed in.
+          if (justLoggedOut.value) {
+            // Clear the flag after the first null user event post-logout
+            justLoggedOut.value = false
           }
         } else if (user && !playerProfile.current.value) {
           // User logged in - check for existing authenticated profile FIRST

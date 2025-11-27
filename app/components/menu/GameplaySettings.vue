@@ -175,7 +175,6 @@ import {
   useConfigStore,
   type CardSizeOptions,
   type GameLengthOptions,
-  type GameSettings,
   type ViewingsOptions,
 } from '~~/stores/configStore'
 
@@ -227,7 +226,9 @@ const saveSettings = async () => {
   if (!settingsUpdated.value || !user.value) return
 
   // Use updateProfile to properly persist settings changes
-  await updateProfile({ settings: config.getCurrentSettings as unknown as Record<string, unknown> })
+  await updateProfile({
+    settings: { ...config.getCurrentSettings },
+  })
   settingsUpdated.value = false
 }
 
@@ -235,8 +236,20 @@ onMounted(async () => {
   // Settings are now loaded when the profile is loaded in usePlayerProfile
   // This check is kept for backwards compatibility in case settings weren't loaded yet
   if (!config.settingsLoaded && user.value?.settings) {
-    config.loadUserSettings(user.value.settings as unknown as GameSettings)
+    config.loadUserSettings(user.value.settings)
   }
+
+  // Ensure settings are loaded into config once the profile becomes available,
+  // even if the options panel is opened before a game starts.
+  watch(
+    user,
+    (newUser) => {
+      if (!newUser?.settings) return
+      if (config.settingsLoaded) return
+      config.loadUserSettings(newUser.settings)
+    },
+    { flush: 'post' },
+  )
 
   watch(config, () => {
     settingsUpdated.value = true

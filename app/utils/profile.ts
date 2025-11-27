@@ -1,9 +1,10 @@
 import { nanoid } from 'nanoid'
-import type { PlayerProfile } from '~/types/profile'
+import type { GameSettings } from '~~/stores/configStore'
+import type { PlayerProfile } from '~~/types/profile'
 import { getRandom } from './myUtils'
 import { createTamperProofStats, getDefaultStats, verifyStatsIntegrity } from './stats'
 
-const DEFAULT_DESIGNS = ['cherry-version', 'ramen-red', 'flash-black'] as const
+const DEFAULT_DESIGNS = ['cherry-version', 'otwarte-karty', 'ramen-red', 'flash-black'] as const
 
 /**
  * Sanitize profile data for storage.
@@ -27,7 +28,7 @@ export function sanitizeProfile(profile: PlayerProfile): PlayerProfile {
       unlocked: profile.designs.unlocked,
       liked: profile.designs.liked,
     },
-    settings: profile.settings || {},
+    settings: validateSettings(profile.settings),
     flags: profile.flags,
     isGuest: profile.isGuest,
     stats: profile.stats,
@@ -144,7 +145,7 @@ export function normalizeTimestamp(timestamp: any): Date {
  * @param settings - Settings object to validate
  * @returns Valid settings object
  */
-function validateSettings(settings: any): Record<string, unknown> {
+export function validateSettings(settings: unknown): GameSettings {
   // If settings is empty, null, undefined, or not an object, return defaults
   if (!settings || typeof settings !== 'object' || Object.keys(settings).length === 0) {
     return {
@@ -159,13 +160,39 @@ function validateSettings(settings: any): Record<string, unknown> {
 
   // Settings exist, ensure all required fields have valid values
   return {
-    rounds: settings.rounds ?? 3,
-    viewings: settings.viewings ?? 'allow',
-    double: settings.double ?? false,
-    wild: settings.wild ?? false,
-    labels: settings.labels ?? false,
-    cardSize: settings.cardSize ?? 1.0,
+    rounds: (settings as Partial<GameSettings>).rounds ?? 3,
+    viewings: (settings as Partial<GameSettings>).viewings ?? 'allow',
+    double: (settings as Partial<GameSettings>).double ?? false,
+    wild: (settings as Partial<GameSettings>).wild ?? false,
+    labels: (settings as Partial<GameSettings>).labels ?? false,
+    cardSize: (settings as Partial<GameSettings>).cardSize ?? 1.0,
   }
+}
+
+/**
+ * Merge two settings objects, with overrideSettings taking precedence,
+ * and return a validated GameSettings object.
+ */
+export function mergeSettings(
+  baseSettings: GameSettings | undefined,
+  overrideSettings: GameSettings | undefined,
+): GameSettings {
+  if (!baseSettings && !overrideSettings) {
+    return validateSettings(undefined)
+  }
+
+  if (!baseSettings && overrideSettings) {
+    return validateSettings(overrideSettings)
+  }
+
+  if (baseSettings && !overrideSettings) {
+    return validateSettings(baseSettings)
+  }
+
+  return validateSettings({
+    ...baseSettings,
+    ...overrideSettings,
+  })
 }
 
 /**

@@ -111,11 +111,6 @@ import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
 
-definePageMeta({
-  requiresAuth: true,
-  middleware: ['auth'],
-})
-
 const { t } = useI18n()
 const pageTitle = computed(() => `${t('game.title')} | ${t('pages.home')}`)
 const pageDescription = computed(() => t('pageDescriptions.home', { appName: t('game.title') }))
@@ -311,70 +306,6 @@ watch(turnCounter, () => {
   }
 })
 
-watch(roundOver, () => {
-  // Ensure modal is closed when starting a new round during autoplay
-  if (gameOver.value === true) return
-  if (roundOver.value === false) showModal.value = false
-})
-
-watch(activePlayer, () => {
-  if (autoOpponent.value && ps.players.p2.isActive) {
-    opponentPlay({ speed: 2 })
-  }
-})
-
-watch(gameStart, async () => {
-  if (gameStart.value) {
-    // Check if we're resuming from a saved game
-    const resumeState = useState('resume-save', () => ({
-      isResuming: false,
-      saveKey: '',
-      saveData: null as any,
-      mode: 'single' as 'single' | 'multiplayer',
-    }))
-
-    if (resumeState.value.isResuming) {
-      // Game state already loaded by StartScreen's loadGameFromStorage()
-      // Just need to handle cleanup
-      try {
-        const { deleteSavedGame } = useStoreManager()
-
-        // Clear the save only for single-player mode (anti-scumming)
-        // Multiplayer saves persist until game is completed
-        if (resumeState.value.saveKey && resumeState.value.mode === 'single') {
-          console.info(`Deleting single-player save after resume: ${resumeState.value.saveKey}`)
-          await deleteSavedGame(resumeState.value.saveKey)
-          console.info('Single-player save deleted successfully')
-        }
-      } catch (error) {
-        console.error('Error during save cleanup:', error)
-      }
-
-      // Clear the resume state
-      resumeState.value = {
-        isResuming: false,
-        saveKey: '',
-        saveData: null,
-        mode: 'single',
-      }
-
-      showLoader.value = false
-      autoOpponent.value = true
-    } else {
-      // Normal new game initialization
-      console.debug('Starting new game - ensuring clean state...')
-      resetAllStores() // Ensure clean state before starting
-      startRound()
-    }
-  } else {
-    console.debug('Resetting game...')
-    if (!roundOver.value) ds.endRound()
-    if (!gameOver.value) handleClose()
-    // Additional cleanup - ensure stores are reset when returning to start screen
-    resetAllStores()
-  }
-})
-
 onBeforeUnmount(() => {
   // Reset the game state if the user navigates away from the page
   ds.endRound()
@@ -389,5 +320,69 @@ onMounted(() => {
   // Default to smaller cards if mobile
   const { applyCardSizeMultiplier } = useCardDesign()
   applyCardSizeMultiplier(isMobile ? 0.8 : undefined)
+
+  watch(roundOver, () => {
+    // Ensure modal is closed when starting a new round during autoplay
+    if (gameOver.value === true) return
+    if (roundOver.value === false) showModal.value = false
+  })
+
+  watch(activePlayer, () => {
+    if (autoOpponent.value && ps.players.p2.isActive) {
+      opponentPlay({ speed: 2 })
+    }
+  })
+
+  watch(gameStart, async () => {
+    if (gameStart.value) {
+      // Check if we're resuming from a saved game
+      const resumeState = useState('resume-save', () => ({
+        isResuming: false,
+        saveKey: '',
+        saveData: null as any,
+        mode: 'single' as 'single' | 'multiplayer',
+      }))
+
+      if (resumeState.value.isResuming) {
+        // Game state already loaded by StartScreen's loadGameFromStorage()
+        // Just need to handle cleanup
+        try {
+          const { deleteSavedGame } = useStoreManager()
+
+          // Clear the save only for single-player mode (anti-scumming)
+          // Multiplayer saves persist until game is completed
+          if (resumeState.value.saveKey && resumeState.value.mode === 'single') {
+            console.info(`Deleting single-player save after resume: ${resumeState.value.saveKey}`)
+            await deleteSavedGame(resumeState.value.saveKey)
+            console.info('Single-player save deleted successfully')
+          }
+        } catch (error) {
+          console.error('Error during save cleanup:', error)
+        }
+
+        // Clear the resume state
+        resumeState.value = {
+          isResuming: false,
+          saveKey: '',
+          saveData: null,
+          mode: 'single',
+        }
+
+        showLoader.value = false
+        autoOpponent.value = true
+      } else {
+        // Normal new game initialization
+        console.debug('Starting new game - ensuring clean state...')
+        resetAllStores() // Ensure clean state before starting
+        startRound()
+      }
+    } else {
+      console.debug('Resetting game...')
+      if (!roundOver.value) ds.endRound()
+      if (!gameOver.value) handleClose()
+      // Additional cleanup - ensure stores are reset when returning to start screen
+      resetAllStores()
+    }
+  })
 })
 </script>

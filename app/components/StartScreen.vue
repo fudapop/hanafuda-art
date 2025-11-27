@@ -248,7 +248,7 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <!-- Options Button - Show for everyone -->
+          <!-- Options Button - Show for everyone with profile -->
           <button
             class="min-w-[120px] px-4 py-2 mt-1 text-sm font-medium transition-all duration-200 bg-transparent border rounded-xs sm:mt-2 text-text-secondary border-border/30 hover:bg-surface/50 hover:border-border/60 hover:text-text"
             @click="() => openOptions()"
@@ -285,18 +285,29 @@
 </template>
 
 <script setup lang="ts">
-import { useScreenOrientation } from '@vueuse/core'
+import { useConfigStore } from '~~/stores/configStore'
+
 const emit = defineEmits(['start-game'])
-const { current: currentProfile } = useProfile()
+const {
+  current: currentProfile,
+  getProfile,
+  hasLocalProfile,
+  getLocalData,
+  loadLocalGuestProfile,
+} = useProfile()
 const { openOptions } = useOptionsPanel()
 const { t } = useI18n()
 const localeRoute = useLocaleRoute()
 
 const { isMobile } = useDevice()
-const { orientation } = useScreenOrientation()
 
-// Determine if user is a guest based on profile flag
-const isGuest = computed(() => currentProfile.value?.isGuest === true)
+// Auth state from Firebase (vuefire)
+const authUser = useCurrentUser()
+
+// Determine if the current player should be treated as a guest in the UI.
+// We treat "no Firebase user" as guest until/unless the player starts a game,
+// at which point a local guest profile will be created lazily.
+const isGuest = computed(() => !authUser.value)
 
 // Game save management
 const { listSavedGames, deleteSavedGame, loadGameFromStorage } = useStoreManager()
@@ -324,14 +335,127 @@ const multiplayerSave = computed(
 const hasSinglePlayerSave = computed(() => singlePlayerSave.value !== null)
 const hasMultiplayerSave = computed(() => multiplayerSave.value !== null)
 
-// For backward compatibility
-const hasSavedGame = computed(() => savedGames.value.length > 0)
-const lastSave = computed(() => savedGames.value[0] || null)
+const config = useConfigStore()
+
+// Card design composable (shared across helpers)
+const { currentDesign, getStoredDesign, saveDesignToStorage, isNew } = useCardDesign()
+
+/**
+ * Initialize config store from the loaded profile settings, if available.
+ * This is safe to call multiple times; it will no-op once settings are loaded.
+ */
+const initializeSettingsFromProfile = () => {
+  if (!currentProfile.value?.settings) return
+  if (config.settingsLoaded === true) return
+
+  console.info('Loading user settings', currentProfile.value.settings)
+  config.loadUserSettings(currentProfile.value.settings as any)
+}
+
+/**
+ * Initialize the current card design from profile + localStorage.
+ * Only applies when currentDesign is unset or at SYSTEM_DEFAULT_DESIGN.
+ */
+const initializeDesignFromProfile = () => {
+  const unlockedDesigns = currentProfile.value?.designs.unlocked ?? []
+  const favoriteDesigns = currentProfile.value?.designs.liked ?? []
+
+  // Try to get design from localStorage first
+  const storedDesign = getStoredDesign()
+
+  // Check if stored design is available to the user
+  const isStoredDesignAvailable = storedDesign && unlockedDesigns.includes(storedDesign)
+
+  console.info('Loading deck design', {
+    current: currentDesign.value,
+    stored: storedDesign,
+    unlockedDesigns,
+    favoriteDesigns,
+  })
+
+  // Do not override an explicit non-default selection
+  if (currentDesign.value && currentDesign.value !== SYSTEM_DEFAULT_DESIGN) {
+    // If stored design is invalid but a non-default current exists, normalize storage
+    if (storedDesign && !isStoredDesignAvailable && storedDesign !== currentDesign.value) {
+      saveDesignToStorage(currentDesign.value)
+    }
+    return
+  }
+
+  const defaultDesign = unlockedDesigns.find(isNew) || SYSTEM_DEFAULT_DESIGN
+
+  if (isStoredDesignAvailable) {
+    // Use stored design if it's available
+    currentDesign.value = storedDesign
+  } else if (currentProfile.value?.isGuest) {
+    currentDesign.value = defaultDesign
+  } else {
+    currentDesign.value = unlockedDesigns.find((d) => favoriteDesigns.includes(d)) || defaultDesign
+  }
+}
 
 // Check for saved games on mount only
 onMounted(async () => {
   savedGames.value = await listSavedGames()
+
+  // If a profile is already available, hydrate settings and design immediately.
+  initializeSettingsFromProfile()
+  initializeDesignFromProfile()
+
+  // For existing guests: if a local guest profile already exists, load it so
+  // the options menu reflects their saved settings and design before starting a game.
+  if (!authUser.value && !currentProfile.value) {
+    try {
+      const hasGuest = await hasLocalProfile('guest_profile')
+      if (hasGuest) {
+        const existingGuest = await getLocalData('guest_profile')
+        if (existingGuest) {
+          await loadLocalGuestProfile(existingGuest)
+          initializeSettingsFromProfile()
+          initializeDesignFromProfile()
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load existing guest profile:', error)
+    }
+  }
 })
+
+// React to profile loading after StartScreen has mounted.
+watch(
+  currentProfile,
+  (newProfile) => {
+    if (!newProfile) return
+    initializeSettingsFromProfile()
+    initializeDesignFromProfile()
+  },
+  { flush: 'post' },
+)
+
+/**
+ * Ensure there is an appropriate player profile before starting/resuming a game.
+ * - If a Firebase user is present, ensure their authenticated profile is loaded.
+ * - If no Firebase user and no current profile, lazily create and load a guest profile.
+ */
+const ensurePlayerProfile = async () => {
+  // If the user is authenticated, make sure their profile is loaded
+  if (authUser.value) {
+    if (!currentProfile.value || currentProfile.value.uid !== authUser.value.uid) {
+      await getProfile(authUser.value)
+    }
+  } else if (!currentProfile.value) {
+    // Unauthenticated: lazily create/load a guest profile only when starting a game
+    const { createLocalGuestProfile } = await import('~/composables/usePlayerProfile')
+    const { loadLocalGuestProfile } = useProfile()
+
+    const guestProfile = await createLocalGuestProfile()
+    await loadLocalGuestProfile(guestProfile)
+  }
+
+  // After ensuring a profile exists, hydrate settings and design.
+  initializeSettingsFromProfile()
+  initializeDesignFromProfile()
+}
 
 const goToLogin = () => {
   const route = localeRoute({ name: 'sign-in' })
@@ -350,6 +474,8 @@ const resumeSinglePlayerGame = async () => {
 
   isLoading.value = true
   try {
+    await ensurePlayerProfile()
+
     // Set global state to indicate we're resuming from save
     const resumeState = useState('resume-save', () => ({
       isResuming: false,
@@ -418,6 +544,8 @@ const resumeMultiplayerGame = async () => {
 }
 
 const startNewSinglePlayerGame = async () => {
+  await ensurePlayerProfile()
+
   // Clear any existing single-player save when starting new game
   if (hasSinglePlayerSave.value && singlePlayerSave.value) {
     await deleteSavedGame(singlePlayerSave.value.key)
@@ -469,11 +597,6 @@ const deleteMultiplayerSave = async () => {
     }
   }
 }
-
-// Backward compatibility handlers
-const resumeGame = resumeSinglePlayerGame
-const startNewGame = startNewSinglePlayerGame
-const deleteSave = deleteSinglePlayerSave
 
 const formatSaveDate = (timestamp?: number) => {
   if (!timestamp) return ''
