@@ -37,7 +37,7 @@ export default defineNuxtConfig({
       link: [
         {
           rel: 'icon',
-          href: '/images/sakura.png',
+          href: '/icons/icon_64x64.png',
         },
         {
           rel: 'preconnect',
@@ -61,30 +61,6 @@ export default defineNuxtConfig({
         {
           rel: 'preconnect',
           href: process.env.NUXT_PUBLIC_SUPABASE_URL,
-        },
-        {
-          rel: 'preload',
-          as: 'image',
-          href: `${bucketUrl}/assets/bg-landing.webp`,
-          type: 'image/webp',
-        },
-        {
-          rel: 'preload',
-          as: 'image',
-          href: `${bucketUrl}/assets/logo-title.webp`,
-          type: 'image/webp',
-        },
-        {
-          rel: 'preload',
-          as: 'image',
-          href: `${bucketUrl}/assets/flowers-landing1.webp`,
-          type: 'image/webp',
-        },
-        {
-          rel: 'preload',
-          as: 'image',
-          href: `${bucketUrl}/assets/flowers-landing2.webp`,
-          type: 'image/webp',
         },
         {
           rel: 'preload',

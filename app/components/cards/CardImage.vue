@@ -10,8 +10,9 @@
         :src="src"
         :alt="card"
         loading="eager"
-        class="pointer-events-none user-select-none"
-        sizes="100vw"
+        class="pointer-events-none user-select-none object-cover w-full h-full"
+        width="120"
+        height="200"
       />
     </template>
   </div>
