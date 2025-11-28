@@ -115,9 +115,6 @@ watch(gameOver, async () => {
   if (!user) return
 
   const result = getResult()
-  const { updateGameRecord } = useProfile()
-  // Update game record properly through the exposed method
-  await updateGameRecord(result, ds.scoreboard.p1)
   ds.generateGameId()
 })
 </script>
