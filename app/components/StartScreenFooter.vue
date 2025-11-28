@@ -37,7 +37,7 @@
     </div>
 
     <!-- Right side: Version -->
-    <div class="text-center sm:text-right self-end">
+    <div class="text-center sm:text-right sm:self-end">
       <!-- LEGAL LINKS -->
       <div
         class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
