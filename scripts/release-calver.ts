@@ -263,15 +263,6 @@ const main = async () => {
     console.log('[DRY RUN] Would push changes and tags\n')
   }
 
-  // Deploy preview
-  console.log('🚀 Deploying preview...')
-  await exec('pnpm deploy:preview')
-  if (!isDryRun) {
-    console.log('✅ Preview deployed\n')
-  } else {
-    console.log('[DRY RUN] Would deploy preview\n')
-  }
-
   if (isDryRun) {
     console.log(`🎉 Dry run completed! Would release v${nextVersion}`)
     console.log('   Run without --dry-run to execute the release.')
