@@ -25,8 +25,34 @@ service cloud.firestore {
                             && request.resource.data.uid == request.auth.uid;
 
       // Only the owner can delete their saves
+      // Prefer uid field, but fall back to document ID prefix for robustness
       allow delete: if request.auth != null
-                    && resource.data.uid == request.auth.uid;
+                    && (resource.data.uid == request.auth.uid
+                      || saveId.startsWith(request.auth.uid + '_'));
+    }
+
+    // NEW: invite codes for multiplayer games
+    match /invite_codes/{code} {
+      // Anyone authenticated can read a code to validate it
+      allow read: if request.auth != null;
+
+      // Only creator can create their own codes
+      allow create: if request.auth != null
+                    && request.resource.data.createdBy == request.auth.uid
+                    && request.resource.data.code is string
+                    && request.resource.data.gameId is string
+                    && request.resource.data.used == false;
+
+      // Only allow marking as used when joining game
+      allow update: if request.auth != null
+                    && !resource.data.used  // Not already used
+                    && request.resource.data.used == true  // Marking as used
+                    && request.resource.data.usedBy == request.auth.uid;
+
+      // Only creator can delete their unused codes
+      allow delete: if request.auth != null
+                    && resource.data.createdBy == request.auth.uid
+                    && !resource.data.used;
     }
 
     // NEW: shared multiplayer game states
@@ -42,8 +68,17 @@ service cloud.firestore {
             || request.auth.uid == request.resource.data.p2;
       }
 
+      // Helper to check if user is joining a waiting game
+      function isJoiningWaitingGame() {
+        return resource.data.status == 'waiting'
+            && resource.data.p2 == ''
+            && request.resource.data.p2 == request.auth.uid
+            && request.resource.data.status == 'active';
+      }
+
       // Participants can read their games
-      allow read: if request.auth != null && isParticipant();
+      allow read: if request.auth != null && (
+        resource.data.status == 'waiting' || isParticipant());
 
       // Any authenticated user can create a game (matchmaking)
       allow create: if request.auth != null
@@ -51,15 +86,21 @@ service cloud.firestore {
                     && request.resource.data.mode == 'multiplayer'
                     && request.resource.data.p1 is string
                     && request.resource.data.p2 is string
-                    && request.resource.data.activePlayer is string;
+                    && request.resource.data.activePlayer is string
+                    && request.resource.data.status is string;
 
-      // Only the active player can update the game
+      // Allow updates in two cases:
+      // 1. Participant updating game state (client/enforced active player)
+      // 2. Second player joining a waiting game
       allow update: if request.auth != null
-                    && isParticipant()
-                    && request.auth.uid == resource.data.activePlayer
-                    && request.resource.data.mode == 'multiplayer'
-                    && request.resource.data.p1 == resource.data.p1
-                    && request.resource.data.p2 == resource.data.p2;
+                    && (
+                      // Case 1: Participant making a move / updating game state
+                      (isParticipant()
+                        && request.resource.data.mode == 'multiplayer')
+                      ||
+                      // Case 2: Second player joining
+                      isJoiningWaitingGame()
+                    );
 
       // Participants can delete their games
       allow delete: if request.auth != null && isParticipant();

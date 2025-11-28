@@ -223,6 +223,91 @@ const resetAllStores = () => {
   cs.reset() // Reset card store
 }
 
+// Specialized initialization for a brand new multiplayer game
+const initializeNewMultiplayerGame = async () => {
+  const { current: currentProfile } = useProfile()
+  const { saveMultiplayerGame, syncMultiplayerGame, loadMultiplayerGame, initializeSync } =
+    useStoreManager()
+
+  const multiplayerMeta = useState<{
+    isNew: boolean
+    gameId: string
+    p1: string
+    p2: string
+    activePlayerUid: string
+  }>('multiplayer-game-meta', () => ({
+    isNew: false,
+    gameId: '',
+    p1: '',
+    p2: '',
+    activePlayerUid: '',
+  }))
+
+  if (!multiplayerMeta.value.isNew || !multiplayerMeta.value.gameId) {
+    console.warn('initializeNewMultiplayerGame called without multiplayer meta; falling back')
+    resetAllStores()
+    startRound()
+    return
+  }
+
+  const currentUid = currentProfile.value?.uid
+  const isStarter = currentUid && currentUid === multiplayerMeta.value.activePlayerUid
+
+  // Ensure sync adapters are ready
+  initializeSync()
+
+  if (isStarter) {
+    console.info('Initializing new multiplayer game as starting player', multiplayerMeta.value)
+
+    // Start with a clean state and run normal round initialization
+    resetAllStores()
+    await startRound()
+
+    try {
+      await saveMultiplayerGame(
+        multiplayerMeta.value.p1,
+        multiplayerMeta.value.p2,
+        multiplayerMeta.value.activePlayerUid,
+      )
+      console.info('Multiplayer game state saved and pushed by starting player')
+    } catch (error) {
+      console.error('Failed to save multiplayer game from starting player:', error)
+    }
+  } else {
+    console.info(
+      'Joining new multiplayer game as non-starting player, syncing from remote state',
+      multiplayerMeta.value,
+    )
+
+    try {
+      const maxAttempts = 3
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const synced = await syncMultiplayerGame(multiplayerMeta.value.gameId)
+        if (synced) {
+          break
+        }
+        console.warn(
+          `Multiplayer game ${multiplayerMeta.value.gameId} not yet initialized by starter (attempt ${attempt + 1}/${maxAttempts})`,
+        )
+
+        // Small delay before retrying to give starter time to push state
+        await sleep(1000)
+      }
+
+      const loaded = await loadMultiplayerGame()
+      if (!loaded) {
+        console.warn('Failed to load multiplayer game state after sync retries')
+      }
+    } catch (error) {
+      console.error('Failed to sync/load multiplayer game for non-starting player:', error)
+    }
+  }
+
+  // Mark meta as no longer "new" so subsequent starts use regular resume/new logic
+  multiplayerMeta.value.isNew = false
+}
+
 const startRound = async () => {
   // FIX: Opponent played twice on starting new round
   showLoader.value = false
@@ -370,9 +455,15 @@ onMounted(() => {
 
         showLoader.value = false
         autoOpponent.value = true
+      } else if (resumeState.value.mode === 'multiplayer') {
+        // Specialized initialization for a brand new multiplayer game
+        console.debug('Starting new multiplayer game with specialized initialization')
+        await initializeNewMultiplayerGame()
+        showLoader.value = false
+        autoOpponent.value = true
       } else {
-        // Normal new game initialization
-        console.debug('Starting new game - ensuring clean state...')
+        // Normal new game initialization (single-player)
+        console.debug('Starting new single-player game - ensuring clean state...')
         resetAllStores() // Ensure clean state before starting
         startRound()
       }

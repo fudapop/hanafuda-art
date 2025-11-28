@@ -50,6 +50,7 @@ import { usePlayerStore } from '~~/stores/playerStore'
 import type {
   GameMode,
   GameSaveRecord,
+  GameStatus,
   LocalGameSaveStore,
   MultiplayerGame,
   SyncStatus,
@@ -869,7 +870,7 @@ export const useStoreManager = () => {
     // Set new timeout (1 second debounce)
     syncTimeoutId.value = setTimeout(() => {
       if (syncStatus.value === 'idle') {
-        void syncPush(uid)
+        syncPush(uid)
       }
     }, 1000)
   }
@@ -905,6 +906,7 @@ export const useStoreManager = () => {
       try {
         if (await multiplayerAdapter.value.isAvailable()) {
           const gameState = await serializeGameState()
+          const derivedStatus: GameStatus = p2 && p2.trim() !== '' ? 'active' : 'waiting'
           const multiplayerGame: MultiplayerGame = {
             gameId: gameState.gameId,
             gameState,
@@ -912,6 +914,7 @@ export const useStoreManager = () => {
             p1,
             p2,
             activePlayer,
+            status: derivedStatus,
             lastUpdated: new Date(),
             createdAt: new Date(), // Will be overwritten if game already exists
           }

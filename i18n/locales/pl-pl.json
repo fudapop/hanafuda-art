@@ -260,6 +260,31 @@
       "comingSoon": "Wkrótce"
     }
   },
+  "multiplayer": {
+    "new_match": "Nowy mecz wieloosobowy",
+    "create_game": "Utwórz grę",
+    "join_game": "Dołącz do gry",
+    "choose_option": "Rozpocznij nowy mecz wieloosobowy:",
+    "create_description": "Wygeneruj kod zaproszenia do udostępnienia",
+    "join_description": "Wprowadź kod zaproszenia od znajomego",
+    "creating_game": "Tworzenie gry...",
+    "game_created": "Gra utworzona!",
+    "share_code_message": "Udostępnij ten kod przeciwnikowi. Gra rozpocznie się, gdy dołączy.",
+    "invite_code": "Kod zaproszenia",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano!",
+    "waiting_for_opponent": "Oczekiwanie na przeciwnika...",
+    "cancel_game": "Anuluj grę",
+    "enter_code_message": "Wprowadź kod zaproszenia od znajomego, aby dołączyć do gry.",
+    "code_placeholder": "ABC-123",
+    "join": "Dołącz",
+    "validating_code": "Sprawdzanie kodu...",
+    "joining_game": "Dołączanie do gry...",
+    "try_again": "Spróbuj ponownie",
+    "invalid_code": "Nieprawidłowy kod zaproszenia",
+    "join_failed": "Nie udało się dołączyć do gry",
+    "error_creating_game": "Nie udało się utworzyć gry. Spróbuj ponownie."
+  },
   "settings": {
     "actions": {
       "toggleColorMode": "Przełącz tryb kolorów",

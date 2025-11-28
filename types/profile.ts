@@ -131,6 +131,8 @@ export interface SyncResult {
 
 export type GameMode = 'single' | 'multiplayer'
 
+export type GameStatus = 'waiting' | 'active' | 'completed' | 'abandoned'
+
 export interface GameSaveRecord {
   id: string
   uid: string
@@ -145,17 +147,36 @@ export interface GameSaveRecord {
 }
 
 /**
+ * Invite code document stored in Firestore
+ * Collection: invite_codes
+ * Document ID: ${code}
+ */
+export type InviteCode = {
+  code: string
+  gameId: string
+  createdBy: string
+  createdAt: Date
+  expiresAt: Date
+  used: boolean
+  usedBy?: string
+  usedAt?: Date
+}
+
+/**
  * Shared multiplayer game document stored in Firestore
  * Collection: multiplayer_games
  * Document ID: ${gameId}
  */
-export interface MultiplayerGame {
+export type MultiplayerGame = {
   gameId: string
   gameState: SerializedGameState
   mode: 'multiplayer'
   p1: string // Player 1 uid
-  p2: string // Player 2 uid
+  p2: string // Player 2 uid (empty string when waiting)
   activePlayer: string // Current turn player uid
+  status: GameStatus // Game lifecycle status
+  inviteCode?: string // Optional reference back to invite code
+  startedAt?: Date // When p2 joined
   lastUpdated: Date
   createdAt: Date
 }
