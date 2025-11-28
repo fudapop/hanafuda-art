@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { PlayerProfile } from '~/types/profile'
+import type { PlayerProfile } from '~~/types/profile'
 import {
   calculateGameRecord,
   createDefaultProfile,
@@ -22,7 +22,14 @@ describe('sanitizeProfile', () => {
       record: { coins: 500, win: 5, loss: 3, draw: 1 },
       lastUpdated: new Date('2024-01-01'),
       designs: { unlocked: ['cherry-version'], liked: ['flash-black'] },
-      settings: { volume: 0.8 },
+      settings: {
+        rounds: 3,
+        viewings: 'allow',
+        double: false,
+        wild: false,
+        labels: false,
+        cardSize: 0.8,
+      },
       flags: { isNewPlayer: false, hasSubmittedFeedback: true },
       isGuest: false,
       stats: {} as any, // Simplified for test
@@ -46,7 +53,14 @@ describe('sanitizeProfile', () => {
       record: { coins: 500, win: 5, loss: 3, draw: 1 },
       lastUpdated: '2024-06-15T10:00:00.000Z' as any, // ISO string date
       designs: { unlocked: ['cherry-version'], liked: [] },
-      settings: {},
+      settings: {
+        rounds: 3,
+        viewings: 'allow',
+        double: false,
+        wild: false,
+        labels: false,
+        cardSize: 1.0,
+      },
       flags: { isNewPlayer: false, hasSubmittedFeedback: true },
       stats: {} as any,
     }
@@ -144,6 +158,14 @@ describe('createDefaultProfile', () => {
     expect(profile.record.win).toBe(0)
     expect(profile.flags.isNewPlayer).toBe(true)
     expect(profile.stats).toBeDefined()
+    expect(profile.settings).toEqual({
+      rounds: 3,
+      viewings: 'allow',
+      double: false,
+      wild: false,
+      labels: false,
+      cardSize: 1.0,
+    })
   })
 
   it('overrides defaults with provided values', async () => {
