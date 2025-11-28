@@ -94,13 +94,14 @@ const updateDisplayedCards = () => {
 const { getCardUrl } = useCardDesign()
 
 const { useMatchedCards, matchExists, handleCardSelect } = useCardHandler()
+const { selfKey } = useLocalPlayerPerspective()
 
 const matchedCards = useMatchedCards()
 
 const showMatchHint = computed(
   () => (card: CardName) =>
     ds.checkCurrentPhase('select') &&
-    ps.players.p1.isActive &&
+    ps.players[selfKey.value].isActive &&
     (matchExists(card) as CardName[]).length,
 )
 

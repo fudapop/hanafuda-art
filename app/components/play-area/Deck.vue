@@ -104,7 +104,10 @@ const matchedCards = useMatchedCards()
 const revealedCard = computed(() => ds.checkCurrentPhase('draw') && selectedCard.value)
 const revealedCardImg = computed(() => (revealedCard.value ? getCardUrl(revealedCard.value) : null))
 
-const isDrawPhase = computed(() => ds.checkCurrentPhase('draw') && ps.players.p1.isActive)
+const { selfKey } = useLocalPlayerPerspective()
+const isDrawPhase = computed(
+  () => ds.checkCurrentPhase('draw') && ps.players[selfKey.value].isActive,
+)
 const autoOpponent = useState('opponent')
 
 const playDrawPhase = async () => {

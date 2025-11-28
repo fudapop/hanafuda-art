@@ -92,7 +92,7 @@
     <div
       :class="{
         'z-[-1] fixed top-0 inset-x-0 duration-300 transition-all sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
-        'opacity-40': players.p1.isActive,
+        'opacity-40': players[selfKey].isActive,
         '-translate-y-full': !gameStart,
       }"
     >
@@ -131,7 +131,7 @@
     <div
       :class="{
         'z-[-1] fixed bottom-0 inset-x-0 duration-300 transition-all bg-transparent sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
-        'opacity-40': players.p2.isActive,
+        'opacity-40': players[opponentKey].isActive,
         'translate-y-full': !gameStart,
       }"
     >
@@ -196,6 +196,7 @@ const { t } = useI18n()
 const { $clientPosthog } = useNuxtApp()
 
 const { players } = storeToRefs(usePlayerStore())
+const { selfKey, opponentKey } = useLocalPlayerPerspective()
 const { current: user } = useProfile()
 
 const gameStart = useState('start', () => false)

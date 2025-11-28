@@ -134,6 +134,8 @@ watch(
 const { getCardUrl } = useCardDesign()
 
 const { useSelectedCard, useMatchedCards, handleCardSelect, handlePlayerDiscard } = useCardHandler()
+const { selfKey } = useLocalPlayerPerspective()
+const ps = usePlayerStore()
 
 const selectedCard = useSelectedCard()
 const matchedCards = useMatchedCards()
@@ -143,7 +145,7 @@ const discarding = computed(() =>
     ds.checkCurrentPhase('select'),
     !!selectedCard.value,
     !matchedCards.value.length,
-    usePlayerStore().players.p1.isActive,
+    ps.players[selfKey.value].isActive,
   ].every((cond) => cond === true),
 )
 

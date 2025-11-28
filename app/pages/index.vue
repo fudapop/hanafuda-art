@@ -22,7 +22,7 @@
       >
         <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
           <CollectionArea
-            player="p2"
+            :player="opponentKey"
             @completed="handleCompletion"
           />
         </div>
@@ -54,7 +54,7 @@
       >
         <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
           <CollectionArea
-            player="p1"
+            :player="selfKey"
             @completed="handleCompletion"
           />
         </div>
@@ -72,8 +72,10 @@
         <div
           class="w-screen max-w-full py-8 mx-auto overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x"
         >
-          <div v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')">
-            <HandDisplay id="p1" />
+          <div
+            v-click-disabled:unless="players[selfKey].isActive && ds.checkCurrentPhase('select')"
+          >
+            <HandDisplay :id="selfKey" />
           </div>
         </div>
       </div>
@@ -129,6 +131,8 @@ const { isMobile } = useDevice()
 const cs = useCardStore()
 const ps = usePlayerStore()
 const ds = useGameDataStore()
+
+const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
 const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
@@ -252,6 +256,18 @@ const initializeNewMultiplayerGame = async () => {
 
   const currentUid = currentProfile.value?.uid
   const isStarter = currentUid && currentUid === multiplayerMeta.value.activePlayerUid
+
+  // Set local player perspective for multiplayer
+  if (
+    currentUid &&
+    (currentUid === multiplayerMeta.value.p1 || currentUid === multiplayerMeta.value.p2)
+  ) {
+    localKey.value = currentUid === multiplayerMeta.value.p1 ? 'p1' : 'p2'
+    isMultiplayerGame.value = true
+  } else {
+    localKey.value = 'p1'
+    isMultiplayerGame.value = false
+  }
 
   // Ensure sync adapters are ready
   initializeSync()
@@ -464,6 +480,8 @@ onMounted(() => {
       } else {
         // Normal new game initialization (single-player)
         console.debug('Starting new single-player game - ensuring clean state...')
+        isMultiplayerGame.value = false
+        localKey.value = 'p1'
         resetAllStores() // Ensure clean state before starting
         startRound()
       }

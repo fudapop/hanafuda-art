@@ -65,7 +65,7 @@
       <!-- Hidden during opponent decision -->
       <div v-show="decisionIsPending">
         <div
-          v-show="players.p1.isActive"
+          v-show="players[selfKey].isActive"
           class="flex justify-end shrink-0 gap-2 ml-4"
         >
           <button
@@ -138,6 +138,7 @@ const { handNotEmpty } = storeToRefs(useCardStore())
 
 const ps = usePlayerStore()
 const { activePlayer, bonusMultiplier, players } = storeToRefs(ps)
+const { selfKey } = useLocalPlayerPerspective()
 
 const lastRoundResult = computed(() => useGameDataStore().getCurrent.result)
 

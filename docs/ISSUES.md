@@ -117,6 +117,128 @@ After resuming:
 
 ---
 
+## 2025-11-28: Multiplayer Join Did Not Load Shared Game State
+
+**Status**: RESOLVED
+
+**Problem**:  
+When a second player joined a multiplayer match via invite code, their local game state remained empty or out-of-sync. The join flow updated Firestore documents but did not correctly seed the joining player's local save from the shared `multiplayer_games` state.
+
+**Symptoms**:
+- Joiner saw an empty or uninitialized board after the game started.
+- IndexedDB `gameSaves` table on the joiner either had no multiplayer entry or contained a state that did not match Firestore.
+
+**Root Cause**:
+- `useMultiplayerMatch.joinGame` called `saveMultiplayerGame(p1, p2, activePlayer)` directly after updating Firestore.
+- `saveMultiplayerGame` is designed only for the **active player**, and it re-serializes local store state instead of using the remote `gameState`, so the joiner either failed the “active player” check or saved an incorrect state.
+
+**Resolution**:
+1. Updated `useMultiplayerMatch` to:
+   - Randomly select a starting player (between `p1` and `p2`) and write `activePlayer` on join.
+   - Remove the incorrect `saveMultiplayerGame` call from `joinGame`.
+   - Call `initializeSync()` + `syncMultiplayerGame(gameId)` to seed the joiner’s local `hanafuda-save-multiplayer` slot from the remote `gameState`.
+2. Added a specialized new-multiplayer initialization path in `StartScreen.vue` + `pages/index.vue` so that:
+   - The **starting player** runs `startRound()` and then pushes the initialized state via `saveMultiplayerGame`.
+   - The **other player** retries `syncMultiplayerGame(gameId)` and then calls `loadMultiplayerGame()` once to hydrate from the starter’s pushed state.
+
+**Files Changed**:
+- `app/composables/useMultiplayerMatch.ts` – join flow, starting player selection.
+- `app/composables/useStoreManager.ts` – multiplayer sync adapter usage.
+- `app/composables/adapters/useMultiplayerSyncAdapter.ts` – push/pull behavior (used by StoreManager).
+- `app/components/StartScreen.vue` – multiplayer meta handling and start-game emission.
+- `app/pages/index.vue` – `initializeNewMultiplayerGame` (starter vs non-starter init).
+
+**Verification**:
+- In two authenticated browser sessions:
+  - Host creates a game; joiner joins via invite code.
+  - Both sides show the same initialized board (cards dealt, same field/hand layout).
+  - IndexedDB `gameSaves` on both clients contains a single multiplayer entry with identical `gameState` payloads (verified via DevTools).
+
+---
+
+## 2025-11-28: Firestore Rules Blocking Multiplayer Saves and Deletes
+
+**Status**: RESOLVED
+
+**Problem**:  
+After wiring multiplayer sync, Firestore began returning `FirebaseError: Missing or insufficient permissions` when:
+- Deleting game saves via `useGameSavesSyncAdapter.remove`.
+- Pushing multiplayer state via `useMultiplayerSyncAdapter.push` / `saveMultiplayerGame`.
+
+**Symptoms**:
+- Console errors on initial multiplayer save push from the starting player.
+- Console errors when deleting saves, especially for older `game_saves` documents.
+- Multiplayer initialization succeeded locally but failed to persist to Firestore.
+
+**Root Cause**:
+- `firestore.rules` were stricter than the adapters’ behavior:
+  - `game_saves` delete rule required `resource.data.uid == request.auth.uid`, which failed for some legacy docs missing `uid` or with mismatched data despite the doc ID being `${uid}_${saveKey}`.
+  - `multiplayer_games` update rule additionally required `request.auth.uid == resource.data.activePlayer` and strict equality on `p1`/`p2`, while the adapter already enforced active-player and participant checks and used `merge` updates.
+
+**Resolution**:
+1. `game_saves`:
+   - Relaxed delete rule to allow owner deletion when **either**:
+     - `resource.data.uid == request.auth.uid`, **or**
+     - `saveId.startsWith(request.auth.uid + '_')` (safe fallback for legacy docs).
+2. `multiplayer_games`:
+   - Simplified update rule for normal game-state updates to:
+     - Require `mode == 'multiplayer'` and `isParticipant()`, with active-player enforcement delegated to the adapter.
+   - Kept a stricter `isJoiningWaitingGame()` branch for the “second player joins waiting game” transition.
+
+**Files Changed**:
+- `firestore.rules` – `match /game_saves/{saveId}` and `match /multiplayer_games/{gameId}` rules.
+
+**Verification**:
+- Starting player’s initial `saveMultiplayerGame` push now succeeds (no permission errors).
+- Multiplayer game documents in Firestore update correctly on save.
+- Deletes from `game_saves` succeed for both new and legacy docs whose IDs start with the user’s auth UID.
+
+---
+
+## 2025-11-28: Remote P2 Cards Appearing as Local P1 Cards
+
+**Status**: RESOLVED
+
+**Problem**:  
+In multiplayer matches, each client always treated `p1` as “the player at the bottom” locally. This meant the joiner (canonical `p2`) saw the host’s (`p1`) cards and turn state as if they were their own.
+
+**Symptoms**:
+- On the host, the bottom hand correctly showed host’s cards; on the joiner, the bottom hand also showed `p1`’s cards from the shared state.
+- Interaction gating (`players.p1.isActive`) only respected canonical `p1`, so turns and hints were wrong for the joiner’s perspective.
+
+**Root Cause**:
+- UI and interaction logic hard-coded `p1` as the local player (bottom hand, match hints, draw phase, round results buttons), while the canonical saved state correctly used `p1`/`p2` as host/joiner.
+
+**Resolution**:
+1. Introduced `useLocalPlayerPerspective` composable:
+   - Tracks `localKey` (`'p1' | 'p2'`), `selfKey`, `opponentKey`, and `isMultiplayerGame` in global state.
+2. In `initializeNewMultiplayerGame`:
+   - Set `localKey` based on the authenticated user’s UID vs `multiplayerMeta.p1`/`p2`.
+   - Marked multiplayer vs single-player mode accordingly.
+3. Updated core UI components to use `selfKey` / `opponentKey` instead of hard-coded `p1`/`p2`:
+   - `pages/index.vue` – which collection/hand is shown where and when interaction is allowed.
+   - `GameLayout.vue` – which status bar is dimmed based on whose turn it is.
+   - `HandDisplay.vue` / `FieldDisplay.vue` / `Deck.vue` – hints, discard/draw gating keyed to the local player’s active state.
+   - `RoundResults.vue` – only the local active player gets KOI-KOI/STOP controls.
+
+**Files Changed**:
+- `app/composables/useLocalPlayerPerspective.ts` – new composable.
+- `app/pages/index.vue` – uses `selfKey`/`opponentKey` for collections and hand gating, sets perspective on multiplayer init.
+- `app/components/GameLayout.vue` – status bars now tied to `selfKey`/`opponentKey`.
+- `app/components/play-area/HandDisplay.vue` – match hints respect local active player.
+- `app/components/play-area/FieldDisplay.vue` – discard logic respects local active player.
+- `app/components/play-area/Deck.vue` – draw phase check uses local active player.
+- `app/components/modal/RoundResults.vue` – KOI-KOI/STOP buttons visible only for local active player.
+
+**Verification**:
+- Host view: bottom hand shows host’s cards; top area shows joiner’s cards.
+- Joiner view: bottom hand shows joiner’s cards; top area shows host’s cards.
+- In both sessions:
+  - The same canonical game state (hands, field, deck) is visible, but oriented so that “you” are always at the bottom.
+  - Interaction (selecting cards, discarding/drawing, KOI-KOI/STOP) is only enabled when the local player is the active player from the shared state.
+
+---
+
 ## Future Issues
 
 (New issues will be added above this line)
