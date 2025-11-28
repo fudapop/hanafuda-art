@@ -1,12 +1,16 @@
 ---
 title: Attributions
 description: Credits and attributions for music, artwork, and other assets used in Hanafuda Koi-Koi.
-date: 2025-08-17
+date: 2025-11-27
 ---
 
 # Attributions
 
-_Last updated: 2025-08-17_
+_Last updated: 2025-11-27_
+
+## Demo Version
+
+This demo version features the **OpenCards Hanafuda** deck design by Kooperatywa Otwarte Karty & Luiza Kwiatkowska. The full version of newhanafuda.art includes multiple deck designs and additional features.
 
 ## Card Artwork
 

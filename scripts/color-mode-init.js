@@ -1,13 +1,13 @@
 /**
  * Color Mode Initialization Script
- * 
+ *
  * This script runs synchronously in the <head> before render to prevent
- * flash of unstyled content (FOUC) in PWA standalone mode.
- * 
+ * flash of unstyled content (FOUC).
+ *
  * It reads color mode preference from localStorage and applies the 'dark'
  * class to the HTML element immediately, before any rendering occurs.
  */
-(function () {
+;(function () {
   try {
     const storage = localStorage.getItem('hanafuda-system-preferences')
     let colorMode = 'auto'
@@ -37,4 +37,3 @@
     console.error('Error applying color mode:', e)
   }
 })()
-

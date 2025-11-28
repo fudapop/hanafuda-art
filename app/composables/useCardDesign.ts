@@ -23,12 +23,10 @@ export type DesignInfo = {
 
 export type CardDesign = keyof typeof CARD_DESIGNS
 
-const DESIGNS = (Object.keys(CARD_DESIGNS) as CardDesign[]).filter(
-  // Temporary filter; need better images
-  (design) => CARD_DESIGNS[design].name !== 'ramen-red',
-)
+// Demo mode: Only OpenCards deck is available
+const DESIGNS: CardDesign[] = Object.keys(CARD_DESIGNS) as CardDesign[]
 
-export const SYSTEM_DEFAULT_DESIGN = 'cherry-version' as const satisfies CardDesign
+export const SYSTEM_DEFAULT_DESIGN = 'otwarte-karty' as const satisfies CardDesign
 
 // localStorage key for design persistence
 export const DESIGN_STORAGE_KEY = 'hanafuda-selected-design'
@@ -39,7 +37,8 @@ export const useCardDesign = () => {
   const { supabaseUrl } = useRuntimeConfig().public
   const { locale } = useI18n()
   const bucketUrl = `${supabaseUrl}/storage/v1/render/image/public/static`
-  const currentDesign: Ref<CardDesign> = useState('design', () => 'cherry-version')
+  // Demo mode: Always use OpenCards deck
+  const currentDesign: Ref<CardDesign> = useState('design', () => SYSTEM_DEFAULT_DESIGN)
 
   // Cache for localized design info
   const localizedDesigns = useState<Record<string, Record<string, DesignInfo>>>(

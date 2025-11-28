@@ -1,16 +1,10 @@
-import { createClient as _createClient } from '@supabase/supabase-js'
-import type { Database } from '~/lib/supabase/types'
+// Supabase client composable - not used in demo mode
+// Kept for potential future use or compatibility
 
 export const createSupabaseClient = () => {
-  const { supabaseUrl, supabasePublishableKey } = useRuntimeConfig().public
-  if (!supabaseUrl || !supabasePublishableKey) {
-    throw new Error('Missing Supabase environment variables')
-  }
-  return _createClient<Database>(supabaseUrl, supabasePublishableKey)
+  throw new Error('Supabase client is not available in demo mode')
 }
 
-const supabase = createSupabaseClient()
-
 export const useSupabase = () => {
-  return supabase
+  throw new Error('useSupabase is not available in demo mode')
 }

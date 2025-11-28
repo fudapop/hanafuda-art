@@ -70,7 +70,6 @@
         </div>
 
         <!-- Fullscreen Toggle -->
-        <!-- Installed PWA on mobile should already be fullscreen -->
         <div
           class="mb-3"
           v-if="isSupported"
@@ -322,7 +321,7 @@ watchEffect(() => {
   if (process.client) {
     window.dispatchEvent(new CustomEvent('color-mode-change'))
 
-    // Also apply directly to HTML element for immediate effect in PWA
+    // Also apply directly to HTML element for immediate effect
     const html = document.documentElement
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 

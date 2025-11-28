@@ -1,12 +1,16 @@
 ---
 title: Atrybucje
 description: Podziękowania i atrybucje za muzykę, grafikę i inne zasoby użyte w grze Hanafuda Koi-Koi.
-date: 2025-08-17
+date: 2025-11-27
 ---
 
 # Atrybucje
 
-_Ostatnia aktualizacja: 2025-08-17_
+_Ostatnia aktualizacja: 2025-11-27_
+
+## Wersja demo
+
+Ta wersja demo zawiera projekt talii kart **OpenCards Hanafuda** autorstwa Kooperatywa Otwarte Karty & Luiza Kwiatkowska. Pełna wersja newhanafuda.art zawiera wiele projektów talii kart oraz dodatkowe funkcje.
 
 ## Grafika Kart
 

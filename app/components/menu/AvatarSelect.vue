@@ -3,7 +3,6 @@
     <HeadlessPopoverButton>
       <slot />
     </HeadlessPopoverButton>
-    <!-- <HeadlessPopoverOverlay class="fixed inset-0 z-40 bg-black opacity-70" /> -->
 
     <Transition
       appear
@@ -34,26 +33,6 @@
         </div>
         <div class="max-h-[500px] overflow-y-auto">
           <div class="grid justify-center grid-cols-4 gap-4 px-4 py-8 place-items-center">
-            <div
-              v-for="a in premiumAvatars"
-              :key="a.url"
-              class="relative w-16 overflow-hidden [@media(min-height:500px)]:sm:w-24 aspect-square drop-shadow-xs cursor-pointer rounded-full"
-            >
-              <img
-                :src="a.url"
-                alt="user avatar"
-                :class="['grayscale', a.url === modelValue && 'ring-2 ring-offset-2 ring-primary']"
-              />
-              <div class="absolute inset-0 z-10 place-content-center bg-black/50">
-                <LockClosedIcon
-                  aria-label="locked"
-                  class="w-8 h-8 mx-auto text-white/80"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="h-0 mx-8 my-4 border-b border-border opacity-80"></div>
-          <div class="grid justify-center grid-cols-4 gap-4 px-4 py-8 place-items-center">
             <img
               v-for="url in avatars"
               :key="url"
@@ -72,26 +51,15 @@
 </template>
 
 <script setup lang="ts">
-import { LockClosedIcon } from '@heroicons/vue/20/solid'
-
 const { t } = useI18n()
 const { modelValue } = defineProps<{ modelValue: string }>()
 const emits = defineEmits(['update:modelValue'])
 
 const { listAvatars } = useAvatar()
 
-const photo = computed(() => useCurrentUser().value?.photoURL)
-
-const premiumAvatars = listAvatars('gamblers')
+// Demo mode: only show basic avatars (no premium/locked avatars, no auth photo)
 const basicAvatars = [...listAvatars('origami'), ...listAvatars('flat')]
-
-const avatars = computed(() => {
-  const avatarUrls = basicAvatars.map((a) => a.url)
-  if (photo.value) {
-    avatarUrls.unshift(photo.value)
-  }
-  return avatarUrls
-})
+const avatars = computed(() => basicAvatars.map((a) => a.url))
 
 const handleClick = (url: string, close: () => void) => {
   emits('update:modelValue', url)

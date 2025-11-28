@@ -20,7 +20,7 @@
         <button
           id="exit-button"
           type="button"
-          @click="handlePressExit"
+          @click="handleExit"
           :class="[
             'game-ui-btn',
             gameStart && 'opacity-50 hover:opacity-100',
@@ -39,14 +39,14 @@
 
       <!-- OPTIONS MENU -->
       <div class="fixed flex bottom-4 right-4 gap-x-4">
-        <GameOptionsPanel :tabs="Array.from(GAME_OPTIONS_TABS)">
+        <GameOptionsPanel :tabs="demoTabs">
+          <!-- DECK TAB -->
           <template #tab-panel-1>
             <DesignRadioGroup />
           </template>
-          <!-- DESIGN TAB -->
           <template #tab-icon-1>
             <Icon
-              name="mdi:cards-variant"
+              name="mdi:cards"
               class="text-base"
               aria-hidden="true"
             />
@@ -69,17 +69,6 @@
           <template #tab-icon-3>
             <Icon
               name="mdi:gamepad-variant"
-              class="text-base"
-              aria-hidden="true"
-            />
-          </template>
-          <!-- PROFILE TAB -->
-          <template #tab-panel-4>
-            <ProfilePanel />
-          </template>
-          <template #tab-icon-4>
-            <Icon
-              name="ic:round-account-circle"
               class="text-base"
               aria-hidden="true"
             />
@@ -141,138 +130,38 @@
       />
     </div>
 
-    <!-- LOADER -->
-    <Transition
-      appear
-      enter-active-class="duration-300 ease-out"
-      enter-from-class="translate-y-4 opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="duration-300 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="translate-y-4 opacity-0"
-    >
-      <div
-        v-if="showLoader"
-        class="absolute inset-0 h-full pointer-events-none top-1/3 isolate"
-      >
-        <SakuraLoader class="mx-auto opacity-80 w-max" />
-        <p class="font-semibold tracking-wide text-center text-white drop-shadow-md animate-pulse">
-          {{ t('common.labels.justAMoment') }}
-        </p>
-      </div>
-    </Transition>
-
-    <!-- MODALS -->
+    <!-- EXIT CONFIRMATION MODAL -->
     <LazyExitWarning
-      :open="leavingGame"
-      :isSaving="isSaving"
-      @cancel="leavingGame = false"
-      @save="handleSaveAndExit"
-      @forfeit="handleForfeitAndExit"
-    />
-    <!-- <FeedbackForm
-      :open="promptFeedback"
-      @close="
-        () => {
-          promptFeedback = false
-        }
-      "
-    /> -->
-    <LazySignupPrompt
-      :open="promptSignup"
-      @cancel="handleSignupCancel"
+      :open="showExitConfirm"
+      @forfeit="confirmExit"
+      @cancel="showExitConfirm = false"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { GAME_OPTIONS_TABS } from '~/composables/useOptionsPanel'
+import type { GameOptionsTab } from '~/composables/useOptionsPanel'
 import { usePlayerStore } from '~~/stores/playerStore'
 
 const { currentDesign } = useCardDesign()
 const { t } = useI18n()
-const { $clientPosthog } = useNuxtApp()
 
 const { players } = storeToRefs(usePlayerStore())
 const { current: user } = useProfile()
 
 const gameStart = useState('start', () => false)
-const leavingGame = ref(false)
-const isSaving = ref(false)
-// const promptFeedback = ref(false)
-const promptSignup = ref(false)
-const showLoader = ref(false)
+const showExitConfirm = ref(false)
 const player1Inactive = computed(() => gameStart.value && !players.value.p1.isActive)
 
-const feedbackSubmitted = computed(() => user.value?.flags?.hasSubmittedFeedback)
-const signupDeclined = useStorage('hanafuda-signup-declined', false, sessionStorage)
+const demoTabs: GameOptionsTab[] = ['deck', 'yaku', 'settings']
 
-const handlePressExit = async () => {
-  $clientPosthog?.capture('exit_game')
-  leavingGame.value = true
+const handleExit = () => {
+  showExitConfirm.value = true
 }
 
-const handleSaveAndExit = async () => {
-  $clientPosthog?.capture('exit_game_save')
-  isSaving.value = true
-
-  try {
-    const { quickSave } = useStoreManager()
-    await quickSave() // Save current game state
-
-    leavingGame.value = false
-    gameStart.value = false
-  } catch (error) {
-    console.error('Failed to save game:', error)
-    // Still exit even if save fails, but could show error message
-    leavingGame.value = false
-    gameStart.value = false
-  } finally {
-    isSaving.value = false
-  }
-}
-
-const handleForfeitAndExit = () => {
-  $clientPosthog?.capture('exit_game_forfeit')
-  leavingGame.value = false
-  // Reset gameStart to trigger cleanup in main game component
+const confirmExit = () => {
+  showExitConfirm.value = false
   gameStart.value = false
 }
-
-const handleSignupCancel = async () => {
-  $clientPosthog?.capture('signup_declined')
-  showLoader.value = true
-  promptSignup.value = false
-  signupDeclined.value = true
-  await sleep()
-  showLoader.value = false
-  // promptFeedback.value = true
-}
-
-const unwatchGame = watch([gameStart, leavingGame], async () => {
-  if (!gameStart.value && !leavingGame.value) {
-    showLoader.value = true
-    if (user.value?.isGuest && !signupDeclined.value) {
-      await sleep()
-      showLoader.value = false
-      promptSignup.value = true
-      return
-    }
-    if (!feedbackSubmitted.value) {
-      await sleep()
-      showLoader.value = false
-      // promptFeedback.value = true
-      return
-    }
-    await sleep(500)
-    showLoader.value = false
-    unwatchGame()
-  }
-})
-
-onUnmounted(() => {
-  unwatchGame?.()
-})
 </script>

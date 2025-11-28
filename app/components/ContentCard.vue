@@ -15,12 +15,6 @@
               class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
             >
               <NuxtLink
-                :to="localeRoute('/changelog')"
-                class="transition-colors hover:text-primary"
-                >{{ t('footer.links.changelog') }}</NuxtLink
-              >
-              <span>•</span>
-              <NuxtLink
                 :to="localeRoute('/attributions')"
                 class="transition-colors hover:text-primary"
                 >{{ t('footer.links.attributions') }}</NuxtLink
@@ -30,12 +24,6 @@
                 :to="localeRoute('/terms')"
                 class="transition-colors hover:text-primary"
                 >{{ t('footer.links.termsOfUse') }}</NuxtLink
-              >
-              <span>•</span>
-              <NuxtLink
-                :to="localeRoute('/privacy')"
-                class="transition-colors hover:text-primary"
-                >{{ t('footer.links.privacyPolicy') }}</NuxtLink
               >
             </div>
           </div>

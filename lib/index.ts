@@ -1,1 +1,2 @@
-export * from './supabase/client'
+// Library exports
+// Supabase client removed - only using Supabase URLs for static assets

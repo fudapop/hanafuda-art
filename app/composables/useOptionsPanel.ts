@@ -1,12 +1,12 @@
-export const GAME_OPTIONS_TABS = ['deck', 'yaku', 'settings', 'profile'] as const
+export const GAME_OPTIONS_TABS = ['deck', 'yaku', 'settings'] as const
 export type GameOptionsTab = (typeof GAME_OPTIONS_TABS)[number]
 
 export const useOptionsPanel = () => {
   const isOpen = useState('options-panel', () => false)
-  const currentTab = useState<GameOptionsTab>('options-panel-tab', () => 'deck')
+  const currentTab = useState<GameOptionsTab>('options-panel-tab', () => 'yaku')
   const currentTabIndex = computed(() => GAME_OPTIONS_TABS.indexOf(currentTab.value))
 
-  const openOptions = (tab: GameOptionsTab = 'deck') => {
+  const openOptions = (tab: GameOptionsTab = 'yaku') => {
     isOpen.value = true
     currentTab.value = tab
   }

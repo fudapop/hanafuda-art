@@ -1,12 +1,16 @@
 ---
 title: Attributions
 description: Crédits et attributions pour la musique, les illustrations et autres éléments utilisés dans Hanafuda Koi-Koi.
-date: 2025-08-17
+date: 2025-11-27
 ---
 
 # Attributions
 
-_Dernière mise à jour : 2025-08-17_
+_Dernière mise à jour : 2025-11-27_
+
+## Version démo
+
+Cette version démo présente le design de jeu de cartes **OpenCards Hanafuda** par Kooperatywa Otwarte Karty & Luiza Kwiatkowska. La version complète de newhanafuda.art inclut plusieurs designs de jeux de cartes et des fonctionnalités supplémentaires.
 
 ## Illustrations des cartes
 

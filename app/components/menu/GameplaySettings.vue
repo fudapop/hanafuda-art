@@ -3,99 +3,11 @@
     ref="settingsPanel"
     class="h-full px-8 py-8"
   >
-    <div
-      v-show="!gameStart"
-      class="space-y-8"
-    >
-      <!-- Set maximum for number of rounds per game -->
-      <OptionsRadioGroup
-        :model-value="config.maxRounds"
-        :update-callback="(option) => (config.maxRounds = option as GameLengthOptions)"
-        :value-options="config.OPTIONS.GAME_LENGTH"
-        class-name="grid grid-cols-3 gap-2 py-2"
-      >
-        <template #group-label>
-          <span class="capitalize">{{ t('common.labels.rounds') }}</span>
-        </template>
-      </OptionsRadioGroup>
-
-      <!-- Set allowance of TSUKIMI-/HANAMI-ZAKE -->
-      <OptionsRadioGroup
-        :model-value="config.allowViewingsYaku"
-        :update-callback="(option) => (config.allowViewingsYaku = option as ViewingsOptions)"
-        :value-options="config.OPTIONS.VIEWINGS"
-        :description-template="(option) => t(`settings.gameplay.viewingOptions.${option}`)"
-      >
-        <template #group-label>
-          <a
-            title="Tsukimi-/Hanami-zake"
-            class="underline decoration-dotted underline-offset-4 cursor-help"
-          >
-            {{ t('settings.gameplay.moonFlowerViewing') }}
-          </a>
-          <a
-            href="https://fudawiki.org/en/hanafuda/games/koi-koi#taming-the-sake-cup"
-            title="Read about this rule on fudawiki.org"
-            target="_blank"
-          >
-            <QuestionMarkCircleIcon
-              class="inline w-5 h-5 mb-1 cursor-pointer text-text-secondary hover:text-primary"
-            />
-            <span class="sr-only">{{ t('settings.gameplay.readAboutThisRule') }}</span>
-          </a>
-        </template>
-      </OptionsRadioGroup>
-
-      <div class="space-y-4">
-        <div class="flex">
-          <p class="text-base font-semibold leading-6 text-text">
-            {{ t('settings.gameplay.otherVariations') }}
-          </p>
-          <a
-            href="https://fudawiki.org/en/hanafuda/games/koi-koi#scoring-variations"
-            title="Read about scoring on fudawiki.org"
-            target="_blank"
-          >
-            <QuestionMarkCircleIcon
-              class="inline w-5 h-5 mb-1 ml-1 cursor-pointer text-text-secondary hover:text-primary"
-            />
-            <span class="sr-only">{{ t('settings.gameplay.readAboutThisRule') }}</span>
-          </a>
-        </div>
-        <div class="space-y-4">
-          <!-- Set wild-card behavior for KIKU-NI-SAKAZUKI -->
-          <ToggleSwitch
-            :callback="toggleSake"
-            :init-value="config.sakeIsWildCard"
-          >
-            <template #label>{{ t('settings.gameplay.wildCardSakeCup') }}</template>
-            <template #description>{{
-              t('settings.gameplay.wildCardSakeCupDescription')
-            }}</template>
-          </ToggleSwitch>
-
-          <!-- Set additional scoring rule -->
-          <ToggleSwitch
-            :callback="toggleDouble"
-            :init-value="config.doubleScoreOverSeven"
-          >
-            <template #label>{{ t('settings.gameplay.doubleOverSeven') }}</template>
-            <template #description>{{
-              t('settings.gameplay.doubleOverSevenDescription')
-            }}</template>
-          </ToggleSwitch>
-        </div>
-      </div>
-    </div>
-
-    <!-- Hide options and show current settings while game is in progress -->
-    <div
-      v-show="gameStart"
-      class="w-full"
-    >
+    <!-- Demo Mode: Show locked gameplay rules -->
+    <div class="w-full mb-8">
       <p class="my-4 text-text-secondary">
         <LockClosedIcon class="inline w-6 h-6 align-text-bottom" />
-        {{ t('settings.notices.settingsLocked') }}
+        {{ t('settings.notices.demoSettingsLocked') }}
       </p>
       <ul class="grid w-full mx-auto gap-y-4">
         <li class="flex justify-between leading-6 text-text">
@@ -108,41 +20,34 @@
           <div>
             <span class="font-semibold"> {{ t('settings.gameplay.moonFlowerViewing') }} </span>
             <span class="block w-3/4 pl-2 text-sm text-text-secondary">
-              {{ getOptionDescription(config.allowViewingsYaku) }}
+              {{ t('settings.gameplay.viewingOptions.allow') }}
             </span>
           </div>
           <span class="self-center capitalize text-primary">
-            {{ config.allowViewingsYaku }}
+            {{ t('common.states.enabled') }}
           </span>
         </li>
         <li class="flex justify-between leading-6 text-text">
           <div>
             <span class="font-semibold"> {{ t('settings.gameplay.wildCardSakeCup') }} </span>
-            <span class="block w-3/4 pl-2 text-sm text-text-secondary">
-              {{ t('settings.gameplay.wildCardSakeCupDescription') }}
-            </span>
           </div>
           <span class="self-center capitalize text-primary">
-            {{ config.sakeIsWildCard ? t('common.states.enabled') : t('common.states.disabled') }}
+            {{ t('common.states.disabled') }}
           </span>
         </li>
         <li class="flex justify-between leading-6 text-text">
           <div>
             <span class="font-semibold"> {{ t('settings.gameplay.doubleOverSeven') }} </span>
-            <span class="block w-3/4 pl-2 text-sm text-text-secondary">
-              {{ t('settings.gameplay.doubleOverSevenDescription') }}
-            </span>
           </div>
           <span class="self-center capitalize text-primary">
-            {{
-              config.doubleScoreOverSeven ? t('common.states.enabled') : t('common.states.disabled')
-            }}
+            {{ t('common.states.disabled') }}
           </span>
         </li>
       </ul>
     </div>
 
-    <div :class="['space-y-4 pb-20 pt-8']">
+    <!-- Interface Settings (always editable) -->
+    <div class="space-y-4 pb-20 pt-8 border-t border-border">
       <p class="text-base font-semibold leading-6 text-text">
         {{ t('settings.interface.title') }}
       </p>
@@ -169,28 +74,17 @@
 </template>
 
 <script setup lang="ts">
-import { LockClosedIcon, QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
+import { LockClosedIcon } from '@heroicons/vue/24/outline'
 import { onClickOutside } from '@vueuse/core'
 import {
   useConfigStore,
   type CardSizeOptions,
-  type GameLengthOptions,
-  type ViewingsOptions,
 } from '~~/stores/configStore'
 
 const { t } = useI18n()
 const config = useConfigStore()
 const settingsPanel: Ref<HTMLElement | null> = ref(null)
 const settingsUpdated = ref(false)
-const gameStart: Ref<boolean> = useState('start')
-
-const toggleSake = (enabled: boolean) => {
-  config.sakeIsWildCard = enabled
-}
-
-const toggleDouble = (enabled: boolean) => {
-  config.doubleScoreOverSeven = enabled
-}
 
 const toggleLabels = (enabled: boolean) => {
   config.cardLabels = enabled
@@ -209,23 +103,11 @@ const getCardSizeLabel = (size: CardSizeOptions) => {
   }
 }
 
-const getOptionDescription = (option: ViewingsOptions) => {
-  switch (option) {
-    case 'allow':
-      return 'Completion is scored normally.'
-    case 'limited':
-      return 'Requires another completed yaku to score points.'
-    case 'none':
-      return 'No points are scored for completion.'
-  }
-}
-
 const { current: user, updateProfile } = useProfile()
 
 const saveSettings = async () => {
   if (!settingsUpdated.value || !user.value) return
 
-  // Use updateProfile to properly persist settings changes
   await updateProfile({
     settings: { ...config.getCurrentSettings },
   })
@@ -233,14 +115,10 @@ const saveSettings = async () => {
 }
 
 onMounted(async () => {
-  // Settings are now loaded when the profile is loaded in usePlayerProfile
-  // This check is kept for backwards compatibility in case settings weren't loaded yet
   if (!config.settingsLoaded && user.value?.settings) {
     config.loadUserSettings(user.value.settings)
   }
 
-  // Ensure settings are loaded into config once the profile becomes available,
-  // even if the options panel is opened before a game starts.
   watch(
     user,
     (newUser) => {
@@ -253,7 +131,6 @@ onMounted(async () => {
 
   watch(config, () => {
     settingsUpdated.value = true
-    // Register listener to save settings when the panel is closed.
     const cleanup = onClickOutside(settingsPanel, () => {
       saveSettings()
       cleanup?.()

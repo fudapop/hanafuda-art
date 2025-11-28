@@ -49,7 +49,8 @@
       "total": "Total",
       "win": "Win",
       "lose": "Lose",
-      "draw": "Draw"
+      "draw": "Draw",
+      "guest": "Guest"
     },
     "states": {
       "enabled": "Enabled",
@@ -316,6 +317,7 @@
     },
     "notices": {
       "settingsLocked": "Some settings are locked while a game is in progress.",
+      "demoSettingsLocked": "Gameplay rules are locked in demo mode. Only display settings can be changed.",
       "languageChangeNotice": "Language can only be changed at the title screen."
     }
   },
@@ -398,7 +400,7 @@
       "viewPrivacyPolicy": "View privacy policy"
     },
     "credits": {
-      "backgroundArtBy": "Background art and design by",
+      "deckDesignBy": "Deck design by",
       "developedBy": "Developed by"
     },
     "copyright": {
@@ -515,5 +517,10 @@
     "signIn": "Sign in to your {appName} account",
     "terms": "Terms of Use for {appName}",
     "home": "Play the Japanese card game Hanafuda Koi-Koi against an AI opponent."
+  },
+  "demo": {
+    "playingDemo": "Playing with OpenCards Hanafuda deck",
+    "wantMoreFeatures": "Want more decks, stats, and online features?",
+    "playFullGame": "Play the full game at newhanafuda.art"
   }
 }

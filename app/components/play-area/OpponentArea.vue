@@ -56,11 +56,6 @@
           </div>
         </ListGrid>
       </div>
-
-      <!-- ARTIST CREDIT -->
-      <div class="w-full text-center">
-        <ArtistCredit />
-      </div>
     </div>
   </div>
 </template>

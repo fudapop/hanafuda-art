@@ -157,11 +157,6 @@ const handleDecision = async () => await makeDecision()
 
 const shoutTimeout = ref<NodeJS.Timeout | null>(null)
 
-// Initialize stats tracking (automatically watches for round completion)
-useStatsTracking()
-
-const { $clientPosthog } = useNuxtApp()
-
 const handleCompletion = (data: CompletionEvent) => {
   const { player, score, completedYaku } = data
   if (player) {
@@ -184,7 +179,6 @@ const handleStop = () => {
   const player = activePlayer.value.id
   console.debug(player.toUpperCase(), '>>> Called STOP')
   ds.endRound()
-  // Stats are automatically tracked by useStatsTracking composable
 }
 
 const handleKoikoi = () => {
@@ -207,7 +201,6 @@ const handleNext = async () => {
 
 // Closing the final results modal
 const handleClose = () => {
-  $clientPosthog?.capture('game_ended')
   ds.nextRound() // This should fix the issue of not swapping to the winner after final round
   showModal.value = false
   resetAllStores()
@@ -245,7 +238,6 @@ const handleInstantWin = (result: CompletionEvent) => {
   showModal.value = true
   callStop()
   ds.endRound()
-  // Stats are automatically tracked by useStatsTracking composable
 }
 
 const checkDeal = () => {
@@ -302,7 +294,6 @@ watch(turnCounter, () => {
     handleCompletion({ player: null, score: 0 })
     callStop()
     ds.endRound()
-    // Stats are automatically tracked by useStatsTracking composable
   }
 })
 
@@ -335,47 +326,10 @@ onMounted(() => {
 
   watch(gameStart, async () => {
     if (gameStart.value) {
-      // Check if we're resuming from a saved game
-      const resumeState = useState('resume-save', () => ({
-        isResuming: false,
-        saveKey: '',
-        saveData: null as any,
-        mode: 'single' as 'single' | 'multiplayer',
-      }))
-
-      if (resumeState.value.isResuming) {
-        // Game state already loaded by StartScreen's loadGameFromStorage()
-        // Just need to handle cleanup
-        try {
-          const { deleteSavedGame } = useStoreManager()
-
-          // Clear the save only for single-player mode (anti-scumming)
-          // Multiplayer saves persist until game is completed
-          if (resumeState.value.saveKey && resumeState.value.mode === 'single') {
-            console.info(`Deleting single-player save after resume: ${resumeState.value.saveKey}`)
-            await deleteSavedGame(resumeState.value.saveKey)
-            console.info('Single-player save deleted successfully')
-          }
-        } catch (error) {
-          console.error('Error during save cleanup:', error)
-        }
-
-        // Clear the resume state
-        resumeState.value = {
-          isResuming: false,
-          saveKey: '',
-          saveData: null,
-          mode: 'single',
-        }
-
-        showLoader.value = false
-        autoOpponent.value = true
-      } else {
-        // Normal new game initialization
-        console.debug('Starting new game - ensuring clean state...')
-        resetAllStores() // Ensure clean state before starting
-        startRound()
-      }
+      // Normal new game initialization
+      console.debug('Starting new game - ensuring clean state...')
+      resetAllStores() // Ensure clean state before starting
+      startRound()
     } else {
       console.debug('Resetting game...')
       if (!roundOver.value) ds.endRound()
