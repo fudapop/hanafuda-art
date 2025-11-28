@@ -1,5 +1,23 @@
 # Dziennik zmian
 
+## [2025.11.5] - 2025-11-28
+
+### Nowe funkcje
+- **Zdalne zapisy gry**: Wdrożono synchronizację w chmurze dla zapisów gier jednoosobowych. Uwierzytelnieni gracze mogą teraz synchronizować swoje zapisane gry na wszystkich urządzeniach, zapewniając, że postęp nigdy nie zostanie utracony. System automatycznie przesyła zapisy do chmury i może je przywrócić na dowolnym urządzeniu, na którym jesteś zalogowany.
+- **Obsługa responsywnych obrazów**: Dodano obsługę responsywnych obrazów z atrybutami srcset we wszystkich komponentach, automatycznie serwując obrazy o odpowiednim rozmiarze w zależności od możliwości urządzenia. To znacznie zmniejsza zużycie przepustowości na urządzeniach mobilnych, zachowując jednocześnie wysoką jakość wizualną na większych ekranach.
+
+### Ulepszenia interfejsu i doświadczenia
+- **Aktualizacje stylu menu**: Dopracowano padding, animacje i kolory zakładek w komponentach menu dla lepszej spójności wizualnej i płynniejszych interakcji.
+- **Ulepszenia panelu ustawień**: Zwiększono dolny padding panelu ustawień dla lepszego odstępu i czytelności.
+
+### Naprawione błędy
+- **Inicjalizacja profilu**: Naprawiono problem, w którym ustawienia gry i preferencje dotyczące projektu kart mogły nie ładować się poprawnie przed rozpoczęciem gry. Ustawienia i wybory projektów są teraz prawidłowo inicjalizowane podczas ładowania profili, zapewniając, że Twoje preferencje są stosowane od początku.
+- **Aktualizacje yaku Tsuki-fuda**: Naprawiono problem, w którym karty yaku tsuki-fuda mogły nie aktualizować się poprawnie, gdy zmienia się liczba rund. Lista yaku teraz prawidłowo odzwierciedla aktualną konfigurację gry.
+
+### Ulepszenia wydajności i techniczne
+- **Wstępne ładowanie czcionek**: Dodano wstępne ładowanie czcionek pomocniczych w celu poprawy wydajności renderowania tekstu i zmniejszenia przesunięć układu.
+- **Fundament gry wieloosobowej**: Położono fundamenty pod przyszłą funkcjonalność gry wieloosobowej z infrastrukturą synchronizacji współdzielonego stanu gry.
+
 ## [2025.11.4] - 2025-11-20
 
 ### Nowe funkcje

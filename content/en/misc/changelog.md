@@ -1,5 +1,23 @@
 # Changelog
 
+## [2025.11.5] - 2025-11-28
+
+### New Features
+- **Remote Game Saves**: Implemented cloud synchronization for single-player game saves. Authenticated players can now sync their saved games across devices, ensuring your progress is never lost. The system automatically uploads saves to the cloud and can restore them on any device where you're signed in.
+- **Responsive Image Support**: Added responsive image support with srcset attributes across all components, automatically serving appropriately sized images based on device capabilities. This significantly reduces bandwidth usage on mobile devices while maintaining high-quality visuals on larger screens.
+
+### UI & Experience Improvements
+- **Menu Styling Updates**: Refined padding, animations, and tab colors in menu components for improved visual consistency and smoother interactions.
+- **Settings Panel Improvements**: Increased bottom padding on the settings panel for better spacing and readability.
+
+### Bug Fixes
+- **Profile Initialization**: Fixed an issue where game settings and card design preferences might not load correctly before starting a game. Settings and design selections now properly initialize when profiles load, ensuring your preferences are applied from the start.
+- **Tsuki-fuda Yaku Updates**: Fixed an issue where tsuki-fuda yaku cards might not update correctly when the number of rounds changes. The yaku list now properly reflects the current game configuration.
+
+### Performance & Technical Improvements
+- **Font Preloading**: Added preloading for secondary fonts to improve text rendering performance and reduce layout shifts.
+- **Multiplayer Foundation**: Laid the groundwork for future multiplayer functionality with infrastructure for shared game state synchronization.
+
 ## [2025.11.4] - 2025-11-20
 
 ### New Features
