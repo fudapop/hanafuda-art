@@ -365,23 +365,23 @@
     }
     .one {
       animation-name: none;
-      transform: translate(-30px, 5px) rotate(-45deg);
+      transform: translate(-85px, 25px) rotate(-45deg);
     }
     .two {
       animation-name: none;
-      transform: translate(-15px) rotate(-25deg);
+      transform: translate(-45px, 3px) rotate(-20deg);
     }
     .three {
       animation-name: none;
-      transform: rotate(-5deg);
+      transform: translate(0, -2px) rotate(0deg);
     }
     .four {
       animation-name: none;
-      transform: translate(15px, 5px) rotate(15deg);
+      transform: translate(45px, 8px) rotate(20deg);
     }
     .five {
       animation-name: none;
-      transform: translate(28px, 14px) rotate(35deg);
+      transform: translate(85px, 30px) rotate(45deg);
     }
   }
 }
@@ -392,7 +392,7 @@
   }
 
   to {
-    transform: translate(-30px, 5px) rotate(-45deg);
+    transform: translate(-85px, 25px) rotate(-45deg);
   }
 
   /* to {
@@ -405,7 +405,7 @@
   }
 
   to {
-    transform: translate(-15px) rotate(-25deg);
+    transform: translate(-45px, 3px) rotate(-20deg);
   }
 
   /* to {
@@ -418,7 +418,7 @@
   }
 
   to {
-    transform: translate(15px, 5px) rotate(15deg);
+    transform: translate(45px, 8px) rotate(20deg);
   }
 
   /* to {
@@ -432,7 +432,7 @@
   }
 
   to {
-    transform: rotate(-5deg);
+    transform: translate(0, -2px) rotate(0deg);
   }
 
   /* to {
@@ -445,7 +445,7 @@
   }
 
   to {
-    transform: translate(28px, 14px) rotate(35deg);
+    transform: translate(85px, 30px) rotate(45deg);
   }
 
   /* to {

@@ -2,11 +2,11 @@
   <HeadlessRadioGroup
     v-model="currentDesign"
     as="div"
-    class="relative w-full @container px-4"
+    class="relative w-full @container"
   >
     <div
       v-if="!!currentProfile"
-      class="sticky top-0 z-10 flex justify-between px-4 py-4 shadow-xs bg-surface"
+      class="sticky top-0 z-10 flex justify-between px-8 py-4 shadow-xs bg-surface"
     >
       <HeadlessRadioGroupLabel class="text-lg font-semibold tracking-wide text-text">
         {{ t('deck.selectADeck') }}
