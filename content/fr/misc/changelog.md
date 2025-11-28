@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## [2025.11.5] - 2025-11-28
+
+### Nouvelles fonctionnalités
+- **Sauvegardes de jeu à distance**: Implémentation de la synchronisation cloud pour les sauvegardes de jeu en solo. Les joueurs authentifiés peuvent maintenant synchroniser leurs jeux sauvegardés sur tous leurs appareils, garantissant que votre progression n'est jamais perdue. Le système télécharge automatiquement les sauvegardes vers le cloud et peut les restaurer sur tout appareil où vous êtes connecté.
+- **Support d'images responsives**: Ajout du support d'images responsives avec des attributs srcset sur tous les composants, servant automatiquement des images de taille appropriée selon les capacités de l'appareil. Cela réduit considérablement l'utilisation de la bande passante sur les appareils mobiles tout en maintenant des visuels de haute qualité sur les écrans plus grands.
+
+### Améliorations de l'interface et de l'expérience
+- **Mises à jour du style du menu**: Affinement du padding, des animations et des couleurs des onglets dans les composants du menu pour une meilleure cohérence visuelle et des interactions plus fluides.
+- **Améliorations du panneau des paramètres**: Augmentation du padding inférieur du panneau des paramètres pour un meilleur espacement et une meilleure lisibilité.
+
+### Corrections de bugs
+- **Initialisation du profil**: Correction d'un problème où les paramètres de jeu et les préférences de design de cartes pourraient ne pas se charger correctement avant de commencer une partie. Les paramètres et les sélections de design s'initialisent maintenant correctement lorsque les profils se chargent, garantissant que vos préférences sont appliquées dès le début.
+- **Mises à jour des yaku Tsuki-fuda**: Correction d'un problème où les cartes yaku tsuki-fuda pourraient ne pas se mettre à jour correctement lorsque le nombre de manches change. La liste des yaku reflète maintenant correctement la configuration actuelle du jeu.
+
+### Améliorations des performances et techniques
+- **Préchargement des polices**: Ajout du préchargement des polices secondaires pour améliorer les performances de rendu du texte et réduire les décalages de mise en page.
+- **Fondation multijoueur**: Pose des bases pour la fonctionnalité multijoueur future avec une infrastructure pour la synchronisation de l'état de jeu partagé.
+
 ## [2025.11.4] - 2025-11-20
 
 ### Nouvelles fonctionnalités
