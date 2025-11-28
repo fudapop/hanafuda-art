@@ -46,7 +46,7 @@
           </template>
           <template #tab-icon-1>
             <Icon
-              name="mdi:cards"
+              name="mdi:cards-variant"
               class="text-base"
               aria-hidden="true"
             />
