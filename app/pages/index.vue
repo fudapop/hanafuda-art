@@ -32,7 +32,7 @@
       <div :class="['absolute inset-x-0 max-w-2xl top-1/4 w-max mx-auto isolate -z-10']">
         <div class="w-screen overflow-x-auto touch-pan-x no-scrollbar">
           <div
-            v-click-disabled:unless="players.p1.isActive && !!selectedCard"
+            v-click-disabled:unless="players[selfKey].isActive && !!selectedCard"
             :class="[
               'grid grid-cols-[80px_1fr] gap-2',
               'py-8 px-4 sm:px-8 lg:px-12',
@@ -65,17 +65,18 @@
         :class="[
           'absolute -bottom-4 inset-x-0 pb-8',
           'transition-all duration-200 origin-left [&_ul]:scale-90 sm:[&_ul]:scale-100',
-          players.p2.isActive && 'opacity-80',
+          players[opponentKey].isActive && 'opacity-80',
           isMobile && 'landscape:translate-y-8',
         ]"
       >
         <div
           class="w-screen max-w-full py-8 mx-auto overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x"
         >
-          <div
-            v-click-disabled:unless="players[selfKey].isActive && ds.checkCurrentPhase('select')"
-          >
-            <HandDisplay :id="selfKey" />
+          <div>
+            <HandDisplay
+              :id="selfKey"
+              :can-interact="canInteractLocalHand"
+            />
           </div>
         </div>
       </div>
@@ -137,11 +138,32 @@ const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
 const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
 
+// Derived flag: whether the local player's hand should be interactive
+const canInteractLocalHand = computed(() => {
+  const current = ds.getCurrent
+  const key = selfKey.value
+  const can = current.player === key && current.phase === 'select'
+  // Debug output to verify turn perspective on each client
+  console.debug('[canInteractLocalHand]', {
+    currentPlayer: current.player,
+    phase: current.phase,
+    selfKey: key,
+    can,
+  })
+  return can
+})
+
 const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
 
 const { opponentPlay, useOpponent } = useAutoplay()
 const autoOpponent: Ref<boolean> = useOpponent()
+
+// Multiplayer turn sync helpers
+const { saveMultiplayerGame, syncMultiplayerGame, loadMultiplayerGame, initializeSync } =
+  useStoreManager()
+const { subscribeToGame } = useMultiplayerMatch()
+const gameUnsubscribe = ref<(() => void) | null>(null)
 
 const showModal = ref(false)
 const showLoader = ref(false)
@@ -230,8 +252,6 @@ const resetAllStores = () => {
 // Specialized initialization for a brand new multiplayer game
 const initializeNewMultiplayerGame = async () => {
   const { current: currentProfile } = useProfile()
-  const { saveMultiplayerGame, syncMultiplayerGame, loadMultiplayerGame, initializeSync } =
-    useStoreManager()
 
   const multiplayerMeta = useState<{
     isNew: boolean
@@ -322,6 +342,26 @@ const initializeNewMultiplayerGame = async () => {
 
   // Mark meta as no longer "new" so subsequent starts use regular resume/new logic
   multiplayerMeta.value.isNew = false
+
+  // Subscribe to game document to receive opponent turns
+  if (gameUnsubscribe.value) {
+    gameUnsubscribe.value()
+  }
+
+  gameUnsubscribe.value = subscribeToGame(multiplayerMeta.value.gameId, async (game) => {
+    // Only care when it's now our turn
+    const uid = currentProfile.value?.uid
+    if (!uid || game.activePlayer !== uid) return
+
+    try {
+      const synced = await syncMultiplayerGame(game.gameId)
+      if (synced) {
+        await loadMultiplayerGame()
+      }
+    } catch (error) {
+      console.error('Failed to sync multiplayer turn from Firestore:', error)
+    }
+  })
 }
 
 const startRound = async () => {
@@ -408,6 +448,12 @@ watch(turnCounter, () => {
 })
 
 onBeforeUnmount(() => {
+  // Clean up multiplayer listener
+  if (gameUnsubscribe.value) {
+    gameUnsubscribe.value()
+    gameUnsubscribe.value = null
+  }
+
   // Reset the game state if the user navigates away from the page
   ds.endRound()
   ds.nextRound()
@@ -428,11 +474,61 @@ onMounted(() => {
     if (roundOver.value === false) showModal.value = false
   })
 
-  watch(activePlayer, () => {
-    if (autoOpponent.value && ps.players.p2.isActive) {
-      opponentPlay({ speed: 2 })
-    }
-  })
+  watch(
+    activePlayer,
+    async (newActive, oldActive) => {
+      // Single-player CPU opponent
+      if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {
+        opponentPlay({ speed: 2 })
+      }
+
+      // In multiplayer, when our local turn ends (we were active and now opponent is active),
+      // save a snapshot with the next active player.
+      if (
+        isMultiplayerGame.value &&
+        oldActive &&
+        oldActive.id === selfKey.value &&
+        newActive.id === opponentKey.value
+      ) {
+        const multiplayerMeta = useState<{
+          isNew: boolean
+          gameId: string
+          p1: string
+          p2: string
+          activePlayerUid: string
+        }>('multiplayer-game-meta', () => ({
+          isNew: false,
+          gameId: '',
+          p1: '',
+          p2: '',
+          activePlayerUid: '',
+        }))
+
+        const { current: currentProfile } = useProfile()
+        if (!currentProfile.value || !multiplayerMeta.value.gameId) return
+
+        const p1 = multiplayerMeta.value.p1
+        const p2 = multiplayerMeta.value.p2
+        const nextActiveUid = newActive.id === 'p1' ? p1 : p2
+
+        // Only participants should push
+        if (currentProfile.value.uid !== p1 && currentProfile.value.uid !== p2) return
+
+        try {
+          await saveMultiplayerGame(p1, p2, nextActiveUid)
+          console.info(
+            'Multiplayer turn snapshot saved',
+            currentProfile.value.uid,
+            '->',
+            nextActiveUid,
+          )
+        } catch (error) {
+          console.error('Failed to save multiplayer turn snapshot:', error)
+        }
+      }
+    },
+    { flush: 'post' },
+  )
 
   watch(gameStart, async () => {
     if (gameStart.value) {

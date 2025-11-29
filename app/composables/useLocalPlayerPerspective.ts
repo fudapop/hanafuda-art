@@ -13,5 +13,6 @@ export const useLocalPlayerPerspective = () => {
     selfKey,
     opponentKey,
     isMultiplayerGame,
+    isLocalActive: (id: PlayerKey) => id === selfKey.value,
   }
 }

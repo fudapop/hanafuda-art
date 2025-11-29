@@ -209,14 +209,6 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
 
     async push(game: MultiplayerGame, callerUid: string): Promise<boolean> {
       try {
-        // Validate that caller is the active player
-        if (game.activePlayer !== callerUid) {
-          console.error(
-            `Push denied: caller ${callerUid} is not the active player ${game.activePlayer}`,
-          )
-          return false
-        }
-
         // Validate that caller is a participant
         if (game.p1 !== callerUid && game.p2 !== callerUid) {
           console.error(

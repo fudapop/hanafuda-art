@@ -888,11 +888,6 @@ export const useStoreManager = () => {
   ): Promise<string> => {
     const uid = getCurrentUserId()
 
-    // Validate caller is the active player
-    if (uid !== activePlayer) {
-      throw new Error('Only the active player can save a multiplayer game')
-    }
-
     // Validate caller is a participant
     if (uid !== p1 && uid !== p2) {
       throw new Error('Only participants can save a multiplayer game')
