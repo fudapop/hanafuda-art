@@ -134,6 +134,8 @@ const ps = usePlayerStore()
 const ds = useGameDataStore()
 
 const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
+const { setOpponentPlayer } = useMultiplayerMatch()
+
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
 const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
@@ -160,8 +162,14 @@ const { opponentPlay, useOpponent } = useAutoplay()
 const autoOpponent: Ref<boolean> = useOpponent()
 
 // Multiplayer turn sync helpers
-const { saveMultiplayerGame, syncMultiplayerGame, loadMultiplayerGame, initializeSync } =
-  useStoreManager()
+const {
+  saveMultiplayerGame,
+  syncMultiplayerGame,
+  loadMultiplayerGame,
+  initializeSync,
+  deleteSavedGame,
+  getSaveKeyForMode,
+} = useStoreManager()
 const { subscribeToGame } = useMultiplayerMatch()
 const gameUnsubscribe = ref<(() => void) | null>(null)
 
@@ -218,11 +226,12 @@ const handleCompletion = (data: CompletionEvent) => {
   }
 }
 
-const handleStop = () => {
+const handleStop = async () => {
   const player = activePlayer.value.id
   console.debug(player.toUpperCase(), '>>> Called STOP')
   ds.endRound()
   // Stats are automatically tracked by useStatsTracking composable
+  await pushMultiplayerSnapshot('round-end')
 }
 
 const handleKoikoi = () => {
@@ -244,50 +253,29 @@ const handleNext = async () => {
 
   // In multiplayer, push a fresh snapshot immediately after starting the new round
   // so the opponent sees the new round state before the first turn completes.
-  if (isMultiplayerGame.value) {
-    const multiplayerMeta = useState<{
-      isNew: boolean
-      gameId: string
-      p1: string
-      p2: string
-      activePlayerUid: string
-    }>('multiplayer-game-meta', () => ({
-      isNew: false,
-      gameId: '',
-      p1: '',
-      p2: '',
-      activePlayerUid: '',
-    }))
-
-    const { current: currentProfile } = useProfile()
-    if (!currentProfile.value || !multiplayerMeta.value.gameId) {
-      return
-    }
-
-    const p1 = multiplayerMeta.value.p1
-    const p2 = multiplayerMeta.value.p2
-    const currentActiveKey = activePlayer.value.id as PlayerKey
-    const nextActiveUid = currentActiveKey === 'p1' ? p1 : p2
-
-    try {
-      await saveMultiplayerGame(p1, p2, nextActiveUid)
-      console.info('Multiplayer new round snapshot saved', {
-        gameId: multiplayerMeta.value.gameId,
-        p1,
-        p2,
-        activePlayerUid: nextActiveUid,
-      })
-    } catch (error) {
-      console.error('Failed to save multiplayer new round snapshot:', error)
-    }
-  }
+  await pushMultiplayerSnapshot('new-round')
 }
 
 // Closing the final results modal
-const handleClose = () => {
+const handleClose = async () => {
   $clientPosthog?.capture('game_ended')
   ds.nextRound() // This should fix the issue of not swapping to the winner after final round
   showModal.value = false
+
+  // When a multiplayer match is fully completed, clear the multiplayer save
+  // so "Resume Match" no longer appears on the start screen.
+  if (isMultiplayerGame.value) {
+    try {
+      const multiplayerKey = getSaveKeyForMode('multiplayer')
+      const success = await deleteSavedGame(multiplayerKey)
+      if (success) {
+        console.info('Deleted multiplayer save after match completion', multiplayerKey)
+      }
+    } catch (error) {
+      console.error('Failed to delete multiplayer save after match completion:', error)
+    }
+  }
+
   resetAllStores()
   // Return to the start screen
   gameStart.value = false
@@ -299,6 +287,51 @@ const resetAllStores = () => {
   ds.reset() // Reset game data store
   ps.reset() // Reset player store to initial state (p1 active and dealer)
   cs.reset() // Reset card store
+}
+
+/**
+ * Push a multiplayer snapshot to Firestore reflecting the current local state.
+ * Used after key transitions: turn hand-off, new round start, and round end.
+ */
+const pushMultiplayerSnapshot = async (context: string, activeKeyOverride?: PlayerKey) => {
+  if (!isMultiplayerGame.value) return
+
+  const multiplayerMeta = useState<{
+    isNew: boolean
+    gameId: string
+    p1: string
+    p2: string
+    activePlayerUid: string
+  }>('multiplayer-game-meta', () => ({
+    isNew: false,
+    gameId: '',
+    p1: '',
+    p2: '',
+    activePlayerUid: '',
+  }))
+
+  const { current: currentProfile } = useProfile()
+  if (!currentProfile.value || !multiplayerMeta.value.gameId) return
+
+  const p1 = multiplayerMeta.value.p1
+  const p2 = multiplayerMeta.value.p2
+  const activeKey = activeKeyOverride ?? (activePlayer.value.id as PlayerKey)
+  const activeUid = activeKey === 'p1' ? p1 : p2
+
+  // Only participants should push
+  if (currentProfile.value.uid !== p1 && currentProfile.value.uid !== p2) return
+
+  try {
+    await saveMultiplayerGame(p1, p2, activeUid)
+    console.info(`Multiplayer snapshot saved (${context})`, {
+      gameId: multiplayerMeta.value.gameId,
+      p1,
+      p2,
+      activePlayerUid: activeUid,
+    })
+  } catch (error) {
+    console.error(`Failed to save multiplayer snapshot (${context}):`, error)
+  }
 }
 
 // Specialized initialization for a brand new multiplayer game
@@ -335,6 +368,7 @@ const initializeNewMultiplayerGame = async () => {
     (currentUid === multiplayerMeta.value.p1 || currentUid === multiplayerMeta.value.p2)
   ) {
     localKey.value = currentUid === multiplayerMeta.value.p1 ? 'p1' : 'p2'
+    await setOpponentPlayer(multiplayerMeta.value[opponentKey.value])
     isMultiplayerGame.value = true
   } else {
     localKey.value = 'p1'
@@ -405,9 +439,20 @@ const initializeNewMultiplayerGame = async () => {
     if (!uid) return
 
     try {
-      const synced = await syncMultiplayerGame(game.gameId)
-      if (synced) {
-        await loadMultiplayerGame()
+      // Always pull the latest remote state on any multiplayer_games change.
+      // This avoids subtle timestamp-based no-op cases in syncMultiplayerGame
+      // and guarantees that both players see round/match transitions.
+      await syncMultiplayerGame(game.gameId)
+      const loaded = await loadMultiplayerGame()
+      if (!loaded) {
+        console.warn('Failed to load multiplayer game state after remote update')
+      }
+
+      // If the updated state indicates the match is over, ensure this client
+      // also shows the final results modal, even if they were not the
+      // active player on the last turn.
+      if (ds.gameOver && !showModal.value) {
+        showModal.value = true
       }
     } catch (error) {
       console.error('Failed to sync multiplayer turn from Firestore:', error)
@@ -441,6 +486,7 @@ const handleInstantWin = (result: CompletionEvent) => {
   callStop()
   ds.endRound()
   // Stats are automatically tracked by useStatsTracking composable
+  void pushMultiplayerSnapshot('instant-win-round-end')
 }
 
 const checkDeal = () => {
@@ -476,31 +522,6 @@ const checkDeal = () => {
   return result
 }
 
-watch(decisionIsPending, () => {
-  if (decisionIsPending.value) showModal.value = true
-  if (koikoiIsCalled.value) handleKoikoi()
-  if (stopIsCalled.value) handleStop()
-})
-
-watch(turnCounter, () => {
-  // Handle an exhaustive draw condition
-  if (turnCounter.value !== 9) return
-  const drawConditions = [
-    handsEmpty.value,
-    ds.checkCurrentPhase('select'),
-    !decisionIsPending.value,
-    !stopIsCalled.value,
-  ]
-  if (drawConditions.every((cond) => cond === true)) {
-    showModal.value = true
-    // @ts-expect-error: CompletionEvent 'player' should not be null
-    handleCompletion({ player: null, score: 0 })
-    callStop()
-    ds.endRound()
-    // Stats are automatically tracked by useStatsTracking composable
-  }
-})
-
 onBeforeUnmount(() => {
   // Clean up multiplayer listener
   if (gameUnsubscribe.value) {
@@ -522,6 +543,31 @@ onMounted(() => {
   const { applyCardSizeMultiplier } = useCardDesign()
   applyCardSizeMultiplier(isMobile ? 0.8 : undefined)
 
+  watch(decisionIsPending, () => {
+    if (decisionIsPending.value) showModal.value = true
+    if (koikoiIsCalled.value) handleKoikoi()
+    if (stopIsCalled.value) handleStop()
+  })
+
+  watch(turnCounter, () => {
+    // Handle an exhaustive draw condition
+    if (turnCounter.value !== 9) return
+    const drawConditions = [
+      handsEmpty.value,
+      ds.checkCurrentPhase('select'),
+      !decisionIsPending.value,
+      !stopIsCalled.value,
+    ]
+    if (drawConditions.every((cond) => cond === true)) {
+      showModal.value = true
+      // @ts-expect-error: CompletionEvent 'player' should not be null
+      handleCompletion({ player: null, score: 0 })
+      callStop()
+      ds.endRound()
+      // Stats are automatically tracked by useStatsTracking composable
+    }
+  })
+
   watch(roundOver, () => {
     // Ensure modal is closed when starting a new round during autoplay
     if (gameOver.value === true) return
@@ -540,6 +586,13 @@ onMounted(() => {
     }
   })
 
+  // When the match ends, ensure both players see the final results modal,
+  // even if they were not the calling / active player on the last turn.
+  watch(gameOver, () => {
+    if (!gameOver.value) return
+    showModal.value = true
+  })
+
   watch(
     activePlayer,
     async (newActive, oldActive) => {
@@ -556,41 +609,7 @@ onMounted(() => {
         oldActive.id === selfKey.value &&
         newActive.id === opponentKey.value
       ) {
-        const multiplayerMeta = useState<{
-          isNew: boolean
-          gameId: string
-          p1: string
-          p2: string
-          activePlayerUid: string
-        }>('multiplayer-game-meta', () => ({
-          isNew: false,
-          gameId: '',
-          p1: '',
-          p2: '',
-          activePlayerUid: '',
-        }))
-
-        const { current: currentProfile } = useProfile()
-        if (!currentProfile.value || !multiplayerMeta.value.gameId) return
-
-        const p1 = multiplayerMeta.value.p1
-        const p2 = multiplayerMeta.value.p2
-        const nextActiveUid = newActive.id === 'p1' ? p1 : p2
-
-        // Only participants should push
-        if (currentProfile.value.uid !== p1 && currentProfile.value.uid !== p2) return
-
-        try {
-          await saveMultiplayerGame(p1, p2, nextActiveUid)
-          console.info(
-            'Multiplayer turn snapshot saved',
-            currentProfile.value.uid,
-            '->',
-            nextActiveUid,
-          )
-        } catch (error) {
-          console.error('Failed to save multiplayer turn snapshot:', error)
-        }
+        await pushMultiplayerSnapshot('turn-end', newActive.id as PlayerKey)
       }
     },
     { flush: 'post' },

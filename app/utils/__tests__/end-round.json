@@ -1,0 +1,31 @@
+{
+    "gameId": "a1670fRR5Onu6msxI8aHzHOehzYt",
+    "mode": "multiplayer",
+    "p1": "fAHNbiPoSmUds5mWEe2Zeoqb6ur2",
+    "inviteCode": "EUY-4M9",
+    "p2": "AV2Xc6NcUMfFKAgRf8nkInN6vnP2",
+    "startedAt": {
+      "_seconds": 1764522966,
+      "_nanoseconds": 567000000
+    },
+    "status": "active",
+    "createdAt": {
+      "_seconds": 1764523535,
+      "_nanoseconds": 331000000
+    },
+    "lastUpdated": {
+      "_seconds": 1764523535,
+      "_nanoseconds": 331000000
+    },
+    "activePlayer": "AV2Xc6NcUMfFKAgRf8nkInN6vnP2",
+    "gameState": {
+      "version": "1.0.0",
+      "gameId": "a1670fRR5Onu6msxI8aHzHOehzYt",
+      "config": "{\"maxRounds\":3,\"allowViewingsYaku\":\"allow\",\"doubleScoreOverSeven\":false,\"sakeIsWildCard\":false,\"cardLabels\":false,\"cardSizeMultiplier\":0.8,\"settingsLoaded\":true}",
+      "cards": "{\"encryptedData\":\"oBBUCd5C/Ji/5y2+OowNOrVB7ZCzgq4D0462KKkgcFIG5ddshtm8uNQCPYLZvAxA5LPAJ30WomS+1AZ4Gok1LqV9U9LRkjnAST3W+syypMxmqQVpsLWhkTJmEOh3pK26aBXyy5rUF9AnKjlGwFiBYlNjTQjzg+j15xIu9kO1/u/uVG8EPOfLJkqbU0xHbU+rJ/MXrD7LevyjWkV3s/s3JQHsx0F/s3M1iA5vo5IqV21kGSm9CUvfhOLN8drFk9R3dmPgOJQufqDr1fxXLi3lXAlVhmiVgYgdXNbnEfGRyzuF+kPzpmoz02UHolUiOQ9fz953WeraCSd3nkSGcE+s5UQ4PwNPDBxPG8tufMj9SNaRHpGtn/fB/7uI06jtwlakrOqtEnphNVJlHzlCEsejdqWEztXNsAl+6FI3nxxrTh2fFzeJAJ3HjKI3AaoKZYBh0m4t8MqoSDYiO/V6o8MRgOPS7+vJmS8LJ0KlydvMEjVdDfTWypLLz6wwKyZAWQS3zUYLOU4IPzp7+xbA9YayeHgSx+5aWCvqGZHUkm+s/ViwFLIkIYAHvaCPK/o24rt4MCEG/vNORBfTWTlnG1sJuMOzq92L8C/j5wneDJA8+8ySzrEeEQigN6MfEgpMj8mHRhGGf9/DOHtp0dFcufSR3LJVdoLApHrgv7I9AiHSWahjkK1vto4K/EISPUc6f8FMUQ4GaJUmjs3m3KsC6ZaMJLQ1y6/DP4avmRi/VXtpmztq9FHe5OP1HschrdLnRjhAZH65CBlX9gdWaKJJinWJC77LPXs/eWuLZucjJO07A59TXpwMDof4AqTJIyDVRpzJ28dvr6/46T3XM717/gcrYsnxTLkQoqfIBUPmriL9eOBpo6LxJYpvo0/QdtYufJ1nCfMtBLJHSwHo1RxC2cGBknjnrMTjayNbElMF8z6dcevd+pBvslRNZLdZAJPhIFS7CM7YLzRUfnLd3q1c1/dgRmgK5hsoO+UVtkeMcCW6Tjv2FZqNM1IAumP6P57QJgWKeYxOVGfxIJGCMM1nt7owbl+xJxcvZ9L4v+lgwprBYStHEwwidw8HI1LylYTZ6eq4m82Pjq+TwDpMiPJEYEp9SJFI/ldL0YpxLeBnWhqHDVoz6mkNQ7gh9hMcPDd9OKwQ160F0unrBFsCfzdbE+qBE3ViKhFTVom4+5gaRQa8GtQ8EBJC76GDhshzGslyOU5bLyYVAiiFJp2oIle7dZWBG7L1Zt2gzvhzDZRx4zp2\",\"hash\":\"17bd0200\",\"hashAlgorithm\":\"fnv1a-mixed\",\"version\":\"1.0.0\"}",
+      "players": "{\"players\":{\"p1\":{\"id\":\"p1\",\"name\":\"The Creator 🌱\",\"isActive\":false,\"isDealer\":true},\"p2\":{\"id\":\"p2\",\"name\":\"Player 2\",\"isActive\":true,\"isDealer\":false}},\"bonusMultiplier\":1}",
+      "gameData": "{\"gameId\":\"a1670fRR5Onu6msxI8aHzHOehzYt\",\"roundHistory\":[],\"roundCounter\":1,\"turnCounter\":5,\"turnPhase\":\"select\",\"roundOver\":false,\"gameOver\":false,\"eventHistory\":[{\"type\":\"system\",\"message\":\"START ROUND 1\",\"timestamp\":1764522966},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"match\",\"cards\":[\"kiri-no-kasu-1\",\"kiri-ni-ho-oh\"],\"timestamp\":1764522972},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"draw\",\"cards\":[\"ayame-no-kasu-2\"],\"timestamp\":1764522972},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"discard\",\"cards\":[\"ayame-no-kasu-2\"],\"timestamp\":1764522973},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"match\",\"cards\":[\"ume-no-kasu-1\",\"ume-no-tan\"],\"timestamp\":1764523008},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"draw\",\"cards\":[\"matsu-ni-tsuru\"],\"timestamp\":1764523008},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"match\",\"cards\":[\"matsu-no-tan\",\"matsu-ni-tsuru\"],\"timestamp\":1764523009},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"match\",\"cards\":[\"yanagi-ni-ono-no-toufuu\",\"yanagi-ni-tsubame\"],\"timestamp\":1764523015},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"draw\",\"cards\":[\"momiji-ni-shika\"],\"timestamp\":1764523015},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"discard\",\"cards\":[\"momiji-ni-shika\"],\"timestamp\":1764523016},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"match\",\"cards\":[\"ayame-no-kasu-2\",\"ayame-no-tan\"],\"timestamp\":1764523024},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"draw\",\"cards\":[\"botan-no-kasu-1\"],\"timestamp\":1764523024},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"discard\",\"cards\":[\"botan-no-kasu-1\"],\"timestamp\":1764523025},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"match\",\"cards\":[\"momiji-ni-shika\",\"momiji-no-kasu-1\"],\"timestamp\":1764523031},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"draw\",\"cards\":[\"hagi-ni-inoshishi\"],\"timestamp\":1764523031},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"discard\",\"cards\":[\"hagi-ni-inoshishi\"],\"timestamp\":1764523032},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"match\",\"cards\":[\"hagi-ni-inoshishi\",\"hagi-no-tan\"],\"timestamp\":1764523043},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"draw\",\"cards\":[\"momiji-no-kasu-2\"],\"timestamp\":1764523043},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"discard\",\"cards\":[\"momiji-no-kasu-2\"],\"timestamp\":1764523044},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"match\",\"cards\":[\"botan-no-kasu-1\",\"botan-no-kasu-2\"],\"timestamp\":1764523056},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"draw\",\"cards\":[\"susuki-ni-tsuki\"],\"timestamp\":1764523056},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"match\",\"cards\":[\"susuki-ni-tsuki\",\"susuki-ni-kari\"],\"timestamp\":1764523057},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"match\",\"cards\":[\"fuji-ni-kakku\",\"fuji-no-kasu-2\"],\"timestamp\":1764523515},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"draw\",\"cards\":[\"fuji-no-tan\"],\"timestamp\":1764523515},{\"type\":\"player\",\"player\":\"p2\",\"action\":\"discard\",\"cards\":[\"fuji-no-tan\"],\"timestamp\":1764523516},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"discard\",\"cards\":[\"sakura-no-tan\"],\"timestamp\":1764523530},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"draw\",\"cards\":[\"susuki-no-kasu-1\"],\"timestamp\":1764523532},{\"type\":\"player\",\"player\":\"p1\",\"action\":\"discard\",\"cards\":[\"susuki-no-kasu-1\"],\"timestamp\":1764523533}]}",
+      "timestamp": 1764523535318
+    },
+    "firestore_id": "a1670fRR5Onu6msxI8aHzHOehzYt"
+}

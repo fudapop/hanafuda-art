@@ -22,7 +22,13 @@ import {
 } from 'firebase/firestore'
 import type { InviteCode, MultiplayerGame } from '~~/types/profile'
 import { useCardStore } from '~~/stores/cardStore'
-import { useConfigStore } from '~~/stores/configStore'
+import type { PlayerKey } from '~~/stores/playerStore'
+
+export type OpponentPlayer = {
+  uid: string
+  username: string
+  avatar: string
+}
 
 export type MultiplayerMatchComposable = {
   /**
@@ -74,6 +80,20 @@ export type MultiplayerMatchComposable = {
    * @returns Array of multiplayer games
    */
   listMyGames: () => Promise<MultiplayerGame[]>
+
+  /**
+   * Global reactive reference to the opponent player details for multiplayer games.
+   * This is shared across the app and auto-persisted with useState.
+   *
+   * @returns Global Ref to the OpponentPlayer object, or null if not set.
+   *
+   * Usage:
+   * const opponent = useOpponentPlayer()
+   * opponent.value = { uid, username, avatar }
+   */
+  useOpponentPlayer: () => Ref<OpponentPlayer | null>
+
+  setOpponentPlayer: (opponentUid: string) => Promise<void>
 }
 
 /**
@@ -114,6 +134,24 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
   const { current: profile } = useProfile()
   const { saveMultiplayerGame, serializeGameState, syncMultiplayerGame, initializeSync } =
     useStoreManager()
+
+  const useOpponentPlayer = () =>
+    useState<OpponentPlayer | null>('multiplayer-opponent', () => null)
+
+  const setOpponentPlayer = async (opponentUid: string) => {
+    const opponentDoc = await getDoc(doc(db, 'users', `u_${opponentUid}`))
+    if (opponentDoc.exists()) {
+      const opponent = useOpponentPlayer()
+      const opponentData = opponentDoc.data()
+      opponent.value = {
+        uid: opponentData.uid,
+        username: opponentData.username,
+        avatar: opponentData.avatar,
+      }
+    } else {
+      console.warn('Unable to retrieve opponent details')
+    }
+  }
 
   const createGame = async (): Promise<{ gameId: string; code: string }> => {
     // 1. Verify authentication
@@ -242,7 +280,12 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
     // 7. Choose starting player randomly between p1 and p2
     const hostUid = gameData.p1 as string
     const joinerUid = profile.value.uid
-    const startingUid = Math.random() < 0.5 ? hostUid : joinerUid
+    // TODO: Continue to debug issues initializing with joiner as starter
+    const startingUid = hostUid
+    // const startingUid = Math.random() < 0.5 ? hostUid : joinerUid
+
+    // 7.5 Set opponent player details
+    await setOpponentPlayer(hostUid)
 
     // 8. Update game document (set p2, activePlayer, and change status to active)
     const now = new Date()
@@ -328,7 +371,13 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
       }
 
       const gameData = gameDoc.data()
-      return gameData.status === 'active' && gameData.p2 !== ''
+      const hasJoined = gameData.status === 'active' && gameData.p2 !== ''
+
+      if (hasJoined) {
+        await setOpponentPlayer(gameData.p2)
+      }
+
+      return hasJoined
     } catch (error) {
       console.error('Error checking opponent joined:', error)
       return false
@@ -525,5 +574,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
     subscribeToGame,
     validateInviteCode,
     listMyGames,
+    useOpponentPlayer,
+    setOpponentPlayer,
   }
 }

@@ -96,10 +96,7 @@
         '-translate-y-full': !gameStart,
       }"
     >
-      <StatusBar
-        :user="null"
-        :playerNum="2"
-      />
+      <OpponentStatusBar />
     </div>
 
     <!-- GAMEPLAY AREA -->
@@ -135,10 +132,7 @@
         'translate-y-full': !gameStart,
       }"
     >
-      <StatusBar
-        :user="user"
-        :playerNum="1"
-      />
+      <PlayerStatusBar :user="user" />
     </div>
 
     <!-- LOADER -->

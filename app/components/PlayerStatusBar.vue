@@ -1,6 +1,6 @@
 <template>
   <div class="relative w-full h-16 px-4 py-2">
-    <div :class="['size-full mx-auto flex', isPlayer1 ? 'items-end' : 'items-start']">
+    <div class="size-full mx-auto flex items-end">
       <div class="flex space-x-2 sm:space-x-4">
         <div class="shrink-0">
           <img
@@ -11,15 +11,12 @@
           />
           <img
             v-else
-            :src="p2Avatar"
+            :src="p1Avatar"
             class="size-12 mx-auto transition-all border-2 rounded-full lg:size-24 border-border"
           />
         </div>
-        <div :class="['flex flex-col', isPlayer1 ? 'justify-end' : 'justify-start']">
-          <p
-            v-if="isPlayer1"
-            class="text-sm font-normal lg:text-2xl lg:mb-2 text-white/80"
-          >
+        <div class="flex flex-col justify-end">
+          <p class="text-sm font-normal lg:text-2xl lg:mb-2 text-white/80">
             {{ t('common.labels.round') }} {{ ds.roundCounter }} / {{ config.maxRounds }}
           </p>
           <div
@@ -29,9 +26,7 @@
             ]"
           >
             <p class="flex items-center font-bold gap-x-2">
-              <span class="">{{
-                user?.username || `${t('common.labels.player')} ${playerNum}`
-              }}</span>
+              <span class="">{{ user?.username || `${t('common.labels.player')} 1` }}</span>
               <span
                 class="flex items-center"
                 v-memo="[ds.roundOver, gameStart]"
@@ -65,14 +60,14 @@ import { storeToRefs } from 'pinia'
 import NumberAnimation from 'vue-number-animation'
 import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
-import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
+import { usePlayerStore } from '~~/stores/playerStore'
 
 const { isMobile } = useDevice()
 
 const { orientation } = useScreenOrientation()
 const isMobileLandscape = computed(() => isMobile && orientation.value?.includes('landscape'))
 
-const { user, playerNum } = defineProps(['user', 'playerNum'])
+const { user } = defineProps<{ user?: { username: string; avatar: string } | null }>()
 const ds = useGameDataStore()
 const ps = usePlayerStore()
 const config = useConfigStore()
@@ -80,44 +75,54 @@ const { t } = useI18n()
 
 const gameStart = useState('start')
 const { gameOver } = storeToRefs(ds)
-const player = `p${playerNum}` as PlayerKey
-const opponent: PlayerKey = player === 'p1' ? 'p2' : 'p1'
-const score = computed(() => ds.scoreboard[player])
-const isPlayer1 = computed(() => playerNum === 1)
+
+const { selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
+
+const score = computed(() => ds.scoreboard[selfKey.value])
 
 const { p1Avatar, p2Avatar } = useAvatar()
+const opponent = useMultiplayerMatch().useOpponentPlayer()
 
 const getResult = () => {
   const result =
-    ds.scoreboard[player] > ds.scoreboard[opponent]
+    ds.scoreboard[selfKey.value] > ds.scoreboard[opponentKey.value]
       ? 'win'
-      : ds.scoreboard[player] === ds.scoreboard[opponent]
+      : ds.scoreboard[selfKey.value] === ds.scoreboard[opponentKey.value]
         ? 'draw'
         : 'loss'
-  if (result === 'win') ps.reset(player)
+  if (result === 'win') ps.reset(selfKey.value)
   return result
 }
 
-watch(
-  () => user,
-  () => {
-    ps.setPlayerName(player, user?.username || `${t('common.labels.player')} ${playerNum}`)
-    if (user?.avatar) {
-      p1Avatar.value = user.avatar
+onMounted(() => {
+  watch(
+    () => user,
+    () => {
+      ps.setPlayerName(selfKey.value, user?.username || `${t('common.labels.player')} 1`)
+      if (user?.avatar) {
+        p1Avatar.value = user.avatar
+      }
+      if (isMultiplayerGame.value && opponent.value) {
+        p2Avatar.value = opponent.value.avatar
+      }
+    },
+    { immediate: true },
+  )
+  watch(opponent, (newOpponent) => {
+    if (newOpponent?.avatar) {
+      p2Avatar.value = newOpponent.avatar
     }
-  },
-  { immediate: true },
-)
-watch(gameOver, async () => {
-  if (!gameOver.value) return
-  // Only update game record from the actual user's StatusBar (Player 1)
-  // Player 2's StatusBar has user=null and should not update the record
-  if (!user) return
+  })
+  watch(gameOver, async () => {
+    if (!gameOver.value) return
+    // Only update game record from the actual user's StatusBar
+    if (!user) return
 
-  const result = getResult()
-  const { updateGameRecord } = useProfile()
-  // Update game record properly through the exposed method
-  await updateGameRecord(result, ds.scoreboard.p1)
-  ds.generateGameId()
+    const result = getResult()
+    const { updateGameRecord } = useProfile()
+    // Update game record properly through the exposed method
+    await updateGameRecord(result, ds.scoreboard[selfKey.value])
+    ds.generateGameId()
+  })
 })
 </script>
