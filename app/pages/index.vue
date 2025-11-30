@@ -240,7 +240,47 @@ const handleNext = async () => {
   ds.nextRound()
   showModal.value = false
   await sleep(2000)
-  startRound()
+  await startRound()
+
+  // In multiplayer, push a fresh snapshot immediately after starting the new round
+  // so the opponent sees the new round state before the first turn completes.
+  if (isMultiplayerGame.value) {
+    const multiplayerMeta = useState<{
+      isNew: boolean
+      gameId: string
+      p1: string
+      p2: string
+      activePlayerUid: string
+    }>('multiplayer-game-meta', () => ({
+      isNew: false,
+      gameId: '',
+      p1: '',
+      p2: '',
+      activePlayerUid: '',
+    }))
+
+    const { current: currentProfile } = useProfile()
+    if (!currentProfile.value || !multiplayerMeta.value.gameId) {
+      return
+    }
+
+    const p1 = multiplayerMeta.value.p1
+    const p2 = multiplayerMeta.value.p2
+    const currentActiveKey = activePlayer.value.id as PlayerKey
+    const nextActiveUid = currentActiveKey === 'p1' ? p1 : p2
+
+    try {
+      await saveMultiplayerGame(p1, p2, nextActiveUid)
+      console.info('Multiplayer new round snapshot saved', {
+        gameId: multiplayerMeta.value.gameId,
+        p1,
+        p2,
+        activePlayerUid: nextActiveUid,
+      })
+    } catch (error) {
+      console.error('Failed to save multiplayer new round snapshot:', error)
+    }
+  }
 }
 
 // Closing the final results modal
@@ -355,15 +395,14 @@ const initializeNewMultiplayerGame = async () => {
   // Mark meta as no longer "new" so subsequent starts use regular resume/new logic
   multiplayerMeta.value.isNew = false
 
-  // Subscribe to game document to receive opponent turns
+  // Subscribe to game document to receive remote updates (turns, new rounds, etc.)
   if (gameUnsubscribe.value) {
     gameUnsubscribe.value()
   }
 
   gameUnsubscribe.value = subscribeToGame(multiplayerMeta.value.gameId, async (game) => {
-    // Only care when it's now our turn
     const uid = currentProfile.value?.uid
-    if (!uid || game.activePlayer !== uid) return
+    if (!uid) return
 
     try {
       const synced = await syncMultiplayerGame(game.gameId)
@@ -390,7 +429,10 @@ const startRound = async () => {
     handleInstantWin(result as CompletionEvent)
     return
   }
-  if (ps.players.p2.isActive) opponentPlay({ speed: 2 })
+  // In single-player, let the CPU opponent take the first turn when p2 starts.
+  if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {
+    opponentPlay({ speed: 2 })
+  }
 }
 
 const handleInstantWin = (result: CompletionEvent) => {
@@ -483,7 +525,19 @@ onMounted(() => {
   watch(roundOver, () => {
     // Ensure modal is closed when starting a new round during autoplay
     if (gameOver.value === true) return
-    if (roundOver.value === false) showModal.value = false
+
+    if (roundOver.value === false) {
+      showModal.value = false
+      return
+    }
+
+    // When a round has ended in multiplayer, make sure the non-calling player
+    // also sees the round results modal. Their client will have roundOver = true
+    // after syncing, but decisionIsPending will be false so RoundResults renders
+    // in a read-only state (no KOI-KOI/STOP buttons).
+    if (isMultiplayerGame.value && !decisionIsPending.value) {
+      showModal.value = true
+    }
   })
 
   watch(

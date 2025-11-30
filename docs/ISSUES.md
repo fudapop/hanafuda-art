@@ -349,6 +349,57 @@ Additionally, the event log showed duplicated yaku completion entries (e.g., “
 
 ---
 
+## 2025-11-30: Multiplayer Round Transition Desync After STOP
+
+**Status**: RESOLVED
+
+**Problem**:  
+In async multiplayer, when a player called **STOP** to end a round and then advanced to the next round:
+- The inactive (non-calling) player did not see the round results modal, even though the round had ended for them.
+- After clicking “Next” on the active player’s side, the new round state was correctly pushed and both players eventually saw the new deal, but:
+  - The inactive player initially remained on the previous round view (no results UI).
+  - If `p2` was the winner, the **single-player CPU autoplay** (`autoOpponent`) could incorrectly start playing the new round in a multiplayer game.
+
+**Root Cause**:
+1. **Round results modal only driven by local decision flow**:
+   - The results modal (`showModal`) was primarily controlled by the local `decisionIsPending` / KOI-KOI flow.
+   - In multiplayer, only the calling player’s client entered `decisionIsPending`, so only they ever opened the modal in response to a STOP; the opponent’s client had `roundOver = true` but `showModal` remained `false`.
+2. **Autoplay trigger not aware of multiplayer mode**:
+   - `startRound()` unconditionally set `autoOpponent.value = true` and, if `ps.players.p2.isActive`, called `opponentPlay({ speed: 2 })`.
+   - This is correct for single-player (CPU as p2), but in multiplayer it caused the CPU logic to run as soon as `p2` became the starting player of the next round.
+
+**Resolution**:
+1. **Ensure both players see round results in multiplayer**:
+   - Updated the `watch(roundOver, ...)` block in `app/pages/index.vue`:
+     - If `roundOver` becomes `false` and `gameOver` is not set, it closes the modal (`showModal = false`) for new-round starts.
+     - When `roundOver` becomes `true`:
+       - In single-player, behavior remains unchanged.
+       - In multiplayer, if `decisionIsPending` is `false`, it **forces** `showModal.value = true`, ensuring the non-calling player sees the round results modal in read-only mode (no KOI-KOI/STOP buttons).
+2. **Disable CPU autoplay in multiplayer**:
+   - In `startRound()` in `app/pages/index.vue`, gated the opponent autoplay to single-player only:
+     ```ts
+     if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {
+       opponentPlay({ speed: 2 })
+     }
+     ```
+   - This keeps CPU behavior intact for single-player while preventing `opponentPlay` from running in any multiplayer context.
+
+**Files Changed**:
+- `app/pages/index.vue`:
+  - `startRound()` now only triggers `opponentPlay` when `!isMultiplayerGame.value`.
+  - `watch(roundOver, ...)` now opens the round results modal for the inactive player in multiplayer when `roundOver` becomes `true` and no decision is pending.
+
+**Verification**:
+- In two-client multiplayer tests:
+  - When P2 calls STOP and wins the round:
+    - P2 sees the round results modal and can click **Next** to start the next round.
+    - P1’s client, after syncing, also sees the round results modal with the correct “Player 2 called stop” summary but no decision buttons.
+  - On advancing to the next round:
+    - Both players see the new deal immediately (from previous fixes).
+    - No CPU autoplay occurs; only the human player whose turn it is can act.
+
+---
+
 ## Future Issues
 
 (New issues will be added above this line)
