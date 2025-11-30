@@ -280,9 +280,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
     // 7. Choose starting player randomly between p1 and p2
     const hostUid = gameData.p1 as string
     const joinerUid = profile.value.uid
-    // TODO: Continue to debug issues initializing with joiner as starter
-    const startingUid = hostUid
-    // const startingUid = Math.random() < 0.5 ? hostUid : joinerUid
+    const startingUid = Math.random() < 0.5 ? hostUid : joinerUid
 
     // 7.5 Set opponent player details
     await setOpponentPlayer(hostUid)

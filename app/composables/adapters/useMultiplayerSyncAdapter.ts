@@ -2,6 +2,8 @@ import {
   collection,
   doc,
   getDoc,
+  getDocFromCache,
+  getDocFromServer,
   getDocs,
   getFirestore,
   query,
@@ -71,18 +73,20 @@ function parseMultiplayerGame(
   data: Record<string, unknown>,
   docId?: string,
 ): MultiplayerGame | null {
+  const status = typeof data.status === 'string' ? data.status : undefined
+
+  const hasValidGameId = typeof data.gameId === 'string' && data.gameId !== ''
+  const hasGameState = !!data.gameState
+  const hasValidP1 = typeof data.p1 === 'string' && data.p1 !== ''
+
+  // For active / completed games, p2 must be a non-empty string.
+  // For waiting games, p2 may legitimately be empty until an opponent joins.
+  const hasValidP2 = typeof data.p2 === 'string' && (data.p2 !== '' || status === 'waiting')
+
+  const hasValidActivePlayer = typeof data.activePlayer === 'string' && data.activePlayer !== ''
+
   // Validate required fields
-  if (
-    typeof data.gameId !== 'string' ||
-    data.gameId === '' ||
-    !data.gameState ||
-    typeof data.p1 !== 'string' ||
-    data.p1 === '' ||
-    typeof data.p2 !== 'string' ||
-    data.p2 === '' ||
-    typeof data.activePlayer !== 'string' ||
-    data.activePlayer === ''
-  ) {
+  if (!hasValidGameId || !hasGameState || !hasValidP1 || !hasValidP2 || !hasValidActivePlayer) {
     console.error('Invalid multiplayer game data: missing or invalid required fields', {
       docId,
       gameId: data.gameId,
@@ -134,6 +138,7 @@ function parseMultiplayerGame(
     p1: data.p1,
     p2: data.p2,
     activePlayer: data.activePlayer,
+    status: data.status,
     lastUpdated,
     createdAt,
   } as MultiplayerGame
@@ -145,11 +150,12 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
   return {
     name: 'firestore-multiplayer-games',
 
-    async get(gameId: string): Promise<MultiplayerGame | null> {
+    async get(gameId: string, cached?: boolean): Promise<MultiplayerGame | null> {
       try {
         const docRef = doc(db, 'multiplayer_games', gameId)
-        const docSnapshot = await getDoc(docRef)
+        const docSnapshot = cached ? await getDocFromCache(docRef) : await getDocFromServer(docRef)
 
+        console.log('RETRIEVED SNAPSHOT', Date.now())
         if (!docSnapshot.exists()) {
           return null
         }
@@ -237,6 +243,7 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
         }
 
         await setDoc(docRef, firestoreData, { merge: true })
+        console.log('PUSHED SNAPSHOT', Date.now())
         return true
       } catch (error) {
         console.error('Firestore multiplayer game push error:', error)

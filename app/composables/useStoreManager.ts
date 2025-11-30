@@ -491,7 +491,9 @@ export const useStoreManager = () => {
       )
 
       if (!cardResult) {
-        throw new Error('Card store failed to import - possible data tampering detected')
+        throw new Error(
+          'Card store failed to import - possible data tampering or salt mismatch detected',
+        )
       }
 
       return true
@@ -893,13 +895,40 @@ export const useStoreManager = () => {
       throw new Error('Only participants can save a multiplayer game')
     }
 
+    // Snapshot of current card / round state at the moment we save, used to avoid
+    // pushing obviously uninitialized boards to Firestore.
+    const debugCardStore = useCardStore()
+    const debugHandSizes = {
+      p1: debugCardStore.hand.p1.size,
+      p2: debugCardStore.hand.p2.size,
+    }
+    const debugFieldSize = debugCardStore.field.size
+    const debugDeckSize = debugCardStore.deck.size
+
+    // Guard: avoid pushing obviously uninitialized board state (full deck, empty hands/field).
+    // This can occur during pre-game setup or if a client hasn't yet loaded the starter's
+    // dealt snapshot. We still allow the local IndexedDB save so StartScreen can show a
+    // "Resume Match" entry, but we skip updating the shared multiplayer_games document.
+    const isUninitializedBoard =
+      debugDeckSize === DECK.length &&
+      debugFieldSize === 0 &&
+      debugHandSizes.p1 === 0 &&
+      debugHandSizes.p2 === 0
+
+    if (isUninitializedBoard) {
+      console.warn(
+        '[saveMultiplayerGame] Skipping shared multiplayer push for uninitialized board (full deck, empty hands/field)',
+      )
+    }
+
     // Save to local IndexedDB
     const saveKey = await saveGameToStorage('multiplayer', p1, p2, activePlayer)
 
     // Also push to shared Firestore collection if adapter initialized
-    if (multiplayerAdapter.value) {
+    if (multiplayerAdapter.value && !isUninitializedBoard) {
       try {
         if (await multiplayerAdapter.value.isAvailable()) {
+          await sleep(1000)
           const gameState = await serializeGameState()
           const derivedStatus: GameStatus = p2 && p2.trim() !== '' ? 'active' : 'waiting'
           const multiplayerGame: MultiplayerGame = {
@@ -914,7 +943,9 @@ export const useStoreManager = () => {
             createdAt: new Date(), // Will be overwritten if game already exists
           }
           await multiplayerAdapter.value.push(multiplayerGame, uid)
-          console.info('Multiplayer game saved to shared Firestore')
+          console.info('Multiplayer game saved to shared Firestore', multiplayerGame)
+        } else {
+          console.error('Multiplayer adapter not available')
         }
       } catch (error) {
         console.error('Failed to push multiplayer game to Firestore:', error)
@@ -965,36 +996,61 @@ export const useStoreManager = () => {
       const uid = getCurrentUserId()
       const store = await getGameSaveStore()
       const localSave = await store.get(uid, getSaveKeyForMode('multiplayer'))
-
       const remoteState = remoteGame.gameState as SerializedGameState
       const localState = localSave?.gameState as SerializedGameState | undefined
 
-      // Primary change detection: serialized game state timestamp (remote must be newer)
-      const hasNewerSerializedState = !localState || remoteState.timestamp > localState.timestamp
-
-      // Fallback: lastUpdated (kept for additional safety / debugging)
-      const hasNewerLastUpdated = !!localSave && remoteGame.lastUpdated > localSave.timestamp
-
-      if (!localSave || hasNewerSerializedState || hasNewerLastUpdated) {
-        // Update local cache with remote state
-        const updatedSave: GameSaveRecord = {
-          id: `${uid}_${getSaveKeyForMode('multiplayer')}`,
-          uid,
-          saveKey: getSaveKeyForMode('multiplayer'),
-          gameState: remoteGame.gameState,
-          timestamp: remoteGame.lastUpdated,
-          gameId: remoteGame.gameId,
-          mode: 'multiplayer',
-          p1: remoteGame.p1,
-          p2: remoteGame.p2,
-          activePlayer: remoteGame.activePlayer,
+      // Inspect gameData to avoid overwriting the local board with a "pre-game" snapshot
+      // (e.g., full deck, no START ROUND event) from the waiting lobby state.
+      let hasStartedRound = false
+      try {
+        const parsedGameData = JSON.parse(remoteState.gameData ?? '{}') as {
+          eventHistory?: Array<{ type?: string; message?: string }>
         }
-        await store.set(updatedSave)
-        console.info('Multiplayer game synced from Firestore')
-        return true
+        const events = parsedGameData.eventHistory ?? []
+        hasStartedRound = events.some(
+          (evt) =>
+            evt &&
+            evt.type === 'system' &&
+            typeof evt.message === 'string' &&
+            evt.message.startsWith('START ROUND'),
+        )
+
+        if (!hasStartedRound) {
+          console.warn(
+            '[syncMultiplayerGame] Remote multiplayer state has no START ROUND event; treating as pre-game and not overwriting local board',
+            {
+              gameId,
+              remoteEventCount: events.length,
+            },
+          )
+        }
+      } catch (error) {
+        console.error('[syncMultiplayerGame] Failed to parse remote multiplayer gameData', error)
+        hasStartedRound = true
       }
 
-      return false
+      if (!hasStartedRound) {
+        return false
+      }
+
+      // For multiplayer, Firestore is the single source of truth (once a round has started).
+      // Always overwrite the local multiplayer save with the latest remote snapshot so both
+      // players converge to the same state.
+      const updatedSave: GameSaveRecord = {
+        id: `${uid}_${getSaveKeyForMode('multiplayer')}`,
+        uid,
+        saveKey: getSaveKeyForMode('multiplayer'),
+        gameState: remoteGame.gameState,
+        timestamp: remoteGame.lastUpdated,
+        gameId: remoteGame.gameId,
+        mode: 'multiplayer',
+        p1: remoteGame.p1,
+        p2: remoteGame.p2,
+        activePlayer: remoteGame.activePlayer,
+      }
+      await store.set(updatedSave)
+      console.info('Multiplayer game synced from Firestore')
+      return true
     } catch (error) {
       console.error('Failed to sync multiplayer game:', error)
       return false

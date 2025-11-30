@@ -239,6 +239,66 @@ In multiplayer matches, each client always treated `p1` as “the player at the 
 
 ---
 
+## 2025-11-30: Joiner as Starting Player Left Host Board Empty
+
+**Status**: RESOLVED
+
+**Problem**:  
+When the invite-code joiner was randomly chosen (or forced) to be the starting player in async multiplayer, only the starter’s client showed the newly dealt board. The non-starting host remained on an empty UI even though Firestore contained a valid multiplayer snapshot.
+
+**Symptoms**:
+- With the joiner forced as starter:
+  - Joiner saw a fully dealt board and could play normally.
+  - Host’s board stayed blank at the start of the round.
+- Console logs showed:
+  - Multiple `syncMultiplayerGame` attempts on the host with no apparent errors.
+  - Local and remote serialized game states sometimes appearing “equal” despite different card layouts.
+- Firestore `multiplayer_games` collection contained a valid, dealt `gameState` for the match.
+
+**Root Cause**:
+1. **Mismatched game IDs between local state and Firestore**:
+   - `useGameDataStore` generated a fresh `gameId` when the starter initialized the round via `startRound()`.
+   - `saveMultiplayerGame` serialized this new `gameId` and pushed snapshots to a *different* `multiplayer_games/{gameId}` document than the one used for the original invite-code match.
+   - The non-starter (host) continued syncing against the original pre-game document, which never received the dealt state.
+2. **Pre-game snapshots overwriting valid boards**:
+   - Both clients occasionally pushed snapshots while the board was still uninitialized (full deck, empty hands/field).
+   - `syncMultiplayerGame` treated all snapshots as authoritative, so empty “lobby” states could overwrite valid boards on the other client.
+   - Early change-detection relied solely on timestamps, which were sometimes equal for structurally different payloads.
+
+**Resolution**:
+1. **Canonical multiplayer gameId wiring**:
+   - In `initializeNewMultiplayerGame` (`app/pages/index.vue`), the local `gameDataStore.gameId` is now explicitly synchronized to the Firestore multiplayer `gameId` stored in `multiplayerMeta`:
+     - If `ds.gameId` differs from `multiplayerMeta.gameId`, we overwrite the local value with the canonical multiplayer ID.
+   - Result: both host and joiner always serialize and push to the *same* `multiplayer_games/{gameId}` document, regardless of who starts the round.
+2. **Guard against pushing uninitialized boards**:
+   - `saveMultiplayerGame` (`app/composables/useStoreManager.ts`) now inspects the current card state before pushing:
+     - If `deckSize === DECK.length` and both hand sizes are `0` and `fieldSize === 0`, it treats the board as **uninitialized** (waiting lobby) and:
+       - Still saves locally to IndexedDB for resume purposes.
+       - Skips updating the shared `multiplayer_games` document.
+   - This prevents empty pre-game states from overwriting a valid dealt board in Firestore.
+3. **Ignore pre-round remote snapshots during sync**:
+   - `syncMultiplayerGame` now parses `remoteState.gameData.eventHistory` and checks for a system `"START ROUND"` event.
+   - If no such event exists:
+     - It logs a warning indicating the remote state is pre-game and **does not overwrite** the local multiplayer save.
+   - If parsing fails, it conservatively applies the snapshot but logs an error.
+   - Once the starter has pushed a real round state (with `START ROUND`), subsequent syncs always overwrite local state from Firestore.
+
+**Files Changed**:
+- `app/pages/index.vue` – `initializeNewMultiplayerGame` now syncs `ds.gameId` to `multiplayerMeta.gameId`.
+- `app/composables/useStoreManager.ts`:
+  - `saveMultiplayerGame` adds an “uninitialized board” guard before pushing to Firestore.
+  - `syncMultiplayerGame` skips applying snapshots whose `gameData.eventHistory` lacks a `"START ROUND"` system event, treating them as lobby/pre-round states.
+
+**Verification**:
+- In two authenticated browser sessions:
+  - Host creates a game; joiner joins via invite code.
+  - When the joiner is selected as starter:
+    - Joiner sees the correctly dealt board and can act as expected.
+    - Host now also sees the same dealt board after `syncMultiplayerGame` + `loadMultiplayerGame` run, instead of remaining empty.
+  - Firestore shows a single `multiplayer_games/{gameId}` document whose `gameId` matches `ds.gameId` on both clients, and whose `gameState` reflects the dealt board.
+
+---
+
 ## 2025-11-30: Multiplayer Hand Showing Card Back After Card Was Collected
 
 **Status**: RESOLVED

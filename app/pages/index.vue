@@ -138,7 +138,7 @@ const { setOpponentPlayer } = useMultiplayerMatch()
 
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
-const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
+const { roundOver, gameOver, turnCounter, gameId } = storeToRefs(ds)
 
 // Derived flag: whether the local player's hand should be interactive
 const canInteractLocalHand = computed(() => {
@@ -362,6 +362,19 @@ const initializeNewMultiplayerGame = async () => {
   const currentUid = currentProfile.value?.uid
   const isStarter = currentUid && currentUid === multiplayerMeta.value.activePlayerUid
 
+  // Ensure the game data store uses the canonical multiplayer gameId from Firestore
+  // so both players share the same identifier and push to the same multiplayer_games
+  // document. Without this, the starting player could generate a new local gameId and
+  // push snapshots to a different document, leaving the original host document in a
+  // pre-game state.
+  if (multiplayerMeta.value.gameId && gameId.value !== multiplayerMeta.value.gameId) {
+    console.debug('[initializeNewMultiplayerGame] Syncing local gameId to multiplayer meta', {
+      previousGameId: gameId.value,
+      multiplayerGameId: multiplayerMeta.value.gameId,
+    })
+    gameId.value = multiplayerMeta.value.gameId
+  }
+
   // Set local player perspective for multiplayer
   if (
     currentUid &&
@@ -383,6 +396,9 @@ const initializeNewMultiplayerGame = async () => {
 
     // Start with a clean state and run normal round initialization
     resetAllStores()
+    // Ensure the correct starting players is reflected in state
+    ps.reset(localKey.value)
+
     await startRound()
 
     try {
@@ -395,6 +411,7 @@ const initializeNewMultiplayerGame = async () => {
     } catch (error) {
       console.error('Failed to save multiplayer game from starting player:', error)
     }
+    console.log('STARTER INITIALIZED', Date.now())
   } else {
     console.info(
       'Joining new multiplayer game as non-starting player, syncing from remote state',
@@ -421,6 +438,7 @@ const initializeNewMultiplayerGame = async () => {
       if (!loaded) {
         console.warn('Failed to load multiplayer game state after sync retries')
       }
+      console.log('NON-STARTER INITIALIZED', Date.now())
     } catch (error) {
       console.error('Failed to sync/load multiplayer game for non-starting player:', error)
     }
