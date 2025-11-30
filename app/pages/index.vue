@@ -203,7 +203,19 @@ const handleCompletion = (data: CompletionEvent) => {
     score: score * ps.bonusMultiplier,
     completedYaku,
   })
-  handleDecision()
+
+  // Single-player: always enter decision flow (human vs CPU).
+  if (!isMultiplayerGame.value) {
+    handleDecision()
+    return
+  }
+
+  // Multiplayer: only the player who completed the yaku (from this client's perspective)
+  // should enter the decision flow. Opponent clients see the results but never
+  // enter a pending decision state, so their modal does not reopen.
+  if (selfKey.value === player) {
+    handleDecision()
+  }
 }
 
 const handleStop = () => {

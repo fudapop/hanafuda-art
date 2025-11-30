@@ -288,6 +288,67 @@ In async multiplayer games, after a turn hand-off, one client occasionally showe
 
 ---
 
+## 2025-11-30: KOI-KOI Decision Modal Reappearing and Duplicate Yaku Logs in Multiplayer
+
+**Status**: RESOLVED
+
+**Problem**:  
+In async multiplayer matches, when a player completed a yaku and called **KOI-KOI**, the round results decision modal would:
+- Correctly appear for the scoring player, but
+- Reappear for the opponent after the turn hand-off.  
+Additionally, the event log showed duplicated yaku completion entries (e.g., “P1 completed KASU” twice) for a single scoring event.
+
+**Symptoms**:
+- After a player called KOI-KOI, the opponent’s client saw the KOI-KOI/STOP modal again when the turn switched.
+- Event log contained two identical “P1 completed {YAKU}” entries, timestamped within a second of each other.
+
+**Root Cause**:
+1. **Decision flow not scoped per client in multiplayer**:
+   - `handleCompletion` in `index.vue` called `handleDecision()` (which uses `makeDecision()` from `useDecisionHandler`) on **every** client whenever `CollectionArea` emitted a `completed` event.
+   - In multiplayer, both clients ran `handleCompletion()` and set `decision.value = 'pending'`, so `decisionIsPending` became `true` everywhere, causing both clients to open/maintain the decision modal.
+2. **Yaku completion generation not scoped per local player**:
+   - Each `CollectionArea` instance (for `p1` and `p2`) recomputed yaku and, on detecting new completions, logged `'complete'` events and emitted a `completed` event.
+   - When the scoring player’s state synced to the opponent, the opponent’s `CollectionArea` recomputed the same yaku and emitted its own `completed`, producing duplicate log entries.
+
+**Resolution**:
+1. **Scope decision flow to the correct local player**:
+   - Updated `handleCompletion` in `app/pages/index.vue`:
+     - Always saves the result via `ds.saveResult(...)`.
+     - In **single-player** (`!isMultiplayerGame.value`), still calls `handleDecision()` unconditionally.
+     - In **multiplayer**, only calls `handleDecision()` when `selfKey.value === player` (i.e., the local client represents the canonical player who just completed yaku). Opponent clients do **not** enter a pending decision state.
+2. **Limit yaku completion emission to the scoring client in multiplayer**:
+   - In `app/components/play-area/CollectionArea.vue`, added local perspective gating:
+     ```ts
+     const { selfKey, isMultiplayerGame } = useLocalPlayerPerspective()
+     ...
+     const taggedYaku = applyExtraTags(newCompleted)
+
+     if (isMultiplayerGame.value && player !== selfKey.value) {
+       return
+     }
+     ```
+   - This ensures that in multiplayer, only the scoring player’s own client:
+     - Logs `'complete'` actions via `ds.logPlayerAction(...)`, and
+     - Emits the `completed` event consumed by `index.vue`.
+   - The opponent’s client still updates the visual collection, but does not create duplicate log entries or extra `completed` events.
+
+**Files Changed**:
+- `app/pages/index.vue` – `handleCompletion` now calls `handleDecision()` only:
+  - Always in single-player, and
+  - In multiplayer only when `selfKey` equals the scoring `player`.
+- `app/components/play-area/CollectionArea.vue` – completion watcher now skips logging/emitting when `isMultiplayerGame` is true and `player !== selfKey`.
+
+**Verification**:
+- In single-player:
+  - KOI-KOI/STOP modal behavior unchanged; human and CPU decisions behave as before.
+- In multiplayer (two authenticated clients):
+  - When P1 completes yaku and calls KOI-KOI:
+    - Only P1’s client ever enters `decisionIsPending` and sees the decision modal with KOI-KOI/STOP buttons.
+    - P2’s client sees updated collections and log entries but **no extra decision modal** after the turn switches.
+  - Event log shows a single “P1 completed {YAKU}” entry per actual completion; no duplicate lines appear after remote sync.
+
+---
+
 ## Future Issues
 
 (New issues will be added above this line)

@@ -79,6 +79,8 @@ const cs = useCardStore()
 const config = useConfigStore()
 const { getDesignInfo } = useCardDesign()
 
+const { selfKey, isMultiplayerGame } = useLocalPlayerPerspective()
+
 const cardTypes = ['brights', 'animals', 'ribbons', 'plains'] as const
 const coll: Record<string, Set<CardName>> = reactive({
   brights: new Set([]),
@@ -187,6 +189,13 @@ onMounted(() => {
 
       // Tag potentially upgraded yaku
       const taggedYaku = applyExtraTags(newCompleted)
+
+      // In multiplayer, only the local self player should generate completion
+      // logs and completion events. Opponent completions are synced via shared
+      // state from the scoring player's client to avoid duplicate entries.
+      if (isMultiplayerGame.value && player !== selfKey.value) {
+        return
+      }
 
       // No yaku completed or upgraded since the last update
       if (taggedYaku.every((yaku) => lastCompleted.has(yaku))) return
