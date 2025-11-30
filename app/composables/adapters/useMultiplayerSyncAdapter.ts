@@ -227,6 +227,7 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
           p1: game.p1,
           p2: game.p2,
           activePlayer: game.activePlayer,
+          status: game.status,
           lastUpdated:
             game.lastUpdated instanceof Date
               ? Timestamp.fromDate(game.lastUpdated)

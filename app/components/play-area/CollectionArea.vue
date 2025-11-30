@@ -68,7 +68,6 @@ const emits = defineEmits<{
 }>()
 
 const { p1Avatar, p2Avatar } = useAvatar()
-const playerAvatar = computed(() => (player === 'p1' ? p1Avatar.value : p2Avatar.value))
 
 const { isMobile } = useDevice()
 const { orientation } = useScreenOrientation()

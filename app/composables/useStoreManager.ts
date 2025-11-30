@@ -935,8 +935,18 @@ export const useStoreManager = () => {
   }
 
   /**
-   * Pull the latest multiplayer game from shared Firestore
-   * Updates local cache if remote is newer
+   * Pull the latest multiplayer game from shared Firestore.
+   *
+   * For multiplayer, Firestore is the single source of truth and only the
+   * active player is allowed to push via `saveMultiplayerGame`. Other clients
+   * (including the non-starting player during initialization) should always
+   * treat the remote state as authoritative when it has a different serialized
+   * game state.
+   *
+   * We detect changes primarily via the serialized game state's own
+   * `timestamp` field, falling back to `lastUpdated` as an additional signal.
+   *
+   * @returns true if local cache was updated from remote, false otherwise
    */
   const syncMultiplayerGame = async (gameId: string): Promise<boolean> => {
     if (!multiplayerAdapter.value) {
@@ -951,12 +961,21 @@ export const useStoreManager = () => {
         return false
       }
 
-      // Check if local cache is outdated
+      // Check if local cache is outdated based on serialized game state
       const uid = getCurrentUserId()
       const store = await getGameSaveStore()
       const localSave = await store.get(uid, getSaveKeyForMode('multiplayer'))
 
-      if (!localSave || remoteGame.lastUpdated > localSave.timestamp) {
+      const remoteState = remoteGame.gameState as SerializedGameState
+      const localState = localSave?.gameState as SerializedGameState | undefined
+
+      // Primary change detection: serialized game state timestamp (remote must be newer)
+      const hasNewerSerializedState = !localState || remoteState.timestamp > localState.timestamp
+
+      // Fallback: lastUpdated (kept for additional safety / debugging)
+      const hasNewerLastUpdated = !!localSave && remoteGame.lastUpdated > localSave.timestamp
+
+      if (!localSave || hasNewerSerializedState || hasNewerLastUpdated) {
         // Update local cache with remote state
         const updatedSave: GameSaveRecord = {
           id: `${uid}_${getSaveKeyForMode('multiplayer')}`,

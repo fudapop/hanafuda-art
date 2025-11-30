@@ -242,14 +242,13 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
     // 7. Choose starting player randomly between p1 and p2
     const hostUid = gameData.p1 as string
     const joinerUid = profile.value.uid
-    // const startingUid = Math.random() < 0.5 ? hostUid : joinerUid
-    // For now host will always start until we can debug issues with the alternative
+    const startingUid = Math.random() < 0.5 ? hostUid : joinerUid
 
     // 8. Update game document (set p2, activePlayer, and change status to active)
     const now = new Date()
     await updateDoc(doc(db, 'multiplayer_games', gameId), {
       p2: profile.value.uid,
-      activePlayer: hostUid,
+      activePlayer: startingUid,
       status: 'active',
       startedAt: Timestamp.fromDate(now),
       lastUpdated: Timestamp.fromDate(now),

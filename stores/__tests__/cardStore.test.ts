@@ -63,4 +63,32 @@ describe('CardStore', () => {
       expect(store.integrityCheck).toBe(true)
     })
   })
+
+  describe('normalizeState', () => {
+    it('removes collected cards from all other zones', () => {
+      const store = useCardStore()
+
+      // Take a concrete card from the initial deck
+      const card = [...store.deck][0]
+
+      // Force an inconsistent state: card appears in p2 hand and p1 collection
+      store.deck.delete(card)
+      store.hand.p2.add(card)
+      store.collection.p1.add(card)
+
+      // Sanity check precondition
+      expect(store.hand.p2.has(card)).toBe(true)
+      expect(store.collection.p1.has(card)).toBe(true)
+
+      store.normalizeState()
+
+      // Card should remain only in the collection
+      expect(store.collection.p1.has(card)).toBe(true)
+      expect(store.hand.p1.has(card)).toBe(false)
+      expect(store.hand.p2.has(card)).toBe(false)
+      expect(store.field.has(card)).toBe(false)
+      expect(store.deck.has(card)).toBe(false)
+      expect(store.staged.has(card)).toBe(false)
+    })
+  })
 })

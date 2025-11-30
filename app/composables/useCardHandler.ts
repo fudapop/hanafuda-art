@@ -115,7 +115,7 @@ export const useCardHandler = () => {
 
   const handlePlayerDiscard = async () => {
     if (!selectedCard.value) return
-    cs.discard(selectedCard.value, 'p1')
+    cs.discard(selectedCard.value, ds.getCurrent.player)
     ds.logPlayerAction(ds.getCurrent.player, 'discard', [selectedCard.value])
     selectedCard.value = null
   }

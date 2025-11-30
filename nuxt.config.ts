@@ -220,6 +220,7 @@ export default defineNuxtConfig({
       ],
     },
     workbox: {
+      disableDevLogs: true,
       globPatterns: ['**/*.{js,css,html,webp,png}'],
       navigateFallback: '/',
       runtimeCaching: [

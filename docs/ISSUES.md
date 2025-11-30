@@ -239,6 +239,55 @@ In multiplayer matches, each client always treated `p1` as “the player at the 
 
 ---
 
+## 2025-11-30: Multiplayer Hand Showing Card Back After Card Was Collected
+
+**Status**: RESOLVED
+
+**Problem**:  
+In async multiplayer games, after a turn hand-off, one client occasionally showed the opponent with an extra face-down card in hand (card back), even though that exact card had already been played to the field and collected into the other player’s collection.
+
+**Symptoms**:
+- On the non-active client, the opponent’s hand showed an extra card back (e.g., 3rd slot), while the same card also appeared as the last card in a plains collection row.
+- The issue appeared immediately after a turn hand-off, with no refresh/reconnect in between.
+- Underlying game state had the same `CardName` present in both `hand.p2` and `collection.p1`.
+
+**Root Cause**:
+- In `useCardHandler.handlePlayerDiscard`, the discard operation hard-coded `'p1'` as the player:
+  ```ts
+  cs.discard(selectedCard.value, 'p1')
+  ```
+- When the canonical `p2` was the active player:
+  - The selected card was in `cs.hand.p2`, but `discard` was invoked with `'p1'`, so it never removed the card from `hand.p2` and only added it to the field.
+  - Later, when the other player collected that field card, `collectCards(player)` removed it from the field and the collector’s hand/deck, but **never from `hand.p2`**, leaving the card both in a hand and in a collection.
+
+**Resolution**:
+1. **Fix discard ownership**:
+   - Updated `handlePlayerDiscard` to respect the current active player instead of hard-coding `'p1'`:
+     ```ts
+     cs.discard(selectedCard.value, ds.getCurrent.player)
+     ds.logPlayerAction(ds.getCurrent.player, 'discard', [selectedCard.value])
+     ```
+   - This ensures discards always remove the card from the correct hand in both single-player and multiplayer.
+2. **Add card-location normalization & diagnostics**:
+   - Introduced `normalizeState()` in `cardStore` to enforce the invariant that any card present in a player’s collection is removed from all other zones (`hand`, `field`, `deck`, `staged`) for both players.
+   - Wired `normalizeState()` into:
+     - `exportSerializedState(...)` (before serializing card data for saves/sync).
+     - `importSerializedState(...)` (after loading card data from saves/sync).
+   - Added a dev-only helper `_debugLogDuplicateCards(context)` that logs any cards found in multiple zones, aiding future debugging of multiplayer desyncs.
+
+**Files Changed**:
+- `app/composables/useCardHandler.ts` – `handlePlayerDiscard` now uses `ds.getCurrent.player` instead of a hard-coded `'p1'`.
+- `stores/cardStore.ts` – new `normalizeState()` and `_debugLogDuplicateCards()` helpers, invoked during reset, export, and import.
+- `stores/__tests__/cardStore.test.ts` – regression test verifying `normalizeState()` removes a card from all zones except the owning collection.
+
+**Verification**:
+- In async multiplayer sessions:
+  - Discard actions from either player now correctly remove cards from that player’s hand and place them on the field.
+  - After a card is collected into a player’s collection, the same card is no longer present in any hand, field, deck, or staged set (confirmed via DevTools inspection of the `cards` store).
+  - No further occurrences of a card back remaining in hand after its card has been collected have been observed during manual multiplayer testing.
+
+---
+
 ## Future Issues
 
 (New issues will be added above this line)
