@@ -189,3 +189,14 @@ export interface LocalGameSaveStore {
   remove(uid: string, saveKey: string): Promise<void>
   clear(uid: string): Promise<void> // Clear all saves for user
 }
+
+/**
+ * Player presence state tracked in Realtime Database
+ * Path: /presence/{uid}
+ */
+export type PresenceState = {
+  uid: string
+  state: 'online' | 'offline' | 'playing' | 'unknown'
+  lastSeen: Date | null
+  currentGameId: string | null
+}

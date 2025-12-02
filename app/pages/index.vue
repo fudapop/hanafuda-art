@@ -135,6 +135,13 @@ const ds = useGameDataStore()
 
 const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const { setOpponentPlayer } = useMultiplayerMatch()
+const {
+  subscribeToOpponentPresence,
+  setMyStatus,
+  opponentPresence,
+  isOpponentOnline,
+  formatLastSeen,
+} = usePresence()
 
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
@@ -476,6 +483,13 @@ const initializeNewMultiplayerGame = async () => {
       console.error('Failed to sync multiplayer turn from Firestore:', error)
     }
   })
+
+  // Subscribe to opponent's presence
+  const opponentUid = multiplayerMeta.value[opponentKey.value]
+  if (opponentUid) {
+    subscribeToOpponentPresence(opponentUid)
+    console.info(`[Multiplayer] Subscribed to opponent presence: ${opponentUid}`)
+  }
 }
 
 const startRound = async () => {
@@ -617,6 +631,17 @@ onMounted(() => {
       // Single-player CPU opponent
       if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {
         opponentPlay({ speed: 2 })
+      }
+
+      // Update presence status based on whose turn it is (multiplayer only)
+      if (isMultiplayerGame.value && newActive) {
+        if (newActive.id === selfKey.value) {
+          // It's my turn - set status to 'playing'
+          await setMyStatus('playing')
+        } else if (oldActive && oldActive.id === selfKey.value) {
+          // My turn just ended - set status back to 'online'
+          await setMyStatus('online')
+        }
       }
 
       // In multiplayer, when our local turn ends (we were active and now opponent is active),

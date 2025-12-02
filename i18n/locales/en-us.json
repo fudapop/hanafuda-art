@@ -283,7 +283,10 @@
     "try_again": "Try Again",
     "invalid_code": "Invalid invite code",
     "join_failed": "Failed to join game",
-    "error_creating_game": "Failed to create game. Please try again."
+    "error_creating_game": "Failed to create game. Please try again.",
+    "opponent_online": "Online",
+    "opponent_offline": "Offline",
+    "opponent_playing": "Playing..."
   },
   "settings": {
     "actions": {

@@ -39,6 +39,12 @@
               </span>
             </p>
           </div>
+          <!-- Presence indicator (multiplayer only) -->
+          <OpponentStatusBadge
+            v-if="isMultiplayerGame && opponentPresence.uid"
+            :presence="opponentPresence"
+            :show-text="!isMobileLandscape"
+          />
         </div>
       </div>
     </div>
@@ -62,7 +68,8 @@ const { t } = useI18n()
 
 const gameStart = useState('start')
 
-const { opponentKey } = useLocalPlayerPerspective()
+const { opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
+const { opponentPresence } = usePresence()
 
 const score = computed(() => ds.scoreboard[opponentKey.value])
 

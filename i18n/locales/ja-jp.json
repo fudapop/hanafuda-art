@@ -283,7 +283,10 @@
     "try_again": "再試行",
     "invalid_code": "無効な招待コード",
     "join_failed": "ゲームへの参加に失敗しました",
-    "error_creating_game": "ゲームの作成に失敗しました。もう一度お試しください。"
+    "error_creating_game": "ゲームの作成に失敗しました。もう一度お試しください。",
+    "opponent_online": "オンライン",
+    "opponent_offline": "オフライン",
+    "opponent_playing": "プレイ中..."
   },
   "settings": {
     "actions": {

@@ -283,7 +283,10 @@
     "try_again": "Spróbuj ponownie",
     "invalid_code": "Nieprawidłowy kod zaproszenia",
     "join_failed": "Nie udało się dołączyć do gry",
-    "error_creating_game": "Nie udało się utworzyć gry. Spróbuj ponownie."
+    "error_creating_game": "Nie udało się utworzyć gry. Spróbuj ponownie.",
+    "opponent_online": "Online",
+    "opponent_offline": "Offline",
+    "opponent_playing": "Gra..."
   },
   "settings": {
     "actions": {

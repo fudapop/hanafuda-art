@@ -22,7 +22,6 @@ import {
 } from 'firebase/firestore'
 import type { InviteCode, MultiplayerGame } from '~~/types/profile'
 import { useCardStore } from '~~/stores/cardStore'
-import type { PlayerKey } from '~~/stores/playerStore'
 
 export type OpponentPlayer = {
   uid: string
@@ -134,6 +133,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
   const { current: profile } = useProfile()
   const { saveMultiplayerGame, serializeGameState, syncMultiplayerGame, initializeSync } =
     useStoreManager()
+  const { initializePresence, cleanup: cleanupPresence } = usePresence()
 
   const useOpponentPlayer = () =>
     useState<OpponentPlayer | null>('multiplayer-opponent', () => null)
@@ -228,6 +228,9 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
     // 7. Save to local state (as waiting game)
     await saveMultiplayerGame(profile.value.uid, '', profile.value.uid)
 
+    // 8. Initialize presence tracking for the game
+    await initializePresence(gameId)
+
     return { gameId, code }
   }
 
@@ -318,6 +321,9 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
       // Do not fail the join flow if local sync fails; remote state is still valid
     }
 
+    // 11. Initialize presence tracking for the game
+    await initializePresence(gameId)
+
     return { gameId, success: true }
   }
 
@@ -353,6 +359,9 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
           await deleteDoc(doc(db, 'invite_codes', gameData.inviteCode))
         }
       }
+
+      // Cleanup presence tracking
+      await cleanupPresence()
 
       return true
     } catch (error) {

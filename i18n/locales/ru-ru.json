@@ -283,7 +283,10 @@
     "try_again": "Попробовать снова",
     "invalid_code": "Недействительный код приглашения",
     "join_failed": "Не удалось присоединиться к игре",
-    "error_creating_game": "Не удалось создать игру. Попробуйте еще раз."
+    "error_creating_game": "Не удалось создать игру. Попробуйте еще раз.",
+    "opponent_online": "Онлайн",
+    "opponent_offline": "Оффлайн",
+    "opponent_playing": "Играет..."
   },
   "settings": {
     "actions": {

@@ -299,6 +299,7 @@ export default defineNuxtConfig({
       messagingSenderId: '938327095699',
       appId: '1:938327095699:web:b79f95821825d93b295066',
       measurementId: 'G-RDPJ7SKMBT',
+      databaseURL: 'https://new-hanafuda-default-rtdb.firebaseio.com',
     },
   },
 })
