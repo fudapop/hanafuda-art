@@ -135,13 +135,7 @@ const ds = useGameDataStore()
 
 const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const { setOpponentPlayer } = useMultiplayerMatch()
-const {
-  subscribeToOpponentPresence,
-  setMyStatus,
-  opponentPresence,
-  isOpponentOnline,
-  formatLastSeen,
-} = usePresence()
+const { subscribeToOpponentPresence, setMyStatus, cleanup: cleanupPresence } = usePresence()
 
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
@@ -561,6 +555,8 @@ onBeforeUnmount(() => {
     gameUnsubscribe.value = null
   }
 
+  cleanupPresence()
+
   // Reset the game state if the user navigates away from the page
   ds.endRound()
   ds.nextRound()
@@ -637,10 +633,14 @@ onMounted(() => {
       if (isMultiplayerGame.value && newActive) {
         if (newActive.id === selfKey.value) {
           // It's my turn - set status to 'playing'
-          await setMyStatus('playing')
+          await setMyStatus('playing').catch((err) =>
+            console.error('[Presence] Failed to set status to playing:', err),
+          )
         } else if (oldActive && oldActive.id === selfKey.value) {
           // My turn just ended - set status back to 'online'
-          await setMyStatus('online')
+          await setMyStatus('online').catch((err) =>
+            console.error('[Presence] Failed to set status to online:', err),
+          )
         }
       }
 

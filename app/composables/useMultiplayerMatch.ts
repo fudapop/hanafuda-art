@@ -229,7 +229,12 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
     await saveMultiplayerGame(profile.value.uid, '', profile.value.uid)
 
     // 8. Initialize presence tracking for the game
-    await initializePresence(gameId)
+    try {
+      await initializePresence(gameId)
+    } catch (error) {
+      console.error('Failed to initialize presence for game:', error)
+      // Continue without presence - game creation succeeded
+    }
 
     return { gameId, code }
   }
@@ -321,8 +326,14 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
       // Do not fail the join flow if local sync fails; remote state is still valid
     }
 
-    // 11. Initialize presence tracking for the game
-    await initializePresence(gameId)
+    // 11. Cleanup any previous presence session and initialize new one
+    try {
+      await cleanupPresence()
+      await initializePresence(gameId)
+    } catch (error) {
+      console.error('Failed to initialize presence for game:', error)
+      // Continue without presence - join succeeded in Firestore
+    }
 
     return { gameId, success: true }
   }
@@ -360,8 +371,13 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
         }
       }
 
-      // Cleanup presence tracking
-      await cleanupPresence()
+      // Cleanup presence tracking (non-blocking)
+      try {
+        await cleanupPresence()
+      } catch (error) {
+        console.error('Failed to cleanup presence:', error)
+        // Continue - cancellation succeeded
+      }
 
       return true
     } catch (error) {

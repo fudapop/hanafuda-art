@@ -41,7 +41,7 @@
           </div>
           <!-- Presence indicator (multiplayer only) -->
           <OpponentStatusBadge
-            v-if="isMultiplayerGame && opponentPresence.uid"
+            v-if="isMultiplayerGame && opponentPresence?.uid"
             :presence="opponentPresence"
             :show-text="!isMobileLandscape"
           />

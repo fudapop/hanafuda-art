@@ -286,7 +286,15 @@
     "error_creating_game": "Failed to create game. Please try again.",
     "opponent_online": "Online",
     "opponent_offline": "Offline",
-    "opponent_playing": "Playing..."
+    "opponent_playing": "Playing...",
+    "exit": {
+      "title": "Leave Multiplayer Game",
+      "description": "Your game will be saved automatically and you can resume it at any time. Your opponent will be notified that you've left.",
+      "messageLabel": "Leave a message for your opponent",
+      "messageOptional": "optional",
+      "messagePlaceholder": "e.g., 'Be back soon!' or 'Great game!'",
+      "leaveGame": "Leave Game"
+    }
   },
   "settings": {
     "actions": {

@@ -286,7 +286,15 @@
     "error_creating_game": "ゲームの作成に失敗しました。もう一度お試しください。",
     "opponent_online": "オンライン",
     "opponent_offline": "オフライン",
-    "opponent_playing": "プレイ中..."
+    "opponent_playing": "プレイ中...",
+    "exit": {
+      "title": "マルチプレイヤーゲームを退出",
+      "description": "ゲームは自動的に保存され、いつでも再開できます。対戦相手に退出したことが通知されます。",
+      "messageLabel": "対戦相手へのメッセージ",
+      "messageOptional": "任意",
+      "messagePlaceholder": "例：「すぐに戻ります！」または「いいゲームでした！」",
+      "leaveGame": "ゲームを退出"
+    }
   },
   "settings": {
     "actions": {

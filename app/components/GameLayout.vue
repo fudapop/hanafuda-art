@@ -157,12 +157,22 @@
     </Transition>
 
     <!-- MODALS -->
+    <!-- Single player exit modal -->
     <LazyExitWarning
+      v-if="!isMultiplayerGame"
       :open="leavingGame"
       :isSaving="isSaving"
       @cancel="leavingGame = false"
       @save="handleSaveAndExit"
       @forfeit="handleForfeitAndExit"
+    />
+    <!-- Multiplayer exit modal -->
+    <LazyMultiplayerExitModal
+      v-if="isMultiplayerGame"
+      :open="leavingGame"
+      :isSaving="isSaving"
+      @cancel="leavingGame = false"
+      @leave="handleMultiplayerLeave"
     />
     <!-- <FeedbackForm
       :open="promptFeedback"
@@ -190,7 +200,7 @@ const { t } = useI18n()
 const { $clientPosthog } = useNuxtApp()
 
 const { players } = storeToRefs(usePlayerStore())
-const { selfKey, opponentKey } = useLocalPlayerPerspective()
+const { selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const { current: user } = useProfile()
 
 const gameStart = useState('start', () => false)
@@ -234,6 +244,63 @@ const handleForfeitAndExit = () => {
   leavingGame.value = false
   // Reset gameStart to trigger cleanup in main game component
   gameStart.value = false
+}
+
+const handleMultiplayerLeave = async (message: string | null) => {
+  $clientPosthog?.capture('exit_multiplayer_game')
+  isSaving.value = true
+
+  try {
+    const { saveMultiplayerGame } = useStoreManager()
+    const { current: currentProfile } = useProfile()
+    const { setMessage, cleanup: cleanupPresence } = usePresence()
+    const ps = usePlayerStore()
+
+    if (!currentProfile.value) {
+      throw new Error('User not authenticated')
+    }
+
+    // Get multiplayer meta state for p1 and p2 uids
+    const multiplayerMeta = useState<{
+      isNew: boolean
+      gameId: string
+      p1: string
+      p2: string
+      activePlayerUid: string
+    }>('multiplayer-game-meta', () => ({
+      isNew: false,
+      gameId: '',
+      p1: '',
+      p2: '',
+      activePlayerUid: '',
+    }))
+
+    const p1 = multiplayerMeta.value.p1 || currentProfile.value.uid
+    const p2 = multiplayerMeta.value.p2 || ''
+    const activeKey = ps.activePlayer.id as 'p1' | 'p2'
+    const activePlayer = activeKey === 'p1' ? p1 : p2
+
+    // Save game state to Firestore
+    await saveMultiplayerGame(p1, p2, activePlayer)
+
+    // Set presence message if provided
+    if (message) {
+      await setMessage(message)
+    }
+
+    // Cleanup presence tracking
+    await cleanupPresence()
+
+    leavingGame.value = false
+    gameStart.value = false
+  } catch (error) {
+    console.error('Failed to save multiplayer game:', error)
+    // Still exit even if save fails
+    leavingGame.value = false
+    gameStart.value = false
+  } finally {
+    isSaving.value = false
+  }
 }
 
 const handleSignupCancel = async () => {

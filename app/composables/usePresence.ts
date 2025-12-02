@@ -7,6 +7,7 @@
  */
 
 import {
+  get,
   getDatabase,
   onDisconnect,
   onValue,
@@ -15,6 +16,7 @@ import {
   set,
   type Database,
   type Unsubscribe,
+  update,
 } from 'firebase/database'
 import type { PresenceState } from '~~/types/profile'
 
@@ -36,6 +38,12 @@ export type PresenceComposable = {
    * Use 'playing' when it's the user's turn
    */
   setMyStatus: (status: 'online' | 'playing') => Promise<void>
+
+  /**
+   * Set a message that will be displayed to the opponent
+   * Used when leaving a multiplayer game
+   */
+  setMessage: (message: string | null) => Promise<void>
 
   /**
    * Cleanup presence tracking
@@ -79,6 +87,7 @@ export const usePresence = (): PresenceComposable => {
 
   const connectedUnsubscribe = ref<Unsubscribe | null>(null)
   const opponentUnsubscribe = ref<Unsubscribe | null>(null)
+  const keepaliveUnsubscribe = ref<Unsubscribe | null>(null)
   const currentGameId = ref<string | null>(null)
 
   const isOpponentOnline = computed(() => opponentPresence.value.state === 'online')
@@ -145,7 +154,7 @@ export const usePresence = (): PresenceComposable => {
     // Keepalive for Android - prevents 60s disconnect
     // This empty listener keeps the connection active
     const keepaliveRef = dbRef(db, '.info/connected')
-    onValue(keepaliveRef, () => {
+    keepaliveUnsubscribe.value = onValue(keepaliveRef, () => {
       // Intentionally empty - just keeps connection alive
     })
 
@@ -176,6 +185,7 @@ export const usePresence = (): PresenceComposable => {
           state: data.state || 'unknown',
           lastSeen: lastSeen,
           currentGameId: data.currentGameId || null,
+          message: data.message || null,
         }
 
         console.debug('[Presence] Opponent status updated:', opponentPresence.value)
@@ -186,6 +196,7 @@ export const usePresence = (): PresenceComposable => {
           state: 'unknown',
           lastSeen: null,
           currentGameId: null,
+          message: null,
         }
 
         console.debug('[Presence] No presence data for opponent')
@@ -210,7 +221,7 @@ export const usePresence = (): PresenceComposable => {
     const userStatusRef = dbRef(db, `presence/${uid}`)
 
     try {
-      await set(userStatusRef, {
+      await update(userStatusRef, {
         state: status,
         lastSeen: serverTimestamp(),
         currentGameId: currentGameId.value,
@@ -218,6 +229,36 @@ export const usePresence = (): PresenceComposable => {
       console.debug(`[Presence] Status updated to: ${status}`)
     } catch (error) {
       console.error('[Presence] Failed to update status:', error)
+    }
+  }
+
+  /**
+   * Set a message that will be displayed to the opponent
+   * Used when leaving a multiplayer game
+   */
+  const setMessage = async (message: string | null): Promise<void> => {
+    const uid = currentProfile.value?.uid
+    if (!uid) {
+      console.warn('[Presence] Cannot set message: user not authenticated')
+      return
+    }
+
+    const db = initRTDB()
+    const userStatusRef = dbRef(db, `presence/${uid}`)
+
+    try {
+      // Get current presence data to preserve state
+      const snapshot = await get(userStatusRef)
+      const currentData = snapshot.exists() ? snapshot.val() : {}
+
+      await set(userStatusRef, {
+        ...currentData,
+        message: message || null,
+        lastSeen: serverTimestamp(),
+      })
+      console.debug(`[Presence] Message updated: ${message || 'cleared'}`)
+    } catch (error) {
+      console.error('[Presence] Failed to set message:', error)
     }
   }
 
@@ -262,6 +303,13 @@ export const usePresence = (): PresenceComposable => {
       console.debug('[Presence] Unsubscribed from opponent presence')
     }
 
+    // Unsubscribe from keepalive listener
+    if (keepaliveUnsubscribe.value) {
+      keepaliveUnsubscribe.value()
+      keepaliveUnsubscribe.value = null
+      console.debug('[Presence] Unsubscribed from keepalive listener')
+    }
+
     // Mark user offline (will also auto-trigger on disconnect via onDisconnect)
     if (uid && rtdb) {
       const userStatusRef = dbRef(rtdb, `presence/${uid}`)
@@ -284,6 +332,7 @@ export const usePresence = (): PresenceComposable => {
       state: 'unknown',
       lastSeen: null,
       currentGameId: null,
+      message: null,
     }
   }
 
@@ -291,6 +340,7 @@ export const usePresence = (): PresenceComposable => {
     initializePresence,
     subscribeToOpponentPresence,
     setMyStatus,
+    setMessage,
     cleanup,
     opponentPresence: readonly(opponentPresence),
     isOpponentOnline: readonly(isOpponentOnline),

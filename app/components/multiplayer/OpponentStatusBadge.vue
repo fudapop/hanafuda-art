@@ -1,21 +1,29 @@
 <template>
-  <div class="flex items-center gap-2 text-sm">
-    <!-- Status indicator dot -->
-    <div
-      :class="[
-        'w-2 h-2 rounded-full transition-colors duration-300',
-        dotColorClass,
-      ]"
-      :title="statusTitle"
-    />
+  <div class="flex flex-col gap-1 text-sm">
+    <div class="flex items-center gap-2">
+      <!-- Status indicator dot -->
+      <div
+        :class="['w-2 h-2 rounded-full transition-colors duration-300', dotColorClass]"
+        :title="statusTitle"
+      />
 
-    <!-- Status text -->
-    <span
-      v-if="showText"
-      :class="['font-medium transition-colors duration-300', textColorClass]"
+      <!-- Status text -->
+      <span
+        v-if="showText"
+        :class="['font-medium transition-colors duration-300', textColorClass]"
+      >
+        {{ statusText }}
+      </span>
+    </div>
+
+    <!-- Opponent message (if present) -->
+    <p
+      v-if="presence.message"
+      class="text-xs italic text-text-secondary/80 max-w-xs truncate"
+      :title="presence.message"
     >
-      {{ statusText }}
-    </span>
+      "{{ presence.message }}"
+    </p>
   </div>
 </template>
 

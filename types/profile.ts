@@ -199,4 +199,5 @@ export type PresenceState = {
   state: 'online' | 'offline' | 'playing' | 'unknown'
   lastSeen: Date | null
   currentGameId: string | null
+  message?: string | null // Optional message set when leaving a multiplayer game
 }

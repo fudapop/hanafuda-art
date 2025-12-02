@@ -286,7 +286,15 @@
     "error_creating_game": "Nie udało się utworzyć gry. Spróbuj ponownie.",
     "opponent_online": "Online",
     "opponent_offline": "Offline",
-    "opponent_playing": "Gra..."
+    "opponent_playing": "W grze...",
+    "exit": {
+      "title": "Opuść grę wieloosobową",
+      "description": "Twoja gra zostanie automatycznie zapisana i możesz ją wznowić w dowolnym momencie. Twój przeciwnik zostanie powiadomiony, że opuściłeś grę.",
+      "messageLabel": "Zostaw wiadomość dla przeciwnika",
+      "messageOptional": "opcjonalne",
+      "messagePlaceholder": "np. 'Wrócę wkrótce!' lub 'Świetna gra!'",
+      "leaveGame": "Opuść grę"
+    }
   },
   "settings": {
     "actions": {
