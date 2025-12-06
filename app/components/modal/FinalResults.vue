@@ -58,7 +58,7 @@
   >
     <HeadlessDisclosureButton
       :class="`flex w-full justify-between my-1 rounded-md ${
-        result.winner === 'p1'
+        result.winner === selfKey
           ? 'text-black bg-hanafuda-green'
           : !result.winner
             ? 'text-text bg-surface'
@@ -71,7 +71,7 @@
           v-if="result.winner"
           class="font-semibold tracking-wide uppercase"
         >
-          {{ result.winner === 'p1' ? t('common.labels.win') : t('common.labels.lose') }}
+          {{ result.winner === selfKey ? t('common.labels.win') : t('common.labels.lose') }}
         </span>
         <span
           v-else
@@ -93,7 +93,6 @@
     >
       <YakuGrid
         v-if="result.winner"
-        :winner="result.winner"
         :completed="result.completedYaku ?? []"
         :show-cards="true"
       />
@@ -113,21 +112,25 @@ const { results } = defineProps<{
 
 defineEmits(['close'])
 
+const { selfKey, opponentKey } = useLocalPlayerPerspective()
 const ds = useGameDataStore()
 
 const final = computed(() => {
   let result: string
-  const [p1Score, p2Score] = [ds.scoreboard.p1, ds.scoreboard.p2]
-  if (p1Score === p2Score) {
+  const [playerScore, opponentScore] = [
+    ds.scoreboard[selfKey.value],
+    ds.scoreboard[opponentKey.value],
+  ]
+  if (playerScore === opponentScore) {
     result = 'Draw'
-  } else if (p1Score > p2Score) {
+  } else if (playerScore > opponentScore) {
     result = 'Win'
   } else {
     result = 'Lose'
   }
   return {
     result,
-    score: p1Score,
+    score: playerScore,
   }
 })
 </script>
