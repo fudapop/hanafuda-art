@@ -63,6 +63,8 @@ const displayedCards: (CardName | undefined)[] = reactive(Array(8))
 const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
 
+const ps = usePlayerStore()
+const ds = useGameDataStore()
 const cs = useCardStore()
 const hand = computed(() => cs.hand[id])
 
@@ -97,12 +99,13 @@ const matchedCards = useMatchedCards()
 
 const showMatchHint = computed(
   () => (card: CardName) =>
-    useGameDataStore().checkCurrentPhase('select') &&
-    usePlayerStore().players.p1.isActive &&
+    ds.checkCurrentPhase('select') &&
+    ps.players.p1.isActive &&
     (matchExists(card) as CardName[]).length,
 )
 
 const handleClick = (card: CardName) => {
+  if (!ps.players.p1.isActive || !ds.checkCurrentPhase('select')) return
   handleCardSelect(card)
 }
 
