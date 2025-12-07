@@ -59,10 +59,10 @@
     <HeadlessDisclosureButton
       :class="`flex w-full justify-between my-1 rounded-md ${
         result.winner === 'p1'
-          ? 'text-text bg-hanafuda-green'
+          ? 'text-black bg-hanafuda-green'
           : !result.winner
             ? 'text-text bg-surface'
-            : 'text-text bg-primary'
+            : 'text-black bg-primary'
       } px-4 py-2 text-left text-sm font-medium focus:outline-hidden focus-visible:ring-3 focus-visible:ring-primary dark:focus-visible:ring-accent focus-visible:ring-opacity-75`"
     >
       <span class="capitalize"
