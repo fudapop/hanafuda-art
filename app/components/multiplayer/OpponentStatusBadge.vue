@@ -14,6 +14,28 @@
       >
         {{ statusText }}
       </span>
+
+      <!-- Reconnecting spinner for offline state -->
+      <svg
+        v-if="presence.state === 'offline'"
+        class="w-3 h-3 animate-spin text-amber-500"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        />
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        />
+      </svg>
     </div>
 
     <!-- Opponent message (if present) -->
@@ -64,8 +86,9 @@ const statusText = computed(() => {
     return t('multiplayer.opponent_online')
   }
 
-  if (state === 'offline' && lastSeen) {
-    return formatLastSeen(lastSeen)
+  // Show "Reconnecting..." for offline state to indicate we're waiting for them
+  if (state === 'offline') {
+    return t('multiplayer.disconnect.reconnecting')
   }
 
   return t('multiplayer.opponent_offline')
@@ -102,6 +125,11 @@ const dotColorClass = computed(() => {
     return 'bg-green-500 animate-pulse'
   }
 
+  // Amber pulsing dot for offline/reconnecting state
+  if (state === 'offline') {
+    return 'bg-amber-500 animate-pulse'
+  }
+
   return 'bg-gray-400'
 })
 
@@ -117,6 +145,11 @@ const textColorClass = computed(() => {
 
   if (state === 'online') {
     return 'text-green-600 dark:text-green-400'
+  }
+
+  // Amber text for offline/reconnecting state
+  if (state === 'offline') {
+    return 'text-amber-600 dark:text-amber-400'
   }
 
   return 'text-gray-600 dark:text-gray-400'

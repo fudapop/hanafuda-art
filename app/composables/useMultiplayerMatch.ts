@@ -197,6 +197,9 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
       p2: '', // Empty until joined
       activePlayer: profile.value.uid, // Creator goes first
       status: 'waiting',
+      roundAcks: null,
+      finalSeen: { p1: false, p2: false },
+      terminalStatus: null,
       inviteCode: code,
       createdAt: now,
       lastUpdated: now,
@@ -437,6 +440,9 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
           activePlayer: data.activePlayer,
           status: data.status,
           inviteCode: data.inviteCode,
+      roundAcks: data.roundAcks ?? null,
+      finalSeen: data.finalSeen ?? null,
+      terminalStatus: data.terminalStatus ?? null,
           startedAt: data.startedAt ? convertTimestamp(data.startedAt) : undefined,
           lastUpdated: convertTimestamp(data.lastUpdated),
           createdAt: convertTimestamp(data.createdAt),

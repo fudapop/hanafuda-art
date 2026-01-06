@@ -40,12 +40,23 @@
       <!-- BUTTONS -->
       <!-- Warning is logged if no focusable elements rendered -->
       <!-- Hidden during opponent decision -->
-      <div v-show="ds.gameOver">
+      <div
+        v-show="ds.gameOver"
+        class="flex items-center gap-3"
+      >
+        <p
+          v-if="waitingForOpponent"
+          class="text-sm font-medium text-text-secondary dark:text-text-secondary"
+        >
+          Waiting for opponent...
+        </p>
         <button
-          class="sec-btn"
+          class="sec-btn disabled:opacity-60 disabled:cursor-not-allowed"
+          :disabled="waitingForOpponent"
           @click="() => $emit('close')"
         >
-          {{ t('common.actions.close') }}
+          <span v-if="waitingForOpponent">Waiting...</span>
+          <span v-else>{{ t('common.actions.close') }}</span>
         </button>
       </div>
     </div>
@@ -106,8 +117,9 @@ import NumberAnimation from 'vue-number-animation'
 import { type RoundResult, useGameDataStore } from '~~/stores/gameDataStore'
 
 const { t } = useI18n()
-const { results } = defineProps<{
+const { results, waitingForOpponent = false } = defineProps<{
   results: RoundResult[]
+  waitingForOpponent?: boolean
 }>()
 
 defineEmits(['close'])

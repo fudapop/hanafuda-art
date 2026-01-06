@@ -48,11 +48,14 @@ import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { usePlayerStore } from '~~/stores/playerStore'
 import type {
+  DisconnectReason,
+  FinalSeenState,
   GameMode,
   GameSaveRecord,
   GameStatus,
   LocalGameSaveStore,
   MultiplayerGame,
+  RoundAckState,
   SyncStatus,
 } from '~~/types/profile'
 import {
@@ -89,6 +92,12 @@ export interface SerializedGameState {
 // In-memory fallback store for tests / environments without IndexedDB
 const memoryGameSaveStores = {
   byId: new Map<string, GameSaveRecord>(),
+}
+
+type MultiplayerSyncMetadata = {
+  roundAcks?: RoundAckState | null
+  finalSeen?: FinalSeenState | null
+  terminalStatus?: GameStatus | null
 }
 
 const createMemoryGameSaveStore = (): LocalGameSaveStore => {
@@ -513,6 +522,7 @@ export const useStoreManager = () => {
     p1?: string | null,
     p2?: string | null,
     activePlayer?: string | null,
+    metadata?: MultiplayerSyncMetadata,
   ): Promise<string> => {
     const gameState = await serializeGameState()
     const uid = getCurrentUserId()
@@ -539,6 +549,9 @@ export const useStoreManager = () => {
         p1: p1 || null,
         p2: p2 || null,
         activePlayer: activePlayer || null,
+        roundAcks: metadata?.roundAcks ?? null,
+        finalSeen: metadata?.finalSeen ?? null,
+        terminalStatus: metadata?.terminalStatus ?? null,
       }
       await store.set(saveRecord)
 
@@ -887,6 +900,7 @@ export const useStoreManager = () => {
     p1: string,
     p2: string,
     activePlayer: string,
+    metadata?: MultiplayerSyncMetadata,
   ): Promise<string> => {
     const uid = getCurrentUserId()
 
@@ -922,7 +936,13 @@ export const useStoreManager = () => {
     }
 
     // Save to local IndexedDB
-    const saveKey = await saveGameToStorage('multiplayer', p1, p2, activePlayer)
+    const plainMetadata: MultiplayerSyncMetadata = {
+      roundAcks: metadata?.roundAcks ? { ...metadata.roundAcks } : null,
+      finalSeen: metadata?.finalSeen ? { ...metadata.finalSeen } : null,
+      terminalStatus: metadata?.terminalStatus ?? null,
+    }
+
+    const saveKey = await saveGameToStorage('multiplayer', p1, p2, activePlayer, plainMetadata)
 
     // Also push to shared Firestore collection if adapter initialized
     if (multiplayerAdapter.value && !isUninitializedBoard) {
@@ -931,6 +951,8 @@ export const useStoreManager = () => {
           await sleep(1000)
           const gameState = await serializeGameState()
           const derivedStatus: GameStatus = p2 && p2.trim() !== '' ? 'active' : 'waiting'
+          const terminalStatus = plainMetadata.terminalStatus ?? null
+          const statusToPersist: GameStatus = terminalStatus ?? derivedStatus
           const multiplayerGame: MultiplayerGame = {
             gameId: gameState.gameId,
             gameState,
@@ -938,7 +960,10 @@ export const useStoreManager = () => {
             p1,
             p2,
             activePlayer,
-            status: derivedStatus,
+            status: statusToPersist,
+            roundAcks: plainMetadata.roundAcks ?? null,
+            finalSeen: plainMetadata.finalSeen ?? null,
+            terminalStatus,
             lastUpdated: new Date(),
             createdAt: new Date(), // Will be overwritten if game already exists
           }
@@ -1047,6 +1072,9 @@ export const useStoreManager = () => {
         p1: remoteGame.p1,
         p2: remoteGame.p2,
         activePlayer: remoteGame.activePlayer,
+        roundAcks: remoteGame.roundAcks ?? null,
+        finalSeen: remoteGame.finalSeen ?? null,
+        terminalStatus: remoteGame.terminalStatus ?? null,
       }
       await store.set(updatedSave)
       console.info('Multiplayer game synced from Firestore')
@@ -1075,6 +1103,83 @@ export const useStoreManager = () => {
     }
   }
 
+  /**
+   * Forfeit a multiplayer game (claim victory when opponent disconnects)
+   * Updates the game status to 'abandoned' and records the forfeited player
+   *
+   * @param gameId - The game ID to forfeit
+   * @param forfeitedByUid - The UID of the player who forfeited (the disconnected player)
+   * @param reason - The reason for the forfeit
+   * @returns true if forfeit was successful
+   */
+  const forfeitMultiplayerGame = async (
+    gameId: string,
+    forfeitedByUid: string,
+    reason: DisconnectReason = 'network_disconnect',
+  ): Promise<boolean> => {
+    const uid = getCurrentUserId()
+
+    if (!multiplayerAdapter.value) {
+      console.warn('Multiplayer adapter not initialized')
+      return false
+    }
+
+    try {
+      // Get the current game state from Firestore
+      const remoteGame = await multiplayerAdapter.value.get(gameId)
+      if (!remoteGame) {
+        console.error(`Cannot forfeit: game ${gameId} not found`)
+        return false
+      }
+
+      // Validate caller is a participant
+      if (uid !== remoteGame.p1 && uid !== remoteGame.p2) {
+        console.error('Only participants can forfeit a multiplayer game')
+        return false
+      }
+
+      // Validate the forfeited player is a participant
+      if (forfeitedByUid !== remoteGame.p1 && forfeitedByUid !== remoteGame.p2) {
+        console.error('Forfeited player must be a participant')
+        return false
+      }
+
+      // Update the game with forfeit information
+      const updatedGame: MultiplayerGame = {
+        ...remoteGame,
+        status: 'abandoned',
+        terminalStatus: 'abandoned',
+        forfeitedBy: forfeitedByUid,
+        forfeitReason: reason,
+        lastUpdated: new Date(),
+      }
+
+      // Push to Firestore
+      const success = await multiplayerAdapter.value.push(updatedGame, uid)
+      if (!success) {
+        console.error('Failed to push forfeit update to Firestore')
+        return false
+      }
+
+      // Update local IndexedDB
+      const store = await getGameSaveStore()
+      const localSave = await store.get(uid, getSaveKeyForMode('multiplayer'))
+      if (localSave && localSave.gameId === gameId) {
+        const updatedSave: GameSaveRecord = {
+          ...localSave,
+          terminalStatus: 'abandoned',
+        }
+        await store.set(updatedSave)
+      }
+
+      console.info(`Multiplayer game ${gameId} forfeited by ${forfeitedByUid} (reason: ${reason})`)
+      return true
+    } catch (error) {
+      console.error('Failed to forfeit multiplayer game:', error)
+      return false
+    }
+  }
+
   return {
     serializeGameState,
     deserializeGameState,
@@ -1095,6 +1200,7 @@ export const useStoreManager = () => {
     loadMultiplayerGame,
     syncMultiplayerGame,
     listMultiplayerGames,
+    forfeitMultiplayerGame,
     getSaveKeyForMode,
   }
 }

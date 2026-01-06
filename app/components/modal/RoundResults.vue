@@ -84,14 +84,22 @@
         </div>
       </div>
       <div
-        v-show="stopIsCalled"
-        class="flex justify-end shrink-0 gap-2 my-auto ml-4"
+        v-show="showAckControls"
+        class="flex items-center justify-end shrink-0 gap-3 my-auto ml-4"
       >
+        <p
+          v-if="waitingForOpponent"
+          class="text-sm font-medium text-text-secondary dark:text-text-secondary"
+        >
+          Waiting for opponent...
+        </p>
         <button
-          class="text-base uppercase pri-btn lg:text-xl"
+          class="text-base uppercase pri-btn lg:text-xl disabled:opacity-60 disabled:cursor-not-allowed"
+          :disabled="waitingForOpponent || hasAcknowledged"
           @click="() => $emit('next')"
         >
-          {{ t('common.actions.next') }}
+          <span v-if="waitingForOpponent">Waiting...</span>
+          <span v-else>{{ t('common.actions.next') }}</span>
         </button>
       </div>
     </div>
@@ -129,6 +137,16 @@ import { usePlayerStore } from '~~/stores/playerStore'
 const { t } = useI18n()
 
 defineEmits(['next'])
+
+const {
+  waitingForOpponent = false,
+  hasAcknowledged = false,
+  showAckControls = false,
+} = defineProps<{
+  waitingForOpponent?: boolean
+  hasAcknowledged?: boolean
+  showAckControls?: boolean
+}>()
 
 const { p1Avatar, p2Avatar } = useAvatar()
 

@@ -95,13 +95,27 @@
         <FinalResults
           v-if="gameOver"
           :results="ds.roundHistory"
+          :waiting-for-opponent="isWaitingForOpponentFinal"
           @close="handleClose"
         />
         <RoundResults
           v-else
+          :waiting-for-opponent="isWaitingForOpponentAck"
+          :has-acknowledged="hasMyRoundAck"
+          :show-ack-controls="roundOver && !gameOver"
           @next="handleNext"
         />
       </ResultsModal>
+
+      <!-- Opponent Disconnected Modal -->
+      <OpponentDisconnectedModal
+        :open="showDisconnectModal"
+        :opponent-message="opponentPresence.message"
+        :offline-duration="offlineDurationDisplay"
+        :is-processing="isProcessingForfeit"
+        @claim-victory="handleClaimVictory"
+        @continue-waiting="handleContinueWaiting"
+      />
     </div>
   </GameLayout>
 </template>
@@ -109,6 +123,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
+import type { FinalSeenState, GameStatus, RoundAckState } from '~~/types/profile'
 import { checkForWin } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
@@ -133,9 +148,31 @@ const cs = useCardStore()
 const ps = usePlayerStore()
 const ds = useGameDataStore()
 
+type SnapshotMetadata = {
+  roundAcks?: RoundAckState | null
+  finalSeen?: FinalSeenState | null
+  terminalStatus?: GameStatus | null
+}
+
+const toPlain = <T,>(value: T | null | undefined): T | null =>
+  value ? (JSON.parse(JSON.stringify(value)) as T) : null
+
+const roundAcks = useState<RoundAckState | null>('round-acks', () => null)
+const finalSeen = useState<FinalSeenState | null>('final-seen', () => ({ p1: false, p2: false }))
+const terminalStatus = useState<GameStatus | null>('terminal-status', () => null)
+const advancingRound = ref(false)
+const finalCleanupDone = ref(false)
+
 const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const { setOpponentPlayer } = useMultiplayerMatch()
-const { subscribeToOpponentPresence, setMyStatus, cleanup: cleanupPresence } = usePresence()
+const {
+  subscribeToOpponentPresence,
+  setMyStatus,
+  cleanup: cleanupPresence,
+  opponentPresence,
+  isOpponentDisconnected,
+  formatOfflineDuration,
+} = usePresence()
 
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
@@ -156,6 +193,56 @@ const canInteractLocalHand = computed(() => {
   return can
 })
 
+const buildRoundAckState = (round: number): RoundAckState => ({
+  round,
+  p1: false,
+  p2: false,
+})
+
+const setLocalRoundAck = (round: number, playerKey: PlayerKey, value: boolean): RoundAckState => {
+  const base =
+    roundAcks.value && roundAcks.value.round === round
+      ? { ...roundAcks.value }
+      : buildRoundAckState(round)
+  base[playerKey] = value
+  roundAcks.value = base
+  return base
+}
+
+const resetRoundAcks = () => {
+  roundAcks.value = null
+}
+
+const ensureFinalSeenState = (): FinalSeenState => finalSeen.value ?? { p1: false, p2: false }
+
+const markLocalFinalSeen = (playerKey: PlayerKey): FinalSeenState => {
+  const next = { ...ensureFinalSeenState(), [playerKey]: true }
+  finalSeen.value = next
+  return next
+}
+
+const hasMyRoundAck = computed(() => {
+  if (!roundAcks.value) return false
+  if (roundAcks.value.round !== ds.roundCounter) return false
+  return roundAcks.value[selfKey.value]
+})
+
+const hasOpponentRoundAck = computed(() => {
+  if (!roundAcks.value) return false
+  if (roundAcks.value.round !== ds.roundCounter) return false
+  return roundAcks.value[opponentKey.value]
+})
+
+const isWaitingForOpponentAck = computed(
+  () => hasMyRoundAck.value && !hasOpponentRoundAck.value && roundOver.value && !gameOver.value,
+)
+
+const hasLocalFinalSeen = computed(() => ensureFinalSeenState()[selfKey.value])
+const hasOpponentFinalSeen = computed(() => ensureFinalSeenState()[opponentKey.value])
+const isWaitingForOpponentFinal = computed(
+  () => ds.gameOver && hasLocalFinalSeen.value && !hasOpponentFinalSeen.value,
+)
+
 const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
 
@@ -170,12 +257,22 @@ const {
   initializeSync,
   deleteSavedGame,
   getSaveKeyForMode,
+  forfeitMultiplayerGame,
 } = useStoreManager()
 const { subscribeToGame } = useMultiplayerMatch()
 const gameUnsubscribe = ref<(() => void) | null>(null)
 
 const showModal = ref(false)
 const showLoader = ref(false)
+const showDisconnectModal = ref(false)
+const isProcessingForfeit = ref(false)
+
+// Grace period before showing disconnect modal (30 seconds)
+const DISCONNECT_GRACE_PERIOD_MS = 30 * 1000
+const disconnectGraceTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+
+// Computed offline duration for the modal
+const offlineDurationDisplay = computed(() => formatOfflineDuration() || '0s')
 const gameStart = useState('start')
 
 const {
@@ -232,7 +329,18 @@ const handleStop = async () => {
   console.debug(player.toUpperCase(), '>>> Called STOP')
   ds.endRound()
   // Stats are automatically tracked by useStatsTracking composable
-  await pushMultiplayerSnapshot('round-end')
+  const ackSeed = buildRoundAckState(ds.roundCounter)
+  roundAcks.value = ackSeed
+  const finalSeed = ds.gameOver ? ensureFinalSeenState() : (finalSeen.value ?? null)
+  if (ds.gameOver) {
+    finalSeen.value = finalSeed ?? { p1: false, p2: false }
+    terminalStatus.value = 'completed'
+  }
+  await pushMultiplayerSnapshot('round-end', undefined, {
+    roundAcks: ackSeed,
+    finalSeen: finalSeed,
+    terminalStatus: ds.gameOver ? 'completed' : null,
+  })
 }
 
 const handleKoikoi = () => {
@@ -245,8 +353,16 @@ const handleKoikoi = () => {
 }
 
 // Closing the round results modal
-const handleNext = async () => {
+const advanceToNextRound = async () => {
+  if (advancingRound.value || gameOver.value) {
+    showLoader.value = false
+    return
+  }
+  advancingRound.value = true
   showLoader.value = true
+  resetRoundAcks()
+  finalSeen.value = null
+  terminalStatus.value = null
   ds.nextRound()
   showModal.value = false
   await sleep(2000)
@@ -254,11 +370,28 @@ const handleNext = async () => {
 
   // In multiplayer, push a fresh snapshot immediately after starting the new round
   // so the opponent sees the new round state before the first turn completes.
-  await pushMultiplayerSnapshot('new-round')
+  await pushMultiplayerSnapshot('new-round', undefined, {
+    roundAcks: null,
+    finalSeen: null,
+    terminalStatus: null,
+  })
+  advancingRound.value = false
 }
 
-// Closing the final results modal
-const handleClose = async () => {
+const handleNext = async () => {
+  const ack = setLocalRoundAck(ds.roundCounter, selfKey.value, true)
+  await pushMultiplayerSnapshot('round-ack', undefined, { roundAcks: toPlain(ack) })
+
+  if (ack.p1 && ack.p2) {
+    await advanceToNextRound()
+  } else {
+    showLoader.value = false
+  }
+}
+
+const performFinalCleanup = async () => {
+  if (finalCleanupDone.value) return
+  finalCleanupDone.value = true
   $clientPosthog?.capture('game_ended')
   ds.nextRound() // This should fix the issue of not swapping to the winner after final round
   showModal.value = false
@@ -282,19 +415,106 @@ const handleClose = async () => {
   gameStart.value = false
 }
 
+// Closing the final results modal
+const handleClose = async () => {
+  finalSeen.value = markLocalFinalSeen(selfKey.value)
+  terminalStatus.value = 'completed'
+
+  await pushMultiplayerSnapshot('final-seen', undefined, {
+    finalSeen: finalSeen.value,
+    terminalStatus: 'completed',
+  })
+
+  if (finalSeen.value?.p1 && finalSeen.value?.p2) {
+    await performFinalCleanup()
+  } else {
+    showModal.value = true
+  }
+}
+
+// Handle claiming victory when opponent disconnects
+const handleClaimVictory = async () => {
+  if (!isMultiplayerGame.value || isProcessingForfeit.value) return
+
+  const multiplayerMeta = useState<{
+    isNew: boolean
+    gameId: string
+    p1: string
+    p2: string
+    activePlayerUid: string
+  }>('multiplayer-game-meta')
+
+  const opponentUid = opponentPresence.value.uid
+  if (!opponentUid || !multiplayerMeta.value?.gameId) {
+    console.error('Cannot claim victory: missing opponent UID or game ID')
+    return
+  }
+
+  isProcessingForfeit.value = true
+
+  try {
+    const success = await forfeitMultiplayerGame(
+      multiplayerMeta.value.gameId,
+      opponentUid,
+      'network_disconnect',
+    )
+
+    if (success) {
+      console.info('Victory claimed due to opponent disconnect')
+      showDisconnectModal.value = false
+
+      // Set game as over and show final results
+      // The forfeited opponent gets 0 points, winner gets their current score
+      ds.endRound()
+      ds.gameOver = true
+      terminalStatus.value = 'abandoned'
+
+      // Show final results modal
+      showModal.value = true
+    } else {
+      console.error('Failed to claim victory')
+    }
+  } catch (error) {
+    console.error('Error claiming victory:', error)
+  } finally {
+    isProcessingForfeit.value = false
+  }
+}
+
+// Handle continuing to wait for opponent
+const handleContinueWaiting = () => {
+  showDisconnectModal.value = false
+}
+
+// Clear disconnect grace timer
+const clearDisconnectGraceTimer = () => {
+  if (disconnectGraceTimer.value) {
+    clearTimeout(disconnectGraceTimer.value)
+    disconnectGraceTimer.value = null
+  }
+}
+
 // Reset all stores to initial state
 const resetAllStores = () => {
   console.debug('Resetting all stores to initial state...')
   ds.reset() // Reset game data store
   ps.reset() // Reset player store to initial state (p1 active and dealer)
   cs.reset() // Reset card store
+  roundAcks.value = null
+  finalSeen.value = null
+  terminalStatus.value = null
+  finalCleanupDone.value = false
 }
 
 /**
  * Push a multiplayer snapshot to Firestore reflecting the current local state.
  * Used after key transitions: turn hand-off, new round start, and round end.
  */
-const pushMultiplayerSnapshot = async (context: string, activeKeyOverride?: PlayerKey) => {
+const pushMultiplayerSnapshot = async (
+  context: string,
+  activeKeyOverride?: PlayerKey,
+  metadata?: SnapshotMetadata,
+) => {
   if (!isMultiplayerGame.value) return
 
   const multiplayerMeta = useState<{
@@ -322,13 +542,28 @@ const pushMultiplayerSnapshot = async (context: string, activeKeyOverride?: Play
   // Only participants should push
   if (currentProfile.value.uid !== p1 && currentProfile.value.uid !== p2) return
 
+  const mergedMetadata: SnapshotMetadata = {
+    roundAcks: metadata?.roundAcks ?? roundAcks.value ?? null,
+    finalSeen: metadata?.finalSeen ?? finalSeen.value ?? null,
+    terminalStatus: metadata?.terminalStatus ?? terminalStatus.value ?? null,
+  }
+
+  const plainMetadata: SnapshotMetadata = {
+    roundAcks: toPlain(mergedMetadata.roundAcks),
+    finalSeen: toPlain(mergedMetadata.finalSeen),
+    terminalStatus: mergedMetadata.terminalStatus ?? null,
+  }
+
   try {
-    await saveMultiplayerGame(p1, p2, activeUid)
+    await saveMultiplayerGame(p1, p2, activeUid, plainMetadata)
     console.info(`Multiplayer snapshot saved (${context})`, {
       gameId: multiplayerMeta.value.gameId,
       p1,
       p2,
       activePlayerUid: activeUid,
+      roundAcks: plainMetadata.roundAcks,
+      finalSeen: plainMetadata.finalSeen,
+      terminalStatus: plainMetadata.terminalStatus,
     })
   } catch (error) {
     console.error(`Failed to save multiplayer snapshot (${context}):`, error)
@@ -388,6 +623,11 @@ const initializeNewMultiplayerGame = async () => {
     localKey.value = 'p1'
     isMultiplayerGame.value = false
   }
+
+  roundAcks.value = null
+  finalSeen.value = null
+  terminalStatus.value = null
+  finalCleanupDone.value = false
 
   // Ensure sync adapters are ready
   initializeSync()
@@ -466,12 +706,20 @@ const initializeNewMultiplayerGame = async () => {
       if (!loaded) {
         console.warn('Failed to load multiplayer game state after remote update')
       }
+      roundAcks.value = game.roundAcks ?? roundAcks.value ?? null
+      finalSeen.value = game.finalSeen ?? finalSeen.value ?? { p1: false, p2: false }
+      terminalStatus.value = game.terminalStatus ?? terminalStatus.value ?? null
 
       // If the updated state indicates the match is over, ensure this client
       // also shows the final results modal, even if they were not the
       // active player on the last turn.
-      if (ds.gameOver && !showModal.value) {
-        showModal.value = true
+      if (ds.gameOver) {
+        if (!finalSeen.value) {
+          finalSeen.value = ensureFinalSeenState()
+        }
+        if (!showModal.value) {
+          showModal.value = true
+        }
       }
     } catch (error) {
       console.error('Failed to sync multiplayer turn from Firestore:', error)
@@ -512,7 +760,18 @@ const handleInstantWin = (result: CompletionEvent) => {
   callStop()
   ds.endRound()
   // Stats are automatically tracked by useStatsTracking composable
-  void pushMultiplayerSnapshot('instant-win-round-end')
+  const ackSeed = buildRoundAckState(ds.roundCounter)
+  roundAcks.value = ackSeed
+  const finalSeed = ds.gameOver ? ensureFinalSeenState() : (finalSeen.value ?? null)
+  if (ds.gameOver) {
+    finalSeen.value = finalSeed ?? { p1: false, p2: false }
+    terminalStatus.value = 'completed'
+  }
+  void pushMultiplayerSnapshot('instant-win-round-end', undefined, {
+    roundAcks: ackSeed,
+    finalSeen: finalSeed,
+    terminalStatus: ds.gameOver ? 'completed' : null,
+  })
 }
 
 const checkDeal = () => {
@@ -554,6 +813,9 @@ onBeforeUnmount(() => {
     gameUnsubscribe.value()
     gameUnsubscribe.value = null
   }
+
+  // Clean up disconnect grace timer
+  clearDisconnectGraceTimer()
 
   cleanupPresence()
 
@@ -611,6 +873,9 @@ onMounted(() => {
     // in a read-only state (no KOI-KOI/STOP buttons).
     if (isMultiplayerGame.value && !decisionIsPending.value) {
       showModal.value = true
+      if (roundAcks.value?.round !== ds.roundCounter) {
+        roundAcks.value = buildRoundAckState(ds.roundCounter)
+      }
     }
   })
 
@@ -618,8 +883,32 @@ onMounted(() => {
   // even if they were not the calling / active player on the last turn.
   watch(gameOver, () => {
     if (!gameOver.value) return
+    finalSeen.value = ensureFinalSeenState()
     showModal.value = true
   })
+
+  watch(
+    roundAcks,
+    async (acks) => {
+      if (!acks) return
+      if (acks.round !== ds.roundCounter) return
+      if (acks.p1 && acks.p2 && roundOver.value && !gameOver.value) {
+        await advanceToNextRound()
+      }
+    },
+    { deep: true },
+  )
+
+  watch(
+    finalSeen,
+    async (state) => {
+      if (finalCleanupDone.value) return
+      if (state?.p1 && state?.p2 && gameOver.value) {
+        await performFinalCleanup()
+      }
+    },
+    { deep: true },
+  )
 
   watch(
     activePlayer,
@@ -646,16 +935,44 @@ onMounted(() => {
 
       // In multiplayer, when our local turn ends (we were active and now opponent is active),
       // save a snapshot with the next active player.
-      if (
-        isMultiplayerGame.value &&
-        oldActive &&
-        oldActive.id === selfKey.value &&
-        newActive.id === opponentKey.value
-      ) {
-        await pushMultiplayerSnapshot('turn-end', newActive.id as PlayerKey)
+      if (isMultiplayerGame.value && oldActive && newActive && newActive.id !== oldActive.id) {
+        // Push a snapshot on any active-player change to avoid missing handoffs.
+        await pushMultiplayerSnapshot('turn-change', newActive.id as PlayerKey)
       }
     },
     { flush: 'post' },
+  )
+
+  // Watch for opponent disconnection in multiplayer games
+  watch(
+    isOpponentDisconnected,
+    (disconnected, wasDisconnected) => {
+      // Only handle multiplayer games that are in progress
+      if (!isMultiplayerGame.value || gameOver.value || !gameStart.value) {
+        clearDisconnectGraceTimer()
+        showDisconnectModal.value = false
+        return
+      }
+
+      if (disconnected && !wasDisconnected) {
+        // Opponent just went offline - start grace period
+        console.info('[Presence] Opponent disconnected, starting grace period')
+        clearDisconnectGraceTimer()
+        disconnectGraceTimer.value = setTimeout(() => {
+          // After grace period, show the disconnect modal
+          if (isOpponentDisconnected.value && isMultiplayerGame.value && !gameOver.value) {
+            console.info('[Presence] Grace period expired, showing disconnect modal')
+            showDisconnectModal.value = true
+          }
+        }, DISCONNECT_GRACE_PERIOD_MS)
+      } else if (!disconnected && wasDisconnected) {
+        // Opponent came back online
+        console.info('[Presence] Opponent reconnected')
+        clearDisconnectGraceTimer()
+        showDisconnectModal.value = false
+      }
+    },
+    { immediate: true },
   )
 
   watch(gameStart, async () => {

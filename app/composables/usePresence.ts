@@ -67,9 +67,26 @@ export type PresenceComposable = {
   isOpponentPlaying: Readonly<Ref<boolean>>
 
   /**
+   * Computed: Is opponent disconnected (offline state)?
+   */
+  isOpponentDisconnected: Readonly<Ref<boolean>>
+
+  /**
    * Format last seen timestamp as human-readable string
    */
   formatLastSeen: (lastSeen: Date) => string
+
+  /**
+   * Get duration in milliseconds since opponent went offline
+   * Returns 0 if opponent is online or lastSeen is unavailable
+   */
+  getOfflineDuration: () => number
+
+  /**
+   * Format offline duration as human-readable string
+   * Returns null if opponent is online
+   */
+  formatOfflineDuration: () => string | null
 }
 
 export const usePresence = (): PresenceComposable => {
@@ -92,6 +109,41 @@ export const usePresence = (): PresenceComposable => {
 
   const isOpponentOnline = computed(() => opponentPresence.value.state === 'online')
   const isOpponentPlaying = computed(() => opponentPresence.value.state === 'playing')
+  const isOpponentDisconnected = computed(() => opponentPresence.value.state === 'offline')
+
+  /**
+   * Get duration in milliseconds since opponent went offline
+   * Returns 0 if opponent is online or lastSeen is unavailable
+   */
+  const getOfflineDuration = (): number => {
+    const presence = opponentPresence.value
+    if (presence.state !== 'offline' || !presence.lastSeen) {
+      return 0
+    }
+    return Date.now() - presence.lastSeen.getTime()
+  }
+
+  /**
+   * Format offline duration as human-readable string
+   * Returns null if opponent is online
+   */
+  const formatOfflineDuration = (): string | null => {
+    const presence = opponentPresence.value
+    if (presence.state !== 'offline') {
+      return null
+    }
+
+    const durationMs = getOfflineDuration()
+    if (durationMs === 0) return 'just now'
+
+    const seconds = Math.floor(durationMs / 1000)
+    const minutes = Math.floor(seconds / 60)
+    const hours = Math.floor(minutes / 60)
+
+    if (seconds < 60) return `${seconds}s`
+    if (minutes < 60) return `${minutes}m ${seconds % 60}s`
+    return `${hours}h ${minutes % 60}m`
+  }
 
   /**
    * Initialize RTDB instance (lazy)
@@ -345,6 +397,9 @@ export const usePresence = (): PresenceComposable => {
     opponentPresence: readonly(opponentPresence),
     isOpponentOnline: readonly(isOpponentOnline),
     isOpponentPlaying: readonly(isOpponentPlaying),
+    isOpponentDisconnected: readonly(isOpponentDisconnected),
     formatLastSeen,
+    getOfflineDuration,
+    formatOfflineDuration,
   }
 }

@@ -131,6 +131,43 @@ function parseMultiplayerGame(
   const lastUpdated = convertTimestamp(data.lastUpdated)
   const createdAt = convertTimestamp(data.createdAt)
 
+  const roundAcks =
+    data.roundAcks &&
+    typeof data.roundAcks === 'object' &&
+    typeof (data.roundAcks as any).round === 'number' &&
+    typeof (data.roundAcks as any).p1 === 'boolean' &&
+    typeof (data.roundAcks as any).p2 === 'boolean'
+      ? {
+          round: (data.roundAcks as any).round,
+          p1: (data.roundAcks as any).p1,
+          p2: (data.roundAcks as any).p2,
+        }
+      : null
+
+  const finalSeen =
+    data.finalSeen &&
+    typeof data.finalSeen === 'object' &&
+    typeof (data.finalSeen as any).p1 === 'boolean' &&
+    typeof (data.finalSeen as any).p2 === 'boolean'
+      ? {
+          p1: (data.finalSeen as any).p1,
+          p2: (data.finalSeen as any).p2,
+        }
+      : null
+
+  const terminalStatus =
+    typeof data.terminalStatus === 'string' && data.terminalStatus.length > 0
+      ? (data.terminalStatus as any)
+      : null
+
+  // Forfeit fields (optional)
+  const forfeitedBy =
+    typeof data.forfeitedBy === 'string' && data.forfeitedBy.length > 0 ? data.forfeitedBy : null
+  const forfeitReason =
+    typeof data.forfeitReason === 'string' && data.forfeitReason.length > 0
+      ? (data.forfeitReason as any)
+      : null
+
   return {
     gameId: data.gameId,
     gameState: data.gameState,
@@ -139,6 +176,11 @@ function parseMultiplayerGame(
     p2: data.p2,
     activePlayer: data.activePlayer,
     status: data.status,
+    roundAcks,
+    finalSeen,
+    terminalStatus,
+    forfeitedBy,
+    forfeitReason,
     lastUpdated,
     createdAt,
   } as MultiplayerGame
@@ -234,6 +276,11 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
           p2: game.p2,
           activePlayer: game.activePlayer,
           status: game.status,
+          roundAcks: game.roundAcks ?? null,
+          finalSeen: game.finalSeen ?? null,
+          terminalStatus: game.terminalStatus ?? null,
+          forfeitedBy: game.forfeitedBy ?? null,
+          forfeitReason: game.forfeitReason ?? null,
           lastUpdated:
             game.lastUpdated instanceof Date
               ? Timestamp.fromDate(game.lastUpdated)

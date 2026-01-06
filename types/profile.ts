@@ -133,6 +133,19 @@ export type GameMode = 'single' | 'multiplayer'
 
 export type GameStatus = 'waiting' | 'active' | 'completed' | 'abandoned'
 
+export type DisconnectReason = 'graceful_exit' | 'network_disconnect' | 'timeout' | 'forfeit'
+
+export type RoundAckState = {
+  round: number
+  p1: boolean
+  p2: boolean
+}
+
+export type FinalSeenState = {
+  p1: boolean
+  p2: boolean
+}
+
 export interface GameSaveRecord {
   id: string
   uid: string
@@ -144,6 +157,9 @@ export interface GameSaveRecord {
   p1?: string | null // Player 1 uid (null for single-player)
   p2?: string | null // Player 2 uid (null for single-player)
   activePlayer?: string | null // Current turn player uid (null for single-player)
+  roundAcks?: RoundAckState | null
+  finalSeen?: FinalSeenState | null
+  terminalStatus?: GameStatus | null
 }
 
 /**
@@ -175,6 +191,11 @@ export type MultiplayerGame = {
   p2: string // Player 2 uid (empty string when waiting)
   activePlayer: string // Current turn player uid
   status: GameStatus // Game lifecycle status
+  roundAcks?: RoundAckState | null // Per-round acknowledgement to advance
+  finalSeen?: FinalSeenState | null // Final modal seen flags
+  terminalStatus?: GameStatus | null // Terminal marker (completed/abandoned)
+  forfeitedBy?: string | null // UID of player who forfeited (opponent claimed victory)
+  forfeitReason?: DisconnectReason | null // Reason for forfeit
   inviteCode?: string // Optional reference back to invite code
   startedAt?: Date // When p2 joined
   lastUpdated: Date
