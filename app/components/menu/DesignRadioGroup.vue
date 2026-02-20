@@ -34,7 +34,7 @@
           'group rounded-xs focus-visible:ring-1 focus-visible:ring-offset-2 focus-visible:ring-primary',
         ]"
         :value="design"
-        :disabled="!!currentProfile && !unlocked?.includes(design)"
+        :disabled="!isDesignAvailable(design)"
         v-posthog-capture="{
           event: 'view_design',
           properties: {
@@ -72,7 +72,7 @@
               <!-- UNLOCK BUTTON -->
               <button
                 type="button"
-                v-if="unlocked && !unlocked.includes(design)"
+                v-if="!isDesignAvailable(design)"
                 @click="() => handleUnlock(design)"
                 class="rounded-[inherit]"
               >
@@ -284,6 +284,10 @@ const coins = computed({
 })
 
 const unlocked = computed(() => currentProfile?.value?.designs.unlocked)
+const isDesignAvailable = (design: CardDesign) => {
+  const available = unlocked.value ?? getDefaultDesigns()
+  return available.includes(design)
+}
 const newUnlock: Ref<{ design: CardDesign; cost: number } | null> = ref(null)
 
 let initialDesign: CardDesign | undefined
