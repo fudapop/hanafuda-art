@@ -1,5 +1,18 @@
 # Dziennik zmian
 
+## [2026.2.0] - 2026-02-20
+
+### Naprawione błędy
+- **Wybór projektu talii dla anonimowych graczy**: Naprawiono problem, w którym anonimowi (nieuwierzytelnieni) gracze mogli wybierać projekty talii kart wymagające konta. Zablokowane projekty są teraz prawidłowo ograniczone tylko do zalogowanych graczy.
+
+## [2025.12.0] - 2025-12-07
+
+### Ulepszenia interfejsu i doświadczenia
+- **Widoczność wyników rundy**: Poprawiono widoczność tekstu na ekranie wyników rundy dla lepszej czytelności.
+
+### Naprawione błędy
+- **Ochrona interakcji z ręką**: Dodano dodatkowe zabezpieczenie uniemożliwiające interakcję z kartami w ręce poza fazą wyboru gracza, zapewniając, że akcje gry są możliwe tylko w odpowiednim czasie.
+
 ## [2025.11.5] - 2025-11-28
 
 ### Nowe funkcje

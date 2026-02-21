@@ -1,5 +1,18 @@
 # Journal des modifications
 
+## [2026.2.0] - 2026-02-20
+
+### Corrections de bugs
+- **Sélection de design de deck pour les joueurs anonymes**: Correction d'un problème permettant aux joueurs anonymes (non authentifiés) de sélectionner des designs de cartes nécessitant un compte. Les designs verrouillés sont maintenant correctement réservés aux joueurs connectés uniquement.
+
+## [2025.12.0] - 2025-12-07
+
+### Améliorations de l'interface et de l'expérience
+- **Visibilité des résultats de manche**: Amélioration de la visibilité du texte dans l'écran des résultats de manche pour une meilleure lisibilité.
+
+### Corrections de bugs
+- **Protection des interactions de main**: Ajout d'une protection supplémentaire empêchant l'interaction avec les cartes en main en dehors de la phase de sélection du joueur, garantissant que les actions de jeu ne sont possibles qu'au moment approprié.
+
 ## [2025.11.5] - 2025-11-28
 
 ### Nouvelles fonctionnalités

@@ -1,5 +1,18 @@
 # Changelog
 
+## [2026.2.0] - 2026-02-20
+
+### Bug Fixes
+- **Anonymous Deck Design Selection**: Fixed an issue where anonymous (non-authenticated) players could select card deck designs that require an account. Locked designs are now properly restricted to signed-in players only.
+
+## [2025.12.0] - 2025-12-07
+
+### UI & Experience Improvements
+- **Round Results Visibility**: Improved text visibility in the round results screen for better readability.
+
+### Bug Fixes
+- **Hand Interaction Guard**: Added an additional safeguard to prevent cards in hand from being interacted with outside of the player selection phase, ensuring game actions are only possible at the correct time.
+
 ## [2025.11.5] - 2025-11-28
 
 ### New Features
