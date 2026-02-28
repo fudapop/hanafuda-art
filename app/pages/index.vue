@@ -95,14 +95,11 @@
         <FinalResults
           v-if="gameOver"
           :results="ds.roundHistory"
-          :waiting-for-opponent="isWaitingForOpponentFinal"
           @close="handleClose"
         />
         <RoundResults
           v-else
-          :waiting-for-opponent="isWaitingForOpponentAck"
-          :has-acknowledged="hasMyRoundAck"
-          :show-ack-controls="roundOver && !gameOver"
+          :show-ack-controls="roundOver && !gameOver && players[selfKey].isActive"
           @next="handleNext"
         />
       </ResultsModal>
@@ -123,7 +120,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
-import type { FinalSeenState, GameStatus, RoundAckState } from '~~/types/profile'
+import type { MultiplayerGame } from '~~/types/profile'
 import { checkForWin } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
@@ -148,25 +145,11 @@ const cs = useCardStore()
 const ps = usePlayerStore()
 const ds = useGameDataStore()
 
-type SnapshotMetadata = {
-  roundAcks?: RoundAckState | null
-  finalSeen?: FinalSeenState | null
-  terminalStatus?: GameStatus | null
-}
-
-const toPlain = <T,>(value: T | null | undefined): T | null =>
-  value ? (JSON.parse(JSON.stringify(value)) as T) : null
-
-const roundAcks = useState<RoundAckState | null>('round-acks', () => null)
-const finalSeen = useState<FinalSeenState | null>('final-seen', () => ({ p1: false, p2: false }))
-const terminalStatus = useState<GameStatus | null>('terminal-status', () => null)
 const advancingRound = ref(false)
 const finalCleanupDone = ref(false)
 
 const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
-const { setOpponentPlayer } = useMultiplayerMatch()
 const {
-  subscribeToOpponentPresence,
   setMyStatus,
   cleanup: cleanupPresence,
   opponentPresence,
@@ -176,7 +159,7 @@ const {
 
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
-const { roundOver, gameOver, turnCounter, gameId } = storeToRefs(ds)
+const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
 
 // Derived flag: whether the local player's hand should be interactive
 const canInteractLocalHand = computed(() => {
@@ -193,74 +176,26 @@ const canInteractLocalHand = computed(() => {
   return can
 })
 
-const buildRoundAckState = (round: number): RoundAckState => ({
-  round,
-  p1: false,
-  p2: false,
-})
-
-const setLocalRoundAck = (round: number, playerKey: PlayerKey, value: boolean): RoundAckState => {
-  const base =
-    roundAcks.value && roundAcks.value.round === round
-      ? { ...roundAcks.value }
-      : buildRoundAckState(round)
-  base[playerKey] = value
-  roundAcks.value = base
-  return base
-}
-
-const resetRoundAcks = () => {
-  roundAcks.value = null
-}
-
-const ensureFinalSeenState = (): FinalSeenState => finalSeen.value ?? { p1: false, p2: false }
-
-const markLocalFinalSeen = (playerKey: PlayerKey): FinalSeenState => {
-  const next = { ...ensureFinalSeenState(), [playerKey]: true }
-  finalSeen.value = next
-  return next
-}
-
-const hasMyRoundAck = computed(() => {
-  if (!roundAcks.value) return false
-  if (roundAcks.value.round !== ds.roundCounter) return false
-  return roundAcks.value[selfKey.value]
-})
-
-const hasOpponentRoundAck = computed(() => {
-  if (!roundAcks.value) return false
-  if (roundAcks.value.round !== ds.roundCounter) return false
-  return roundAcks.value[opponentKey.value]
-})
-
-const isWaitingForOpponentAck = computed(
-  () => hasMyRoundAck.value && !hasOpponentRoundAck.value && roundOver.value && !gameOver.value,
-)
-
-const hasLocalFinalSeen = computed(() => ensureFinalSeenState()[selfKey.value])
-const hasOpponentFinalSeen = computed(() => ensureFinalSeenState()[opponentKey.value])
-const isWaitingForOpponentFinal = computed(
-  () => ds.gameOver && hasLocalFinalSeen.value && !hasOpponentFinalSeen.value,
-)
-
 const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
 
 const { opponentPlay, useOpponent } = useAutoplay()
 const autoOpponent: Ref<boolean> = useOpponent()
 
-// Multiplayer turn sync helpers
+// Multiplayer orchestration
 const {
-  saveMultiplayerGame,
+  pushSnapshot: pushMultiplayerSnapshot,
+  initGame: initMultiplayerGame,
+  cleanupSubscription: cleanupMultiplayerSubscription,
+  terminalStatus,
+} = useMultiplayerOrchestrator()
+
+const {
   syncMultiplayerGame,
-  loadMultiplayerGame,
-  initializeSync,
   deleteSavedGame,
   getSaveKeyForMode,
   forfeitMultiplayerGame,
 } = useStoreManager()
-const { subscribeToGame } = useMultiplayerMatch()
-const gameUnsubscribe = ref<(() => void) | null>(null)
 
 const showModal = ref(false)
 const showLoader = ref(false)
@@ -329,16 +264,10 @@ const handleStop = async () => {
   console.debug(player.toUpperCase(), '>>> Called STOP')
   ds.endRound()
   // Stats are automatically tracked by useStatsTracking composable
-  const ackSeed = buildRoundAckState(ds.roundCounter)
-  roundAcks.value = ackSeed
-  const finalSeed = ds.gameOver ? ensureFinalSeenState() : (finalSeen.value ?? null)
   if (ds.gameOver) {
-    finalSeen.value = finalSeed ?? { p1: false, p2: false }
     terminalStatus.value = 'completed'
   }
   await pushMultiplayerSnapshot('round-end', undefined, {
-    roundAcks: ackSeed,
-    finalSeen: finalSeed,
     terminalStatus: ds.gameOver ? 'completed' : null,
   })
 }
@@ -360,8 +289,6 @@ const advanceToNextRound = async () => {
   }
   advancingRound.value = true
   showLoader.value = true
-  resetRoundAcks()
-  finalSeen.value = null
   terminalStatus.value = null
   ds.nextRound()
   showModal.value = false
@@ -371,22 +298,13 @@ const advanceToNextRound = async () => {
   // In multiplayer, push a fresh snapshot immediately after starting the new round
   // so the opponent sees the new round state before the first turn completes.
   await pushMultiplayerSnapshot('new-round', undefined, {
-    roundAcks: null,
-    finalSeen: null,
     terminalStatus: null,
   })
   advancingRound.value = false
 }
 
 const handleNext = async () => {
-  const ack = setLocalRoundAck(ds.roundCounter, selfKey.value, true)
-  await pushMultiplayerSnapshot('round-ack', undefined, { roundAcks: toPlain(ack) })
-
-  if (ack.p1 && ack.p2) {
-    await advanceToNextRound()
-  } else {
-    showLoader.value = false
-  }
+  await advanceToNextRound()
 }
 
 const performFinalCleanup = async () => {
@@ -417,19 +335,11 @@ const performFinalCleanup = async () => {
 
 // Closing the final results modal
 const handleClose = async () => {
-  finalSeen.value = markLocalFinalSeen(selfKey.value)
   terminalStatus.value = 'completed'
-
-  await pushMultiplayerSnapshot('final-seen', undefined, {
-    finalSeen: finalSeen.value,
+  await pushMultiplayerSnapshot('final-close', undefined, {
     terminalStatus: 'completed',
   })
-
-  if (finalSeen.value?.p1 && finalSeen.value?.p2) {
-    await performFinalCleanup()
-  } else {
-    showModal.value = true
-  }
+  await performFinalCleanup()
 }
 
 // Handle claiming victory when opponent disconnects
@@ -500,223 +410,32 @@ const resetAllStores = () => {
   ds.reset() // Reset game data store
   ps.reset() // Reset player store to initial state (p1 active and dealer)
   cs.reset() // Reset card store
-  roundAcks.value = null
-  finalSeen.value = null
   terminalStatus.value = null
   finalCleanupDone.value = false
 }
 
-/**
- * Push a multiplayer snapshot to Firestore reflecting the current local state.
- * Used after key transitions: turn hand-off, new round start, and round end.
- */
-const pushMultiplayerSnapshot = async (
-  context: string,
-  activeKeyOverride?: PlayerKey,
-  metadata?: SnapshotMetadata,
-) => {
-  if (!isMultiplayerGame.value) return
-
-  const multiplayerMeta = useState<{
-    isNew: boolean
-    gameId: string
-    p1: string
-    p2: string
-    activePlayerUid: string
-  }>('multiplayer-game-meta', () => ({
-    isNew: false,
-    gameId: '',
-    p1: '',
-    p2: '',
-    activePlayerUid: '',
-  }))
-
-  const { current: currentProfile } = useProfile()
-  if (!currentProfile.value || !multiplayerMeta.value.gameId) return
-
-  const p1 = multiplayerMeta.value.p1
-  const p2 = multiplayerMeta.value.p2
-  const activeKey = activeKeyOverride ?? (activePlayer.value.id as PlayerKey)
-  const activeUid = activeKey === 'p1' ? p1 : p2
-
-  // Only participants should push
-  if (currentProfile.value.uid !== p1 && currentProfile.value.uid !== p2) return
-
-  const mergedMetadata: SnapshotMetadata = {
-    roundAcks: metadata?.roundAcks ?? roundAcks.value ?? null,
-    finalSeen: metadata?.finalSeen ?? finalSeen.value ?? null,
-    terminalStatus: metadata?.terminalStatus ?? terminalStatus.value ?? null,
-  }
-
-  const plainMetadata: SnapshotMetadata = {
-    roundAcks: toPlain(mergedMetadata.roundAcks),
-    finalSeen: toPlain(mergedMetadata.finalSeen),
-    terminalStatus: mergedMetadata.terminalStatus ?? null,
-  }
-
-  try {
-    await saveMultiplayerGame(p1, p2, activeUid, plainMetadata)
-    console.info(`Multiplayer snapshot saved (${context})`, {
-      gameId: multiplayerMeta.value.gameId,
-      p1,
-      p2,
-      activePlayerUid: activeUid,
-      roundAcks: plainMetadata.roundAcks,
-      finalSeen: plainMetadata.finalSeen,
-      terminalStatus: plainMetadata.terminalStatus,
-    })
-  } catch (error) {
-    console.error(`Failed to save multiplayer snapshot (${context}):`, error)
-  }
-}
-
-// Specialized initialization for a brand new multiplayer game
+// Initialize a new multiplayer game via the orchestrator
 const initializeNewMultiplayerGame = async () => {
-  const { current: currentProfile } = useProfile()
-
-  const multiplayerMeta = useState<{
-    isNew: boolean
-    gameId: string
-    p1: string
-    p2: string
-    activePlayerUid: string
-  }>('multiplayer-game-meta', () => ({
-    isNew: false,
-    gameId: '',
-    p1: '',
-    p2: '',
-    activePlayerUid: '',
-  }))
-
-  if (!multiplayerMeta.value.isNew || !multiplayerMeta.value.gameId) {
-    console.warn('initializeNewMultiplayerGame called without multiplayer meta; falling back')
-    resetAllStores()
-    startRound()
-    return
-  }
-
-  const currentUid = currentProfile.value?.uid
-  const isStarter = currentUid && currentUid === multiplayerMeta.value.activePlayerUid
-
-  // Ensure the game data store uses the canonical multiplayer gameId from Firestore
-  // so both players share the same identifier and push to the same multiplayer_games
-  // document. Without this, the starting player could generate a new local gameId and
-  // push snapshots to a different document, leaving the original host document in a
-  // pre-game state.
-  if (multiplayerMeta.value.gameId && gameId.value !== multiplayerMeta.value.gameId) {
-    console.debug('[initializeNewMultiplayerGame] Syncing local gameId to multiplayer meta', {
-      previousGameId: gameId.value,
-      multiplayerGameId: multiplayerMeta.value.gameId,
-    })
-    gameId.value = multiplayerMeta.value.gameId
-  }
-
-  // Set local player perspective for multiplayer
-  if (
-    currentUid &&
-    (currentUid === multiplayerMeta.value.p1 || currentUid === multiplayerMeta.value.p2)
-  ) {
-    localKey.value = currentUid === multiplayerMeta.value.p1 ? 'p1' : 'p2'
-    await setOpponentPlayer(multiplayerMeta.value[opponentKey.value])
-    isMultiplayerGame.value = true
-  } else {
-    localKey.value = 'p1'
-    isMultiplayerGame.value = false
-  }
-
-  roundAcks.value = null
-  finalSeen.value = null
-  terminalStatus.value = null
   finalCleanupDone.value = false
 
-  // Ensure sync adapters are ready
-  initializeSync()
-
-  if (isStarter) {
-    console.info('Initializing new multiplayer game as starting player', multiplayerMeta.value)
-
-    // Start with a clean state and run normal round initialization
-    resetAllStores()
-    // Ensure the correct starting players is reflected in state
-    ps.reset(localKey.value)
-
-    await startRound()
-
-    try {
-      await saveMultiplayerGame(
-        multiplayerMeta.value.p1,
-        multiplayerMeta.value.p2,
-        multiplayerMeta.value.activePlayerUid,
-      )
-      console.info('Multiplayer game state saved and pushed by starting player')
-    } catch (error) {
-      console.error('Failed to save multiplayer game from starting player:', error)
-    }
-    console.log('STARTER INITIALIZED', Date.now())
-  } else {
-    console.info(
-      'Joining new multiplayer game as non-starting player, syncing from remote state',
-      multiplayerMeta.value,
-    )
-
-    try {
-      const maxAttempts = 3
-
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const synced = await syncMultiplayerGame(multiplayerMeta.value.gameId)
-        if (synced) {
-          break
-        }
-        console.warn(
-          `Multiplayer game ${multiplayerMeta.value.gameId} not yet initialized by starter (attempt ${attempt + 1}/${maxAttempts})`,
-        )
-
-        // Small delay before retrying to give starter time to push state
-        await sleep(1000)
-      }
-
-      const loaded = await loadMultiplayerGame()
-      if (!loaded) {
-        console.warn('Failed to load multiplayer game state after sync retries')
-      }
-      console.log('NON-STARTER INITIALIZED', Date.now())
-    } catch (error) {
-      console.error('Failed to sync/load multiplayer game for non-starting player:', error)
-    }
-  }
-
-  // Mark meta as no longer "new" so subsequent starts use regular resume/new logic
-  multiplayerMeta.value.isNew = false
-
-  // Subscribe to game document to receive remote updates (turns, new rounds, etc.)
-  if (gameUnsubscribe.value) {
-    gameUnsubscribe.value()
-  }
-
-  gameUnsubscribe.value = subscribeToGame(multiplayerMeta.value.gameId, async (game) => {
+  const handleRemoteUpdate = async (game: MultiplayerGame) => {
+    const { current: currentProfile } = useProfile()
     const uid = currentProfile.value?.uid
     if (!uid) return
 
     try {
-      // Always pull the latest remote state on any multiplayer_games change.
-      // This avoids subtle timestamp-based no-op cases in syncMultiplayerGame
-      // and guarantees that both players see round/match transitions.
-      await syncMultiplayerGame(game.gameId)
-      const loaded = await loadMultiplayerGame()
-      if (!loaded) {
-        console.warn('Failed to load multiplayer game state after remote update')
-      }
-      roundAcks.value = game.roundAcks ?? roundAcks.value ?? null
-      finalSeen.value = game.finalSeen ?? finalSeen.value ?? { p1: false, p2: false }
+      // Set metadata FIRST before deserialization sets gameOver (which triggers watchers).
       terminalStatus.value = game.terminalStatus ?? terminalStatus.value ?? null
 
+      // Always pull the latest remote state on any multiplayer_games change.
+      const synced = await syncMultiplayerGame(game.gameId)
+      if (!synced) {
+        console.warn('Failed to sync multiplayer game state after remote update')
+      }
+
       // If the updated state indicates the match is over, ensure this client
-      // also shows the final results modal, even if they were not the
-      // active player on the last turn.
+      // also shows the final results modal.
       if (ds.gameOver) {
-        if (!finalSeen.value) {
-          finalSeen.value = ensureFinalSeenState()
-        }
         if (!showModal.value) {
           showModal.value = true
         }
@@ -724,14 +443,12 @@ const initializeNewMultiplayerGame = async () => {
     } catch (error) {
       console.error('Failed to sync multiplayer turn from Firestore:', error)
     }
-  })
-
-  // Subscribe to opponent's presence
-  const opponentUid = multiplayerMeta.value[opponentKey.value]
-  if (opponentUid) {
-    subscribeToOpponentPresence(opponentUid)
-    console.info(`[Multiplayer] Subscribed to opponent presence: ${opponentUid}`)
   }
+
+  await initMultiplayerGame(
+    { resetAllStores, startRound },
+    handleRemoteUpdate,
+  )
 }
 
 const startRound = async () => {
@@ -760,16 +477,10 @@ const handleInstantWin = (result: CompletionEvent) => {
   callStop()
   ds.endRound()
   // Stats are automatically tracked by useStatsTracking composable
-  const ackSeed = buildRoundAckState(ds.roundCounter)
-  roundAcks.value = ackSeed
-  const finalSeed = ds.gameOver ? ensureFinalSeenState() : (finalSeen.value ?? null)
   if (ds.gameOver) {
-    finalSeen.value = finalSeed ?? { p1: false, p2: false }
     terminalStatus.value = 'completed'
   }
   void pushMultiplayerSnapshot('instant-win-round-end', undefined, {
-    roundAcks: ackSeed,
-    finalSeen: finalSeed,
     terminalStatus: ds.gameOver ? 'completed' : null,
   })
 }
@@ -809,10 +520,7 @@ const checkDeal = () => {
 
 onBeforeUnmount(() => {
   // Clean up multiplayer listener
-  if (gameUnsubscribe.value) {
-    gameUnsubscribe.value()
-    gameUnsubscribe.value = null
-  }
+  cleanupMultiplayerSubscription()
 
   // Clean up disconnect grace timer
   clearDisconnectGraceTimer()
@@ -873,9 +581,6 @@ onMounted(() => {
     // in a read-only state (no KOI-KOI/STOP buttons).
     if (isMultiplayerGame.value && !decisionIsPending.value) {
       showModal.value = true
-      if (roundAcks.value?.round !== ds.roundCounter) {
-        roundAcks.value = buildRoundAckState(ds.roundCounter)
-      }
     }
   })
 
@@ -883,32 +588,8 @@ onMounted(() => {
   // even if they were not the calling / active player on the last turn.
   watch(gameOver, () => {
     if (!gameOver.value) return
-    finalSeen.value = ensureFinalSeenState()
     showModal.value = true
   })
-
-  watch(
-    roundAcks,
-    async (acks) => {
-      if (!acks) return
-      if (acks.round !== ds.roundCounter) return
-      if (acks.p1 && acks.p2 && roundOver.value && !gameOver.value) {
-        await advanceToNextRound()
-      }
-    },
-    { deep: true },
-  )
-
-  watch(
-    finalSeen,
-    async (state) => {
-      if (finalCleanupDone.value) return
-      if (state?.p1 && state?.p2 && gameOver.value) {
-        await performFinalCleanup()
-      }
-    },
-    { deep: true },
-  )
 
   watch(
     activePlayer,

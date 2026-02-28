@@ -44,19 +44,11 @@
         v-show="ds.gameOver"
         class="flex items-center gap-3"
       >
-        <p
-          v-if="waitingForOpponent"
-          class="text-sm font-medium text-text-secondary dark:text-text-secondary"
-        >
-          Waiting for opponent...
-        </p>
         <button
-          class="sec-btn disabled:opacity-60 disabled:cursor-not-allowed"
-          :disabled="waitingForOpponent"
+          class="sec-btn"
           @click="() => $emit('close')"
         >
-          <span v-if="waitingForOpponent">Waiting...</span>
-          <span v-else>{{ t('common.actions.close') }}</span>
+          {{ t('common.actions.close') }}
         </button>
       </div>
     </div>
@@ -117,9 +109,8 @@ import NumberAnimation from 'vue-number-animation'
 import { type RoundResult, useGameDataStore } from '~~/stores/gameDataStore'
 
 const { t } = useI18n()
-const { results, waitingForOpponent = false } = defineProps<{
+const { results } = defineProps<{
   results: RoundResult[]
-  waitingForOpponent?: boolean
 }>()
 
 defineEmits(['close'])
