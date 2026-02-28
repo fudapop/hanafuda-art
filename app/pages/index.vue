@@ -163,6 +163,7 @@ const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
 
 // Derived flag: whether the local player's hand should be interactive
 const canInteractLocalHand = computed(() => {
+  if (isReplaying.value) return false
   const current = ds.getCurrent
   const key = selfKey.value
   const can = current.player === key && current.phase === 'select'
@@ -192,10 +193,18 @@ const {
 
 const {
   syncMultiplayerGame,
+  deserializeGameState,
   deleteSavedGame,
   getSaveKeyForMode,
   forfeitMultiplayerGame,
 } = useStoreManager()
+
+// Opponent turn replay for multiplayer
+const {
+  isReplaying,
+  shouldReplayTurn,
+  replayOpponentTurn,
+} = useOpponentReplay()
 
 const showModal = ref(false)
 const showLoader = ref(false)
@@ -427,10 +436,16 @@ const initializeNewMultiplayerGame = async () => {
       // Set metadata FIRST before deserialization sets gameOver (which triggers watchers).
       terminalStatus.value = game.terminalStatus ?? terminalStatus.value ?? null
 
-      // Always pull the latest remote state on any multiplayer_games change.
-      const synced = await syncMultiplayerGame(game.gameId)
-      if (!synced) {
-        console.warn('Failed to sync multiplayer game state after remote update')
+      const remoteState = game.gameState
+
+      // Attempt step-by-step replay for opponent turns; fall through to direct sync otherwise.
+      if (remoteState && shouldReplayTurn(remoteState)) {
+        await replayOpponentTurn(remoteState, deserializeGameState)
+      } else {
+        const synced = await syncMultiplayerGame(game.gameId)
+        if (!synced) {
+          console.warn('Failed to sync multiplayer game state after remote update')
+        }
       }
 
       // If the updated state indicates the match is over, ensure this client
@@ -594,6 +609,9 @@ onMounted(() => {
   watch(
     activePlayer,
     async (newActive, oldActive) => {
+      // Suppress all side-effects during opponent turn replay
+      if (isReplaying.value) return
+
       // Single-player CPU opponent
       if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {
         opponentPlay({ speed: 2 })
