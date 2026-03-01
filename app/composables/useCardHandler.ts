@@ -142,13 +142,15 @@ export const useCardHandler = () => {
     // console.debug('\tMatching:', matchedCards.value.join(', ').toUpperCase())
     if (matchedCards.value.length === 3) {
       // Collect the entire suit
-      handleMatched([...matchedCards.value, selected])
+      handleMatched([selected, ...matchedCards.value])
     } else {
       // Player selects one match
-      handleMatched([card, selected])
+      handleMatched([selected, card])
     }
   }
 
+  // Convention: matches[0] is always the hand card, followed by field card(s).
+  // useOpponentReplay relies on this ordering to display the correct card during replay.
   const handleMatched = (matches: CardName[]) => {
     ds.logPlayerAction(ds.getCurrent.player, 'match', matches)
     cs.stageForCollection(matches)
@@ -223,6 +225,7 @@ export const useCardHandler = () => {
         case 1:
         case 3:
           cs.stageForCollection([...matches, selected])
+          // Hand card first, then field card(s) — see handleMatched convention
           ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, ...matches])
           break
         case 2:
@@ -239,6 +242,7 @@ export const useCardHandler = () => {
           )
           const best = rateProgress(p0, cardsInHand) > rateProgress(p1, cardsInHand) ? 0 : 1
           cs.stageForCollection([matches[best]!, selected])
+          // Hand card first, then field card — see handleMatched convention
           ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, matches[best]!])
           break
       }

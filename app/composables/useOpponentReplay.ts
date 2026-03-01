@@ -69,7 +69,7 @@ export const useOpponentReplay = () => {
 
       case 'match': {
         const cards = event.cards as CardName[]
-        // Set the primary card as selected for visual feedback
+        // cards[0] is always the hand card (see handleMatched convention in useCardHandler)
         if (cards[0]) {
           selectedCard.value = cards[0]
         }
@@ -105,7 +105,7 @@ export const useOpponentReplay = () => {
       case 'koi-koi': {
         const { callKoikoiFor } = useDecisionHandler()
         ds.logPlayerAction(player, 'koi-koi')
-        callKoikoiFor(player)
+        await callKoikoiFor(player)
         break
       }
 
