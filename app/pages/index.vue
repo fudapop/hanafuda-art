@@ -448,6 +448,14 @@ const initializeNewMultiplayerGame = async () => {
         }
       }
 
+      // Update presence after replay/sync -- the activePlayer watcher is suppressed during replay
+      if (isMultiplayerGame.value && !ds.gameOver && !ds.roundOver) {
+        const isMyTurn = ps.activePlayer.id === selfKey.value
+        await setMyStatus(isMyTurn ? 'playing' : 'online').catch((err) =>
+          console.error('[Presence] Failed to update status after remote update:', err),
+        )
+      }
+
       // If the updated state indicates the match is over, ensure this client
       // also shows the final results modal.
       if (ds.gameOver) {

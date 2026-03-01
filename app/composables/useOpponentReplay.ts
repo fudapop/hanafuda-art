@@ -7,6 +7,7 @@ import { useGameDataStore } from '~~/stores/gameDataStore'
 import { usePlayerStore } from '~~/stores/playerStore'
 
 const REPLAY_STEP_DELAY = 1000
+const CARD_REVEAL_DELAY = 500
 
 export const useOpponentReplay = () => {
   const isReplaying = useState('opponent-replay-active', () => false)
@@ -45,17 +46,6 @@ export const useOpponentReplay = () => {
     if (isReplaying.value) return false
     if (ds.roundOver || ds.gameOver) return false
 
-    // Check for terminal status on the remote update
-    try {
-      const parsedGameData = JSON.parse(remoteState.gameData) as {
-        roundOver?: boolean
-        gameOver?: boolean
-      }
-      if (parsedGameData.roundOver || parsedGameData.gameOver) return false
-    } catch {
-      return false
-    }
-
     const newPlayerEvents = extractNewPlayerEvents(remoteState)
     return newPlayerEvents.length > 0
   }
@@ -63,7 +53,7 @@ export const useOpponentReplay = () => {
   /**
    * Replay a single player event by executing the corresponding card store operations.
    */
-  const replayEvent = (event: PlayerEventLog) => {
+  const replayEvent = async (event: PlayerEventLog) => {
     const player = event.player as PlayerKey
 
     switch (event.action) {
@@ -83,6 +73,8 @@ export const useOpponentReplay = () => {
         if (cards[0]) {
           selectedCard.value = cards[0]
         }
+        // Allow a render frame for the card reveal animation during select phase
+        if (ds.checkCurrentPhase('select')) await sleep(CARD_REVEAL_DELAY)
         ds.logPlayerAction(player, 'match', cards, event.yaku)
         cs.stageForCollection(cards)
         // During draw phase, collect immediately (same as handleMatched)
@@ -98,6 +90,8 @@ export const useOpponentReplay = () => {
         const card = event.cards[0]
         if (card) {
           selectedCard.value = card
+          // Allow a render frame for the card reveal animation during select phase
+          if (ds.checkCurrentPhase('select')) await sleep(CARD_REVEAL_DELAY)
           ds.logPlayerAction(player, 'discard', [card])
           cs.discard(card, player)
           selectedCard.value = null
@@ -142,7 +136,7 @@ export const useOpponentReplay = () => {
 
     try {
       for (const event of newPlayerEvents) {
-        replayEvent(event)
+        await replayEvent(event)
         await sleep(REPLAY_STEP_DELAY)
       }
     } catch (error) {
