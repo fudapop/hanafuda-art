@@ -5,7 +5,13 @@
         v-show="showLoader"
         class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-1"
       >
-        <CardsLoader />
+        <template v-if="isMultiplayerGame">
+          <SakuraLoader class="mx-auto opacity-80 w-max" />
+          <p class="font-semibold tracking-wide text-center drop-shadow-md animate-pulse">
+            {{ t('multiplayer.waiting_for_opponent') }}
+          </p>
+        </template>
+        <CardsLoader v-else />
       </div>
 
       <!-- OPPONENT HAND -->
@@ -317,6 +323,7 @@ const handleNext = async () => {
   // The active player will advance the round and push the new-round snapshot.
   if (isMultiplayerGame.value && !players.value[selfKey.value].isActive) {
     showModal.value = false
+    showLoader.value = true
     return
   }
   await advanceToNextRound()
@@ -640,6 +647,7 @@ onMounted(() => {
 
     if (roundOver.value === false) {
       showModal.value = false
+      showLoader.value = false
       return
     }
 
