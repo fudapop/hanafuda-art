@@ -460,6 +460,53 @@ In async multiplayer, when a player called **STOP** to end a round and then adva
 
 ---
 
+## 2026-03-01: Multiplayer Stats Tracked From Wrong Player Perspective
+
+**Status**: RESOLVED
+
+**Problem**:
+In async multiplayer games, detailed round statistics (koi-koi calls, yaku completions, cards captured, round win/loss) were recorded from the wrong perspective when the local player was assigned `p2`. A `p2` player's wins were counted as losses, opponent's cards were counted as their own captures, and opponent's yaku were attributed to them.
+
+**Symptoms**:
+- A player assigned `p2` who won a round would see their loss count increase instead of their win count.
+- Cards captured stats reflected the opponent's collection, not the local player's.
+- Yaku completion stats attributed the opponent's yaku to the local player.
+- Players assigned `p1` were unaffected (stats appeared correct).
+
+**Root Cause**:
+`useStatsTracking.ts` hardcoded `'p1'` and `'p2'` literals throughout `processRoundStats` instead of using the perspective-aware `selfKey`/`opponentKey` from `useLocalPlayerPerspective`. Seven references were affected:
+
+| Location | Hardcoded | Should be |
+|----------|-----------|-----------|
+| Koi-koi call filter | `call.player === 'p1'` | `call.player === selfKey` |
+| Opponent koi-koi check | `call.player === 'p2'` | `call.player === opponentKey` |
+| Win determination | `winner === 'p1'` | `winner === selfKey` |
+| Yaku completion filter | `completion.player === 'p1'` | `completion.player === selfKey` |
+| Card collection access | `cs.collection.p1` | `cs.collection[selfKey]` |
+| Round result (win) | `winner === 'p1'` | `winner === selfKey` |
+| Round result (loss) | `winner === 'p2'` | `winner === opponentKey` |
+
+Note: `PlayerStatusBar.vue`'s `updateGameRecord()` (win/loss/draw/coins) was not affected — it already used `selfKey` correctly. Only the detailed per-round stats in `useStatsTracking` were broken.
+
+**Resolution**:
+1. Added `const { selfKey, opponentKey } = useLocalPlayerPerspective()` to `useStatsTracking`.
+2. Replaced all 7 hardcoded `'p1'`/`'p2'` references with `selfKey.value`/`opponentKey.value`.
+3. Renamed internal variables for clarity: `p1KoikoiCalls` → `selfKoikoiCalls`, `p1Wins` → `selfWins`, `p1YakuCompletions` → `selfYakuCompletions`, `p1Collection` → `selfCollection`.
+4. For single-player games, `selfKey` defaults to `'p1'`, so behavior is unchanged.
+
+**Files Changed**:
+- `app/composables/useStatsTracking.ts` – replaced hardcoded player keys with perspective-aware keys from `useLocalPlayerPerspective`.
+
+**Verification**:
+- In a multiplayer game where the local player was assigned `p2`:
+  - Wins correctly increment `roundsPlayed_win` (not `roundsPlayed_loss`).
+  - Cards captured stats reflect the local player's own collection.
+  - Yaku completions are attributed to the local player's actual yaku.
+  - Koi-koi call tracking correctly distinguishes self vs opponent calls.
+- Single-player stats remain correct (selfKey resolves to `'p1'`).
+
+---
+
 ## Future Issues
 
 (New issues will be added above this line)

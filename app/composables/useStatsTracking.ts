@@ -14,6 +14,7 @@ export const useStatsTracking = () => {
   const ds = useGameDataStore()
   const cs = useCardStore()
   const { updatePlayerStats } = useProfile()
+  const { selfKey, opponentKey } = useLocalPlayerPerspective()
   type PlayerStatsUpdates = Parameters<typeof updatePlayerStats>[0]
 
   // Real-time tracking of koi-koi calls and yaku completions for current round
@@ -76,44 +77,44 @@ export const useStatsTracking = () => {
     const allOperations: PlayerStatsUpdates = []
 
     // Track koi-koi calls if there was a winner
-    const p1KoikoiCalls = currentRoundKoikoiCalls.value.filter((call) => call.player === 'p1')
-    const hasOpponentKoikoi = currentRoundKoikoiCalls.value.some((call) => call.player === 'p2')
-    const p1Wins = winner === 'p1'
+    const selfKoikoiCalls = currentRoundKoikoiCalls.value.filter((call) => call.player === selfKey.value)
+    const hasOpponentKoikoi = currentRoundKoikoiCalls.value.some((call) => call.player === opponentKey.value)
+    const selfWins = winner === selfKey.value
 
     const koikoiOps = [
       {
-        key: p1Wins ? 'koikoiCalled_success' : 'koikoiCalled_fail',
+        key: selfWins ? 'koikoiCalled_success' : 'koikoiCalled_fail',
         op: 'increment' as const,
-        value: +(p1KoikoiCalls.length > 0), // 1 if p1 wins after calling
+        value: +(selfKoikoiCalls.length > 0), // 1 if self wins after calling
       },
       {
         key: 'koikoiCalled_stack',
         op: 'increment' as const,
-        value: +(p1KoikoiCalls.length > 1), // 1 if multiple calls, 0 if single
+        value: +(selfKoikoiCalls.length > 1), // 1 if multiple calls, 0 if single
       },
       {
         key: 'koikoiCalled_reversal',
         op: 'increment' as const,
-        value: +(p1Wins && hasOpponentKoikoi), // 1 if p1 wins after opponent called, 0 if not
+        value: +(selfWins && hasOpponentKoikoi), // 1 if self wins after opponent called, 0 if not
       },
     ].filter((op) => op.value > 0) as PlayerStatsUpdates // Only include operations that actually change something
 
     allOperations.push(...koikoiOps)
 
     // Track yaku completions for this round
-    const p1YakuCompletions = currentRoundYakuCompletions.value.filter(
-      (completion) => completion.player === 'p1',
+    const selfYakuCompletions = currentRoundYakuCompletions.value.filter(
+      (completion) => completion.player === selfKey.value,
     )
 
-    if (p1YakuCompletions.length > 0) {
+    if (selfYakuCompletions.length > 0) {
       const yakuOps = [
         {
           key: 'totalYakuCompleted',
           op: 'increment' as const,
-          value: p1YakuCompletions.length,
+          value: selfYakuCompletions.length,
         },
         // Update individual yaku completion stats
-        ...p1YakuCompletions.map((completion) => ({
+        ...selfYakuCompletions.map((completion) => ({
           key: `yakuCompleted_${completion.yaku}`,
           op: 'increment' as const,
           value: 1,
@@ -123,8 +124,8 @@ export const useStatsTracking = () => {
     }
 
     // Track cards captured by p1 this round
-    const p1Collection = [...cs.collection.p1]
-    const cardsByType = sortByType(p1Collection)
+    const selfCollection = [...cs.collection[selfKey.value]]
+    const cardsByType = sortByType(selfCollection)
     const cardCounts = {
       bright: cardsByType.brights.length,
       animal: cardsByType.animals.length,
@@ -159,9 +160,9 @@ export const useStatsTracking = () => {
 
     // Track round result
     const roundResultKey =
-      winner === 'p1'
+      winner === selfKey.value
         ? 'roundsPlayed_win'
-        : winner === 'p2'
+        : winner === opponentKey.value
           ? 'roundsPlayed_loss'
           : 'roundsPlayed_draw'
 
