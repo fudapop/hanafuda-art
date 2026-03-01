@@ -288,6 +288,7 @@
     "opponent_online": "Online",
     "opponent_offline": "Offline",
     "opponent_playing": "Playing...",
+    "opponent_thinking": "Thinking...",
     "exit": {
       "title": "Leave Multiplayer Game",
       "description": "Your game will be saved automatically and you can resume it at any time. Your opponent will be notified that you've left.",

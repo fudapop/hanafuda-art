@@ -71,6 +71,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { t } = useI18n()
 const { formatLastSeen } = usePresence()
+const { isReplaying } = useOpponentReplay()
 
 /**
  * Computed status text to display
@@ -78,8 +79,14 @@ const { formatLastSeen } = usePresence()
 const statusText = computed(() => {
   const { state, lastSeen } = props.presence
 
-  if (state === 'playing') {
+  // During replay, always show "Playing..." regardless of presence state
+  // (the opponent may have already updated their presence to 'online')
+  if (isReplaying.value) {
     return t('multiplayer.opponent_playing')
+  }
+
+  if (state === 'playing') {
+    return t('multiplayer.opponent_thinking')
   }
 
   if (state === 'online') {
@@ -100,8 +107,12 @@ const statusText = computed(() => {
 const statusTitle = computed(() => {
   const { state } = props.presence
 
-  if (state === 'playing') {
+  if (isReplaying.value) {
     return t('multiplayer.opponent_playing')
+  }
+
+  if (state === 'playing') {
+    return t('multiplayer.opponent_thinking')
   }
 
   if (state === 'online') {
@@ -117,8 +128,12 @@ const statusTitle = computed(() => {
 const dotColorClass = computed(() => {
   const { state } = props.presence
 
-  if (state === 'playing') {
+  if (isReplaying.value) {
     return 'bg-blue-500 animate-pulse'
+  }
+
+  if (state === 'playing') {
+    return 'bg-indigo-400 animate-pulse'
   }
 
   if (state === 'online') {
@@ -139,8 +154,12 @@ const dotColorClass = computed(() => {
 const textColorClass = computed(() => {
   const { state } = props.presence
 
-  if (state === 'playing') {
+  if (isReplaying.value) {
     return 'text-blue-600 dark:text-blue-400'
+  }
+
+  if (state === 'playing') {
+    return 'text-indigo-600 dark:text-indigo-400'
   }
 
   if (state === 'online') {

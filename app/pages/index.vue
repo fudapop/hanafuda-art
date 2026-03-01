@@ -99,7 +99,7 @@
         />
         <RoundResults
           v-else
-          :show-ack-controls="roundOver && !gameOver && players[selfKey].isActive"
+          :show-ack-controls="roundOver && !gameOver && (players[selfKey].isActive || isMultiplayerGame)"
           @next="handleNext"
         />
       </ResultsModal>
@@ -313,6 +313,12 @@ const advanceToNextRound = async () => {
 }
 
 const handleNext = async () => {
+  // In multiplayer, the non-active player just dismisses the modal locally.
+  // The active player will advance the round and push the new-round snapshot.
+  if (isMultiplayerGame.value && !players.value[selfKey.value].isActive) {
+    showModal.value = false
+    return
+  }
   await advanceToNextRound()
 }
 
@@ -427,10 +433,23 @@ const resetAllStores = () => {
 const initializeNewMultiplayerGame = async () => {
   finalCleanupDone.value = false
 
+  // Buffer for remote updates that arrive while a replay is in progress.
+  // The latest update wins — we only need the most recent authoritative state.
+  const pendingRemoteUpdate = ref<MultiplayerGame | null>(null)
+
   const handleRemoteUpdate = async (game: MultiplayerGame) => {
     const { current: currentProfile } = useProfile()
     const uid = currentProfile.value?.uid
     if (!uid) return
+
+    // If a replay is running, buffer this update and return.
+    // The replay's finally block reconciles with its own state, and we'll
+    // re-reconcile with the buffered (newer) state after it completes.
+    if (isReplaying.value) {
+      console.info('[handleRemoteUpdate] Buffering update received during replay')
+      pendingRemoteUpdate.value = game
+      return
+    }
 
     try {
       // Set metadata FIRST before deserialization sets gameOver (which triggers watchers).
@@ -441,6 +460,22 @@ const initializeNewMultiplayerGame = async () => {
       // Attempt step-by-step replay for opponent turns; fall through to direct sync otherwise.
       if (remoteState && shouldReplayTurn(remoteState)) {
         await replayOpponentTurn(remoteState, deserializeGameState)
+
+        // Reconcile with any newer update that arrived during the replay
+        if (pendingRemoteUpdate.value) {
+          const pending = pendingRemoteUpdate.value
+          pendingRemoteUpdate.value = null
+          console.info('[handleRemoteUpdate] Reconciling with buffered update after replay')
+          terminalStatus.value = pending.terminalStatus ?? terminalStatus.value ?? null
+          if (pending.gameState) {
+            await deserializeGameState(pending.gameState)
+          }
+        }
+
+        // Show results modal after replay settles (watchers are suppressed during replay)
+        if (ds.roundOver && !decisionIsPending.value) {
+          showModal.value = true
+        }
       } else {
         const synced = await syncMultiplayerGame(game.gameId)
         if (!synced) {
@@ -570,6 +605,16 @@ onMounted(() => {
     if (stopIsCalled.value) handleStop()
   })
 
+  // Trigger shout animation during opponent replay (callKoikoiFor sets
+  // decision to 'koikoi' directly, bypassing the decisionIsPending watcher)
+  watch(koikoiIsCalled, (called) => {
+    if (called && isReplaying.value) {
+      shoutTimeout.value = setTimeout(() => {
+        shoutTimeout.value = null
+      }, 2000)
+    }
+  })
+
   watch(turnCounter, () => {
     // Handle an exhaustive draw condition
     if (turnCounter.value !== 9) return
@@ -603,6 +648,7 @@ onMounted(() => {
     // after syncing, but decisionIsPending will be false so RoundResults renders
     // in a read-only state (no KOI-KOI/STOP buttons).
     if (isMultiplayerGame.value && !decisionIsPending.value) {
+      if (isReplaying.value) return // Suppressed; handled after replay settles
       showModal.value = true
     }
   })
@@ -611,6 +657,7 @@ onMounted(() => {
   // even if they were not the calling / active player on the last turn.
   watch(gameOver, () => {
     if (!gameOver.value) return
+    if (isReplaying.value) return // Suppressed; handled in handleRemoteUpdate
     showModal.value = true
   })
 

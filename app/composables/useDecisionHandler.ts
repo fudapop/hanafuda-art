@@ -25,6 +25,11 @@ export const useDecisionHandler = () => {
     ds.logPlayerAction(ps.activePlayer.id, 'koi-koi')
   }
 
+  const callKoikoiFor = (player: PlayerKey) => {
+    calledBy.value = player
+    decision.value = 'koikoi'
+  }
+
   const stopIsCalled = computed(() => decision.value === 'stop')
   const callStop = () => {
     calledBy.value = ps.activePlayer.id
@@ -66,6 +71,7 @@ export const useDecisionHandler = () => {
   return {
     // Setters
     callKoikoi,
+    callKoikoiFor,
     callStop,
     // Getters (reactive)
     noCalls,

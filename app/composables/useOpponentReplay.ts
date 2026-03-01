@@ -103,7 +103,9 @@ export const useOpponentReplay = () => {
       }
 
       case 'koi-koi': {
+        const { callKoikoiFor } = useDecisionHandler()
         ds.logPlayerAction(player, 'koi-koi')
+        callKoikoiFor(player)
         break
       }
 
@@ -145,6 +147,8 @@ export const useOpponentReplay = () => {
       // Always reconcile with the authoritative remote state
       selectedCard.value = null
       await deserializeGameState(remoteState)
+      // Let watchers fire while isReplaying is still true so they can gate on it
+      await nextTick()
       isReplaying.value = false
       console.info('[useOpponentReplay] Replay complete')
     }
