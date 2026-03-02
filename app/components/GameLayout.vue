@@ -24,9 +24,9 @@
           :class="[
             'game-ui-btn',
             gameStart && 'opacity-50 hover:opacity-100',
-            player1Inactive && 'cursor-wait',
+            localPlayerInactive && 'cursor-wait',
           ]"
-          :disabled="player1Inactive"
+          :disabled="localPlayerInactive"
         >
           <Icon
             name="mdi:logout"
@@ -209,7 +209,10 @@ const isSaving = ref(false)
 // const promptFeedback = ref(false)
 const promptSignup = ref(false)
 const showLoader = ref(false)
-const player1Inactive = computed(() => gameStart.value && !players.value.p1.isActive)
+const localPlayerInactive = computed(() => {
+  if (isMultiplayerGame.value) return false
+  return gameStart.value && !players.value.p1.isActive
+})
 
 const feedbackSubmitted = computed(() => user.value?.flags?.hasSubmittedFeedback)
 const signupDeclined = useStorage('hanafuda-signup-declined', false, sessionStorage)

@@ -204,6 +204,79 @@ export const useMultiplayerOrchestrator = () => {
   }
 
   /**
+   * Rejoin an existing multiplayer game after a page refresh or disconnect.
+   * Re-establishes Firestore subscription, presence tracking, and syncs latest state.
+   */
+  const rejoinGame = async (
+    onRemoteUpdate: RemoteUpdateHandler,
+  ) => {
+    const multiplayerMeta = useState<MultiplayerMeta>('multiplayer-game-meta', () => ({
+      isNew: false,
+      gameId: '',
+      p1: '',
+      p2: '',
+      activePlayerUid: '',
+    }))
+
+    if (!multiplayerMeta.value.gameId) {
+      console.warn('rejoinGame called without multiplayer meta')
+      return
+    }
+
+    const currentUid = currentProfile.value?.uid
+    if (!currentUid) {
+      console.warn('rejoinGame called without authenticated user')
+      return
+    }
+
+    // Validate current user is a participant
+    if (currentUid !== multiplayerMeta.value.p1 && currentUid !== multiplayerMeta.value.p2) {
+      console.error('rejoinGame: current user is not a participant')
+      return
+    }
+
+    const { initializePresence } = usePresence()
+    const { setOpponentPlayer } = useMultiplayerMatch()
+
+    // Set local player perspective
+    localKey.value = currentUid === multiplayerMeta.value.p1 ? 'p1' : 'p2'
+    isMultiplayerGame.value = true
+
+    // Set opponent player profile
+    await setOpponentPlayer(multiplayerMeta.value[opponentKey.value])
+
+    // Ensure sync adapters are ready
+    initializeSync()
+
+    // Sync latest state from Firestore
+    const synced = await syncMultiplayerGame(multiplayerMeta.value.gameId)
+    if (!synced) {
+      console.warn('Failed to sync multiplayer game during rejoin')
+    }
+
+    // Clean up any existing subscription
+    if (gameUnsubscribe.value) {
+      gameUnsubscribe.value()
+    }
+
+    // Subscribe to real-time updates
+    gameUnsubscribe.value = subscribeToGame(multiplayerMeta.value.gameId, onRemoteUpdate)
+
+    // Initialize presence
+    await initializePresence(multiplayerMeta.value.gameId)
+
+    // Subscribe to opponent presence
+    const opponentUid = multiplayerMeta.value[opponentKey.value]
+    if (opponentUid) {
+      subscribeToOpponentPresence(opponentUid)
+      console.info(`[Multiplayer Rejoin] Subscribed to opponent presence: ${opponentUid}`)
+    }
+
+    // Load opponent profile
+    console.info('[Multiplayer Rejoin] Successfully rejoined game', multiplayerMeta.value.gameId)
+  }
+
+  /**
    * Clean up multiplayer subscriptions.
    */
   const cleanupSubscription = () => {
@@ -216,6 +289,7 @@ export const useMultiplayerOrchestrator = () => {
   return {
     pushSnapshot,
     initGame,
+    rejoinGame,
     cleanupSubscription,
     terminalStatus,
   }

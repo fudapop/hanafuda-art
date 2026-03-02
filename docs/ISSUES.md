@@ -507,6 +507,95 @@ Note: `PlayerStatusBar.vue`'s `updateGameRecord()` (win/loss/draw/coins) was not
 
 ---
 
+## 2026-03-01: Leave Message Not Persisting to Opponent
+
+**Status**: RESOLVED
+
+**Problem**:
+When a player left a multiplayer game with a farewell message, the message was silently lost before the opponent could see it.
+
+**Root Cause**:
+In `usePresence.ts`, `cleanup()` used `set()` which overwrites the entire RTDB entry, erasing the `message` field set by `setMessage()` moments before. The `setMessage()` function also performed an unnecessary read-then-set pattern.
+
+**Resolution**:
+1. Changed `cleanup()` to use `update()` instead of `set()` so the `message` field is preserved during the offline transition.
+2. Changed `onDisconnect` handler to use `update()` for consistency.
+3. Simplified `setMessage()` to use `update()` directly instead of get+set.
+4. Also added immediate disconnect modal display when opponent leaves with a message (skip 30s grace period).
+
+**Files Changed**:
+- `app/composables/usePresence.ts` – `cleanup()`, `onDisconnect`, `setMessage()` all use `update()`.
+- `app/pages/index.vue` – disconnect watcher checks for message to skip grace period.
+
+---
+
+## 2026-03-01: Exit Button Disabled for Player 2 in Multiplayer
+
+**Status**: RESOLVED
+
+**Problem**:
+The exit button was always disabled when P2's turn was active, because the inactive check was hardcoded to `p1`.
+
+**Root Cause**:
+In `GameLayout.vue`, the computed property `player1Inactive` hardcoded `players.value.p1.isActive`, so when the local player was `p2`, the button was disabled during their own turn.
+
+**Resolution**:
+Replaced hardcoded `p1` with perspective-aware key using `selfKey` from `useLocalPlayerPerspective`. Renamed `player1Inactive` to `localPlayerInactive`.
+
+**Files Changed**:
+- `app/components/GameLayout.vue` – exit button uses `selfKey` instead of hardcoded `p1`.
+
+---
+
+## 2026-03-01: Disconnect "Claim Victory" Records Win/Loss Stats
+
+**Status**: RESOLVED
+
+**Problem**:
+When a player clicked "Claim Victory" after their opponent disconnected, it called `forfeitMultiplayerGame` which recorded the game as `abandoned` with win/loss attribution. This was unfair since disconnects can be accidental.
+
+**Resolution**:
+1. Added `'cancelled'` to `GameStatus` type.
+2. Added `cancelMultiplayerGame()` to `useStoreManager` — marks game as `cancelled` without setting any winner/loser or forfeit fields. Deletes local multiplayer save.
+3. Renamed `handleClaimVictory` to `handleCancelGame` — no stats recorded, returns to StartScreen.
+4. Updated `OpponentDisconnectedModal` — button text changed to "End Game", description updated to indicate no results are recorded.
+
+**Files Changed**:
+- `types/profile.ts` – added `'cancelled'` to `GameStatus`.
+- `app/composables/useStoreManager.ts` – added `cancelMultiplayerGame()`.
+- `app/pages/index.vue` – `handleCancelGame` replaces `handleClaimVictory`.
+- `app/components/modal/OpponentDisconnectedModal.vue` – renamed button and emit.
+- `i18n/locales/en-us.json` – added `cancelDescription` and `endGame` keys.
+
+---
+
+## 2026-03-01: Multiplayer Resume Broken After Page Refresh
+
+**Status**: RESOLVED
+
+**Problem**:
+Clicking "Resume Match" on the StartScreen after a page refresh restored stale local state from IndexedDB without re-establishing the Firestore subscription, presence tracking, or syncing the latest game state from the server. The game appeared frozen.
+
+**Root Cause**:
+1. `saveMultiplayerGame` only pushed to Firestore without saving metadata to IndexedDB, so the local save had no `p1`/`p2`/`gameId` metadata for rejoin.
+2. The resume path in `index.vue` treated multiplayer saves the same as single-player — loaded local state without reconnecting to the live session.
+3. No validation of the game's current status in Firestore before showing the Resume button.
+
+**Resolution**:
+1. **IDB metadata**: `saveMultiplayerGame` now also writes a `GameSaveRecord` to IndexedDB with `gameId`, `p1`, `p2`, `activePlayer`.
+2. **Firestore status check**: `StartScreen.vue` checks the game's Firestore status on mount. If `status !== 'active'`, the stale local save is deleted and a message is shown.
+3. **Rejoin orchestration**: Added `rejoinGame()` to `useMultiplayerOrchestrator` which re-establishes Firestore subscription, presence, and opponent tracking.
+4. **Resume flow**: `resumeMultiplayerGame` in StartScreen populates `multiplayer-game-meta` state. The `gameStart` watcher in `index.vue` detects multiplayer resume and calls `rejoinGame()`.
+5. **Hoisted `handleRemoteUpdate`**: Moved from inside `initializeNewMultiplayerGame` to module scope so both new-game and rejoin paths can share it.
+
+**Files Changed**:
+- `app/composables/useStoreManager.ts` – `saveMultiplayerGame` persists to IDB; added `getMultiplayerGame()`.
+- `app/composables/useMultiplayerOrchestrator.ts` – added `rejoinGame()`.
+- `app/components/StartScreen.vue` – Firestore status check, stale save cleanup, `resumeMultiplayerGame` populates meta.
+- `app/pages/index.vue` – multiplayer rejoin path in `gameStart` watcher; hoisted `handleRemoteUpdate`.
+
+---
+
 ## Future Issues
 
 (New issues will be added above this line)

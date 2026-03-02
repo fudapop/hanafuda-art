@@ -114,10 +114,8 @@
       <OpponentDisconnectedModal
         :open="showDisconnectModal"
         :opponent-message="opponentPresence.message"
-        :offline-duration="offlineDurationDisplay"
         :is-processing="isProcessingForfeit"
-        @claim-victory="handleClaimVictory"
-        @continue-waiting="handleContinueWaiting"
+        @cancel-game="handleCancelGame"
       />
     </div>
   </GameLayout>
@@ -160,7 +158,6 @@ const {
   cleanup: cleanupPresence,
   opponentPresence,
   isOpponentDisconnected,
-  formatOfflineDuration,
 } = usePresence()
 
 const { handsEmpty } = storeToRefs(cs)
@@ -193,6 +190,7 @@ const autoOpponent: Ref<boolean> = useOpponent()
 const {
   pushSnapshot: pushMultiplayerSnapshot,
   initGame: initMultiplayerGame,
+  rejoinGame: rejoinMultiplayerGame,
   cleanupSubscription: cleanupMultiplayerSubscription,
   terminalStatus,
 } = useMultiplayerOrchestrator()
@@ -202,7 +200,7 @@ const {
   deserializeGameState,
   deleteSavedGame,
   getSaveKeyForMode,
-  forfeitMultiplayerGame,
+  cancelMultiplayerGame,
 } = useStoreManager()
 
 // Opponent turn replay for multiplayer
@@ -221,8 +219,6 @@ const isProcessingForfeit = ref(false)
 const DISCONNECT_GRACE_PERIOD_MS = 30 * 1000
 const disconnectGraceTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 
-// Computed offline duration for the modal
-const offlineDurationDisplay = computed(() => formatOfflineDuration() || '0s')
 const gameStart = useState('start')
 
 const {
@@ -364,8 +360,8 @@ const handleClose = async () => {
   await performFinalCleanup()
 }
 
-// Handle claiming victory when opponent disconnects
-const handleClaimVictory = async () => {
+// Handle cancelling the game when opponent disconnects (no stats recorded)
+const handleCancelGame = async () => {
   if (!isMultiplayerGame.value || isProcessingForfeit.value) return
 
   const multiplayerMeta = useState<{
@@ -376,46 +372,36 @@ const handleClaimVictory = async () => {
     activePlayerUid: string
   }>('multiplayer-game-meta')
 
-  const opponentUid = opponentPresence.value.uid
-  if (!opponentUid || !multiplayerMeta.value?.gameId) {
-    console.error('Cannot claim victory: missing opponent UID or game ID')
+  if (!multiplayerMeta.value?.gameId) {
+    console.error('Cannot cancel game: missing game ID')
     return
   }
 
   isProcessingForfeit.value = true
 
   try {
-    const success = await forfeitMultiplayerGame(
+    const success = await cancelMultiplayerGame(
       multiplayerMeta.value.gameId,
-      opponentUid,
-      'network_disconnect',
+      'opponent_disconnected',
     )
 
     if (success) {
-      console.info('Victory claimed due to opponent disconnect')
+      console.info('Game cancelled due to opponent disconnect')
+
+      // Return to start screen — no stats, no results modal
       showDisconnectModal.value = false
-
-      // Set game as over and show final results
-      // The forfeited opponent gets 0 points, winner gets their current score
-      ds.endRound()
-      ds.gameOver = true
-      terminalStatus.value = 'abandoned'
-
-      // Show final results modal
-      showModal.value = true
+      showModal.value = false
+      resetAllStores()
+      terminalStatus.value = 'cancelled'
+      gameStart.value = false
     } else {
-      console.error('Failed to claim victory')
+      console.error('Failed to cancel game')
     }
   } catch (error) {
-    console.error('Error claiming victory:', error)
+    console.error('Error cancelling game:', error)
   } finally {
     isProcessingForfeit.value = false
   }
-}
-
-// Handle continuing to wait for opponent
-const handleContinueWaiting = () => {
-  showDisconnectModal.value = false
 }
 
 // Clear disconnect grace timer
@@ -436,79 +422,79 @@ const resetAllStores = () => {
   finalCleanupDone.value = false
 }
 
+// Buffer for remote updates that arrive while a replay is in progress.
+// The latest update wins — we only need the most recent authoritative state.
+const pendingRemoteUpdate = ref<MultiplayerGame | null>(null)
+
+const handleRemoteUpdate = async (game: MultiplayerGame) => {
+  const { current: currentProfile } = useProfile()
+  const uid = currentProfile.value?.uid
+  if (!uid) return
+
+  // If a replay is running, buffer this update and return.
+  // The replay's finally block reconciles with its own state, and we'll
+  // re-reconcile with the buffered (newer) state after it completes.
+  if (isReplaying.value) {
+    console.info('[handleRemoteUpdate] Buffering update received during replay')
+    pendingRemoteUpdate.value = game
+    return
+  }
+
+  try {
+    // Set metadata FIRST before deserialization sets gameOver (which triggers watchers).
+    terminalStatus.value = game.terminalStatus ?? terminalStatus.value ?? null
+
+    const remoteState = game.gameState
+
+    // Attempt step-by-step replay for opponent turns; fall through to direct sync otherwise.
+    if (remoteState && shouldReplayTurn(remoteState)) {
+      await replayOpponentTurn(remoteState, deserializeGameState)
+
+      // Reconcile with any newer update that arrived during the replay
+      if (pendingRemoteUpdate.value) {
+        const pending = pendingRemoteUpdate.value
+        pendingRemoteUpdate.value = null
+        console.info('[handleRemoteUpdate] Reconciling with buffered update after replay')
+        terminalStatus.value = pending.terminalStatus ?? terminalStatus.value ?? null
+        if (pending.gameState) {
+          await deserializeGameState(pending.gameState)
+        }
+      }
+
+      // Show results modal after replay settles (watchers are suppressed during replay)
+      if (ds.roundOver && !decisionIsPending.value) {
+        showModal.value = true
+      }
+    } else {
+      const synced = await syncMultiplayerGame(game.gameId)
+      if (!synced) {
+        console.warn('Failed to sync multiplayer game state after remote update')
+      }
+    }
+
+    // Update presence after replay/sync -- the activePlayer watcher is suppressed during replay
+    if (isMultiplayerGame.value && !ds.gameOver && !ds.roundOver) {
+      const isMyTurn = ps.activePlayer.id === selfKey.value
+      await setMyStatus(isMyTurn ? 'playing' : 'online').catch((err) =>
+        console.error('[Presence] Failed to update status after remote update:', err),
+      )
+    }
+
+    // If the updated state indicates the match is over, ensure this client
+    // also shows the final results modal.
+    if (ds.gameOver) {
+      if (!showModal.value) {
+        showModal.value = true
+      }
+    }
+  } catch (error) {
+    console.error('Failed to sync multiplayer turn from Firestore:', error)
+  }
+}
+
 // Initialize a new multiplayer game via the orchestrator
 const initializeNewMultiplayerGame = async () => {
   finalCleanupDone.value = false
-
-  // Buffer for remote updates that arrive while a replay is in progress.
-  // The latest update wins — we only need the most recent authoritative state.
-  const pendingRemoteUpdate = ref<MultiplayerGame | null>(null)
-
-  const handleRemoteUpdate = async (game: MultiplayerGame) => {
-    const { current: currentProfile } = useProfile()
-    const uid = currentProfile.value?.uid
-    if (!uid) return
-
-    // If a replay is running, buffer this update and return.
-    // The replay's finally block reconciles with its own state, and we'll
-    // re-reconcile with the buffered (newer) state after it completes.
-    if (isReplaying.value) {
-      console.info('[handleRemoteUpdate] Buffering update received during replay')
-      pendingRemoteUpdate.value = game
-      return
-    }
-
-    try {
-      // Set metadata FIRST before deserialization sets gameOver (which triggers watchers).
-      terminalStatus.value = game.terminalStatus ?? terminalStatus.value ?? null
-
-      const remoteState = game.gameState
-
-      // Attempt step-by-step replay for opponent turns; fall through to direct sync otherwise.
-      if (remoteState && shouldReplayTurn(remoteState)) {
-        await replayOpponentTurn(remoteState, deserializeGameState)
-
-        // Reconcile with any newer update that arrived during the replay
-        if (pendingRemoteUpdate.value) {
-          const pending = pendingRemoteUpdate.value
-          pendingRemoteUpdate.value = null
-          console.info('[handleRemoteUpdate] Reconciling with buffered update after replay')
-          terminalStatus.value = pending.terminalStatus ?? terminalStatus.value ?? null
-          if (pending.gameState) {
-            await deserializeGameState(pending.gameState)
-          }
-        }
-
-        // Show results modal after replay settles (watchers are suppressed during replay)
-        if (ds.roundOver && !decisionIsPending.value) {
-          showModal.value = true
-        }
-      } else {
-        const synced = await syncMultiplayerGame(game.gameId)
-        if (!synced) {
-          console.warn('Failed to sync multiplayer game state after remote update')
-        }
-      }
-
-      // Update presence after replay/sync -- the activePlayer watcher is suppressed during replay
-      if (isMultiplayerGame.value && !ds.gameOver && !ds.roundOver) {
-        const isMyTurn = ps.activePlayer.id === selfKey.value
-        await setMyStatus(isMyTurn ? 'playing' : 'online').catch((err) =>
-          console.error('[Presence] Failed to update status after remote update:', err),
-        )
-      }
-
-      // If the updated state indicates the match is over, ensure this client
-      // also shows the final results modal.
-      if (ds.gameOver) {
-        if (!showModal.value) {
-          showModal.value = true
-        }
-      }
-    } catch (error) {
-      console.error('Failed to sync multiplayer turn from Firestore:', error)
-    }
-  }
 
   await initMultiplayerGame(
     { resetAllStores, startRound },
@@ -595,7 +581,12 @@ onBeforeUnmount(() => {
   // Reset the game state if the user navigates away from the page
   ds.endRound()
   ds.nextRound()
-  handleClose()
+
+  // Only run final-close for single-player; multiplayer leave is handled separately
+  if (!isMultiplayerGame.value) {
+    handleClose()
+  }
+
   if (shoutTimeout.value) clearTimeout(shoutTimeout.value)
   cleanup()
 })
@@ -717,16 +708,22 @@ onMounted(() => {
       }
 
       if (disconnected && !wasDisconnected) {
-        // Opponent just went offline - start grace period
-        console.info('[Presence] Opponent disconnected, starting grace period')
         clearDisconnectGraceTimer()
-        disconnectGraceTimer.value = setTimeout(() => {
-          // After grace period, show the disconnect modal
-          if (isOpponentDisconnected.value && isMultiplayerGame.value && !gameOver.value) {
-            console.info('[Presence] Grace period expired, showing disconnect modal')
-            showDisconnectModal.value = true
-          }
-        }, DISCONNECT_GRACE_PERIOD_MS)
+
+        // If opponent left intentionally with a message, show modal immediately
+        if (opponentPresence.value?.message) {
+          console.info('[Presence] Opponent left with message, showing disconnect modal immediately')
+          showDisconnectModal.value = true
+        } else {
+          // Network drop — start grace period
+          console.info('[Presence] Opponent disconnected, starting grace period')
+          disconnectGraceTimer.value = setTimeout(() => {
+            if (isOpponentDisconnected.value && isMultiplayerGame.value && !gameOver.value) {
+              console.info('[Presence] Grace period expired, showing disconnect modal')
+              showDisconnectModal.value = true
+            }
+          }, DISCONNECT_GRACE_PERIOD_MS)
+        }
       } else if (!disconnected && wasDisconnected) {
         // Opponent came back online
         console.info('[Presence] Opponent reconnected')
@@ -747,15 +744,30 @@ onMounted(() => {
         mode: 'single' as 'single' | 'multiplayer',
       }))
 
-      if (resumeState.value.isResuming) {
-        // Game state already loaded by StartScreen's loadGameFromStorage()
-        // Just need to handle cleanup
+      if (resumeState.value.isResuming && resumeState.value.mode === 'multiplayer') {
+        // Multiplayer resume — rejoin the live session via orchestrator
+        console.debug('Resuming multiplayer game via rejoin')
+        try {
+          await rejoinMultiplayerGame(handleRemoteUpdate)
+        } catch (error) {
+          console.error('Error during multiplayer rejoin:', error)
+        } finally {
+          resumeState.value = {
+            isResuming: false,
+            saveKey: '',
+            saveData: null,
+            mode: 'single',
+          }
+          showLoader.value = false
+          autoOpponent.value = true
+        }
+      } else if (resumeState.value.isResuming) {
+        // Single-player resume — game state already loaded by StartScreen
         try {
           const { deleteSavedGame } = useStoreManager()
 
-          // Clear the save only for single-player mode (anti-scumming)
-          // Multiplayer saves persist until game is completed
-          if (resumeState.value.saveKey && resumeState.value.mode === 'single') {
+          // Clear the save for single-player mode (anti-scumming)
+          if (resumeState.value.saveKey) {
             console.info(`Deleting single-player save after resume: ${resumeState.value.saveKey}`)
             await deleteSavedGame(resumeState.value.saveKey)
             console.info('Single-player save deleted successfully')
@@ -790,10 +802,20 @@ onMounted(() => {
       }
     } else {
       console.debug('Resetting game...')
-      if (!roundOver.value) ds.endRound()
-      if (!gameOver.value) handleClose()
-      // Additional cleanup - ensure stores are reset when returning to start screen
-      resetAllStores()
+
+      if (isMultiplayerGame.value) {
+        // Multiplayer leave: the game was already saved by handleMultiplayerLeave.
+        // Just clean up local subscriptions and state without touching Firestore
+        // or deleting the IDB save (so the player can resume later).
+        cleanupMultiplayerSubscription()
+        isMultiplayerGame.value = false
+        localKey.value = 'p1'
+        resetAllStores()
+      } else {
+        if (!roundOver.value) ds.endRound()
+        if (!gameOver.value) handleClose()
+        resetAllStores()
+      }
     }
   })
 })

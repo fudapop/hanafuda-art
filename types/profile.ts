@@ -131,7 +131,7 @@ export interface SyncResult {
 
 export type GameMode = 'single' | 'multiplayer'
 
-export type GameStatus = 'waiting' | 'active' | 'completed' | 'abandoned'
+export type GameStatus = 'waiting' | 'active' | 'completed' | 'abandoned' | 'cancelled'
 
 export type DisconnectReason = 'graceful_exit' | 'network_disconnect' | 'timeout' | 'forfeit'
 
@@ -196,6 +196,7 @@ export type MultiplayerGame = {
   terminalStatus?: GameStatus | null // Terminal marker (completed/abandoned)
   forfeitedBy?: string | null // UID of player who forfeited (opponent claimed victory)
   forfeitReason?: DisconnectReason | null // Reason for forfeit
+  cancelReason?: string | null // Reason for cancellation (no stats recorded)
   inviteCode?: string // Optional reference back to invite code
   startedAt?: Date // When p2 joined
   lastUpdated: Date

@@ -931,13 +931,37 @@ export const useStoreManager = () => {
       terminalStatus: metadata?.terminalStatus ?? null,
     }
 
-    // Serialize once and push directly to Firestore (no IDB middle layer)
+    // Serialize once for both IDB and Firestore
+    const gameState = await serializeGameState()
+    const terminalStatus = plainMetadata.terminalStatus ?? null
+
+    // Persist multiplayer metadata to IndexedDB for resume detection
+    try {
+      const store = await getGameSaveStore()
+      const storageKey = getSaveKeyForMode('multiplayer')
+      const saveRecord: GameSaveRecord = {
+        id: `${uid}_${storageKey}`,
+        uid,
+        saveKey: storageKey,
+        gameState,
+        timestamp: new Date(),
+        gameId: gameState.gameId,
+        mode: 'multiplayer',
+        p1: p1 || null,
+        p2: p2 || null,
+        activePlayer: activePlayer || null,
+        terminalStatus,
+      }
+      await store.set(saveRecord)
+    } catch (error) {
+      console.error('Failed to persist multiplayer metadata to IndexedDB:', error)
+    }
+
+    // Push to Firestore (source of truth for multiplayer)
     if (multiplayerAdapter.value) {
       try {
         if (await multiplayerAdapter.value.isAvailable()) {
-          const gameState = await serializeGameState()
           const derivedStatus: GameStatus = p2 && p2.trim() !== '' ? 'active' : 'waiting'
-          const terminalStatus = plainMetadata.terminalStatus ?? null
           const statusToPersist: GameStatus = terminalStatus ?? derivedStatus
           const multiplayerGame: MultiplayerGame = {
             gameId: gameState.gameId,
@@ -1134,6 +1158,84 @@ export const useStoreManager = () => {
     }
   }
 
+  /**
+   * Get a multiplayer game document from Firestore by game ID.
+   * Used to check game status before resuming.
+   *
+   * @param gameId - The game ID to look up
+   * @returns The multiplayer game document, or null if not found
+   */
+  const getMultiplayerGame = async (gameId: string): Promise<MultiplayerGame | null> => {
+    if (!multiplayerAdapter.value) {
+      console.warn('Multiplayer adapter not initialized')
+      return null
+    }
+
+    try {
+      return await multiplayerAdapter.value.get(gameId)
+    } catch (error) {
+      console.error('Failed to get multiplayer game:', error)
+      return null
+    }
+  }
+
+  /**
+   * Cancel a multiplayer game without recording any stats (no win/loss).
+   * Used when the opponent disconnects and the remaining player chooses to end the game.
+   *
+   * @param gameId - The game ID to cancel
+   * @param reason - The reason for cancellation
+   * @returns true if cancellation was successful
+   */
+  const cancelMultiplayerGame = async (
+    gameId: string,
+    reason: string,
+  ): Promise<boolean> => {
+    const uid = getCurrentUserId()
+
+    if (!multiplayerAdapter.value) {
+      console.warn('Multiplayer adapter not initialized')
+      return false
+    }
+
+    try {
+      const remoteGame = await multiplayerAdapter.value.get(gameId)
+      if (!remoteGame) {
+        console.error(`Cannot cancel: game ${gameId} not found`)
+        return false
+      }
+
+      if (uid !== remoteGame.p1 && uid !== remoteGame.p2) {
+        console.error('Only participants can cancel a multiplayer game')
+        return false
+      }
+
+      const updatedGame: MultiplayerGame = {
+        ...remoteGame,
+        status: 'cancelled',
+        terminalStatus: 'cancelled',
+        cancelReason: reason,
+        lastUpdated: new Date(),
+      }
+
+      const success = await multiplayerAdapter.value.push(updatedGame, uid)
+      if (!success) {
+        console.error('Failed to push cancellation update to Firestore')
+        return false
+      }
+
+      // Delete local multiplayer save from IndexedDB
+      const store = await getGameSaveStore()
+      await store.remove(uid, getSaveKeyForMode('multiplayer'))
+
+      console.info(`Multiplayer game ${gameId} cancelled (reason: ${reason})`)
+      return true
+    } catch (error) {
+      console.error('Failed to cancel multiplayer game:', error)
+      return false
+    }
+  }
+
   return {
     serializeGameState,
     deserializeGameState,
@@ -1154,6 +1256,8 @@ export const useStoreManager = () => {
     syncMultiplayerGame,
     listMultiplayerGames,
     forfeitMultiplayerGame,
+    cancelMultiplayerGame,
+    getMultiplayerGame,
     getSaveKeyForMode,
   }
 }

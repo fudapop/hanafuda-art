@@ -7,7 +7,6 @@
  */
 
 import {
-  get,
   getDatabase,
   onDisconnect,
   onValue,
@@ -178,7 +177,7 @@ export const usePresence = (): PresenceComposable => {
         // CRITICAL: Set onDisconnect FIRST (server acknowledges immediately)
         // This ensures the offline handler is registered before we go online
         onDisconnect(userStatusRef)
-          .set({
+          .update({
             state: 'offline',
             lastSeen: serverTimestamp(),
             currentGameId: null,
@@ -299,12 +298,7 @@ export const usePresence = (): PresenceComposable => {
     const userStatusRef = dbRef(db, `presence/${uid}`)
 
     try {
-      // Get current presence data to preserve state
-      const snapshot = await get(userStatusRef)
-      const currentData = snapshot.exists() ? snapshot.val() : {}
-
-      await set(userStatusRef, {
-        ...currentData,
+      await update(userStatusRef, {
         message: message || null,
         lastSeen: serverTimestamp(),
       })
@@ -362,16 +356,18 @@ export const usePresence = (): PresenceComposable => {
       console.debug('[Presence] Unsubscribed from keepalive listener')
     }
 
-    // Mark user offline (will also auto-trigger on disconnect via onDisconnect)
+    // Mark user offline and cancel the server-side onDisconnect handler
+    // (we're explicitly going offline, so the handler is no longer needed)
     if (uid && rtdb) {
       const userStatusRef = dbRef(rtdb, `presence/${uid}`)
       try {
-        await set(userStatusRef, {
+        await onDisconnect(userStatusRef).cancel()
+        await update(userStatusRef, {
           state: 'offline',
           lastSeen: serverTimestamp(),
           currentGameId: null,
         })
-        console.info('[Presence] Marked user offline')
+        console.info('[Presence] Marked user offline and cancelled onDisconnect')
       } catch (error) {
         console.error('[Presence] Failed to mark offline:', error)
       }

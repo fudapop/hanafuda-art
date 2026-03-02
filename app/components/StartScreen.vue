@@ -240,6 +240,14 @@
             >
               {{ t('game.actions.newMatch') }}
             </button>
+
+            <!-- Stale match notification -->
+            <div
+              v-if="staleMatchMessage"
+              class="px-3 py-2 text-xs font-medium text-amber-700 bg-amber-100 border border-amber-300 rounded-xs dark:text-amber-300 dark:bg-amber-900/30 dark:border-amber-700"
+            >
+              {{ staleMatchMessage }}
+            </div>
           </div>
         </div>
         <div class="flex flex-col gap-1">
@@ -317,6 +325,7 @@ const {
   deleteSavedGame,
   loadGameFromStorage,
   listMultiplayerGames,
+  getMultiplayerGame,
   initializeSync,
 } = useStoreManager()
 const isLoading = ref(false)
@@ -405,9 +414,30 @@ const initializeDesignFromProfile = () => {
   }
 }
 
+// Toast message for stale multiplayer saves
+const staleMatchMessage = ref<string | null>(null)
+
 // Check for saved games on mount only
 onMounted(async () => {
   savedGames.value = await listSavedGames()
+
+  // Verify multiplayer save status against Firestore
+  const mpSave = savedGames.value.find((s) => s.mode === 'multiplayer')
+  if (mpSave && mpSave.gameId && authUser.value) {
+    try {
+      initializeSync()
+      const remoteGame = await getMultiplayerGame(mpSave.gameId)
+      if (!remoteGame || remoteGame.status !== 'active') {
+        // Game is no longer active — delete the stale local save
+        console.info(`Multiplayer game ${mpSave.gameId} is no longer active (status: ${remoteGame?.status ?? 'not found'}), deleting stale save`)
+        await deleteSavedGame(mpSave.key)
+        savedGames.value = await listSavedGames()
+        staleMatchMessage.value = t('multiplayer.disconnect.matchEnded')
+      }
+    } catch (error) {
+      console.error('Failed to verify multiplayer game status:', error)
+    }
+  }
 
   // If a profile is already available, hydrate settings and design immediately.
   initializeSettingsFromProfile()
@@ -523,7 +553,32 @@ const resumeMultiplayerGame = async () => {
 
   isLoading.value = true
   try {
-    // Set global state to indicate we're resuming from save
+    await ensurePlayerProfile()
+
+    // Populate multiplayer meta from the save's metadata
+    const multiplayerMeta = useState<{
+      isNew: boolean
+      gameId: string
+      p1: string
+      p2: string
+      activePlayerUid: string
+    }>('multiplayer-game-meta', () => ({
+      isNew: false,
+      gameId: '',
+      p1: '',
+      p2: '',
+      activePlayerUid: '',
+    }))
+
+    multiplayerMeta.value = {
+      isNew: false,
+      gameId: multiplayerSave.value.gameId,
+      p1: multiplayerSave.value.p1 || '',
+      p2: multiplayerSave.value.p2 || '',
+      activePlayerUid: multiplayerSave.value.activePlayer || '',
+    }
+
+    // Set global state to indicate we're resuming a multiplayer game
     const resumeState = useState('resume-save', () => ({
       isResuming: false,
       saveKey: '',
@@ -531,24 +586,17 @@ const resumeMultiplayerGame = async () => {
       mode: 'single' as 'single' | 'multiplayer',
     }))
 
-    // Load the save data from IndexedDB
-    const success = await loadGameFromStorage(multiplayerSave.value.key)
-    if (success) {
-      // Store the save key and mode (multiplayer saves persist)
-      resumeState.value = {
-        isResuming: true,
-        saveKey: multiplayerSave.value.key,
-        saveData: null, // Data already loaded into stores
-        mode: 'multiplayer',
-      }
-
-      // Start the game - it will handle the deferred loading
-      emit('start-game')
-    } else {
-      console.error('Failed to load saved game data')
+    resumeState.value = {
+      isResuming: true,
+      saveKey: multiplayerSave.value.key,
+      saveData: null,
+      mode: 'multiplayer',
     }
+
+    // Start the game - index.vue will handle rejoin via the orchestrator
+    emit('start-game')
   } catch (error) {
-    console.error('Error preparing resume:', error)
+    console.error('Error preparing multiplayer resume:', error)
   } finally {
     isLoading.value = false
   }
