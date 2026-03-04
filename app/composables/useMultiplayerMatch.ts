@@ -20,8 +20,9 @@ import {
   where,
   type Unsubscribe,
 } from 'firebase/firestore'
-import type { InviteCode, MultiplayerGame } from '~~/types/profile'
+import type { GameRules, InviteCode, MultiplayerGame } from '~~/types/profile'
 import { useCardStore } from '~~/stores/cardStore'
+import { useConfigStore } from '~~/stores/configStore'
 import { usePlayerStore } from '~~/stores/playerStore'
 
 export type OpponentPlayer = {
@@ -71,9 +72,9 @@ export type MultiplayerMatchComposable = {
   /**
    * Validate invite code
    * @param code The invite code to validate
-   * @returns Object with validity status and optional error message
+   * @returns Object with validity status, optional error, and host's matchRules when valid
    */
-  validateInviteCode: (code: string) => Promise<{ valid: boolean; error?: string }>
+  validateInviteCode: (code: string) => Promise<{ valid: boolean; error?: string; matchRules?: GameRules }>
 
   /**
    * List active multiplayer games for current user
@@ -167,6 +168,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
 
     // 2. Initialize new game state
     const cardStore = useCardStore()
+    const configStore = useConfigStore()
     cardStore.reset()
 
     // 3. Serialize initial state
@@ -207,6 +209,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
       finalSeen: { p1: false, p2: false },
       terminalStatus: null,
       inviteCode: code,
+      matchRules: configStore.getGameRules,
       createdAt: now,
       lastUpdated: now,
     }
@@ -458,7 +461,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
 
   const validateInviteCode = async (
     inputCode: string,
-  ): Promise<{ valid: boolean; error?: string }> => {
+  ): Promise<{ valid: boolean; error?: string; matchRules?: GameRules }> => {
     const code = formatInviteCode(inputCode)
     const normalizedCode = normalizeInviteCode(inputCode)
 
@@ -528,7 +531,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
         }
       }
 
-      return { valid: true }
+      return { valid: true, matchRules: gameData.matchRules as GameRules | undefined }
     } catch (error) {
       console.error('Error validating invite code:', error)
       return {

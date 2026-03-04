@@ -305,7 +305,9 @@
       "leaveGame": "ゲームを退出",
       "forfeitGame": "投了する",
       "forfeitWarning": "投了すると負けになります。"
-    }
+    },
+    "configure_rules_message": "マッチのルールを設定してください。相手はゲームに参加する前にルールを確認できます。",
+    "preview_rules_message": "参加前にホストのゲームルールを確認してください。"
   },
   "settings": {
     "actions": {

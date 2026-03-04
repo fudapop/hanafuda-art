@@ -99,6 +99,7 @@
       <!-- Create Game Flow -->
       <CreateGameFlow
         v-else-if="currentFlow === 'create'"
+        ref="createFlowRef"
         :open="open && currentFlow === 'create'"
         @close="handleClose"
         @game-started="handleGameStarted"
@@ -107,6 +108,7 @@
       <!-- Join Game Flow -->
       <JoinGameFlow
         v-else-if="currentFlow === 'join'"
+        ref="joinFlowRef"
         :open="open && currentFlow === 'join'"
         @close="handleClose"
         @game-joined="handleGameJoined"
@@ -114,26 +116,64 @@
     </template>
 
     <template #actions>
+      <!-- Menu: Cancel button -->
       <div
         v-if="currentFlow === 'menu'"
         class="flex justify-end gap-3 px-4 mt-6 sm:px-6"
       >
         <button
-          class="px-6 py-2 text-sm font-medium transition-colors border rounded-lg border-text-secondary/30 text-text-secondary hover:bg-hanafuda-brown/10 active:scale-95"
+          class="sec-btn"
           @click="handleClose"
         >
           {{ t('common.actions.cancel') }}
         </button>
       </div>
+
+      <!-- Create: ← Back + Create Game (only during configure step) -->
       <div
-        v-else
-        class="flex justify-start gap-3 px-4 mt-6 sm:px-6"
+        v-else-if="currentFlow === 'create'"
+        class="flex items-center justify-between gap-3 px-4 mt-6 sm:px-6"
       >
         <button
-          class="px-4 py-2 text-sm font-medium transition-colors border rounded-lg border-text-secondary/30 text-text-secondary hover:bg-hanafuda-brown/10 active:scale-95"
+          class="sec-btn"
+          @click="handleCreateBack"
+        >
+          ← {{ createFlowRef?.state === 'waiting' ? t('multiplayer.cancel_game') : t('common.actions.back') }}
+        </button>
+        <button
+          v-if="createFlowRef?.state === 'configure'"
+          class="pri-btn"
+          @click="createFlowRef?.applyRulesAndCreate()"
+        >
+          {{ t('multiplayer.create_game') }}
+        </button>
+      </div>
+
+      <!-- Join: ← Back + Join/Confirm Game -->
+      <div
+        v-else-if="currentFlow === 'join'"
+        class="flex items-center justify-between gap-3 px-4 mt-6 sm:px-6"
+      >
+        <button
+          class="sec-btn"
           @click="backToMenu"
         >
           ← {{ t('common.actions.back') }}
+        </button>
+        <button
+          v-if="joinFlowRef?.state === 'input'"
+          class="pri-btn"
+          :disabled="!joinFlowRef?.inviteCode || joinFlowRef.inviteCode.length < 6"
+          @click="joinFlowRef?.handleJoin()"
+        >
+          {{ t('common.actions.next') }}
+        </button>
+        <button
+          v-else-if="joinFlowRef?.state === 'preview'"
+          class="pri-btn"
+          @click="joinFlowRef?.confirmJoin()"
+        >
+          {{ t('multiplayer.join_game') }}
         </button>
       </div>
     </template>
@@ -156,6 +196,8 @@ const emit = defineEmits<{
 }>()
 
 const currentFlow = ref<'menu' | 'create' | 'join'>('menu')
+const createFlowRef = ref<InstanceType<typeof CreateGameFlow> | null>(null)
+const joinFlowRef = ref<InstanceType<typeof JoinGameFlow> | null>(null)
 
 const { t } = useI18n()
 
@@ -176,6 +218,15 @@ const handleClose = () => {
 
 const backToMenu = () => {
   currentFlow.value = 'menu'
+}
+
+const handleCreateBack = async () => {
+  // If a game is waiting for an opponent, cancel it first
+  if (createFlowRef.value?.state === 'waiting') {
+    await createFlowRef.value.handleCancel()
+  } else {
+    backToMenu()
+  }
 }
 
 const handleGameStarted = (gameId: string) => {

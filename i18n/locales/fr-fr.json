@@ -510,7 +510,7 @@
   "multiplayer": {
     "new_match": "Nouveau match multijoueur",
     "create_game": "Créer une partie",
-    "join_game": "Rejoindre une partie",
+    "join_game": "Rejoindre",
     "choose_option": "Démarrer un nouveau match multijoueur :",
     "create_description": "Générer un code d'invitation à partager",
     "join_description": "Entrer un code d'invitation d'un ami",
@@ -543,7 +543,9 @@
       "leaveGame": "Quitter la partie",
       "forfeitGame": "Abandonner la partie",
       "forfeitWarning": "Abandonner comptera comme une défaite."
-    }
+    },
+    "configure_rules_message": "Configurez les règles de votre match. Votre adversaire les verra avant de rejoindre.",
+    "preview_rules_message": "Consultez les règles de l'hôte avant de rejoindre."
   },
   "pages": {
     "changelog": "Journal des modifications",

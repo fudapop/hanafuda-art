@@ -35,22 +35,6 @@
         </p>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex gap-3">
-        <button
-          class="flex-1 px-6 py-2 text-sm font-medium transition-colors border rounded-lg border-text-secondary/30 text-text-secondary hover:bg-hanafuda-brown/10 active:scale-95"
-          @click="emit('close')"
-        >
-          {{ t('common.actions.cancel') }}
-        </button>
-        <button
-          class="flex-1 px-6 py-2 text-sm font-medium transition-colors rounded-lg bg-hanafuda-red text-hanafuda-cream hover:bg-hanafuda-red/90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="!inviteCode || inviteCode.length < 6"
-          @click="handleJoin"
-        >
-          {{ t('multiplayer.join') }}
-        </button>
-      </div>
     </div>
 
     <!-- Validating State -->
@@ -64,6 +48,23 @@
       <p class="text-sm text-text-secondary">
         {{ t('multiplayer.validating_code') }}
       </p>
+    </div>
+
+    <!-- Preview Rules State -->
+    <div
+      v-else-if="state === 'preview'"
+      class="py-4 text-left"
+    >
+      <p class="mb-4 text-sm text-text-secondary">
+        {{ t('multiplayer.preview_rules_message') }}
+      </p>
+
+      <MatchRulesPanel
+        v-if="previewRules"
+        :rules="previewRules"
+        :editable="false"
+      />
+
     </div>
 
     <!-- Joining State -->
@@ -122,6 +123,8 @@
 
 <script setup lang="ts">
 import { useMultiplayerMatch } from '~/composables/useMultiplayerMatch'
+import { useConfigStore } from '~~/stores/configStore'
+import type { GameRules } from '~~/types/profile'
 
 defineProps<{
   open: boolean
@@ -133,10 +136,12 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const state = ref<'input' | 'validating' | 'joining' | 'error'>('input')
+const config = useConfigStore()
+const state = ref<'input' | 'validating' | 'preview' | 'joining' | 'error'>('input')
 const inviteCode = ref('')
 const errorMessage = ref('')
 const validationError = ref('')
+const previewRules = ref<GameRules | null>(null)
 
 const { joinGame, validateInviteCode } = useMultiplayerMatch()
 
@@ -163,7 +168,6 @@ const handleJoin = async () => {
   errorMessage.value = ''
   validationError.value = ''
 
-  // Validate code first
   state.value = 'validating'
 
   try {
@@ -175,13 +179,34 @@ const handleJoin = async () => {
       return
     }
 
-    // Code is valid, proceed to join
-    state.value = 'joining'
+    // Show rules preview if matchRules available, otherwise join directly
+    if (validation.matchRules) {
+      previewRules.value = validation.matchRules
+      state.value = 'preview'
+    } else {
+      await doJoin()
+    }
+  } catch (error) {
+    console.error('Error joining game:', error)
+    state.value = 'error'
+    errorMessage.value = error instanceof Error ? error.message : t('multiplayer.join_failed')
+  }
+}
 
+const confirmJoin = async () => {
+  // Apply host's rules to local config before joining
+  if (previewRules.value) {
+    config.applyGameRules(previewRules.value)
+  }
+  state.value = 'joining'
+  await doJoin()
+}
+
+const doJoin = async () => {
+  try {
     const result = await joinGame(inviteCode.value)
 
     if (result.success) {
-      // Successfully joined!
       emit('game-joined', result.gameId)
     } else {
       state.value = 'error'
@@ -197,9 +222,12 @@ const handleJoin = async () => {
 const backToInput = () => {
   state.value = 'input'
   errorMessage.value = ''
+  previewRules.value = null
 }
 
 const retry = () => {
   handleJoin()
 }
+
+defineExpose({ confirmJoin, handleJoin, inviteCode, state })
 </script>

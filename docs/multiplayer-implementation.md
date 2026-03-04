@@ -61,8 +61,9 @@ Both clients share a single Firestore `multiplayer_games/{gameId}` document as t
 
 | File | Role |
 |------|------|
-| `app/components/multiplayer/CreateGameFlow.vue` | Host flow: create game, show invite code, wait for opponent |
-| `app/components/multiplayer/JoinGameFlow.vue` | Joiner flow: enter code, validate, join |
+| `app/components/multiplayer/CreateGameFlow.vue` | Host flow: configure rules, create game, show invite code, wait for opponent |
+| `app/components/multiplayer/JoinGameFlow.vue` | Joiner flow: enter code, validate, preview host rules, join |
+| `app/components/multiplayer/MatchRulesPanel.vue` | Reusable rules display: editable (host configure, settings) or read-only (joiner preview, locked during game) |
 | `app/components/multiplayer/OpponentStatusBadge.vue` | Colored dot indicator for opponent presence state |
 | `app/components/modal/NewMatchModal.vue` | Lobby entry point: create or join |
 | `app/components/modal/MultiplayerExitModal.vue` | Leave confirmation with optional message |
@@ -73,7 +74,7 @@ Both clients share a single Firestore `multiplayer_games/{gameId}` document as t
 
 | File | Key Types |
 |------|-----------|
-| `types/profile.ts` | `MultiplayerGame`, `GameStatus`, `PresenceState`, `InviteCode`, `GameSaveRecord` |
+| `types/profile.ts` | `MultiplayerGame`, `GameRules`, `GameStatus`, `PresenceState`, `InviteCode`, `GameSaveRecord` |
 | `app/composables/useStoreManager.ts` | `SerializedGameState` (exported, imported by `types/profile.ts`) |
 
 ---
@@ -101,7 +102,7 @@ All multiplayer-relevant `useState` keys:
 
 | Collection | Doc ID | Shape | Purpose |
 |------------|--------|-------|---------|
-| `multiplayer_games` | `{gameId}` | `MultiplayerGame` | Shared game state for both players |
+| `multiplayer_games` | `{gameId}` | `MultiplayerGame` | Shared game state for both players. Includes `matchRules` (host's `GameRules` snapshot) for joiner preview. |
 | `invite_codes` | `{code}` (e.g. `ABC123`) | `InviteCode` | Invite code lookup and validation |
 | `game_saves` | `{uid}_{saveKey}` | `GameSaveRecord` | Single-player save cloud backup |
 | `users` | `u_{uid}` | `PlayerProfile` | Player profiles |
@@ -136,12 +137,14 @@ interface SerializedGameState {
 1. Each of the four Pinia stores exports its own serialized state string.
 2. A cross-store salt is generated from 8 values: `gameId | roundCounter | turnCounter | turnPhase | activePlayer.id | bonusMultiplier | maxRounds | allowViewingsYaku`.
 3. The card store data is AES-GCM encrypted using a PBKDF2-derived key (from `gameId` + config salt), then hashed with FNV-1a for integrity protection.
+4. When `rulesOnly` is true (multiplayer snapshots), `configStore.exportGameRules()` is used instead of `exportSerializedState()`, serializing only gameplay rules (`maxRounds`, `allowViewingsYaku`, `doubleScoreOverSeven`, `sakeIsWildCard`) and excluding personal UI preferences (`cardLabels`, `cardSizeMultiplier`).
 
 ### Deserialization (`deserializeGameState`)
 
 1. Restore non-card stores first (`gameData`, `players`, `config`) to establish the associated salt.
-2. Regenerate the salt from restored store data.
-3. Import the card store with the salt for integrity verification and decryption.
+2. The config payload is detected as rules-only when `cardLabels` is absent in the parsed JSON. Rules-only payloads use `importGameRules()` which preserves each player's personal UI preferences.
+3. Regenerate the salt from restored store data.
+4. Import the card store with the salt for integrity verification and decryption.
 
 The `gameData` string contains the `eventHistory` array -- this is critical for both `syncMultiplayerGame` (guards against pre-game snapshots by checking for `START ROUND` events) and `useOpponentReplay` (diffs to extract new player events for replay).
 
@@ -156,7 +159,7 @@ The `gameData` string contains the `eventHistory` array -- this is critical for 
 ### Lifecycle
 
 1. **Generate**: Host creates game -> unique code generated (up to 10 collision retries) -> `invite_codes/{code}` written with 24h expiry.
-2. **Validate** (`validateInviteCode`): Format check -> Firestore lookup -> expiry check -> used-flag check -> game existence -> game status `'waiting'` -> `p2 === ''`.
+2. **Validate** (`validateInviteCode`): Format check -> Firestore lookup -> expiry check -> used-flag check -> game existence -> game status `'waiting'` -> `p2 === ''`. Returns `{ valid, error?, matchRules? }` so the joiner can preview host rules before committing.
 3. **Redeem** (`joinGame`): Mark code `used: true`, `usedBy`, `usedAt`. Update game: set `p2`, randomly pick `activePlayer`, set `status: 'active'`.
 4. **Cancel** (`cancelGame`): Host deletes the `invite_codes` document and sets game `status: 'abandoned'`.
 
@@ -327,8 +330,8 @@ Via `MultiplayerExitModal`: player writes optional 200-char message, which is st
 
 ```
 Phase 1: Lobby
-  Host: createGame() -> invite code generated -> waiting
-  Joiner: validateInviteCode() -> joinGame() -> randomly picks starter
+  Host: configure rules (MatchRulesPanel) -> createGame() -> matchRules written -> invite code generated -> waiting
+  Joiner: enter code -> validateInviteCode() -> preview host matchRules (MatchRulesPanel) -> applyGameRules() -> joinGame() -> randomly picks starter
 
 Phase 2: Initialization
   Starter: resetAllStores() -> startRound() -> pushSnapshot (initial)

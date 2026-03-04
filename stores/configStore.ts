@@ -77,6 +77,18 @@ export interface GameSettings {
   cardSize: CardSizeOptions
 }
 
+/** Game rules subset — shared in multiplayer, excludes personal UI preferences */
+export type GameRules = {
+  /** Number of rounds in the game */
+  rounds: GameLengthOptions
+  /** Viewing yaku restriction level */
+  viewings: ViewingsOptions
+  /** Whether to double score over 7 points */
+  double: boolean
+  /** Whether sake cup counts as plains */
+  wild: boolean
+}
+
 /** Complete config store state shape */
 export interface ConfigStoreState {
   /** Maximum number of rounds in game */
@@ -118,6 +130,15 @@ const useConfigStore = defineStore('config', () => {
       wild: sakeIsWildCard.value,
       labels: cardLabels.value,
       cardSize: cardSizeMultiplier.value,
+    }),
+  )
+
+  const getGameRules = computed(
+    (): GameRules => ({
+      rounds: maxRounds.value,
+      viewings: allowViewingsYaku.value,
+      double: doubleScoreOverSeven.value,
+      wild: sakeIsWildCard.value,
     }),
   )
 
@@ -195,14 +216,14 @@ const useConfigStore = defineStore('config', () => {
   function importSerializedState(serializedState: string): boolean {
     try {
       const data = JSON.parse(serializedState)
-      
+
       // Validate structure and types
-      if (typeof data.maxRounds !== 'number' || 
+      if (typeof data.maxRounds !== 'number' ||
           typeof data.allowViewingsYaku !== 'string' ||
           typeof data.doubleScoreOverSeven !== 'boolean') {
         throw new Error('Invalid config store state structure')
       }
-      
+
       maxRounds.value = data.maxRounds
       allowViewingsYaku.value = data.allowViewingsYaku
       doubleScoreOverSeven.value = data.doubleScoreOverSeven
@@ -210,10 +231,61 @@ const useConfigStore = defineStore('config', () => {
       cardLabels.value = data.cardLabels
       cardSizeMultiplier.value = data.cardSizeMultiplier
       settingsLoaded.value = data.settingsLoaded
-      
+
       return true
     } catch (error) {
       console.error('Failed to import config store state:', error)
+      return false
+    }
+  }
+
+  /**
+   * Serialize only game rule fields (rounds, viewings, double, wild).
+   * Excludes personal UI preferences (cardLabels, cardSizeMultiplier) so
+   * multiplayer snapshots do not overwrite the opponent's UI settings.
+   */
+  function applyGameRules(rules: GameRules) {
+    maxRounds.value = rules.rounds
+    allowViewingsYaku.value = rules.viewings
+    doubleScoreOverSeven.value = rules.double
+    sakeIsWildCard.value = rules.wild
+  }
+
+  function exportGameRules(): string {
+    const serializable = {
+      maxRounds: maxRounds.value,
+      allowViewingsYaku: allowViewingsYaku.value,
+      doubleScoreOverSeven: doubleScoreOverSeven.value,
+      sakeIsWildCard: sakeIsWildCard.value,
+    }
+    return JSON.stringify(serializable)
+  }
+
+  /**
+   * Restore only game rule fields from a serialized rules string.
+   * Leaves cardLabels and cardSizeMultiplier untouched so each player
+   * keeps their own UI preferences.
+   */
+  function importGameRules(serializedRules: string): boolean {
+    try {
+      const data = JSON.parse(serializedRules)
+
+      if (typeof data.maxRounds !== 'number' ||
+          typeof data.allowViewingsYaku !== 'string' ||
+          typeof data.doubleScoreOverSeven !== 'boolean' ||
+          typeof data.sakeIsWildCard !== 'boolean') {
+        throw new Error('Invalid game rules structure')
+      }
+
+      maxRounds.value = data.maxRounds
+      allowViewingsYaku.value = data.allowViewingsYaku
+      doubleScoreOverSeven.value = data.doubleScoreOverSeven
+      sakeIsWildCard.value = data.sakeIsWildCard
+      // cardLabels and cardSizeMultiplier intentionally preserved
+
+      return true
+    } catch (error) {
+      console.error('Failed to import game rules:', error)
       return false
     }
   }
@@ -227,12 +299,16 @@ const useConfigStore = defineStore('config', () => {
     cardSizeMultiplier,
     settingsLoaded,
     getCurrentSettings,
+    getGameRules,
     loadUserSettings,
     applyViewingsOption,
     applyWildCardOption,
     applyDoubleScoreOption,
     exportSerializedState,
     importSerializedState,
+    applyGameRules,
+    exportGameRules,
+    importGameRules,
     OPTIONS,
   }
 })

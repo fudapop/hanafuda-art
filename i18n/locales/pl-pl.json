@@ -305,7 +305,9 @@
       "leaveGame": "Opuść grę",
       "forfeitGame": "Poddaj się",
       "forfeitWarning": "Poddanie się zostanie uznane za przegraną."
-    }
+    },
+    "configure_rules_message": "Skonfiguruj zasady meczu. Przeciwnik zobaczy je przed dołączeniem.",
+    "preview_rules_message": "Przejrzyj zasady gospodarza przed dołączeniem."
   },
   "settings": {
     "actions": {
@@ -489,20 +491,20 @@
     }
   },
   "hanafuda": {
-	"flowers": {
-		"pine": "Sosna",
-		"plum": "Morela",
-		"cherry": "Wiśnia",
-		"wisteria": "Wisteria",
-		"iris": "Irys",
-		"peony": "Piwonia",
-		"bushClover": "Lespedeza",
-		"susuki": "Trawa słoniowa",
-		"chrysanthemum": "Chryzantema",
-		"maple": "Klon",
-		"willow": "Wierzba",
-		"paulownia": "Pawłownia"
-	}
+    "flowers": {
+      "pine": "Sosna",
+      "plum": "Morela",
+      "cherry": "Wiśnia",
+      "wisteria": "Wisteria",
+      "iris": "Irys",
+      "peony": "Piwonia",
+      "bushClover": "Lespedeza",
+      "susuki": "Trawa słoniowa",
+      "chrysanthemum": "Chryzantema",
+      "maple": "Klon",
+      "willow": "Wierzba",
+      "paulownia": "Pawłownia"
+    }
   },
   "accessibility": {
     "navigation": {

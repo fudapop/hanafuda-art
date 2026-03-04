@@ -1,7 +1,9 @@
 import type { CardDesign } from '~/composables/useCardDesign'
 import type { SerializedGameState } from '~/composables/useStoreManager'
 import type { PlayerStats } from '~/utils/stats'
-import type { GameSettings } from '~~/stores/configStore'
+import type { GameRules, GameSettings } from '~~/stores/configStore'
+
+export type { GameRules }
 
 export interface PlayerRecord {
   coins: number
@@ -198,6 +200,7 @@ export type MultiplayerGame = {
   forfeitReason?: DisconnectReason | null // Reason for forfeit
   cancelReason?: string | null // Reason for cancellation (no stats recorded)
   inviteCode?: string // Optional reference back to invite code
+  matchRules?: GameRules // Host's game rules, stored for joiner preview before joining
   startedAt?: Date // When p2 joined
   lastUpdated: Date
   createdAt: Date

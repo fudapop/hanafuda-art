@@ -406,9 +406,12 @@ export const useStoreManager = () => {
   }
 
   /**
-   * Serializes the current game state from all stores
+   * Serializes the current game state from all stores.
+   * @param rulesOnly When true, config payload includes only game rule fields
+   *   (excludes personal UI preferences such as cardLabels / cardSizeMultiplier).
+   *   Use this for multiplayer snapshots so each player's UI settings are preserved.
    */
-  const serializeGameState = async (): Promise<SerializedGameState> => {
+  const serializeGameState = async (rulesOnly = false): Promise<SerializedGameState> => {
     const cardStore = useCardStore()
     const gameDataStore = useGameDataStore()
     const playerStore = usePlayerStore()
@@ -425,7 +428,7 @@ export const useStoreManager = () => {
       cards: await cardStore.exportSerializedState(associatedSalt, gameId),
       gameData: gameDataStore.exportSerializedState(),
       players: playerStore.exportSerializedState(),
-      config: configStore.exportSerializedState(),
+      config: rulesOnly ? configStore.exportGameRules() : configStore.exportSerializedState(),
     }
   }
 
@@ -443,11 +446,25 @@ export const useStoreManager = () => {
       if (!isVersionCompatible(serializedState.version)) {
       }
 
+      // Detect whether this config payload is rules-only (no cardLabels field).
+      // Rules-only payloads are produced by multiplayer snapshots; use importGameRules
+      // so each player's personal UI preferences are preserved.
+      const isRulesOnly = (() => {
+        try {
+          const parsed = JSON.parse(serializedState.config)
+          return !('cardLabels' in parsed)
+        } catch {
+          return false
+        }
+      })()
+
       // First, restore non-card stores to establish associated data
       const nonCardResults = [
         gameDataStore.importSerializedState(serializedState.gameData),
         playerStore.importSerializedState(serializedState.players),
-        configStore.importSerializedState(serializedState.config),
+        isRulesOnly
+          ? configStore.importGameRules(serializedState.config)
+          : configStore.importSerializedState(serializedState.config),
       ]
 
       if (!nonCardResults.every((result) => result === true)) {
@@ -879,8 +896,9 @@ export const useStoreManager = () => {
       terminalStatus: metadata?.terminalStatus ?? null,
     }
 
-    // Serialize once for both IDB and Firestore
-    const gameState = await serializeGameState()
+    // Serialize once for both IDB and Firestore.
+    // Use rulesOnly=true so personal UI preferences are excluded from the shared snapshot.
+    const gameState = await serializeGameState(true)
     const terminalStatus = plainMetadata.terminalStatus ?? null
 
     // Persist multiplayer metadata to IndexedDB for resume detection

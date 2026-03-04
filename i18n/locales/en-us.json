@@ -319,7 +319,9 @@
       "endGame": "End Game",
       "matchEnded": "Your match has ended.",
       "reconnecting": "Reconnecting..."
-    }
+    },
+    "configure_rules_message": "Configure the rules for your match. Your opponent will see these before joining.",
+    "preview_rules_message": "Review the host's game rules before joining."
   },
   "settings": {
     "actions": {

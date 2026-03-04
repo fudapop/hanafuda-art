@@ -1,8 +1,25 @@
 <template>
   <div class="create-game-flow">
+    <!-- Configure Rules State -->
+    <div
+      v-if="state === 'configure'"
+      class="py-4 text-left"
+    >
+      <p class="mb-4 text-sm text-text-secondary">
+        {{ t('multiplayer.configure_rules_message') }}
+      </p>
+
+      <MatchRulesPanel
+        :rules="pendingRules"
+        :editable="true"
+        @update:rules="pendingRules = $event"
+      />
+
+    </div>
+
     <!-- Loading State -->
     <div
-      v-if="state === 'creating'"
+      v-else-if="state === 'creating'"
       class="flex flex-col items-center gap-4 py-8"
     >
       <div
@@ -55,15 +72,6 @@
         <span>{{ t('multiplayer.waiting_for_opponent') }}</span>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex gap-3 mt-4">
-        <button
-          class="px-6 py-2 text-sm font-medium transition-colors border rounded-lg border-text-secondary/30 text-text-secondary hover:bg-hanafuda-brown/10 active:scale-95"
-          @click="handleCancel"
-        >
-          {{ t('multiplayer.cancel_game') }}
-        </button>
-      </div>
     </div>
 
     <!-- Error State -->
@@ -101,6 +109,8 @@
 
 <script setup lang="ts">
 import { useMultiplayerMatch } from '~/composables/useMultiplayerMatch'
+import { useConfigStore } from '~~/stores/configStore'
+import type { GameRules } from '~~/types/profile'
 
 const props = defineProps<{
   open: boolean
@@ -113,14 +123,25 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const { syncMultiplayerGame, initializeSync } = useStoreManager()
-const state = ref<'idle' | 'creating' | 'waiting' | 'error'>('idle')
+const config = useConfigStore()
+
+const state = ref<'configure' | 'creating' | 'waiting' | 'error'>('configure')
 const inviteCode = ref('')
 const gameId = ref('')
 const errorMessage = ref('')
 const copied = ref(false)
 const unsubscribe = ref<(() => void) | null>(null)
 
+// Local copy of rules for the configure step, pre-populated from configStore
+const pendingRules = ref<GameRules>({ ...config.getGameRules })
+
 const { createGame, cancelGame, subscribeToGame } = useMultiplayerMatch()
+
+const applyRulesAndCreate = async () => {
+  // Apply chosen rules to configStore so they persist as user defaults
+  config.applyGameRules(pendingRules.value)
+  await handleCreateGame()
+}
 
 const handleCreateGame = async () => {
   state.value = 'creating'
@@ -188,17 +209,22 @@ const handleCancel = async () => {
 }
 
 const retry = () => {
-  state.value = 'idle'
-  handleCreateGame()
+  state.value = 'configure'
 }
 
+defineExpose({ applyRulesAndCreate, handleCancel, state })
+
 onMounted(() => {
-  // Auto-create game when component becomes visible
+  // Reset to configure state each time the dialog is opened
   watch(
     () => props.open,
-    async (isOpen) => {
-      if (isOpen && state.value === 'idle') {
-        await handleCreateGame()
+    (isOpen) => {
+      if (isOpen) {
+        state.value = 'configure'
+        pendingRules.value = { ...config.getGameRules }
+        inviteCode.value = ''
+        gameId.value = ''
+        errorMessage.value = ''
       }
     },
     { immediate: true },
