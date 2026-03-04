@@ -75,8 +75,8 @@ export const useCardHandler = () => {
 
   const rateDiscard = (card: CardName, restCards: CardName[]): number => {
     const theCard = CARDS[card]
-    let discardPenality: number
-    switch (theCard.type) {
+    let discardPenality: number = 0
+    switch (theCard?.type) {
       case 'bright':
         discardPenality = -20
         break
@@ -115,15 +115,17 @@ export const useCardHandler = () => {
 
   const handlePlayerDiscard = async () => {
     if (!selectedCard.value) return
-    cs.discard(selectedCard.value, 'p1')
+    cs.discard(selectedCard.value, ds.getCurrent.player)
     ds.logPlayerAction(ds.getCurrent.player, 'discard', [selectedCard.value])
     selectedCard.value = null
   }
 
   const selectCardFromHand = (card: CardName) => {
-    if (!cs.hand.p1.has(card)) return
+    const currentPlayer = ds.getCurrent.player
+    // Only allow selecting cards that are actually in the current player's hand
+    if (!cs.hand[currentPlayer].has(card)) return
     selectedCard.value = card
-    // console.debug(ds.getCurrent.player.toUpperCase(), '>>> Selected', card.toUpperCase())
+    // console.debug(currentPlayer.toUpperCase(), '>>> Selected', card.toUpperCase())
   }
 
   const matchSelection = (card: CardName, selected: CardName) => {
@@ -140,13 +142,15 @@ export const useCardHandler = () => {
     // console.debug('\tMatching:', matchedCards.value.join(', ').toUpperCase())
     if (matchedCards.value.length === 3) {
       // Collect the entire suit
-      handleMatched([...matchedCards.value, selected])
+      handleMatched([selected, ...matchedCards.value])
     } else {
       // Player selects one match
-      handleMatched([card, selected])
+      handleMatched([selected, card])
     }
   }
 
+  // Convention: matches[0] is always the hand card, followed by field card(s).
+  // useOpponentReplay relies on this ordering to display the correct card during replay.
   const handleMatched = (matches: CardName[]) => {
     ds.logPlayerAction(ds.getCurrent.player, 'match', matches)
     cs.stageForCollection(matches)
@@ -188,16 +192,25 @@ export const useCardHandler = () => {
             return
           }
           case 2: {
-            const p0 = getProgress(new Set([card, matches[0], ...collection]), opponentCollection)
-            const p1 = getProgress(new Set([card, matches[1], ...collection]), opponentCollection)
+            const p0 = getProgress(
+              new Set([card, matches[0], ...collection].filter((c) => !!c)),
+              opponentCollection,
+            )
+            const p1 = getProgress(
+              new Set([card, matches[1], ...collection].filter((c) => !!c)),
+              opponentCollection,
+            )
             handScores[i] = Math.max(rateProgress(p0, restCards), rateProgress(p1, restCards))
             return
           }
         }
       })
 
-      const maxScoreIndex = handScores.reduce((iMax, x, i, arr) => (x > arr[iMax] ? i : iMax), 0)
-      selectedCard.value = cardsInHand[maxScoreIndex]
+      const maxScoreIndex = handScores.reduce(
+        (iMax, x, i, arr) => (!Number.isNaN(Number(arr[iMax])) && x > Number(arr[iMax]) ? i : iMax),
+        0,
+      )
+      selectedCard.value = cardsInHand[maxScoreIndex]!
     },
 
     matchOrDiscard() {
@@ -212,17 +225,25 @@ export const useCardHandler = () => {
         case 1:
         case 3:
           cs.stageForCollection([...matches, selected])
+          // Hand card first, then field card(s) — see handleMatched convention
           ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, ...matches])
           break
         case 2:
           const cardsInHand = [...cs.hand[ds.getCurrent.player]]
           const collection = [...cs.collection[ds.getCurrent.player]]
           const opponentCollection = new Set([...cs.collection[ds.getCurrent.inactivePlayer]])
-          const p0 = getProgress(new Set([selected, matches[0], ...collection]), opponentCollection)
-          const p1 = getProgress(new Set([selected, matches[1], ...collection]), opponentCollection)
+          const p0 = getProgress(
+            new Set([selected, matches[0], ...collection].filter((c) => !!c)),
+            opponentCollection,
+          )
+          const p1 = getProgress(
+            new Set([selected, matches[1], ...collection].filter((c) => !!c)),
+            opponentCollection,
+          )
           const best = rateProgress(p0, cardsInHand) > rateProgress(p1, cardsInHand) ? 0 : 1
-          cs.stageForCollection([matches[best], selected])
-          ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, matches[best]])
+          cs.stageForCollection([matches[best]!, selected])
+          // Hand card first, then field card — see handleMatched convention
+          ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, matches[best]!])
           break
       }
       selectedCard.value = null
@@ -234,7 +255,11 @@ export const useCardHandler = () => {
         ds.checkCurrentPhase('draw'),
         `Phase check failed. Expected: 'draw'; Received: '${ds.getCurrent.phase}'`,
       )
-      selectedCard.value = cs.revealCard()
+      const revealed = cs.revealCard()
+      if (!revealed) {
+        throw new Error('Error during draw. No card revealed.')
+      }
+      selectedCard.value = revealed
       ds.logPlayerAction(ds.getCurrent.player, 'draw', [selectedCard.value])
     },
 

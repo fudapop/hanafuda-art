@@ -16,6 +16,7 @@
       "save": "Save",
       "saving": "Saving...",
       "loading": "Loading...",
+      "processing": "Processing...",
       "delete": "Delete",
       "confirm": "Confirm",
       "continue": "Continue",
@@ -258,6 +259,55 @@
     },
     "confirmations": {
       "deleteSave": "Are you sure you want to delete your saved game? This action cannot be undone."
+    }
+  },
+  "multiplayer": {
+    "new_match": "New Multiplayer Match",
+    "create_game": "Create Game",
+    "join_game": "Join Game",
+    "choose_option": "Start a new multiplayer match:",
+    "create_description": "Generate an invite code to share",
+    "join_description": "Enter an invite code from a friend",
+    "creating_game": "Creating game...",
+    "game_created": "Game Created!",
+    "share_code_message": "Share this code with your opponent. The game will start when they join.",
+    "invite_code": "Invite Code",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "waiting_for_opponent": "Waiting for opponent...",
+    "cancel_game": "Cancel Game",
+    "enter_code_message": "Enter the invite code from your friend to join their game.",
+    "code_placeholder": "ABC-123",
+    "join": "Join",
+    "validating_code": "Validating code...",
+    "joining_game": "Joining game...",
+    "try_again": "Try Again",
+    "invalid_code": "Invalid invite code",
+    "join_failed": "Failed to join game",
+    "error_creating_game": "Failed to create game. Please try again.",
+    "opponent_online": "Online",
+    "opponent_offline": "Offline",
+    "opponent_playing": "Playing...",
+    "opponent_thinking": "Thinking...",
+    "exit": {
+      "title": "Leave Multiplayer Game",
+      "description": "Your game will be saved automatically and you can resume it at any time. Your opponent will be notified that you've left.",
+      "messageLabel": "Leave a message for your opponent",
+      "messageOptional": "optional",
+      "messagePlaceholder": "e.g., 'Be back soon!' or 'Great game!'",
+      "leaveGame": "Leave Game"
+    },
+    "disconnect": {
+      "title": "Opponent Disconnected",
+      "description": "Your opponent has disconnected from the game. You can wait for them to return or claim victory.",
+      "cancelDescription": "Your opponent has disconnected from the game. You can wait for them to return or end the game. No results will be recorded.",
+      "opponentMessage": "Message from opponent:",
+      "offlineFor": "Disconnected for:",
+      "continueWaiting": "Continue Waiting",
+      "claimVictory": "Claim Victory",
+      "endGame": "End Game",
+      "matchEnded": "Your match has ended.",
+      "reconnecting": "Reconnecting..."
     }
   },
   "settings": {

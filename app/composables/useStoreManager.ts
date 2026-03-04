@@ -48,8 +48,10 @@ import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { usePlayerStore } from '~~/stores/playerStore'
 import type {
+  DisconnectReason,
   GameMode,
   GameSaveRecord,
+  GameStatus,
   LocalGameSaveStore,
   MultiplayerGame,
   SyncStatus,
@@ -88,6 +90,10 @@ export interface SerializedGameState {
 // In-memory fallback store for tests / environments without IndexedDB
 const memoryGameSaveStores = {
   byId: new Map<string, GameSaveRecord>(),
+}
+
+type MultiplayerSyncMetadata = {
+  terminalStatus?: GameStatus | null
 }
 
 const createMemoryGameSaveStore = (): LocalGameSaveStore => {
@@ -490,7 +496,9 @@ export const useStoreManager = () => {
       )
 
       if (!cardResult) {
-        throw new Error('Card store failed to import - possible data tampering detected')
+        throw new Error(
+          'Card store failed to import - possible data tampering or salt mismatch detected',
+        )
       }
 
       return true
@@ -510,6 +518,7 @@ export const useStoreManager = () => {
     p1?: string | null,
     p2?: string | null,
     activePlayer?: string | null,
+    metadata?: MultiplayerSyncMetadata,
   ): Promise<string> => {
     const gameState = await serializeGameState()
     const uid = getCurrentUserId()
@@ -536,6 +545,7 @@ export const useStoreManager = () => {
         p1: p1 || null,
         p2: p2 || null,
         activePlayer: activePlayer || null,
+        terminalStatus: metadata?.terminalStatus ?? null,
       }
       await store.set(saveRecord)
 
@@ -869,7 +879,7 @@ export const useStoreManager = () => {
     // Set new timeout (1 second debounce)
     syncTimeoutId.value = setTimeout(() => {
       if (syncStatus.value === 'idle') {
-        void syncPush(uid)
+        syncPush(uid)
       }
     }, 1000)
   }
@@ -884,27 +894,75 @@ export const useStoreManager = () => {
     p1: string,
     p2: string,
     activePlayer: string,
-  ): Promise<string> => {
+    metadata?: MultiplayerSyncMetadata,
+  ): Promise<void> => {
     const uid = getCurrentUserId()
-
-    // Validate caller is the active player
-    if (uid !== activePlayer) {
-      throw new Error('Only the active player can save a multiplayer game')
-    }
 
     // Validate caller is a participant
     if (uid !== p1 && uid !== p2) {
       throw new Error('Only participants can save a multiplayer game')
     }
 
-    // Save to local IndexedDB
-    const saveKey = await saveGameToStorage('multiplayer', p1, p2, activePlayer)
+    // Snapshot of current card / round state at the moment we save, used to avoid
+    // pushing obviously uninitialized boards to Firestore.
+    const debugCardStore = useCardStore()
+    const debugHandSizes = {
+      p1: debugCardStore.hand.p1.size,
+      p2: debugCardStore.hand.p2.size,
+    }
+    const debugFieldSize = debugCardStore.field.size
+    const debugDeckSize = debugCardStore.deck.size
 
-    // Also push to shared Firestore collection if adapter initialized
+    // Guard: avoid pushing obviously uninitialized board state (full deck, empty hands/field).
+    const isUninitializedBoard =
+      debugDeckSize === DECK.length &&
+      debugFieldSize === 0 &&
+      debugHandSizes.p1 === 0 &&
+      debugHandSizes.p2 === 0
+
+    if (isUninitializedBoard) {
+      console.warn(
+        '[saveMultiplayerGame] Skipping Firestore push for uninitialized board (full deck, empty hands/field)',
+      )
+      return
+    }
+
+    const plainMetadata: MultiplayerSyncMetadata = {
+      terminalStatus: metadata?.terminalStatus ?? null,
+    }
+
+    // Serialize once for both IDB and Firestore
+    const gameState = await serializeGameState()
+    const terminalStatus = plainMetadata.terminalStatus ?? null
+
+    // Persist multiplayer metadata to IndexedDB for resume detection
+    try {
+      const store = await getGameSaveStore()
+      const storageKey = getSaveKeyForMode('multiplayer')
+      const saveRecord: GameSaveRecord = {
+        id: `${uid}_${storageKey}`,
+        uid,
+        saveKey: storageKey,
+        gameState,
+        timestamp: new Date(),
+        gameId: gameState.gameId,
+        mode: 'multiplayer',
+        p1: p1 || null,
+        p2: p2 || null,
+        activePlayer: activePlayer || null,
+        terminalStatus,
+      }
+      await store.set(saveRecord)
+    } catch (error) {
+      console.error('Failed to persist multiplayer metadata to IndexedDB:', error)
+    }
+
+    // Push to Firestore (source of truth for multiplayer)
     if (multiplayerAdapter.value) {
       try {
         if (await multiplayerAdapter.value.isAvailable()) {
-          const gameState = await serializeGameState()
+          const derivedStatus: GameStatus = p2 && p2.trim() !== '' ? 'active' : 'waiting'
+          const statusToPersist: GameStatus = terminalStatus ?? derivedStatus
           const multiplayerGame: MultiplayerGame = {
             gameId: gameState.gameId,
             gameState,
@@ -912,33 +970,35 @@ export const useStoreManager = () => {
             p1,
             p2,
             activePlayer,
+            status: statusToPersist,
+            terminalStatus,
             lastUpdated: new Date(),
             createdAt: new Date(), // Will be overwritten if game already exists
           }
           await multiplayerAdapter.value.push(multiplayerGame, uid)
-          console.info('Multiplayer game saved to shared Firestore')
+          console.info('Multiplayer game saved to Firestore', multiplayerGame)
+        } else {
+          console.error('Multiplayer adapter not available')
         }
       } catch (error) {
         console.error('Failed to push multiplayer game to Firestore:', error)
-        // Don't throw - local save succeeded
       }
     }
-
-    return saveKey
   }
 
   /**
-   * Load a multiplayer game from local IndexedDB
-   * Does not auto-delete (multiplayer saves persist)
-   */
-  const loadMultiplayerGame = async (): Promise<boolean> => {
-    const saveKey = getSaveKeyForMode('multiplayer')
-    return await loadGameFromStorage(saveKey)
-  }
-
-  /**
-   * Pull the latest multiplayer game from shared Firestore
-   * Updates local cache if remote is newer
+   * Pull the latest multiplayer game from shared Firestore.
+   *
+   * For multiplayer, Firestore is the single source of truth and only the
+   * active player is allowed to push via `saveMultiplayerGame`. Other clients
+   * (including the non-starting player during initialization) should always
+   * treat the remote state as authoritative when it has a different serialized
+   * game state.
+   *
+   * We detect changes primarily via the serialized game state's own
+   * `timestamp` field, falling back to `lastUpdated` as an additional signal.
+   *
+   * @returns true if local cache was updated from remote, false otherwise
    */
   const syncMultiplayerGame = async (gameId: string): Promise<boolean> => {
     if (!multiplayerAdapter.value) {
@@ -953,31 +1013,50 @@ export const useStoreManager = () => {
         return false
       }
 
-      // Check if local cache is outdated
-      const uid = getCurrentUserId()
-      const store = await getGameSaveStore()
-      const localSave = await store.get(uid, getSaveKeyForMode('multiplayer'))
+      const remoteState = remoteGame.gameState as SerializedGameState
 
-      if (!localSave || remoteGame.lastUpdated > localSave.timestamp) {
-        // Update local cache with remote state
-        const updatedSave: GameSaveRecord = {
-          id: `${uid}_${getSaveKeyForMode('multiplayer')}`,
-          uid,
-          saveKey: getSaveKeyForMode('multiplayer'),
-          gameState: remoteGame.gameState,
-          timestamp: remoteGame.lastUpdated,
-          gameId: remoteGame.gameId,
-          mode: 'multiplayer',
-          p1: remoteGame.p1,
-          p2: remoteGame.p2,
-          activePlayer: remoteGame.activePlayer,
+      // Inspect gameData to avoid overwriting the local board with a "pre-game" snapshot
+      // (e.g., full deck, no START ROUND event) from the waiting lobby state.
+      let hasStartedRound = false
+      try {
+        const parsedGameData = JSON.parse(remoteState.gameData ?? '{}') as {
+          eventHistory?: Array<{ type?: string; message?: string }>
         }
-        await store.set(updatedSave)
-        console.info('Multiplayer game synced from Firestore')
-        return true
+        const events = parsedGameData.eventHistory ?? []
+        hasStartedRound = events.some(
+          (evt) =>
+            evt &&
+            evt.type === 'system' &&
+            typeof evt.message === 'string' &&
+            evt.message.startsWith('START ROUND'),
+        )
+
+        if (!hasStartedRound) {
+          console.warn(
+            '[syncMultiplayerGame] Remote multiplayer state has no START ROUND event; treating as pre-game and not overwriting local board',
+            {
+              gameId,
+              remoteEventCount: events.length,
+            },
+          )
+        }
+      } catch (error) {
+        console.error('[syncMultiplayerGame] Failed to parse remote multiplayer gameData', error)
+        hasStartedRound = true
       }
 
-      return false
+      if (!hasStartedRound) {
+        return false
+      }
+
+      // Deserialize directly into stores — Firestore is the single source of truth.
+      const success = await deserializeGameState(remoteState)
+      if (success) {
+        console.info('Multiplayer game synced from Firestore into stores')
+      } else {
+        console.error('Failed to deserialize remote multiplayer game state')
+      }
+      return success
     } catch (error) {
       console.error('Failed to sync multiplayer game:', error)
       return false
@@ -1002,6 +1081,161 @@ export const useStoreManager = () => {
     }
   }
 
+  /**
+   * Forfeit a multiplayer game (claim victory when opponent disconnects)
+   * Updates the game status to 'abandoned' and records the forfeited player
+   *
+   * @param gameId - The game ID to forfeit
+   * @param forfeitedByUid - The UID of the player who forfeited (the disconnected player)
+   * @param reason - The reason for the forfeit
+   * @returns true if forfeit was successful
+   */
+  const forfeitMultiplayerGame = async (
+    gameId: string,
+    forfeitedByUid: string,
+    reason: DisconnectReason = 'network_disconnect',
+  ): Promise<boolean> => {
+    const uid = getCurrentUserId()
+
+    if (!multiplayerAdapter.value) {
+      console.warn('Multiplayer adapter not initialized')
+      return false
+    }
+
+    try {
+      // Get the current game state from Firestore
+      const remoteGame = await multiplayerAdapter.value.get(gameId)
+      if (!remoteGame) {
+        console.error(`Cannot forfeit: game ${gameId} not found`)
+        return false
+      }
+
+      // Validate caller is a participant
+      if (uid !== remoteGame.p1 && uid !== remoteGame.p2) {
+        console.error('Only participants can forfeit a multiplayer game')
+        return false
+      }
+
+      // Validate the forfeited player is a participant
+      if (forfeitedByUid !== remoteGame.p1 && forfeitedByUid !== remoteGame.p2) {
+        console.error('Forfeited player must be a participant')
+        return false
+      }
+
+      // Update the game with forfeit information
+      const updatedGame: MultiplayerGame = {
+        ...remoteGame,
+        status: 'abandoned',
+        terminalStatus: 'abandoned',
+        forfeitedBy: forfeitedByUid,
+        forfeitReason: reason,
+        lastUpdated: new Date(),
+      }
+
+      // Push to Firestore
+      const success = await multiplayerAdapter.value.push(updatedGame, uid)
+      if (!success) {
+        console.error('Failed to push forfeit update to Firestore')
+        return false
+      }
+
+      // Update local IndexedDB
+      const store = await getGameSaveStore()
+      const localSave = await store.get(uid, getSaveKeyForMode('multiplayer'))
+      if (localSave && localSave.gameId === gameId) {
+        const updatedSave: GameSaveRecord = {
+          ...localSave,
+          terminalStatus: 'abandoned',
+        }
+        await store.set(updatedSave)
+      }
+
+      console.info(`Multiplayer game ${gameId} forfeited by ${forfeitedByUid} (reason: ${reason})`)
+      return true
+    } catch (error) {
+      console.error('Failed to forfeit multiplayer game:', error)
+      return false
+    }
+  }
+
+  /**
+   * Get a multiplayer game document from Firestore by game ID.
+   * Used to check game status before resuming.
+   *
+   * @param gameId - The game ID to look up
+   * @returns The multiplayer game document, or null if not found
+   */
+  const getMultiplayerGame = async (gameId: string): Promise<MultiplayerGame | null> => {
+    if (!multiplayerAdapter.value) {
+      console.warn('Multiplayer adapter not initialized')
+      return null
+    }
+
+    try {
+      return await multiplayerAdapter.value.get(gameId)
+    } catch (error) {
+      console.error('Failed to get multiplayer game:', error)
+      return null
+    }
+  }
+
+  /**
+   * Cancel a multiplayer game without recording any stats (no win/loss).
+   * Used when the opponent disconnects and the remaining player chooses to end the game.
+   *
+   * @param gameId - The game ID to cancel
+   * @param reason - The reason for cancellation
+   * @returns true if cancellation was successful
+   */
+  const cancelMultiplayerGame = async (
+    gameId: string,
+    reason: string,
+  ): Promise<boolean> => {
+    const uid = getCurrentUserId()
+
+    if (!multiplayerAdapter.value) {
+      console.warn('Multiplayer adapter not initialized')
+      return false
+    }
+
+    try {
+      const remoteGame = await multiplayerAdapter.value.get(gameId)
+      if (!remoteGame) {
+        console.error(`Cannot cancel: game ${gameId} not found`)
+        return false
+      }
+
+      if (uid !== remoteGame.p1 && uid !== remoteGame.p2) {
+        console.error('Only participants can cancel a multiplayer game')
+        return false
+      }
+
+      const updatedGame: MultiplayerGame = {
+        ...remoteGame,
+        status: 'cancelled',
+        terminalStatus: 'cancelled',
+        cancelReason: reason,
+        lastUpdated: new Date(),
+      }
+
+      const success = await multiplayerAdapter.value.push(updatedGame, uid)
+      if (!success) {
+        console.error('Failed to push cancellation update to Firestore')
+        return false
+      }
+
+      // Delete local multiplayer save from IndexedDB
+      const store = await getGameSaveStore()
+      await store.remove(uid, getSaveKeyForMode('multiplayer'))
+
+      console.info(`Multiplayer game ${gameId} cancelled (reason: ${reason})`)
+      return true
+    } catch (error) {
+      console.error('Failed to cancel multiplayer game:', error)
+      return false
+    }
+  }
+
   return {
     serializeGameState,
     deserializeGameState,
@@ -1019,9 +1253,11 @@ export const useStoreManager = () => {
     syncStatus: computed(() => syncStatus.value),
     // Multiplayer functions
     saveMultiplayerGame,
-    loadMultiplayerGame,
     syncMultiplayerGame,
     listMultiplayerGames,
+    forfeitMultiplayerGame,
+    cancelMultiplayerGame,
+    getMultiplayerGame,
     getSaveKeyForMode,
   }
 }

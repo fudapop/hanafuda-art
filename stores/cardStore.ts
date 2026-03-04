@@ -82,6 +82,74 @@ export const useCardStore = defineStore('cards', {
     },
   },
   actions: {
+    /**
+     * Normalize card locations to enforce core invariants.
+     *
+     * Invariant: any card that appears in a player's collection must not appear
+     * in any other zone (hand, field, deck, staged).
+     *
+     * This is primarily used as a safety net around save/load and multiplayer
+     * sync to recover from any transient duplication bugs.
+     */
+    normalizeState() {
+      const collected = new Set<CardName>([...this.collection.p1, ...this.collection.p2])
+
+      if (collected.size === 0) return
+
+      this.$patch((state) => {
+        for (const card of collected) {
+          state.hand.p1.delete(card)
+          state.hand.p2.delete(card)
+          state.field.delete(card)
+          state.deck.delete(card)
+          state.staged.delete(card)
+        }
+      })
+    },
+
+    /**
+     * Development helper: log any cards that appear in multiple zones.
+     * Useful when tracking down subtle multiplayer desyncs.
+     */
+    _debugLogDuplicateCards(context: string) {
+      if (import.meta.env.PROD) return
+
+      const zones: Record<string, Iterable<CardName>> = {
+        'hand.p1': this.hand.p1,
+        'hand.p2': this.hand.p2,
+        'collection.p1': this.collection.p1,
+        'collection.p2': this.collection.p2,
+        'field': this.field,
+        'deck': this.deck,
+        'staged': this.staged,
+      }
+
+      const locations = new Map<CardName, string[]>()
+
+      for (const [zoneName, cards] of Object.entries(zones)) {
+        for (const card of cards) {
+          const current = locations.get(card) ?? []
+          current.push(zoneName)
+          locations.set(card, current)
+        }
+      }
+
+      const duplicates: Array<{ card: CardName; zones: string[] }> = []
+      for (const [card, zoneList] of locations.entries()) {
+        if (zoneList.length > 1) {
+          duplicates.push({ card, zones: zoneList })
+        }
+      }
+
+      if (duplicates.length) {
+        // eslint-disable-next-line no-console
+        console.warn('[CardStore] Duplicate card locations detected', {
+          context,
+          duplicates,
+        })
+      }
+    },
+
     // Deal the initial hands and field
     dealCards() {
       this.$patch((state) => {
@@ -140,8 +208,13 @@ export const useCardStore = defineStore('cards', {
         state.field.clear()
         state.deck = new Set(shuffle([...DECK]))
       })
+      this._debugLogDuplicateCards('reset:after-reset')
     },
     async exportSerializedState(associatedDataSalt?: string, gameId?: string): Promise<string> {
+      // Safety net: ensure no collected cards still appear in any other zone
+      this.normalizeState()
+      this._debugLogDuplicateCards('exportSerializedState:after-normalize')
+
       const serializable = {
         hand: {
           p1: Array.from(this.hand.p1),
@@ -247,6 +320,10 @@ export const useCardStore = defineStore('cards', {
           state.deck = new Set(data.deck || [])
           state.staged = new Set(data.staged || [])
         })
+
+        // Normalize and log any inconsistencies on load to self-heal
+        this.normalizeState()
+        this._debugLogDuplicateCards('importSerializedState:after-normalize')
 
         return true
       } catch (error) {

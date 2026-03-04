@@ -24,9 +24,9 @@
           :class="[
             'game-ui-btn',
             gameStart && 'opacity-50 hover:opacity-100',
-            player1Inactive && 'cursor-wait',
+            localPlayerInactive && 'cursor-wait',
           ]"
-          :disabled="player1Inactive"
+          :disabled="localPlayerInactive"
         >
           <Icon
             name="mdi:logout"
@@ -92,14 +92,11 @@
     <div
       :class="{
         'z-[-1] fixed top-0 inset-x-0 duration-300 transition-all sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
-        'opacity-40': players.p1.isActive,
+        'opacity-40': players[selfKey].isActive,
         '-translate-y-full': !gameStart,
       }"
     >
-      <StatusBar
-        :user="null"
-        :playerNum="2"
-      />
+      <OpponentStatusBar />
     </div>
 
     <!-- GAMEPLAY AREA -->
@@ -131,14 +128,11 @@
     <div
       :class="{
         'z-[-1] fixed bottom-0 inset-x-0 duration-300 transition-all bg-transparent sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-tr-full': true,
-        'opacity-40': players.p2.isActive,
+        'opacity-40': players[opponentKey].isActive,
         'translate-y-full': !gameStart,
       }"
     >
-      <StatusBar
-        :user="user"
-        :playerNum="1"
-      />
+      <PlayerStatusBar :user="user" />
     </div>
 
     <!-- LOADER -->
@@ -163,12 +157,22 @@
     </Transition>
 
     <!-- MODALS -->
+    <!-- Single player exit modal -->
     <LazyExitWarning
+      v-if="!isMultiplayerGame"
       :open="leavingGame"
       :isSaving="isSaving"
       @cancel="leavingGame = false"
       @save="handleSaveAndExit"
       @forfeit="handleForfeitAndExit"
+    />
+    <!-- Multiplayer exit modal -->
+    <LazyMultiplayerExitModal
+      v-if="isMultiplayerGame"
+      :open="leavingGame"
+      :isSaving="isSaving"
+      @cancel="leavingGame = false"
+      @leave="handleMultiplayerLeave"
     />
     <!-- <FeedbackForm
       :open="promptFeedback"
@@ -196,6 +200,7 @@ const { t } = useI18n()
 const { $clientPosthog } = useNuxtApp()
 
 const { players } = storeToRefs(usePlayerStore())
+const { selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const { current: user } = useProfile()
 
 const gameStart = useState('start', () => false)
@@ -204,7 +209,10 @@ const isSaving = ref(false)
 // const promptFeedback = ref(false)
 const promptSignup = ref(false)
 const showLoader = ref(false)
-const player1Inactive = computed(() => gameStart.value && !players.value.p1.isActive)
+const localPlayerInactive = computed(() => {
+  if (isMultiplayerGame.value) return false
+  return gameStart.value && !players.value.p1.isActive
+})
 
 const feedbackSubmitted = computed(() => user.value?.flags?.hasSubmittedFeedback)
 const signupDeclined = useStorage('hanafuda-signup-declined', false, sessionStorage)
@@ -239,6 +247,63 @@ const handleForfeitAndExit = () => {
   leavingGame.value = false
   // Reset gameStart to trigger cleanup in main game component
   gameStart.value = false
+}
+
+const handleMultiplayerLeave = async (message: string | null) => {
+  $clientPosthog?.capture('exit_multiplayer_game')
+  isSaving.value = true
+
+  try {
+    const { saveMultiplayerGame } = useStoreManager()
+    const { current: currentProfile } = useProfile()
+    const { setMessage, cleanup: cleanupPresence } = usePresence()
+    const ps = usePlayerStore()
+
+    if (!currentProfile.value) {
+      throw new Error('User not authenticated')
+    }
+
+    // Get multiplayer meta state for p1 and p2 uids
+    const multiplayerMeta = useState<{
+      isNew: boolean
+      gameId: string
+      p1: string
+      p2: string
+      activePlayerUid: string
+    }>('multiplayer-game-meta', () => ({
+      isNew: false,
+      gameId: '',
+      p1: '',
+      p2: '',
+      activePlayerUid: '',
+    }))
+
+    const p1 = multiplayerMeta.value.p1 || currentProfile.value.uid
+    const p2 = multiplayerMeta.value.p2 || ''
+    const activeKey = ps.activePlayer.id as 'p1' | 'p2'
+    const activePlayer = activeKey === 'p1' ? p1 : p2
+
+    // Save game state to Firestore
+    await saveMultiplayerGame(p1, p2, activePlayer)
+
+    // Set presence message if provided
+    if (message) {
+      await setMessage(message)
+    }
+
+    // Cleanup presence tracking
+    await cleanupPresence()
+
+    leavingGame.value = false
+    gameStart.value = false
+  } catch (error) {
+    console.error('Failed to save multiplayer game:', error)
+    // Still exit even if save fails
+    leavingGame.value = false
+    gameStart.value = false
+  } finally {
+    isSaving.value = false
+  }
 }
 
 const handleSignupCancel = async () => {

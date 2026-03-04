@@ -10,6 +10,7 @@ import { storeToRefs } from 'pinia'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 
 const { koikoiIsCalled, getCaller } = useDecisionHandler()
+const { selfKey, opponentKey } = useLocalPlayerPerspective()
 
 const { roundCounter, roundOver, getCurrent, eventHistory } = storeToRefs(useGameDataStore())
 
@@ -50,9 +51,9 @@ const cleanupBgm = watch(
       // Use the player who just called koikoi
       const caller = getCaller.value
       audio.playSfx(SFX.slash)
-      if (caller === 'p2') {
+      if (caller === opponentKey.value) {
         audio.crossfadeTo(BGM.koikoi1, 1.5)
-      } else if (caller === 'p1') {
+      } else if (caller === selfKey.value) {
         audio.crossfadeTo(BGM.koikoi2, 1.2)
       }
     } else if (newRound > oldRound) {

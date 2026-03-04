@@ -237,16 +237,19 @@
                 'hover:from-purple-200 hover:to-purple-300 dark:hover:from-purple-300 dark:hover:to-purple-400',
                 'active:from-purple-300 active:to-purple-400',
                 'ring-1 ring-inset ring-offset-2 ring-[#23221c]/30 ring-offset-border/20',
-                'opacity-50 cursor-not-allowed',
               ]"
               @click="startNewMultiplayerGame"
-              disabled
-              :title="t('game.messages.comingSoon')"
+              :disabled="isLoading"
             >
               {{ t('game.actions.newMatch') }}
             </button>
-            <div class="text-xs italic text-text-secondary/70">
-              {{ t('game.messages.comingSoon') }}
+
+            <!-- Stale match notification -->
+            <div
+              v-if="staleMatchMessage"
+              class="px-3 py-2 text-xs font-medium text-amber-700 bg-amber-100 border border-amber-300 rounded-xs dark:text-amber-300 dark:bg-amber-900/30 dark:border-amber-700"
+            >
+              {{ staleMatchMessage }}
             </div>
           </div>
         </div>
@@ -284,11 +287,18 @@
     </div>
 
     <AnnouncementModal />
+    <NewMatchModal
+      :open="showNewMatchModal"
+      @close="showNewMatchModal = false"
+      @game-created="handleGameCreated"
+      @game-joined="handleGameJoined"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useConfigStore } from '~~/stores/configStore'
+import NewMatchModal from '~/components/modal/NewMatchModal.vue'
 
 const emit = defineEmits(['start-game'])
 const {
@@ -313,8 +323,18 @@ const authUser = useCurrentUser()
 const isGuest = computed(() => !authUser.value)
 
 // Game save management
-const { listSavedGames, deleteSavedGame, loadGameFromStorage } = useStoreManager()
+const {
+  listSavedGames,
+  deleteSavedGame,
+  loadGameFromStorage,
+  listMultiplayerGames,
+  getMultiplayerGame,
+  initializeSync,
+} = useStoreManager()
 const isLoading = ref(false)
+
+// Multiplayer modal state
+const showNewMatchModal = ref(false)
 
 // Check for saved games (separate single-player and multiplayer)
 const savedGames = ref<
@@ -397,9 +417,30 @@ const initializeDesignFromProfile = () => {
   }
 }
 
+// Toast message for stale multiplayer saves
+const staleMatchMessage = ref<string | null>(null)
+
 // Check for saved games on mount only
 onMounted(async () => {
   savedGames.value = await listSavedGames()
+
+  // Verify multiplayer save status against Firestore
+  const mpSave = savedGames.value.find((s) => s.mode === 'multiplayer')
+  if (mpSave && mpSave.gameId && authUser.value) {
+    try {
+      initializeSync()
+      const remoteGame = await getMultiplayerGame(mpSave.gameId)
+      if (!remoteGame || remoteGame.status !== 'active') {
+        // Game is no longer active — delete the stale local save
+        console.info(`Multiplayer game ${mpSave.gameId} is no longer active (status: ${remoteGame?.status ?? 'not found'}), deleting stale save`)
+        await deleteSavedGame(mpSave.key)
+        savedGames.value = await listSavedGames()
+        staleMatchMessage.value = t('multiplayer.disconnect.matchEnded')
+      }
+    } catch (error) {
+      console.error('Failed to verify multiplayer game status:', error)
+    }
+  }
 
   // If a profile is already available, hydrate settings and design immediately.
   initializeSettingsFromProfile()
@@ -515,7 +556,32 @@ const resumeMultiplayerGame = async () => {
 
   isLoading.value = true
   try {
-    // Set global state to indicate we're resuming from save
+    await ensurePlayerProfile()
+
+    // Populate multiplayer meta from the save's metadata
+    const multiplayerMeta = useState<{
+      isNew: boolean
+      gameId: string
+      p1: string
+      p2: string
+      activePlayerUid: string
+    }>('multiplayer-game-meta', () => ({
+      isNew: false,
+      gameId: '',
+      p1: '',
+      p2: '',
+      activePlayerUid: '',
+    }))
+
+    multiplayerMeta.value = {
+      isNew: false,
+      gameId: multiplayerSave.value.gameId,
+      p1: multiplayerSave.value.p1 || '',
+      p2: multiplayerSave.value.p2 || '',
+      activePlayerUid: multiplayerSave.value.activePlayer || '',
+    }
+
+    // Set global state to indicate we're resuming a multiplayer game
     const resumeState = useState('resume-save', () => ({
       isResuming: false,
       saveKey: '',
@@ -523,24 +589,17 @@ const resumeMultiplayerGame = async () => {
       mode: 'single' as 'single' | 'multiplayer',
     }))
 
-    // Load the save data from IndexedDB
-    const success = await loadGameFromStorage(multiplayerSave.value.key)
-    if (success) {
-      // Store the save key and mode (multiplayer saves persist)
-      resumeState.value = {
-        isResuming: true,
-        saveKey: multiplayerSave.value.key,
-        saveData: null, // Data already loaded into stores
-        mode: 'multiplayer',
-      }
-
-      // Start the game - it will handle the deferred loading
-      emit('start-game')
-    } else {
-      console.error('Failed to load saved game data')
+    resumeState.value = {
+      isResuming: true,
+      saveKey: multiplayerSave.value.key,
+      saveData: null,
+      mode: 'multiplayer',
     }
+
+    // Start the game - index.vue will handle rejoin via the orchestrator
+    emit('start-game')
   } catch (error) {
-    console.error('Error preparing resume:', error)
+    console.error('Error preparing multiplayer resume:', error)
   } finally {
     isLoading.value = false
   }
@@ -575,8 +634,123 @@ const startNewSinglePlayerGame = async () => {
 }
 
 const startNewMultiplayerGame = async () => {
-  // TODO: Implement multiplayer matchmaking/setup
-  console.warn('Multiplayer matchmaking not yet implemented')
+  showNewMatchModal.value = true
+}
+
+const handleGameCreated = async ({ gameId }: { gameId: string; code: string }) => {
+  console.log('Game created, opponent joined. Preparing new multiplayer match:', gameId)
+  showNewMatchModal.value = false
+
+  // Initialize multiplayer sync adapter and fetch latest multiplayer game meta
+  initializeSync()
+  const games = await listMultiplayerGames()
+  const game = games.find((g) => g.gameId === gameId)
+
+  if (!game) {
+    console.warn('Multiplayer game not found in list after creation; falling back to resume flow')
+    savedGames.value = await listSavedGames()
+    await resumeMultiplayerGame()
+    return
+  }
+
+  // Store multiplayer game metadata for specialized multiplayer initialization on game start
+  const multiplayerMeta = useState<{
+    isNew: boolean
+    gameId: string
+    p1: string
+    p2: string
+    activePlayerUid: string
+  }>('multiplayer-game-meta', () => ({
+    isNew: false,
+    gameId: '',
+    p1: '',
+    p2: '',
+    activePlayerUid: '',
+  }))
+
+  multiplayerMeta.value = {
+    isNew: true,
+    gameId: game.gameId,
+    p1: game.p1,
+    p2: game.p2,
+    activePlayerUid: game.activePlayer,
+  }
+
+  // Ensure we start a brand new multiplayer game (not resuming)
+  const resumeState = useState('resume-save', () => ({
+    isResuming: false,
+    saveKey: '',
+    saveData: null as any,
+    mode: 'single' as 'single' | 'multiplayer',
+  }))
+
+  resumeState.value = {
+    isResuming: false,
+    saveKey: '',
+    saveData: null,
+    mode: 'multiplayer',
+  }
+
+  // Let GameLayout / pages/index handle specialized multiplayer initialization
+  emit('start-game')
+}
+
+const handleGameJoined = async ({ gameId }: { gameId: string }) => {
+  console.log('Joined game. Preparing new multiplayer match:', gameId)
+  showNewMatchModal.value = false
+
+  // Initialize multiplayer sync adapter and fetch latest multiplayer game meta
+  initializeSync()
+  const games = await listMultiplayerGames()
+  const game = games.find((g) => g.gameId === gameId)
+
+  if (!game) {
+    console.warn('Multiplayer game not found in list after join; falling back to resume flow')
+    savedGames.value = await listSavedGames()
+    await resumeMultiplayerGame()
+    return
+  }
+
+  // Store multiplayer game metadata for specialized multiplayer initialization on game start
+  const multiplayerMeta = useState<{
+    isNew: boolean
+    gameId: string
+    p1: string
+    p2: string
+    activePlayerUid: string
+  }>('multiplayer-game-meta', () => ({
+    isNew: false,
+    gameId: '',
+    p1: '',
+    p2: '',
+    activePlayerUid: '',
+  }))
+
+  multiplayerMeta.value = {
+    isNew: true,
+    gameId: game.gameId,
+    p1: game.p1,
+    p2: game.p2,
+    activePlayerUid: game.activePlayer,
+  }
+
+  // Ensure we start a brand new multiplayer game (not resuming)
+  const resumeState = useState('resume-save', () => ({
+    isResuming: false,
+    saveKey: '',
+    saveData: null as any,
+    mode: 'single' as 'single' | 'multiplayer',
+  }))
+
+  resumeState.value = {
+    isResuming: false,
+    saveKey: '',
+    saveData: null,
+    mode: 'multiplayer',
+  }
+
+  // Let GameLayout / pages/index handle specialized multiplayer initialization
+  emit('start-game')
 }
 
 const deleteSinglePlayerSave = async () => {

@@ -11,7 +11,7 @@
         >
           <!-- FACE-DOWN CARDS -->
           <div
-            v-for="card in hand.p2"
+            v-for="card in hand[opponentKey]"
             :class="{
               'card down bg-slate-800': true,
               'opacity-0 transition-opacity': card === selectedCard || staged.has(card),
@@ -36,7 +36,7 @@
               leave-to-class="opacity-0"
             >
               <div
-                v-if="selectedCard && players.p2.isActive && checkCurrentPhase('select')"
+                v-if="selectedCard && players[opponentKey].isActive && checkCurrentPhase('select')"
                 class="relative z-50 overflow-hidden card"
               >
                 <!-- Accessibility announcement for opponent's selected card -->
@@ -80,6 +80,8 @@ const breakpoints = useBreakpoints({
 const { orientation } = useScreenOrientation()
 const isLandscape = computed(() => orientation.value?.includes('landscape'))
 const isMobile = breakpoints.smaller('sm')
+
+const { opponentKey } = useLocalPlayerPerspective()
 
 // Responsive card area classes
 const cardAreaClasses = computed(() => ({

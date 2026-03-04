@@ -25,6 +25,17 @@ export const useDecisionHandler = () => {
     ds.logPlayerAction(ps.activePlayer.id, 'koi-koi')
   }
 
+  const callKoikoiFor = async (player: PlayerKey) => {
+    // Reset first so watchers see a false→true transition even if
+    // decision is already 'koikoi' from a previous call in the same round.
+    if (decision.value === 'koikoi') {
+      decision.value = null
+      await nextTick()
+    }
+    calledBy.value = player
+    decision.value = 'koikoi'
+  }
+
   const stopIsCalled = computed(() => decision.value === 'stop')
   const callStop = () => {
     calledBy.value = ps.activePlayer.id
@@ -66,6 +77,7 @@ export const useDecisionHandler = () => {
   return {
     // Setters
     callKoikoi,
+    callKoikoiFor,
     callStop,
     // Getters (reactive)
     noCalls,

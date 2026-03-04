@@ -55,7 +55,8 @@ import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
 
-const { id } = defineProps<{ id: PlayerKey }>()
+const props = defineProps<{ id: PlayerKey; canInteract?: boolean }>()
+const id = props.id
 
 const displayedCards: (CardName | undefined)[] = reactive(Array(8))
 
@@ -94,18 +95,22 @@ const updateDisplayedCards = () => {
 const { getCardUrl } = useCardDesign()
 
 const { useMatchedCards, matchExists, handleCardSelect } = useCardHandler()
+const { selfKey } = useLocalPlayerPerspective()
 
 const matchedCards = useMatchedCards()
 
 const showMatchHint = computed(
   () => (card: CardName) =>
+    // Only show hints on the local player's hand, when they are active in select phase
+    id === selfKey.value &&
     ds.checkCurrentPhase('select') &&
-    ps.players.p1.isActive &&
+    ps.players[id].isActive &&
     (matchExists(card) as CardName[]).length,
 )
 
 const handleClick = (card: CardName) => {
-  if (!ps.players.p1.isActive || !ds.checkCurrentPhase('select')) return
+  // Final guard: only allow interaction when parent says this hand can interact
+  if (props.canInteract === false) return
   handleCardSelect(card)
 }
 

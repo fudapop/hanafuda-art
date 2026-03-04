@@ -5,7 +5,13 @@
         v-show="showLoader"
         class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-1"
       >
-        <CardsLoader />
+        <template v-if="isMultiplayerGame">
+          <SakuraLoader class="mx-auto opacity-80 w-max" />
+          <p class="font-semibold tracking-wide text-center drop-shadow-md animate-pulse">
+            {{ t('multiplayer.waiting_for_opponent') }}
+          </p>
+        </template>
+        <CardsLoader v-else />
       </div>
 
       <!-- OPPONENT HAND -->
@@ -22,7 +28,7 @@
       >
         <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
           <CollectionArea
-            player="p2"
+            :player="opponentKey"
             @completed="handleCompletion"
           />
         </div>
@@ -32,7 +38,7 @@
       <div :class="['absolute inset-x-0 max-w-2xl top-1/4 w-max mx-auto isolate -z-10']">
         <div class="w-screen overflow-x-auto touch-pan-x no-scrollbar">
           <div
-            v-click-disabled:unless="players.p1.isActive && !!selectedCard"
+            v-click-disabled:unless="players[selfKey].isActive && !!selectedCard"
             :class="[
               'grid grid-cols-[80px_1fr] gap-2',
               'py-8 px-4 sm:px-8 lg:px-12',
@@ -54,7 +60,7 @@
       >
         <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
           <CollectionArea
-            player="p1"
+            :player="selfKey"
             @completed="handleCompletion"
           />
         </div>
@@ -65,15 +71,18 @@
         :class="[
           'absolute -bottom-4 inset-x-0 pb-8',
           'transition-all duration-200 origin-left [&_ul]:scale-90 sm:[&_ul]:scale-100',
-          players.p2.isActive && 'opacity-80',
+          players[opponentKey].isActive && 'opacity-80',
           isMobile && 'landscape:translate-y-8',
         ]"
       >
         <div
           class="w-screen max-w-full py-8 mx-auto overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x"
         >
-          <div v-click-disabled:unless="players.p1.isActive && ds.checkCurrentPhase('select')">
-            <HandDisplay id="p1" />
+          <div>
+            <HandDisplay
+              :id="selfKey"
+              :can-interact="canInteractLocalHand"
+            />
           </div>
         </div>
       </div>
@@ -96,9 +105,18 @@
         />
         <RoundResults
           v-else
+          :show-ack-controls="roundOver && !gameOver && (players[selfKey].isActive || isMultiplayerGame)"
           @next="handleNext"
         />
       </ResultsModal>
+
+      <!-- Opponent Disconnected Modal -->
+      <OpponentDisconnectedModal
+        :open="showDisconnectModal"
+        :opponent-message="opponentPresence.message"
+        :is-processing="isProcessingForfeit"
+        @cancel-game="handleCancelGame"
+      />
     </div>
   </GameLayout>
 </template>
@@ -106,6 +124,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
+import type { MultiplayerGame } from '~~/types/profile'
 import { checkForWin } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
@@ -129,9 +148,37 @@ const { isMobile } = useDevice()
 const cs = useCardStore()
 const ps = usePlayerStore()
 const ds = useGameDataStore()
+
+const advancingRound = ref(false)
+const finalCleanupDone = ref(false)
+
+const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
+const {
+  setMyStatus,
+  cleanup: cleanupPresence,
+  opponentPresence,
+  isOpponentDisconnected,
+} = usePresence()
+
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
 const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
+
+// Derived flag: whether the local player's hand should be interactive
+const canInteractLocalHand = computed(() => {
+  if (isReplaying.value) return false
+  const current = ds.getCurrent
+  const key = selfKey.value
+  const can = current.player === key && current.phase === 'select'
+  // Debug output to verify turn perspective on each client
+  console.debug('[canInteractLocalHand]', {
+    currentPlayer: current.player,
+    phase: current.phase,
+    selfKey: key,
+    can,
+  })
+  return can
+})
 
 const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
@@ -139,8 +186,39 @@ const selectedCard = useSelectedCard()
 const { opponentPlay, useOpponent } = useAutoplay()
 const autoOpponent: Ref<boolean> = useOpponent()
 
+// Multiplayer orchestration
+const {
+  pushSnapshot: pushMultiplayerSnapshot,
+  initGame: initMultiplayerGame,
+  rejoinGame: rejoinMultiplayerGame,
+  cleanupSubscription: cleanupMultiplayerSubscription,
+  terminalStatus,
+} = useMultiplayerOrchestrator()
+
+const {
+  syncMultiplayerGame,
+  deserializeGameState,
+  deleteSavedGame,
+  getSaveKeyForMode,
+  cancelMultiplayerGame,
+} = useStoreManager()
+
+// Opponent turn replay for multiplayer
+const {
+  isReplaying,
+  shouldReplayTurn,
+  replayOpponentTurn,
+} = useOpponentReplay()
+
 const showModal = ref(false)
 const showLoader = ref(false)
+const showDisconnectModal = ref(false)
+const isProcessingForfeit = ref(false)
+
+// Grace period before showing disconnect modal (30 seconds)
+const DISCONNECT_GRACE_PERIOD_MS = 30 * 1000
+const disconnectGraceTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+
 const gameStart = useState('start')
 
 const {
@@ -177,14 +255,32 @@ const handleCompletion = (data: CompletionEvent) => {
     score: score * ps.bonusMultiplier,
     completedYaku,
   })
-  handleDecision()
+
+  // Single-player: always enter decision flow (human vs CPU).
+  if (!isMultiplayerGame.value) {
+    handleDecision()
+    return
+  }
+
+  // Multiplayer: only the player who completed the yaku (from this client's perspective)
+  // should enter the decision flow. Opponent clients see the results but never
+  // enter a pending decision state, so their modal does not reopen.
+  if (selfKey.value === player) {
+    handleDecision()
+  }
 }
 
-const handleStop = () => {
+const handleStop = async () => {
   const player = activePlayer.value.id
   console.debug(player.toUpperCase(), '>>> Called STOP')
   ds.endRound()
   // Stats are automatically tracked by useStatsTracking composable
+  if (ds.gameOver) {
+    terminalStatus.value = 'completed'
+  }
+  await pushMultiplayerSnapshot('round-end', undefined, {
+    terminalStatus: ds.gameOver ? 'completed' : null,
+  })
 }
 
 const handleKoikoi = () => {
@@ -197,22 +293,123 @@ const handleKoikoi = () => {
 }
 
 // Closing the round results modal
-const handleNext = async () => {
+const advanceToNextRound = async () => {
+  if (advancingRound.value || gameOver.value) {
+    showLoader.value = false
+    return
+  }
+  advancingRound.value = true
   showLoader.value = true
+  terminalStatus.value = null
   ds.nextRound()
   showModal.value = false
   await sleep(2000)
-  startRound()
+  await startRound()
+
+  // In multiplayer, push a fresh snapshot immediately after starting the new round
+  // so the opponent sees the new round state before the first turn completes.
+  await pushMultiplayerSnapshot('new-round', undefined, {
+    terminalStatus: null,
+  })
+  advancingRound.value = false
 }
 
-// Closing the final results modal
-const handleClose = () => {
+const handleNext = async () => {
+  // In multiplayer, the non-active player just dismisses the modal locally.
+  // The active player will advance the round and push the new-round snapshot.
+  if (isMultiplayerGame.value && !players.value[selfKey.value].isActive) {
+    showModal.value = false
+    showLoader.value = true
+    return
+  }
+  await advanceToNextRound()
+}
+
+const performFinalCleanup = async () => {
+  if (finalCleanupDone.value) return
+  finalCleanupDone.value = true
   $clientPosthog?.capture('game_ended')
   ds.nextRound() // This should fix the issue of not swapping to the winner after final round
   showModal.value = false
+
+  // When a multiplayer match is fully completed, clear the multiplayer save
+  // so "Resume Match" no longer appears on the start screen.
+  if (isMultiplayerGame.value) {
+    try {
+      const multiplayerKey = getSaveKeyForMode('multiplayer')
+      const success = await deleteSavedGame(multiplayerKey)
+      if (success) {
+        console.info('Deleted multiplayer save after match completion', multiplayerKey)
+      }
+    } catch (error) {
+      console.error('Failed to delete multiplayer save after match completion:', error)
+    }
+  }
+
   resetAllStores()
   // Return to the start screen
   gameStart.value = false
+}
+
+// Closing the final results modal
+const handleClose = async () => {
+  terminalStatus.value = 'completed'
+  await pushMultiplayerSnapshot('final-close', undefined, {
+    terminalStatus: 'completed',
+  })
+  await performFinalCleanup()
+}
+
+// Handle cancelling the game when opponent disconnects (no stats recorded)
+const handleCancelGame = async () => {
+  if (!isMultiplayerGame.value || isProcessingForfeit.value) return
+
+  const multiplayerMeta = useState<{
+    isNew: boolean
+    gameId: string
+    p1: string
+    p2: string
+    activePlayerUid: string
+  }>('multiplayer-game-meta')
+
+  if (!multiplayerMeta.value?.gameId) {
+    console.error('Cannot cancel game: missing game ID')
+    return
+  }
+
+  isProcessingForfeit.value = true
+
+  try {
+    const success = await cancelMultiplayerGame(
+      multiplayerMeta.value.gameId,
+      'opponent_disconnected',
+    )
+
+    if (success) {
+      console.info('Game cancelled due to opponent disconnect')
+
+      // Return to start screen — no stats, no results modal
+      showDisconnectModal.value = false
+      showModal.value = false
+      resetAllStores()
+      terminalStatus.value = 'cancelled'
+      gameStart.value = false
+    } else {
+      console.error('Failed to cancel game')
+    }
+  } catch (error) {
+    console.error('Error cancelling game:', error)
+  } finally {
+    isProcessingForfeit.value = false
+  }
+}
+
+// Clear disconnect grace timer
+const clearDisconnectGraceTimer = () => {
+  if (disconnectGraceTimer.value) {
+    clearTimeout(disconnectGraceTimer.value)
+    disconnectGraceTimer.value = null
+  }
 }
 
 // Reset all stores to initial state
@@ -220,7 +417,90 @@ const resetAllStores = () => {
   console.debug('Resetting all stores to initial state...')
   ds.reset() // Reset game data store
   ps.reset() // Reset player store to initial state (p1 active and dealer)
+  useState('multiplayer-opponent').value = null // Clear opponent from multiplayer
   cs.reset() // Reset card store
+  terminalStatus.value = null
+  finalCleanupDone.value = false
+}
+
+// Buffer for remote updates that arrive while a replay is in progress.
+// The latest update wins — we only need the most recent authoritative state.
+const pendingRemoteUpdate = ref<MultiplayerGame | null>(null)
+
+const handleRemoteUpdate = async (game: MultiplayerGame) => {
+  const { current: currentProfile } = useProfile()
+  const uid = currentProfile.value?.uid
+  if (!uid) return
+
+  // If a replay is running, buffer this update and return.
+  // The replay's finally block reconciles with its own state, and we'll
+  // re-reconcile with the buffered (newer) state after it completes.
+  if (isReplaying.value) {
+    console.info('[handleRemoteUpdate] Buffering update received during replay')
+    pendingRemoteUpdate.value = game
+    return
+  }
+
+  try {
+    // Set metadata FIRST before deserialization sets gameOver (which triggers watchers).
+    terminalStatus.value = game.terminalStatus ?? terminalStatus.value ?? null
+
+    const remoteState = game.gameState
+
+    // Attempt step-by-step replay for opponent turns; fall through to direct sync otherwise.
+    if (remoteState && shouldReplayTurn(remoteState)) {
+      await replayOpponentTurn(remoteState, deserializeGameState)
+
+      // Reconcile with any newer update that arrived during the replay
+      if (pendingRemoteUpdate.value) {
+        const pending = pendingRemoteUpdate.value
+        pendingRemoteUpdate.value = null
+        console.info('[handleRemoteUpdate] Reconciling with buffered update after replay')
+        terminalStatus.value = pending.terminalStatus ?? terminalStatus.value ?? null
+        if (pending.gameState) {
+          await deserializeGameState(pending.gameState)
+        }
+      }
+
+      // Show results modal after replay settles (watchers are suppressed during replay)
+      if (ds.roundOver && !decisionIsPending.value) {
+        showModal.value = true
+      }
+    } else {
+      const synced = await syncMultiplayerGame(game.gameId)
+      if (!synced) {
+        console.warn('Failed to sync multiplayer game state after remote update')
+      }
+    }
+
+    // Update presence after replay/sync -- the activePlayer watcher is suppressed during replay
+    if (isMultiplayerGame.value && !ds.gameOver && !ds.roundOver) {
+      const isMyTurn = ps.activePlayer.id === selfKey.value
+      await setMyStatus(isMyTurn ? 'playing' : 'online').catch((err) =>
+        console.error('[Presence] Failed to update status after remote update:', err),
+      )
+    }
+
+    // If the updated state indicates the match is over, ensure this client
+    // also shows the final results modal.
+    if (ds.gameOver) {
+      if (!showModal.value) {
+        showModal.value = true
+      }
+    }
+  } catch (error) {
+    console.error('Failed to sync multiplayer turn from Firestore:', error)
+  }
+}
+
+// Initialize a new multiplayer game via the orchestrator
+const initializeNewMultiplayerGame = async () => {
+  finalCleanupDone.value = false
+
+  await initMultiplayerGame(
+    { resetAllStores, startRound },
+    handleRemoteUpdate,
+  )
 }
 
 const startRound = async () => {
@@ -237,7 +517,10 @@ const startRound = async () => {
     handleInstantWin(result as CompletionEvent)
     return
   }
-  if (ps.players.p2.isActive) opponentPlay({ speed: 2 })
+  // In single-player, let the CPU opponent take the first turn when p2 starts.
+  if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {
+    opponentPlay({ speed: 2 })
+  }
 }
 
 const handleInstantWin = (result: CompletionEvent) => {
@@ -246,6 +529,12 @@ const handleInstantWin = (result: CompletionEvent) => {
   callStop()
   ds.endRound()
   // Stats are automatically tracked by useStatsTracking composable
+  if (ds.gameOver) {
+    terminalStatus.value = 'completed'
+  }
+  void pushMultiplayerSnapshot('instant-win-round-end', undefined, {
+    terminalStatus: ds.gameOver ? 'completed' : null,
+  })
 }
 
 const checkDeal = () => {
@@ -281,36 +570,24 @@ const checkDeal = () => {
   return result
 }
 
-watch(decisionIsPending, () => {
-  if (decisionIsPending.value) showModal.value = true
-  if (koikoiIsCalled.value) handleKoikoi()
-  if (stopIsCalled.value) handleStop()
-})
-
-watch(turnCounter, () => {
-  // Handle an exhaustive draw condition
-  if (turnCounter.value !== 9) return
-  const drawConditions = [
-    handsEmpty.value,
-    ds.checkCurrentPhase('select'),
-    !decisionIsPending.value,
-    !stopIsCalled.value,
-  ]
-  if (drawConditions.every((cond) => cond === true)) {
-    showModal.value = true
-    // @ts-expect-error: CompletionEvent 'player' should not be null
-    handleCompletion({ player: null, score: 0 })
-    callStop()
-    ds.endRound()
-    // Stats are automatically tracked by useStatsTracking composable
-  }
-})
-
 onBeforeUnmount(() => {
+  // Clean up multiplayer listener
+  cleanupMultiplayerSubscription()
+
+  // Clean up disconnect grace timer
+  clearDisconnectGraceTimer()
+
+  cleanupPresence()
+
   // Reset the game state if the user navigates away from the page
   ds.endRound()
   ds.nextRound()
-  handleClose()
+
+  // Only run final-close for single-player; multiplayer leave is handled separately
+  if (!isMultiplayerGame.value) {
+    handleClose()
+  }
+
   if (shoutTimeout.value) clearTimeout(shoutTimeout.value)
   cleanup()
 })
@@ -321,17 +598,142 @@ onMounted(() => {
   const { applyCardSizeMultiplier } = useCardDesign()
   applyCardSizeMultiplier(isMobile ? 0.8 : undefined)
 
+  watch(decisionIsPending, () => {
+    if (decisionIsPending.value) showModal.value = true
+    if (koikoiIsCalled.value) handleKoikoi()
+    if (stopIsCalled.value) handleStop()
+  })
+
+  // Trigger shout animation during opponent replay (callKoikoiFor sets
+  // decision to 'koikoi' directly, bypassing the decisionIsPending watcher)
+  watch(koikoiIsCalled, (called) => {
+    if (called && isReplaying.value) {
+      shoutTimeout.value = setTimeout(() => {
+        shoutTimeout.value = null
+      }, 2000)
+    }
+  })
+
+  watch(turnCounter, () => {
+    // Handle an exhaustive draw condition
+    if (turnCounter.value !== 9) return
+    const drawConditions = [
+      handsEmpty.value,
+      ds.checkCurrentPhase('select'),
+      !decisionIsPending.value,
+      !stopIsCalled.value,
+    ]
+    if (drawConditions.every((cond) => cond === true)) {
+      showModal.value = true
+      // @ts-expect-error: CompletionEvent 'player' should not be null
+      handleCompletion({ player: null, score: 0 })
+      callStop()
+      ds.endRound()
+      // Stats are automatically tracked by useStatsTracking composable
+    }
+  })
+
   watch(roundOver, () => {
     // Ensure modal is closed when starting a new round during autoplay
     if (gameOver.value === true) return
-    if (roundOver.value === false) showModal.value = false
-  })
 
-  watch(activePlayer, () => {
-    if (autoOpponent.value && ps.players.p2.isActive) {
-      opponentPlay({ speed: 2 })
+    if (roundOver.value === false) {
+      showModal.value = false
+      showLoader.value = false
+      return
+    }
+
+    // When a round has ended in multiplayer, make sure the non-calling player
+    // also sees the round results modal. Their client will have roundOver = true
+    // after syncing, but decisionIsPending will be false so RoundResults renders
+    // in a read-only state (no KOI-KOI/STOP buttons).
+    if (isMultiplayerGame.value && !decisionIsPending.value) {
+      if (isReplaying.value) return // Suppressed; handled after replay settles
+      showModal.value = true
     }
   })
+
+  // When the match ends, ensure both players see the final results modal,
+  // even if they were not the calling / active player on the last turn.
+  watch(gameOver, () => {
+    if (!gameOver.value) return
+    if (isReplaying.value) return // Suppressed; handled in handleRemoteUpdate
+    showModal.value = true
+  })
+
+  watch(
+    activePlayer,
+    async (newActive, oldActive) => {
+      // Suppress all side-effects during opponent turn replay
+      if (isReplaying.value) return
+
+      // Single-player CPU opponent
+      if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {
+        opponentPlay({ speed: 2 })
+      }
+
+      // Update presence status based on whose turn it is (multiplayer only)
+      if (isMultiplayerGame.value && newActive) {
+        if (newActive.id === selfKey.value) {
+          // It's my turn - set status to 'playing'
+          await setMyStatus('playing').catch((err) =>
+            console.error('[Presence] Failed to set status to playing:', err),
+          )
+        } else if (oldActive && oldActive.id === selfKey.value) {
+          // My turn just ended - set status back to 'online'
+          await setMyStatus('online').catch((err) =>
+            console.error('[Presence] Failed to set status to online:', err),
+          )
+        }
+      }
+
+      // In multiplayer, when our local turn ends (we were active and now opponent is active),
+      // save a snapshot with the next active player.
+      if (isMultiplayerGame.value && oldActive && newActive && newActive.id !== oldActive.id) {
+        // Push a snapshot on any active-player change to avoid missing handoffs.
+        await pushMultiplayerSnapshot('turn-change', newActive.id as PlayerKey)
+      }
+    },
+    { flush: 'post' },
+  )
+
+  // Watch for opponent disconnection in multiplayer games
+  watch(
+    isOpponentDisconnected,
+    (disconnected, wasDisconnected) => {
+      // Only handle multiplayer games that are in progress
+      if (!isMultiplayerGame.value || gameOver.value || !gameStart.value) {
+        clearDisconnectGraceTimer()
+        showDisconnectModal.value = false
+        return
+      }
+
+      if (disconnected && !wasDisconnected) {
+        clearDisconnectGraceTimer()
+
+        // If opponent left intentionally with a message, show modal immediately
+        if (opponentPresence.value?.message) {
+          console.info('[Presence] Opponent left with message, showing disconnect modal immediately')
+          showDisconnectModal.value = true
+        } else {
+          // Network drop — start grace period
+          console.info('[Presence] Opponent disconnected, starting grace period')
+          disconnectGraceTimer.value = setTimeout(() => {
+            if (isOpponentDisconnected.value && isMultiplayerGame.value && !gameOver.value) {
+              console.info('[Presence] Grace period expired, showing disconnect modal')
+              showDisconnectModal.value = true
+            }
+          }, DISCONNECT_GRACE_PERIOD_MS)
+        }
+      } else if (!disconnected && wasDisconnected) {
+        // Opponent came back online
+        console.info('[Presence] Opponent reconnected')
+        clearDisconnectGraceTimer()
+        showDisconnectModal.value = false
+      }
+    },
+    { immediate: true },
+  )
 
   watch(gameStart, async () => {
     if (gameStart.value) {
@@ -343,15 +745,30 @@ onMounted(() => {
         mode: 'single' as 'single' | 'multiplayer',
       }))
 
-      if (resumeState.value.isResuming) {
-        // Game state already loaded by StartScreen's loadGameFromStorage()
-        // Just need to handle cleanup
+      if (resumeState.value.isResuming && resumeState.value.mode === 'multiplayer') {
+        // Multiplayer resume — rejoin the live session via orchestrator
+        console.debug('Resuming multiplayer game via rejoin')
+        try {
+          await rejoinMultiplayerGame(handleRemoteUpdate)
+        } catch (error) {
+          console.error('Error during multiplayer rejoin:', error)
+        } finally {
+          resumeState.value = {
+            isResuming: false,
+            saveKey: '',
+            saveData: null,
+            mode: 'single',
+          }
+          showLoader.value = false
+          autoOpponent.value = true
+        }
+      } else if (resumeState.value.isResuming) {
+        // Single-player resume — game state already loaded by StartScreen
         try {
           const { deleteSavedGame } = useStoreManager()
 
-          // Clear the save only for single-player mode (anti-scumming)
-          // Multiplayer saves persist until game is completed
-          if (resumeState.value.saveKey && resumeState.value.mode === 'single') {
+          // Clear the save for single-player mode (anti-scumming)
+          if (resumeState.value.saveKey) {
             console.info(`Deleting single-player save after resume: ${resumeState.value.saveKey}`)
             await deleteSavedGame(resumeState.value.saveKey)
             console.info('Single-player save deleted successfully')
@@ -370,18 +787,36 @@ onMounted(() => {
 
         showLoader.value = false
         autoOpponent.value = true
+      } else if (resumeState.value.mode === 'multiplayer') {
+        // Specialized initialization for a brand new multiplayer game
+        console.debug('Starting new multiplayer game with specialized initialization')
+        await initializeNewMultiplayerGame()
+        showLoader.value = false
+        autoOpponent.value = true
       } else {
-        // Normal new game initialization
-        console.debug('Starting new game - ensuring clean state...')
+        // Normal new game initialization (single-player)
+        console.debug('Starting new single-player game - ensuring clean state...')
+        isMultiplayerGame.value = false
+        localKey.value = 'p1'
         resetAllStores() // Ensure clean state before starting
         startRound()
       }
     } else {
       console.debug('Resetting game...')
-      if (!roundOver.value) ds.endRound()
-      if (!gameOver.value) handleClose()
-      // Additional cleanup - ensure stores are reset when returning to start screen
-      resetAllStores()
+
+      if (isMultiplayerGame.value) {
+        // Multiplayer leave: the game was already saved by handleMultiplayerLeave.
+        // Just clean up local subscriptions and state without touching Firestore
+        // or deleting the IDB save (so the player can resume later).
+        cleanupMultiplayerSubscription()
+        isMultiplayerGame.value = false
+        localKey.value = 'p1'
+        resetAllStores()
+      } else {
+        if (!roundOver.value) ds.endRound()
+        if (!gameOver.value) handleClose()
+        resetAllStores()
+      }
     }
   })
 })

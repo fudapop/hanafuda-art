@@ -104,7 +104,10 @@ const matchedCards = useMatchedCards()
 const revealedCard = computed(() => ds.checkCurrentPhase('draw') && selectedCard.value)
 const revealedCardImg = computed(() => (revealedCard.value ? getCardUrl(revealedCard.value) : null))
 
-const isDrawPhase = computed(() => ds.checkCurrentPhase('draw') && ps.players.p1.isActive)
+const { selfKey } = useLocalPlayerPerspective()
+const isDrawPhase = computed(
+  () => ds.checkCurrentPhase('draw') && ps.players[selfKey.value].isActive,
+)
 const autoOpponent = useState('opponent')
 
 const playDrawPhase = async () => {
@@ -140,7 +143,7 @@ const selectMatchFromField = async () => {
 watch(isDrawPhase, () => {
   if (isDrawPhase.value) {
     // If P2 is active, the turn is controlled by useAutoplay
-    if (autoOpponent.value && ps.players.p1.isActive) {
+    if (autoOpponent.value && ps.players[selfKey.value].isActive) {
       // Autoplay the draw phase for P1
       playDrawPhase()
     }

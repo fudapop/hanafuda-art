@@ -131,6 +131,21 @@ export interface SyncResult {
 
 export type GameMode = 'single' | 'multiplayer'
 
+export type GameStatus = 'waiting' | 'active' | 'completed' | 'abandoned' | 'cancelled'
+
+export type DisconnectReason = 'graceful_exit' | 'network_disconnect' | 'timeout' | 'forfeit'
+
+export type RoundAckState = {
+  round: number
+  p1: boolean
+  p2: boolean
+}
+
+export type FinalSeenState = {
+  p1: boolean
+  p2: boolean
+}
+
 export interface GameSaveRecord {
   id: string
   uid: string
@@ -142,6 +157,25 @@ export interface GameSaveRecord {
   p1?: string | null // Player 1 uid (null for single-player)
   p2?: string | null // Player 2 uid (null for single-player)
   activePlayer?: string | null // Current turn player uid (null for single-player)
+  roundAcks?: RoundAckState | null
+  finalSeen?: FinalSeenState | null
+  terminalStatus?: GameStatus | null
+}
+
+/**
+ * Invite code document stored in Firestore
+ * Collection: invite_codes
+ * Document ID: ${code}
+ */
+export type InviteCode = {
+  code: string
+  gameId: string
+  createdBy: string
+  createdAt: Date
+  expiresAt: Date
+  used: boolean
+  usedBy?: string
+  usedAt?: Date
 }
 
 /**
@@ -149,13 +183,22 @@ export interface GameSaveRecord {
  * Collection: multiplayer_games
  * Document ID: ${gameId}
  */
-export interface MultiplayerGame {
+export type MultiplayerGame = {
   gameId: string
   gameState: SerializedGameState
   mode: 'multiplayer'
   p1: string // Player 1 uid
-  p2: string // Player 2 uid
+  p2: string // Player 2 uid (empty string when waiting)
   activePlayer: string // Current turn player uid
+  status: GameStatus // Game lifecycle status
+  roundAcks?: RoundAckState | null // Per-round acknowledgement to advance
+  finalSeen?: FinalSeenState | null // Final modal seen flags
+  terminalStatus?: GameStatus | null // Terminal marker (completed/abandoned)
+  forfeitedBy?: string | null // UID of player who forfeited (opponent claimed victory)
+  forfeitReason?: DisconnectReason | null // Reason for forfeit
+  cancelReason?: string | null // Reason for cancellation (no stats recorded)
+  inviteCode?: string // Optional reference back to invite code
+  startedAt?: Date // When p2 joined
   lastUpdated: Date
   createdAt: Date
 }
@@ -167,4 +210,16 @@ export interface LocalGameSaveStore {
   set(save: GameSaveRecord): Promise<void>
   remove(uid: string, saveKey: string): Promise<void>
   clear(uid: string): Promise<void> // Clear all saves for user
+}
+
+/**
+ * Player presence state tracked in Realtime Database
+ * Path: /presence/{uid}
+ */
+export type PresenceState = {
+  uid: string
+  state: 'online' | 'offline' | 'playing' | 'unknown'
+  lastSeen: Date | null
+  currentGameId: string | null
+  message?: string | null // Optional message set when leaving a multiplayer game
 }

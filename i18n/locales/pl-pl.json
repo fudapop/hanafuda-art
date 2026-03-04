@@ -260,6 +260,42 @@
       "comingSoon": "Wkrótce"
     }
   },
+  "multiplayer": {
+    "new_match": "Nowy mecz wieloosobowy",
+    "create_game": "Utwórz grę",
+    "join_game": "Dołącz do gry",
+    "choose_option": "Rozpocznij nowy mecz wieloosobowy:",
+    "create_description": "Wygeneruj kod zaproszenia do udostępnienia",
+    "join_description": "Wprowadź kod zaproszenia od znajomego",
+    "creating_game": "Tworzenie gry...",
+    "game_created": "Gra utworzona!",
+    "share_code_message": "Udostępnij ten kod przeciwnikowi. Gra rozpocznie się, gdy dołączy.",
+    "invite_code": "Kod zaproszenia",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano!",
+    "waiting_for_opponent": "Oczekiwanie na przeciwnika...",
+    "cancel_game": "Anuluj grę",
+    "enter_code_message": "Wprowadź kod zaproszenia od znajomego, aby dołączyć do gry.",
+    "code_placeholder": "ABC-123",
+    "join": "Dołącz",
+    "validating_code": "Sprawdzanie kodu...",
+    "joining_game": "Dołączanie do gry...",
+    "try_again": "Spróbuj ponownie",
+    "invalid_code": "Nieprawidłowy kod zaproszenia",
+    "join_failed": "Nie udało się dołączyć do gry",
+    "error_creating_game": "Nie udało się utworzyć gry. Spróbuj ponownie.",
+    "opponent_online": "Online",
+    "opponent_offline": "Offline",
+    "opponent_playing": "W grze...",
+    "exit": {
+      "title": "Opuść grę wieloosobową",
+      "description": "Twoja gra zostanie automatycznie zapisana i możesz ją wznowić w dowolnym momencie. Twój przeciwnik zostanie powiadomiony, że opuściłeś grę.",
+      "messageLabel": "Zostaw wiadomość dla przeciwnika",
+      "messageOptional": "opcjonalne",
+      "messagePlaceholder": "np. 'Wrócę wkrótce!' lub 'Świetna gra!'",
+      "leaveGame": "Opuść grę"
+    }
+  },
   "settings": {
     "actions": {
       "toggleColorMode": "Przełącz tryb kolorów",

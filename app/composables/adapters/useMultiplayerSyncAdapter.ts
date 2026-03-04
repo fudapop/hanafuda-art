@@ -2,6 +2,8 @@ import {
   collection,
   doc,
   getDoc,
+  getDocFromCache,
+  getDocFromServer,
   getDocs,
   getFirestore,
   query,
@@ -71,18 +73,20 @@ function parseMultiplayerGame(
   data: Record<string, unknown>,
   docId?: string,
 ): MultiplayerGame | null {
+  const status = typeof data.status === 'string' ? data.status : undefined
+
+  const hasValidGameId = typeof data.gameId === 'string' && data.gameId !== ''
+  const hasGameState = !!data.gameState
+  const hasValidP1 = typeof data.p1 === 'string' && data.p1 !== ''
+
+  // For active / completed games, p2 must be a non-empty string.
+  // For waiting games, p2 may legitimately be empty until an opponent joins.
+  const hasValidP2 = typeof data.p2 === 'string' && (data.p2 !== '' || status === 'waiting')
+
+  const hasValidActivePlayer = typeof data.activePlayer === 'string' && data.activePlayer !== ''
+
   // Validate required fields
-  if (
-    typeof data.gameId !== 'string' ||
-    data.gameId === '' ||
-    !data.gameState ||
-    typeof data.p1 !== 'string' ||
-    data.p1 === '' ||
-    typeof data.p2 !== 'string' ||
-    data.p2 === '' ||
-    typeof data.activePlayer !== 'string' ||
-    data.activePlayer === ''
-  ) {
+  if (!hasValidGameId || !hasGameState || !hasValidP1 || !hasValidP2 || !hasValidActivePlayer) {
     console.error('Invalid multiplayer game data: missing or invalid required fields', {
       docId,
       gameId: data.gameId,
@@ -127,6 +131,43 @@ function parseMultiplayerGame(
   const lastUpdated = convertTimestamp(data.lastUpdated)
   const createdAt = convertTimestamp(data.createdAt)
 
+  const roundAcks =
+    data.roundAcks &&
+    typeof data.roundAcks === 'object' &&
+    typeof (data.roundAcks as any).round === 'number' &&
+    typeof (data.roundAcks as any).p1 === 'boolean' &&
+    typeof (data.roundAcks as any).p2 === 'boolean'
+      ? {
+          round: (data.roundAcks as any).round,
+          p1: (data.roundAcks as any).p1,
+          p2: (data.roundAcks as any).p2,
+        }
+      : null
+
+  const finalSeen =
+    data.finalSeen &&
+    typeof data.finalSeen === 'object' &&
+    typeof (data.finalSeen as any).p1 === 'boolean' &&
+    typeof (data.finalSeen as any).p2 === 'boolean'
+      ? {
+          p1: (data.finalSeen as any).p1,
+          p2: (data.finalSeen as any).p2,
+        }
+      : null
+
+  const terminalStatus =
+    typeof data.terminalStatus === 'string' && data.terminalStatus.length > 0
+      ? (data.terminalStatus as any)
+      : null
+
+  // Forfeit fields (optional)
+  const forfeitedBy =
+    typeof data.forfeitedBy === 'string' && data.forfeitedBy.length > 0 ? data.forfeitedBy : null
+  const forfeitReason =
+    typeof data.forfeitReason === 'string' && data.forfeitReason.length > 0
+      ? (data.forfeitReason as any)
+      : null
+
   return {
     gameId: data.gameId,
     gameState: data.gameState,
@@ -134,6 +175,12 @@ function parseMultiplayerGame(
     p1: data.p1,
     p2: data.p2,
     activePlayer: data.activePlayer,
+    status: data.status,
+    roundAcks,
+    finalSeen,
+    terminalStatus,
+    forfeitedBy,
+    forfeitReason,
     lastUpdated,
     createdAt,
   } as MultiplayerGame
@@ -145,11 +192,12 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
   return {
     name: 'firestore-multiplayer-games',
 
-    async get(gameId: string): Promise<MultiplayerGame | null> {
+    async get(gameId: string, cached?: boolean): Promise<MultiplayerGame | null> {
       try {
         const docRef = doc(db, 'multiplayer_games', gameId)
-        const docSnapshot = await getDoc(docRef)
+        const docSnapshot = cached ? await getDocFromCache(docRef) : await getDocFromServer(docRef)
 
+        console.log('RETRIEVED SNAPSHOT', Date.now())
         if (!docSnapshot.exists()) {
           return null
         }
@@ -209,14 +257,6 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
 
     async push(game: MultiplayerGame, callerUid: string): Promise<boolean> {
       try {
-        // Validate that caller is the active player
-        if (game.activePlayer !== callerUid) {
-          console.error(
-            `Push denied: caller ${callerUid} is not the active player ${game.activePlayer}`,
-          )
-          return false
-        }
-
         // Validate that caller is a participant
         if (game.p1 !== callerUid && game.p2 !== callerUid) {
           console.error(
@@ -235,6 +275,12 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
           p1: game.p1,
           p2: game.p2,
           activePlayer: game.activePlayer,
+          status: game.status,
+          roundAcks: game.roundAcks ?? null,
+          finalSeen: game.finalSeen ?? null,
+          terminalStatus: game.terminalStatus ?? null,
+          forfeitedBy: game.forfeitedBy ?? null,
+          forfeitReason: game.forfeitReason ?? null,
           lastUpdated:
             game.lastUpdated instanceof Date
               ? Timestamp.fromDate(game.lastUpdated)
@@ -244,6 +290,7 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
         }
 
         await setDoc(docRef, firestoreData, { merge: true })
+        console.log('PUSHED SNAPSHOT', Date.now())
         return true
       } catch (error) {
         console.error('Firestore multiplayer game push error:', error)
