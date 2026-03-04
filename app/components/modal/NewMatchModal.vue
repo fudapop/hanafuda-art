@@ -50,7 +50,7 @@
                 </svg>
               </div>
               <div class="flex-1">
-                <h4 class="font-semibold text-text-primary">
+                <h4 class="font-semibold text-text">
                   {{ t('multiplayer.create_game') }}
                 </h4>
                 <p class="text-sm text-text-secondary">
@@ -84,7 +84,7 @@
                 </svg>
               </div>
               <div class="flex-1">
-                <h4 class="font-semibold text-text-primary">
+                <h4 class="font-semibold text-text">
                   {{ t('multiplayer.join_game') }}
                 </h4>
                 <p class="text-sm text-text-secondary">
@@ -122,7 +122,7 @@
           class="px-6 py-2 text-sm font-medium transition-colors border rounded-lg border-text-secondary/30 text-text-secondary hover:bg-hanafuda-brown/10 active:scale-95"
           @click="handleClose"
         >
-          {{ t('common.cancel') }}
+          {{ t('common.actions.cancel') }}
         </button>
       </div>
       <div
@@ -133,7 +133,7 @@
           class="px-4 py-2 text-sm font-medium transition-colors border rounded-lg border-text-secondary/30 text-text-secondary hover:bg-hanafuda-brown/10 active:scale-95"
           @click="backToMenu"
         >
-          ← {{ t('common.back') }}
+          ← {{ t('common.actions.back') }}
         </button>
       </div>
     </template>

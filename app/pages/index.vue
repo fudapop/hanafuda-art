@@ -171,16 +171,10 @@ const canInteractLocalHand = computed(() => {
   const key = selfKey.value
   const can = current.player === key && current.phase === 'select'
   // Debug output to verify turn perspective on each client
-  console.debug('[canInteractLocalHand]', {
-    currentPlayer: current.player,
-    phase: current.phase,
-    selfKey: key,
-    can,
-  })
   return can
 })
 
-const { useSelectedCard } = useCardHandler()
+const { useSelectedCard, selectCardFromHand } = useCardHandler()
 const selectedCard = useSelectedCard()
 
 const { opponentPlay, useOpponent } = useAutoplay()
@@ -284,7 +278,6 @@ const handleStop = async () => {
 }
 
 const handleKoikoi = () => {
-  console.debug('>>> Called KOI-KOI')
   ps.incrementBonus()
   showModal.value = false
   shoutTimeout.value = setTimeout(() => {
@@ -339,7 +332,6 @@ const performFinalCleanup = async () => {
       const multiplayerKey = getSaveKeyForMode('multiplayer')
       const success = await deleteSavedGame(multiplayerKey)
       if (success) {
-        console.info('Deleted multiplayer save after match completion', multiplayerKey)
       }
     } catch (error) {
       console.error('Failed to delete multiplayer save after match completion:', error)
@@ -386,7 +378,6 @@ const handleCancelGame = async () => {
     )
 
     if (success) {
-      console.info('Game cancelled due to opponent disconnect')
 
       // Return to start screen — no stats, no results modal
       showDisconnectModal.value = false
@@ -414,9 +405,10 @@ const clearDisconnectGraceTimer = () => {
 
 // Reset all stores to initial state
 const resetAllStores = () => {
-  console.debug('Resetting all stores to initial state...')
   ds.reset() // Reset game data store
   ps.reset() // Reset player store to initial state (p1 active and dealer)
+  ps.setPlayerName('p1', 'Player 1')
+  ps.setPlayerName('p2', 'Player 2')
   useState('multiplayer-opponent').value = null // Clear opponent from multiplayer
   cs.reset() // Reset card store
   terminalStatus.value = null
@@ -436,7 +428,6 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
   // The replay's finally block reconciles with its own state, and we'll
   // re-reconcile with the buffered (newer) state after it completes.
   if (isReplaying.value) {
-    console.info('[handleRemoteUpdate] Buffering update received during replay')
     pendingRemoteUpdate.value = game
     return
   }
@@ -455,7 +446,6 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
       if (pendingRemoteUpdate.value) {
         const pending = pendingRemoteUpdate.value
         pendingRemoteUpdate.value = null
-        console.info('[handleRemoteUpdate] Reconciling with buffered update after replay')
         terminalStatus.value = pending.terminalStatus ?? terminalStatus.value ?? null
         if (pending.gameState) {
           await deserializeGameState(pending.gameState)
@@ -469,7 +459,6 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
     } else {
       const synced = await syncMultiplayerGame(game.gameId)
       if (!synced) {
-        console.warn('Failed to sync multiplayer game state after remote update')
       }
     }
 
@@ -667,6 +656,15 @@ onMounted(() => {
       // Suppress all side-effects during opponent turn replay
       if (isReplaying.value) return
 
+      // Auto-select first card in hand at turn start for the local player
+      if (newActive?.id === selfKey.value && ds.checkCurrentPhase('select')) {
+        const hand = cs.hand[selfKey.value]
+        if (hand.size > 0) {
+          const firstCard = [...hand][0]
+          if (firstCard) selectCardFromHand(firstCard)
+        }
+      }
+
       // Single-player CPU opponent
       if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {
         opponentPlay({ speed: 2 })
@@ -713,21 +711,17 @@ onMounted(() => {
 
         // If opponent left intentionally with a message, show modal immediately
         if (opponentPresence.value?.message) {
-          console.info('[Presence] Opponent left with message, showing disconnect modal immediately')
           showDisconnectModal.value = true
         } else {
           // Network drop — start grace period
-          console.info('[Presence] Opponent disconnected, starting grace period')
           disconnectGraceTimer.value = setTimeout(() => {
             if (isOpponentDisconnected.value && isMultiplayerGame.value && !gameOver.value) {
-              console.info('[Presence] Grace period expired, showing disconnect modal')
               showDisconnectModal.value = true
             }
           }, DISCONNECT_GRACE_PERIOD_MS)
         }
       } else if (!disconnected && wasDisconnected) {
         // Opponent came back online
-        console.info('[Presence] Opponent reconnected')
         clearDisconnectGraceTimer()
         showDisconnectModal.value = false
       }
@@ -747,7 +741,6 @@ onMounted(() => {
 
       if (resumeState.value.isResuming && resumeState.value.mode === 'multiplayer') {
         // Multiplayer resume — rejoin the live session via orchestrator
-        console.debug('Resuming multiplayer game via rejoin')
         try {
           await rejoinMultiplayerGame(handleRemoteUpdate)
         } catch (error) {
@@ -769,9 +762,7 @@ onMounted(() => {
 
           // Clear the save for single-player mode (anti-scumming)
           if (resumeState.value.saveKey) {
-            console.info(`Deleting single-player save after resume: ${resumeState.value.saveKey}`)
             await deleteSavedGame(resumeState.value.saveKey)
-            console.info('Single-player save deleted successfully')
           }
         } catch (error) {
           console.error('Error during save cleanup:', error)
@@ -789,20 +780,17 @@ onMounted(() => {
         autoOpponent.value = true
       } else if (resumeState.value.mode === 'multiplayer') {
         // Specialized initialization for a brand new multiplayer game
-        console.debug('Starting new multiplayer game with specialized initialization')
         await initializeNewMultiplayerGame()
         showLoader.value = false
         autoOpponent.value = true
       } else {
         // Normal new game initialization (single-player)
-        console.debug('Starting new single-player game - ensuring clean state...')
         isMultiplayerGame.value = false
         localKey.value = 'p1'
         resetAllStores() // Ensure clean state before starting
         startRound()
       }
     } else {
-      console.debug('Resetting game...')
 
       if (isMultiplayerGame.value) {
         // Multiplayer leave: the game was already saved by handleMultiplayerLeave.

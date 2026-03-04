@@ -1,5 +1,9 @@
 <template>
-  <ul class="h-full mx-auto w-max isolate">
+  <ul
+    :role="id === selfKey ? 'listbox' : 'list'"
+    :aria-label="t(id === selfKey ? 'game.regions.yourHand' : 'game.regions.opponentHand')"
+    class="h-full mx-auto w-max isolate"
+  >
     <li
       v-for="(card, index) in displayedCards.filter((card) => card)"
       :key="index"
@@ -17,6 +21,8 @@
       >
         <div
           v-if="card"
+          :role="id === selfKey ? 'option' : 'listitem'"
+          :aria-selected="id === selfKey ? selectedCard === card : undefined"
           :class="{
             'card drop-shadow-md overflow-hidden cursor-pointer transition-transform relative origin-bottom': true,
             'drop-shadow-xl -translate-y-2 z-20': matchedCards?.includes(card),
@@ -54,6 +60,8 @@ import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
+
+const { t } = useI18n()
 
 const props = defineProps<{ id: PlayerKey; canInteract?: boolean }>()
 const id = props.id

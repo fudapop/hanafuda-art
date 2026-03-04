@@ -18,14 +18,9 @@
       v-else-if="state === 'waiting'"
       class="flex flex-col items-center gap-6 py-6"
     >
-      <div class="text-center">
-        <h3 class="text-lg font-semibold text-text-primary">
-          {{ t('multiplayer.game_created') }}
-        </h3>
-        <p class="mt-2 text-sm text-text-secondary">
-          {{ t('multiplayer.share_code_message') }}
-        </p>
-      </div>
+      <p class="text-sm text-text-secondary">
+        {{ t('multiplayer.share_code_message') }}
+      </p>
 
       <!-- Invite Code Display -->
       <div class="flex flex-col items-center gap-3">

@@ -219,6 +219,15 @@
       "gotDealtA": "got dealt a",
       "koiKoiBonus": "Koi-Koi Bonus"
     },
+    "regions": {
+      "yourHand": "Your hand",
+      "opponentHand": "Opponent's hand",
+      "field": "Field",
+      "yourCollection": "Your collection",
+      "opponentCollection": "Opponent's collection",
+      "yourTurn": "Your turn",
+      "opponentTurn": "Waiting for opponent"
+    },
     "cardTypes": {
       "bright": "bright",
       "animal": "animal",
@@ -295,7 +304,9 @@
       "messageLabel": "Leave a message for your opponent",
       "messageOptional": "optional",
       "messagePlaceholder": "e.g., 'Be back soon!' or 'Great game!'",
-      "leaveGame": "Leave Game"
+      "leaveGame": "Leave Game",
+      "forfeitGame": "Forfeit Game",
+      "forfeitWarning": "Forfeiting will count as a loss."
     },
     "disconnect": {
       "title": "Opponent Disconnected",

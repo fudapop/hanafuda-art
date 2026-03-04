@@ -160,7 +160,6 @@ export const usePresence = (): PresenceComposable => {
   const initializePresence = async (gameId: string): Promise<void> => {
     const uid = currentProfile.value?.uid
     if (!uid) {
-      console.warn('Cannot initialize presence: user not authenticated')
       return
     }
 
@@ -172,7 +171,6 @@ export const usePresence = (): PresenceComposable => {
     // Monitor connection status
     connectedUnsubscribe.value = onValue(connectedRef, (snapshot) => {
       if (snapshot.val() === true) {
-        console.debug('[Presence] Connected to RTDB')
 
         // CRITICAL: Set onDisconnect FIRST (server acknowledges immediately)
         // This ensures the offline handler is registered before we go online
@@ -183,7 +181,6 @@ export const usePresence = (): PresenceComposable => {
             currentGameId: null,
           })
           .then(() => {
-            console.debug('[Presence] onDisconnect handler registered')
           })
           .catch((error) => {
             console.error('[Presence] Failed to set onDisconnect handler:', error)
@@ -198,7 +195,6 @@ export const usePresence = (): PresenceComposable => {
           console.error('[Presence] Failed to set online status:', error)
         })
       } else {
-        console.debug('[Presence] Disconnected from RTDB')
       }
     })
 
@@ -209,7 +205,6 @@ export const usePresence = (): PresenceComposable => {
       // Intentionally empty - just keeps connection alive
     })
 
-    console.info(`[Presence] Initialized for user ${uid} in game ${gameId}`)
   }
 
   /**
@@ -217,7 +212,6 @@ export const usePresence = (): PresenceComposable => {
    */
   const subscribeToOpponentPresence = (opponentUid: string): Unsubscribe | null => {
     if (!opponentUid) {
-      console.warn('Cannot subscribe to opponent presence: invalid uid')
       return null
     }
 
@@ -239,7 +233,6 @@ export const usePresence = (): PresenceComposable => {
           message: data.message || null,
         }
 
-        console.debug('[Presence] Opponent status updated:', opponentPresence.value)
       } else {
         // No presence data for opponent yet
         opponentPresence.value = {
@@ -250,11 +243,9 @@ export const usePresence = (): PresenceComposable => {
           message: null,
         }
 
-        console.debug('[Presence] No presence data for opponent')
       }
     })
 
-    console.info(`[Presence] Subscribed to opponent ${opponentUid}`)
     return opponentUnsubscribe.value
   }
 
@@ -264,7 +255,6 @@ export const usePresence = (): PresenceComposable => {
   const setMyStatus = async (status: 'online' | 'playing'): Promise<void> => {
     const uid = currentProfile.value?.uid
     if (!uid) {
-      console.warn('[Presence] Cannot set status: user not authenticated')
       return
     }
 
@@ -277,7 +267,6 @@ export const usePresence = (): PresenceComposable => {
         lastSeen: serverTimestamp(),
         currentGameId: currentGameId.value,
       })
-      console.debug(`[Presence] Status updated to: ${status}`)
     } catch (error) {
       console.error('[Presence] Failed to update status:', error)
     }
@@ -290,7 +279,6 @@ export const usePresence = (): PresenceComposable => {
   const setMessage = async (message: string | null): Promise<void> => {
     const uid = currentProfile.value?.uid
     if (!uid) {
-      console.warn('[Presence] Cannot set message: user not authenticated')
       return
     }
 
@@ -299,10 +287,9 @@ export const usePresence = (): PresenceComposable => {
 
     try {
       await update(userStatusRef, {
-        message: message || null,
+        message: message ? message.slice(0, 200) : null,
         lastSeen: serverTimestamp(),
       })
-      console.debug(`[Presence] Message updated: ${message || 'cleared'}`)
     } catch (error) {
       console.error('[Presence] Failed to set message:', error)
     }
@@ -335,31 +322,10 @@ export const usePresence = (): PresenceComposable => {
   const cleanup = async (): Promise<void> => {
     const uid = currentProfile.value?.uid
 
-    // Unsubscribe from connection monitoring
-    if (connectedUnsubscribe.value) {
-      connectedUnsubscribe.value()
-      connectedUnsubscribe.value = null
-      console.debug('[Presence] Unsubscribed from connection monitoring')
-    }
-
-    // Unsubscribe from opponent presence
-    if (opponentUnsubscribe.value) {
-      opponentUnsubscribe.value()
-      opponentUnsubscribe.value = null
-      console.debug('[Presence] Unsubscribed from opponent presence')
-    }
-
-    // Unsubscribe from keepalive listener
-    if (keepaliveUnsubscribe.value) {
-      keepaliveUnsubscribe.value()
-      keepaliveUnsubscribe.value = null
-      console.debug('[Presence] Unsubscribed from keepalive listener')
-    }
-
-    // Mark user offline and cancel the server-side onDisconnect handler
-    // (we're explicitly going offline, so the handler is no longer needed)
-    if (uid && rtdb) {
-      const userStatusRef = dbRef(rtdb, `presence/${uid}`)
+    // Write offline status before tearing down listeners to keep connection alive
+    const db = uid ? initRTDB() : null
+    if (uid && db) {
+      const userStatusRef = dbRef(db, `presence/${uid}`)
       try {
         await onDisconnect(userStatusRef).cancel()
         await update(userStatusRef, {
@@ -367,10 +333,15 @@ export const usePresence = (): PresenceComposable => {
           lastSeen: serverTimestamp(),
           currentGameId: null,
         })
-        console.info('[Presence] Marked user offline and cancelled onDisconnect')
       } catch (error) {
         console.error('[Presence] Failed to mark offline:', error)
       }
+    }
+
+    const listeners = [connectedUnsubscribe, opponentUnsubscribe, keepaliveUnsubscribe]
+    for (const listener of listeners) {
+      listener.value?.()
+      listener.value = null
     }
 
     // Reset state

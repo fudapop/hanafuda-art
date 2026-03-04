@@ -18,6 +18,9 @@
         <p class="text-text">
           {{ t('multiplayer.exit.description') }}
         </p>
+        <p class="text-sm text-red-500">
+          {{ t('multiplayer.exit.forfeitWarning') }}
+        </p>
         <div>
           <label
             for="exit-message"
@@ -41,14 +44,23 @@
       </div>
     </template>
     <template #actions>
-      <div class="flex flex-col-reverse gap-3 mt-6 sm:flex-row sm:justify-end">
+      <div class="grid grid-flow-row-dense gap-3 mt-6 sm:grid-cols-3">
         <!-- Cancel button -->
         <button
           type="button"
-          class="px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-300 border rounded-xs border-border hover:bg-surface/50"
+          class="px-4 py-2 text-sm font-medium tracking-wide text-text transition-colors duration-300 border rounded-xs border-border hover:bg-surface/50"
           @click="handleCancel"
         >
           {{ t('common.actions.cancel') }}
+        </button>
+        <!-- Destructive action: Forfeit - Red/danger styling -->
+        <button
+          type="button"
+          class="px-4 py-2 text-sm font-medium tracking-wide text-red-500 transition-colors duration-300 border border-red-300 rounded-xs hover:bg-red-50 hover:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="isSaving"
+          @click="handleForfeit"
+        >
+          {{ t('multiplayer.exit.forfeitGame') }}
         </button>
         <!-- Leave Game button -->
         <button
@@ -78,6 +90,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   leave: [message: string | null]
+  forfeit: [message: string | null]
   cancel: []
 }>()
 
@@ -87,6 +100,11 @@ const message = ref('')
 const handleLeave = () => {
   const trimmedMessage = message.value.trim() || null
   emit('leave', trimmedMessage)
+}
+
+const handleForfeit = () => {
+  const trimmedMessage = message.value.trim() || null
+  emit('forfeit', trimmedMessage)
 }
 
 const handleCancel = () => {

@@ -22,6 +22,7 @@ import {
 } from 'firebase/firestore'
 import type { InviteCode, MultiplayerGame } from '~~/types/profile'
 import { useCardStore } from '~~/stores/cardStore'
+import { usePlayerStore } from '~~/stores/playerStore'
 
 export type OpponentPlayer = {
   uid: string
@@ -148,8 +149,13 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
         username: opponentData.username,
         avatar: opponentData.avatar,
       }
-    } else {
-      console.warn('Unable to retrieve opponent details')
+
+      // Also update the playerStore so the name persists through store resets
+      const { opponentKey } = useLocalPlayerPerspective()
+      const ps = usePlayerStore()
+      if (opponentData.username) {
+        ps.setPlayerName(opponentKey.value, opponentData.username)
+      }
     }
   }
 
@@ -320,9 +326,6 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
 
       const synced = await syncMultiplayerGame(gameId)
       if (!synced) {
-        console.warn(
-          `Multiplayer game ${gameId} joined successfully, but local cache was not updated by syncMultiplayerGame`,
-        )
       }
     } catch (error) {
       console.error('Error syncing multiplayer game after join:', error)
@@ -468,7 +471,6 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
     }
 
     try {
-      console.log('Looking up code', code)
       // Lookup code in Firestore
       const codeDoc = await getDoc(doc(db, 'invite_codes', code))
 
@@ -501,7 +503,6 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
           error: 'This invite code has already been used.',
         }
       }
-      console.log({ inviteData })
 
       // Verify game exists and is in waiting status
       const gameDoc = await getDoc(doc(db, 'multiplayer_games', inviteData.gameId))

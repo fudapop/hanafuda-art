@@ -211,6 +211,15 @@
       "gotDealtA": "a reçu un",
       "koiKoiBonus": "Bonus Koi-Koi"
     },
+    "regions": {
+      "yourHand": "Votre main",
+      "opponentHand": "Main de l'adversaire",
+      "field": "Terrain",
+      "yourCollection": "Votre collection",
+      "opponentCollection": "Collection de l'adversaire",
+      "yourTurn": "Votre tour",
+      "opponentTurn": "En attente de l'adversaire"
+    },
     "cardTypes": {
       "bright": "brillante",
       "animal": "animal",
@@ -531,7 +540,9 @@
       "messageLabel": "Laisser un message à votre adversaire",
       "messageOptional": "optionnel",
       "messagePlaceholder": "ex. 'Je reviens bientôt !' ou 'Belle partie !'",
-      "leaveGame": "Quitter la partie"
+      "leaveGame": "Quitter la partie",
+      "forfeitGame": "Abandonner la partie",
+      "forfeitWarning": "Abandonner comptera comme une défaite."
     }
   },
   "pages": {

@@ -9,6 +9,7 @@
       <ul
         v-for="type in cardTypes"
         :key="type"
+        :aria-label="`${player === selfKey ? t('game.regions.yourCollection') : t('game.regions.opponentCollection')} - ${t(`game.cardTypes.${type}`)}`"
         :class="[
           'relative inline-flex flex-wrap justify-end w-full -gap-2',
           isMobileLandscape && 'max-w-16 h-8',

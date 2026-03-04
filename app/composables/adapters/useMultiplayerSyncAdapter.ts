@@ -81,7 +81,7 @@ function parseMultiplayerGame(
 
   // For active / completed games, p2 must be a non-empty string.
   // For waiting games, p2 may legitimately be empty until an opponent joins.
-  const hasValidP2 = typeof data.p2 === 'string' && (data.p2 !== '' || status === 'waiting')
+  const hasValidP2 = typeof data.p2 === 'string' && (data.p2 !== '' || status === 'waiting' || status === 'abandoned' || status === 'cancelled')
 
   const hasValidActivePlayer = typeof data.activePlayer === 'string' && data.activePlayer !== ''
 
@@ -197,7 +197,6 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
         const docRef = doc(db, 'multiplayer_games', gameId)
         const docSnapshot = cached ? await getDocFromCache(docRef) : await getDocFromServer(docRef)
 
-        console.log('RETRIEVED SNAPSHOT', Date.now())
         if (!docSnapshot.exists()) {
           return null
         }
@@ -290,7 +289,6 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
         }
 
         await setDoc(docRef, firestoreData, { merge: true })
-        console.log('PUSHED SNAPSHOT', Date.now())
         return true
       } catch (error) {
         console.error('Firestore multiplayer game push error:', error)

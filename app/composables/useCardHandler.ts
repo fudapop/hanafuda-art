@@ -277,6 +277,7 @@ export const useCardHandler = () => {
     useMatchedCards,
     handleCardSelect,
     handlePlayerDiscard,
+    selectCardFromHand,
     matchExists,
     useActions,
   })

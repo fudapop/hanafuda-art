@@ -135,6 +135,15 @@
       <PlayerStatusBar :user="user" />
     </div>
 
+    <!-- TURN ANNOUNCEMENT (screen reader only) -->
+    <div
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    >
+      {{ turnAnnouncement }}
+    </div>
+
     <!-- LOADER -->
     <Transition
       appear
@@ -173,6 +182,7 @@
       :isSaving="isSaving"
       @cancel="leavingGame = false"
       @leave="handleMultiplayerLeave"
+      @forfeit="handleMultiplayerForfeit"
     />
     <!-- <FeedbackForm
       :open="promptFeedback"
@@ -199,7 +209,7 @@ const { currentDesign } = useCardDesign()
 const { t } = useI18n()
 const { $clientPosthog } = useNuxtApp()
 
-const { players } = storeToRefs(usePlayerStore())
+const { players, activePlayer } = storeToRefs(usePlayerStore())
 const { selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const { current: user } = useProfile()
 
@@ -209,8 +219,17 @@ const isSaving = ref(false)
 // const promptFeedback = ref(false)
 const promptSignup = ref(false)
 const showLoader = ref(false)
+
+const turnAnnouncement = computed(() => {
+  if (!gameStart.value) return ''
+  return activePlayer.value.id === selfKey.value
+    ? t('game.regions.yourTurn')
+    : t('game.regions.opponentTurn')
+})
+
 const localPlayerInactive = computed(() => {
   if (isMultiplayerGame.value) return false
+  // In single-player mode, the human is always p1
   return gameStart.value && !players.value.p1.isActive
 })
 
@@ -299,6 +318,61 @@ const handleMultiplayerLeave = async (message: string | null) => {
   } catch (error) {
     console.error('Failed to save multiplayer game:', error)
     // Still exit even if save fails
+    leavingGame.value = false
+    gameStart.value = false
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const handleMultiplayerForfeit = async (message: string | null) => {
+  $clientPosthog?.capture('forfeit_multiplayer_game')
+  isSaving.value = true
+
+  try {
+    const { forfeitMultiplayerGame } = useStoreManager()
+    const { current: currentProfile, updateGameRecord } = useProfile()
+    const { setMessage, cleanup: cleanupPresence } = usePresence()
+
+    if (!currentProfile.value) {
+      throw new Error('User not authenticated')
+    }
+
+    const multiplayerMeta = useState<{
+      isNew: boolean
+      gameId: string
+      p1: string
+      p2: string
+      activePlayerUid: string
+    }>('multiplayer-game-meta', () => ({
+      isNew: false,
+      gameId: '',
+      p1: '',
+      p2: '',
+      activePlayerUid: '',
+    }))
+
+    await forfeitMultiplayerGame(
+      multiplayerMeta.value.gameId,
+      currentProfile.value.uid,
+      'forfeit',
+    )
+
+    // Record the loss in player stats
+    await updateGameRecord('loss', 0)
+
+    // Set forfeit message so opponent sees it immediately
+    const forfeitMessage = message
+      ? `${t('multiplayer.exit.forfeitGame')}: ${message}`
+      : t('multiplayer.exit.forfeitGame')
+    await setMessage(forfeitMessage)
+
+    await cleanupPresence()
+
+    leavingGame.value = false
+    gameStart.value = false
+  } catch (error) {
+    console.error('Failed to forfeit multiplayer game:', error)
     leavingGame.value = false
     gameStart.value = false
   } finally {

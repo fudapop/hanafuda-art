@@ -71,13 +71,6 @@ export const useMultiplayerOrchestrator = () => {
 
     try {
       await saveMultiplayerGame(p1, p2, activeUid, plainMetadata)
-      console.info(`Multiplayer snapshot saved (${context})`, {
-        gameId: multiplayerMeta.value.gameId,
-        p1,
-        p2,
-        activePlayerUid: activeUid,
-        terminalStatus: plainMetadata.terminalStatus,
-      })
     } catch (error) {
       console.error(`Failed to save multiplayer snapshot (${context}):`, error)
     }
@@ -100,7 +93,6 @@ export const useMultiplayerOrchestrator = () => {
     }))
 
     if (!multiplayerMeta.value.isNew || !multiplayerMeta.value.gameId) {
-      console.warn('initGame called without multiplayer meta; falling back')
       callbacks.resetAllStores()
       await callbacks.startRound()
       return
@@ -112,10 +104,6 @@ export const useMultiplayerOrchestrator = () => {
 
     // Ensure the game data store uses the canonical multiplayer gameId from Firestore
     if (multiplayerMeta.value.gameId && gameId.value !== multiplayerMeta.value.gameId) {
-      console.debug('[initGame] Syncing local gameId to multiplayer meta', {
-        previousGameId: gameId.value,
-        multiplayerGameId: multiplayerMeta.value.gameId,
-      })
       gameId.value = multiplayerMeta.value.gameId
     }
 
@@ -125,7 +113,6 @@ export const useMultiplayerOrchestrator = () => {
       (currentUid === multiplayerMeta.value.p1 || currentUid === multiplayerMeta.value.p2)
     ) {
       localKey.value = currentUid === multiplayerMeta.value.p1 ? 'p1' : 'p2'
-      await setOpponentPlayer(multiplayerMeta.value[opponentKey.value])
       isMultiplayerGame.value = true
     } else {
       localKey.value = 'p1'
@@ -138,7 +125,6 @@ export const useMultiplayerOrchestrator = () => {
     initializeSync()
 
     if (isStarter) {
-      console.info('Initializing new multiplayer game as starting player', multiplayerMeta.value)
 
       // Start with a clean state and run normal round initialization
       callbacks.resetAllStores()
@@ -153,36 +139,37 @@ export const useMultiplayerOrchestrator = () => {
           multiplayerMeta.value.p2,
           multiplayerMeta.value.activePlayerUid,
         )
-        console.info('Multiplayer game state saved and pushed by starting player')
       } catch (error) {
         console.error('Failed to save multiplayer game from starting player:', error)
       }
-      console.log('STARTER INITIALIZED', Date.now())
     } else {
-      console.info(
-        'Joining new multiplayer game as non-starting player, syncing from remote state',
-        multiplayerMeta.value,
-      )
-
       try {
         const maxAttempts = 3
+        let synced = false
 
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
-          const synced = await syncMultiplayerGame(multiplayerMeta.value.gameId)
+          synced = await syncMultiplayerGame(multiplayerMeta.value.gameId)
           if (synced) {
             break
           }
-          console.warn(
-            `Multiplayer game ${multiplayerMeta.value.gameId} not yet initialized by starter (attempt ${attempt + 1}/${maxAttempts})`,
-          )
-
           // Small delay before retrying to give starter time to push state
           await sleep(1000)
         }
-        console.log('NON-STARTER INITIALIZED', Date.now())
+
+        if (!synced) {
+          console.error(
+            `[initGame] Failed to sync multiplayer game after ${maxAttempts} attempts`,
+            multiplayerMeta.value.gameId,
+          )
+        }
       } catch (error) {
         console.error('Failed to sync/load multiplayer game for non-starting player:', error)
       }
+    }
+
+    // Fetch opponent profile after store resets so it doesn't get cleared
+    if (isMultiplayerGame.value) {
+      await setOpponentPlayer(multiplayerMeta.value[opponentKey.value])
     }
 
     // Mark meta as no longer "new" so subsequent starts use regular resume/new logic
@@ -199,7 +186,6 @@ export const useMultiplayerOrchestrator = () => {
     const opponentUid = multiplayerMeta.value[opponentKey.value]
     if (opponentUid) {
       subscribeToOpponentPresence(opponentUid)
-      console.info(`[Multiplayer] Subscribed to opponent presence: ${opponentUid}`)
     }
   }
 
@@ -219,13 +205,11 @@ export const useMultiplayerOrchestrator = () => {
     }))
 
     if (!multiplayerMeta.value.gameId) {
-      console.warn('rejoinGame called without multiplayer meta')
       return
     }
 
     const currentUid = currentProfile.value?.uid
     if (!currentUid) {
-      console.warn('rejoinGame called without authenticated user')
       return
     }
 
@@ -251,7 +235,6 @@ export const useMultiplayerOrchestrator = () => {
     // Sync latest state from Firestore
     const synced = await syncMultiplayerGame(multiplayerMeta.value.gameId)
     if (!synced) {
-      console.warn('Failed to sync multiplayer game during rejoin')
     }
 
     // Clean up any existing subscription
@@ -269,11 +252,9 @@ export const useMultiplayerOrchestrator = () => {
     const opponentUid = multiplayerMeta.value[opponentKey.value]
     if (opponentUid) {
       subscribeToOpponentPresence(opponentUid)
-      console.info(`[Multiplayer Rejoin] Subscribed to opponent presence: ${opponentUid}`)
     }
 
     // Load opponent profile
-    console.info('[Multiplayer Rejoin] Successfully rejoined game', multiplayerMeta.value.gameId)
   }
 
   /**

@@ -211,6 +211,15 @@
       "gotDealtA": "otrzymujesz",
       "koiKoiBonus": "Bonus koi-koi"
     },
+    "regions": {
+      "yourHand": "Twoja ręka",
+      "opponentHand": "Ręka przeciwnika",
+      "field": "Pole",
+      "yourCollection": "Twoja kolekcja",
+      "opponentCollection": "Kolekcja przeciwnika",
+      "yourTurn": "Twoja kolej",
+      "opponentTurn": "Oczekiwanie na przeciwnika"
+    },
     "cardTypes": {
       "bright": "światło",
       "animal": "zwierzę",
@@ -293,7 +302,9 @@
       "messageLabel": "Zostaw wiadomość dla przeciwnika",
       "messageOptional": "opcjonalne",
       "messagePlaceholder": "np. 'Wrócę wkrótce!' lub 'Świetna gra!'",
-      "leaveGame": "Opuść grę"
+      "leaveGame": "Opuść grę",
+      "forfeitGame": "Poddaj się",
+      "forfeitWarning": "Poddanie się zostanie uznane za przegraną."
     }
   },
   "settings": {

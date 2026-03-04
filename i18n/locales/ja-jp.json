@@ -211,6 +211,15 @@
       "gotDealtA": "が配られました",
       "koiKoiBonus": "こいこいボーナス"
     },
+    "regions": {
+      "yourHand": "あなたの手札",
+      "opponentHand": "相手の手札",
+      "field": "場",
+      "yourCollection": "あなたの獲得札",
+      "opponentCollection": "相手の獲得札",
+      "yourTurn": "あなたの番です",
+      "opponentTurn": "相手の番を待っています"
+    },
     "cardTypes": {
       "bright": "光",
       "animal": "種",
@@ -293,7 +302,9 @@
       "messageLabel": "対戦相手へのメッセージ",
       "messageOptional": "任意",
       "messagePlaceholder": "例：「すぐに戻ります！」または「いいゲームでした！」",
-      "leaveGame": "ゲームを退出"
+      "leaveGame": "ゲームを退出",
+      "forfeitGame": "投了する",
+      "forfeitWarning": "投了すると負けになります。"
     }
   },
   "settings": {

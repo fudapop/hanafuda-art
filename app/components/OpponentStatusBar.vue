@@ -9,7 +9,7 @@
             :alt="opponentName"
           />
         </div>
-        <div class="flex flex-col justify-start">
+        <div class="flex items-start sm:flex-col sm:justify-start gap-x-2">
           <div
             :class="[
               'flex text-sm gap-x-4  text-white/90',

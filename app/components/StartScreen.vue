@@ -371,7 +371,6 @@ const initializeSettingsFromProfile = () => {
   if (!currentProfile.value?.settings) return
   if (config.settingsLoaded === true) return
 
-  console.info('Loading user settings', currentProfile.value.settings)
   config.loadUserSettings(currentProfile.value.settings as any)
 }
 
@@ -389,12 +388,6 @@ const initializeDesignFromProfile = () => {
   // Check if stored design is available to the user
   const isStoredDesignAvailable = storedDesign && unlockedDesigns.includes(storedDesign)
 
-  console.info('Loading deck design', {
-    current: currentDesign.value,
-    stored: storedDesign,
-    unlockedDesigns,
-    favoriteDesigns,
-  })
 
   // Do not override an explicit non-default selection
   if (currentDesign.value && currentDesign.value !== SYSTEM_DEFAULT_DESIGN) {
@@ -431,8 +424,6 @@ onMounted(async () => {
       initializeSync()
       const remoteGame = await getMultiplayerGame(mpSave.gameId)
       if (!remoteGame || remoteGame.status !== 'active') {
-        // Game is no longer active — delete the stale local save
-        console.info(`Multiplayer game ${mpSave.gameId} is no longer active (status: ${remoteGame?.status ?? 'not found'}), deleting stale save`)
         await deleteSavedGame(mpSave.key)
         savedGames.value = await listSavedGames()
         staleMatchMessage.value = t('multiplayer.disconnect.matchEnded')
@@ -629,7 +620,6 @@ const startNewSinglePlayerGame = async () => {
     mode: 'single',
   }
 
-  console.debug('Starting new single-player game - will initialize clean state')
   emit('start-game')
 }
 
@@ -638,7 +628,6 @@ const startNewMultiplayerGame = async () => {
 }
 
 const handleGameCreated = async ({ gameId }: { gameId: string; code: string }) => {
-  console.log('Game created, opponent joined. Preparing new multiplayer match:', gameId)
   showNewMatchModal.value = false
 
   // Initialize multiplayer sync adapter and fetch latest multiplayer game meta
@@ -647,7 +636,6 @@ const handleGameCreated = async ({ gameId }: { gameId: string; code: string }) =
   const game = games.find((g) => g.gameId === gameId)
 
   if (!game) {
-    console.warn('Multiplayer game not found in list after creation; falling back to resume flow')
     savedGames.value = await listSavedGames()
     await resumeMultiplayerGame()
     return
@@ -696,7 +684,6 @@ const handleGameCreated = async ({ gameId }: { gameId: string; code: string }) =
 }
 
 const handleGameJoined = async ({ gameId }: { gameId: string }) => {
-  console.log('Joined game. Preparing new multiplayer match:', gameId)
   showNewMatchModal.value = false
 
   // Initialize multiplayer sync adapter and fetch latest multiplayer game meta
@@ -705,7 +692,6 @@ const handleGameJoined = async ({ gameId }: { gameId: string }) => {
   const game = games.find((g) => g.gameId === gameId)
 
   if (!game) {
-    console.warn('Multiplayer game not found in list after join; falling back to resume flow')
     savedGames.value = await listSavedGames()
     await resumeMultiplayerGame()
     return

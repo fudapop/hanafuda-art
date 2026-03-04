@@ -21,14 +21,12 @@ logs
 wip
 .firebase
 assets/HNFD*
-.cursorrules
 /notes
 .genkit
-.claude
-WARP.md
-CLAUDE.md
-GEMINI.md
 archive/
+.claude/
+.cursor/
+.cursorrules
 
 # Local env files
 .env

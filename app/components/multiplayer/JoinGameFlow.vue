@@ -5,14 +5,9 @@
       v-if="state === 'input'"
       class="flex flex-col gap-6 py-6"
     >
-      <div class="text-center">
-        <h3 class="text-lg font-semibold text-text-primary">
-          {{ t('multiplayer.join_game') }}
-        </h3>
-        <p class="mt-2 text-sm text-text-secondary">
-          {{ t('multiplayer.enter_code_message') }}
-        </p>
-      </div>
+      <p class="text-sm text-text-secondary">
+        {{ t('multiplayer.enter_code_message') }}
+      </p>
 
       <!-- Code Input -->
       <div class="flex flex-col gap-2">
@@ -27,7 +22,7 @@
           v-model="inviteCode"
           type="text"
           :placeholder="t('multiplayer.code_placeholder')"
-          class="px-4 py-3 font-mono text-xl tracking-wider text-center uppercase transition-colors border-2 rounded-lg outline-none bg-hanafuda-cream dark:bg-hanafuda-brown/20 border-text-secondary/30 text-text-primary placeholder:text-text-secondary/50 focus:border-hanafuda-red"
+          class="px-4 py-3 font-mono text-xl tracking-wider text-center uppercase transition-colors border-2 rounded-lg outline-none bg-hanafuda-cream dark:bg-hanafuda-brown/20 border-text-secondary/30 text-text placeholder:text-text-secondary/50 focus:border-hanafuda-red"
           maxlength="7"
           @input="formatCodeInput"
           @keyup.enter="handleJoin"
@@ -46,7 +41,7 @@
           class="flex-1 px-6 py-2 text-sm font-medium transition-colors border rounded-lg border-text-secondary/30 text-text-secondary hover:bg-hanafuda-brown/10 active:scale-95"
           @click="emit('close')"
         >
-          {{ t('common.cancel') }}
+          {{ t('common.actions.cancel') }}
         </button>
         <button
           class="flex-1 px-6 py-2 text-sm font-medium transition-colors rounded-lg bg-hanafuda-red text-hanafuda-cream hover:bg-hanafuda-red/90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -112,7 +107,7 @@
           class="px-6 py-2 text-sm font-medium transition-colors border rounded-lg border-text-secondary/30 text-text-secondary hover:bg-hanafuda-brown/10 active:scale-95"
           @click="backToInput"
         >
-          {{ t('common.back') }}
+          {{ t('common.actions.back') }}
         </button>
         <button
           class="px-6 py-2 text-sm font-medium transition-colors rounded-lg bg-hanafuda-red text-hanafuda-cream hover:bg-hanafuda-red/90 active:scale-95"

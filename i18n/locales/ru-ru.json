@@ -211,6 +211,15 @@
       "gotDealtA": "получил",
       "koiKoiBonus": "Бонус Koi-Koi"
     },
+    "regions": {
+      "yourHand": "Ваша рука",
+      "opponentHand": "Рука соперника",
+      "field": "Поле",
+      "yourCollection": "Ваша коллекция",
+      "opponentCollection": "Коллекция соперника",
+      "yourTurn": "Ваш ход",
+      "opponentTurn": "Ожидание хода соперника"
+    },
     "cardTypes": {
       "bright": "яркая",
       "animal": "животное",
@@ -293,7 +302,9 @@
       "messageLabel": "Оставить сообщение для противника",
       "messageOptional": "необязательно",
       "messagePlaceholder": "например, 'Скоро вернусь!' или 'Отличная игра!'",
-      "leaveGame": "Покинуть игру"
+      "leaveGame": "Покинуть игру",
+      "forfeitGame": "Сдаться",
+      "forfeitWarning": "Сдача будет засчитана как поражение."
     }
   },
   "settings": {

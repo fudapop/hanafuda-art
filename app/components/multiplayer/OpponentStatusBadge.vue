@@ -155,22 +155,22 @@ const textColorClass = computed(() => {
   const { state } = props.presence
 
   if (isReplaying.value) {
-    return 'text-blue-600 dark:text-blue-400'
+    return 'text-blue-400'
   }
 
   if (state === 'playing') {
-    return 'text-indigo-600 dark:text-indigo-400'
+    return 'text-indigo-400'
   }
 
   if (state === 'online') {
-    return 'text-green-600 dark:text-green-400'
+    return 'text-green-400'
   }
 
   // Amber text for offline/reconnecting state
   if (state === 'offline') {
-    return 'text-amber-600 dark:text-amber-400'
+    return 'text-amber-400'
   }
 
-  return 'text-gray-600 dark:text-gray-400'
+  return 'text-gray-400'
 })
 </script>

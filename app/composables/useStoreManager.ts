@@ -241,12 +241,10 @@ const migrateLocalStorageSaves = async (): Promise<void> => {
         activePlayer: null,
       }
       await store.set(saveRecord)
-      console.info(`Migrated save from '${key}' to '${newKey}'`)
     }
 
     // Set migration flag
     localStorage.setItem('hanafuda-saves-migrated', 'true')
-    console.info(`Migrated ${savesToMigrate.length} saves from localStorage to IndexedDB`)
   } catch (error) {
     console.error('Failed to migrate localStorage saves:', error)
   }
@@ -275,7 +273,6 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
       return
     }
 
-    console.info(`Starting save key migration for user ${uid}, found ${saves.length} saves`)
 
     // Separate saves into those needing migration and those already migrated
     const savesToMigrate: GameSaveRecord[] = []
@@ -290,19 +287,14 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
     }
 
     if (alreadyMigrated.length > 0) {
-      console.info(
-        `Found ${alreadyMigrated.length} saves already using new format, skipping migration for these`,
-      )
     }
 
     if (savesToMigrate.length === 0) {
       // No saves to migrate, set flag and return
       localStorage.setItem(migrationFlag, 'true')
-      console.info(`No saves need migration for user ${uid}`)
       return
     }
 
-    console.info(`Found ${savesToMigrate.length} saves that need migration`)
 
     // Group saves by resolved mode
     const savesByMode = new Map<'single' | 'multiplayer', GameSaveRecord[]>()
@@ -323,23 +315,12 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
     for (const [mode, modeSaves] of savesByMode.entries()) {
       const newKey = mode === 'multiplayer' ? 'hanafuda-save-multiplayer' : 'hanafuda-save-single'
 
-      console.info(
-        `Processing ${modeSaves.length} saves for mode '${mode}' (target key: '${newKey}')`,
-      )
-
       // Find the most recent save by timestamp
       const mostRecentSave = modeSaves.reduce((latest, current) => {
         const latestTime = latest.timestamp instanceof Date ? latest.timestamp.getTime() : 0
         const currentTime = current.timestamp instanceof Date ? current.timestamp.getTime() : 0
         return currentTime > latestTime ? current : latest
       })
-
-      const mostRecentTime =
-        mostRecentSave.timestamp instanceof Date ? mostRecentSave.timestamp.getTime() : 0
-
-      console.info(
-        `Selected most recent save for mode '${mode}': key '${mostRecentSave.saveKey}', timestamp: ${new Date(mostRecentTime).toISOString()}`,
-      )
 
       // Migrate the most recent save
       const updatedSave: GameSaveRecord = {
@@ -350,9 +331,6 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
       }
 
       await store.set(updatedSave)
-      console.info(
-        `✓ Migrated save key from '${mostRecentSave.saveKey}' to '${newKey}' (id: ${updatedSave.id})`,
-      )
       migratedCount++
 
       // Remove the migrated save's old key
@@ -362,11 +340,6 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
       for (const save of modeSaves) {
         if (save.id === mostRecentSave.id) continue // Already migrated
 
-        const saveTime = save.timestamp instanceof Date ? save.timestamp.getTime() : 0
-        console.info(
-          `⊘ Skipping older save: key '${save.saveKey}', timestamp: ${new Date(saveTime).toISOString()} (mode: '${mode}')`,
-        )
-
         // Remove the old save to prevent conflicts
         await store.remove(uid, save.saveKey)
         skippedCount++
@@ -375,9 +348,6 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
 
     // Set migration flag for this user
     localStorage.setItem(migrationFlag, 'true')
-    console.info(
-      `IndexedDB save keys migration complete for ${uid}: ${migratedCount} saves migrated, ${skippedCount} older saves skipped and removed`,
-    )
   } catch (error) {
     console.error(`Failed to migrate IndexedDB save keys for ${uid}:`, error)
   }
@@ -471,7 +441,6 @@ export const useStoreManager = () => {
 
       // Validate version compatibility
       if (!isVersionCompatible(serializedState.version)) {
-        console.warn(`Game state version ${serializedState.version} may not be compatible`)
       }
 
       // First, restore non-card stores to establish associated data
@@ -636,7 +605,9 @@ export const useStoreManager = () => {
       await store.remove(uid, key)
 
       // Trigger auto-sync for authenticated users
-      if (!isGuest && syncAdapter.value) {
+      // Multiplayer saves are managed via multiplayerAdapter, not game_saves
+      const isMultiplayerKey = key.includes('multiplayer')
+      if (!isGuest && syncAdapter.value && !isMultiplayerKey) {
         await syncAdapter.value.remove(uid, key)
       }
 
@@ -709,7 +680,6 @@ export const useStoreManager = () => {
     // Get most recent save (migration ensures new key format)
     const saves = await listSavedGames()
     if (saves.length === 0) {
-      console.warn('No saved games found')
       return false
     }
 
@@ -732,11 +702,9 @@ export const useStoreManager = () => {
   const initializeSync = () => {
     if (!syncAdapter.value) {
       syncAdapter.value = useGameSavesSyncAdapter()
-      console.info('Game saves sync adapter initialized')
     }
     if (!multiplayerAdapter.value) {
       multiplayerAdapter.value = useMultiplayerSyncAdapter()
-      console.info('Multiplayer sync adapter initialized')
     }
   }
 
@@ -747,12 +715,10 @@ export const useStoreManager = () => {
    */
   const syncPush = async (uid: string, transferFromGuest = false): Promise<void> => {
     if (!syncAdapter.value) {
-      console.warn('Sync adapter not initialized')
       return
     }
 
     if (syncStatus.value === 'pushing') {
-      console.warn('Sync push already in progress')
       return
     }
 
@@ -760,7 +726,6 @@ export const useStoreManager = () => {
 
     try {
       if (!(await syncAdapter.value.isAvailable())) {
-        console.warn('Firestore not available for sync')
         syncStatus.value = 'idle'
         return
       }
@@ -794,7 +759,6 @@ export const useStoreManager = () => {
         }
       }
 
-      console.info(`Pushed ${localSaves.length} saves to Firestore`)
       syncStatus.value = 'idle'
     } catch (error) {
       console.error('Sync push error:', error)
@@ -807,12 +771,10 @@ export const useStoreManager = () => {
    */
   const syncPull = async (uid: string): Promise<void> => {
     if (!syncAdapter.value) {
-      console.warn('Sync adapter not initialized')
       return
     }
 
     if (syncStatus.value === 'pulling') {
-      console.warn('Sync pull already in progress')
       return
     }
 
@@ -820,7 +782,6 @@ export const useStoreManager = () => {
 
     try {
       if (!(await syncAdapter.value.isAvailable())) {
-        console.warn('Firestore not available for sync')
         syncStatus.value = 'idle'
         return
       }
@@ -857,7 +818,6 @@ export const useStoreManager = () => {
         }
       }
 
-      console.info(`Pulled ${remoteSaves.length} saves, merged ${mergedCount} new/updated saves`)
       syncStatus.value = 'idle'
     } catch (error) {
       console.error('Sync pull error:', error)
@@ -903,27 +863,15 @@ export const useStoreManager = () => {
       throw new Error('Only participants can save a multiplayer game')
     }
 
-    // Snapshot of current card / round state at the moment we save, used to avoid
-    // pushing obviously uninitialized boards to Firestore.
-    const debugCardStore = useCardStore()
-    const debugHandSizes = {
-      p1: debugCardStore.hand.p1.size,
-      p2: debugCardStore.hand.p2.size,
-    }
-    const debugFieldSize = debugCardStore.field.size
-    const debugDeckSize = debugCardStore.deck.size
-
     // Guard: avoid pushing obviously uninitialized board state (full deck, empty hands/field).
+    const cardStore = useCardStore()
     const isUninitializedBoard =
-      debugDeckSize === DECK.length &&
-      debugFieldSize === 0 &&
-      debugHandSizes.p1 === 0 &&
-      debugHandSizes.p2 === 0
+      cardStore.deck.size === DECK.length &&
+      cardStore.field.size === 0 &&
+      cardStore.hand.p1.size === 0 &&
+      cardStore.hand.p2.size === 0
 
     if (isUninitializedBoard) {
-      console.warn(
-        '[saveMultiplayerGame] Skipping Firestore push for uninitialized board (full deck, empty hands/field)',
-      )
       return
     }
 
@@ -976,7 +924,6 @@ export const useStoreManager = () => {
             createdAt: new Date(), // Will be overwritten if game already exists
           }
           await multiplayerAdapter.value.push(multiplayerGame, uid)
-          console.info('Multiplayer game saved to Firestore', multiplayerGame)
         } else {
           console.error('Multiplayer adapter not available')
         }
@@ -1002,14 +949,12 @@ export const useStoreManager = () => {
    */
   const syncMultiplayerGame = async (gameId: string): Promise<boolean> => {
     if (!multiplayerAdapter.value) {
-      console.warn('Multiplayer adapter not initialized')
       return false
     }
 
     try {
       const remoteGame = await multiplayerAdapter.value.get(gameId)
       if (!remoteGame) {
-        console.warn(`Multiplayer game ${gameId} not found in Firestore`)
         return false
       }
 
@@ -1032,13 +977,6 @@ export const useStoreManager = () => {
         )
 
         if (!hasStartedRound) {
-          console.warn(
-            '[syncMultiplayerGame] Remote multiplayer state has no START ROUND event; treating as pre-game and not overwriting local board',
-            {
-              gameId,
-              remoteEventCount: events.length,
-            },
-          )
         }
       } catch (error) {
         console.error('[syncMultiplayerGame] Failed to parse remote multiplayer gameData', error)
@@ -1052,7 +990,6 @@ export const useStoreManager = () => {
       // Deserialize directly into stores — Firestore is the single source of truth.
       const success = await deserializeGameState(remoteState)
       if (success) {
-        console.info('Multiplayer game synced from Firestore into stores')
       } else {
         console.error('Failed to deserialize remote multiplayer game state')
       }
@@ -1068,7 +1005,6 @@ export const useStoreManager = () => {
    */
   const listMultiplayerGames = async (): Promise<MultiplayerGame[]> => {
     if (!multiplayerAdapter.value) {
-      console.warn('Multiplayer adapter not initialized')
       return []
     }
 
@@ -1098,7 +1034,6 @@ export const useStoreManager = () => {
     const uid = getCurrentUserId()
 
     if (!multiplayerAdapter.value) {
-      console.warn('Multiplayer adapter not initialized')
       return false
     }
 
@@ -1150,7 +1085,6 @@ export const useStoreManager = () => {
         await store.set(updatedSave)
       }
 
-      console.info(`Multiplayer game ${gameId} forfeited by ${forfeitedByUid} (reason: ${reason})`)
       return true
     } catch (error) {
       console.error('Failed to forfeit multiplayer game:', error)
@@ -1167,7 +1101,6 @@ export const useStoreManager = () => {
    */
   const getMultiplayerGame = async (gameId: string): Promise<MultiplayerGame | null> => {
     if (!multiplayerAdapter.value) {
-      console.warn('Multiplayer adapter not initialized')
       return null
     }
 
@@ -1194,7 +1127,6 @@ export const useStoreManager = () => {
     const uid = getCurrentUserId()
 
     if (!multiplayerAdapter.value) {
-      console.warn('Multiplayer adapter not initialized')
       return false
     }
 
@@ -1228,7 +1160,6 @@ export const useStoreManager = () => {
       const store = await getGameSaveStore()
       await store.remove(uid, getSaveKeyForMode('multiplayer'))
 
-      console.info(`Multiplayer game ${gameId} cancelled (reason: ${reason})`)
       return true
     } catch (error) {
       console.error('Failed to cancel multiplayer game:', error)

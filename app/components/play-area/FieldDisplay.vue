@@ -1,5 +1,6 @@
 <template>
   <ul
+    :aria-label="t('game.regions.field')"
     :class="[
       'transition-all duration-500 ease-out w-max grid gap-1',
       !thirdRowIsOccupied
@@ -82,6 +83,8 @@ import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { usePlayerStore } from '~~/stores/playerStore'
 import { type CardName } from '~/utils/cards'
+
+const { t } = useI18n()
 
 const displayedCards: (CardName | undefined)[] = reactive(Array(14))
 const isThirdRow = (index: number) => index > 9
