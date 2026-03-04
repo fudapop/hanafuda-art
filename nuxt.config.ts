@@ -23,6 +23,7 @@ if (isProduction) {
     id: 'cookieyes',
     type: 'text/javascript',
     src: 'https://cdn-cookieyes.com/client_data/0d8331e0442d66223912def6/script.js',
+    defer: true,
   })
 }
 

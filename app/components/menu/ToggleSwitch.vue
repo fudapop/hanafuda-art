@@ -10,7 +10,6 @@
         'relative inline-flex h-6 w-12 shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-1 focus:ring-primary focus:ring-offset-2',
       ]"
     >
-      <span class="sr-only">Use setting</span>
       <span
         :class="[
           enabled ? 'translate-x-6' : 'translate-x-0',

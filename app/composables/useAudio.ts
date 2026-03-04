@@ -54,7 +54,7 @@ export const useAudio = () => {
   // Create audio element with fallback sources
   const createAudioWithFallbacks = (sources: readonly string[]): HTMLAudioElement => {
     const audio = new Audio()
-    audio.preload = 'auto'
+    audio.preload = 'none'
     audio.loop = true
 
     // Try each source until one works
@@ -276,7 +276,7 @@ export const useAudio = () => {
       // Direct URL provided
       ref.value = new Audio(trackKeyOrSrc)
       ref.value.loop = true
-      ref.value.preload = 'auto'
+      ref.value.preload = 'none'
       currentTrack.value = trackKeyOrSrc
 
       // Try to find matching track key for Media Session
@@ -480,7 +480,7 @@ export const useAudio = () => {
       targetSrc = trackKeyOrSrc
       newAudio = new Audio(targetSrc)
       newAudio.loop = true
-      newAudio.preload = 'auto'
+      newAudio.preload = 'none'
 
       // Try to find matching track key for Media Session
       for (const [key, trackData] of Object.entries(BGM_TRACKS)) {

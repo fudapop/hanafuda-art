@@ -13,6 +13,7 @@
             v-else
             :src="p2Avatar"
             class="size-12 mx-auto transition-all border-2 rounded-full lg:size-24 border-border"
+            alt=""
           />
         </div>
         <div :class="['flex flex-col', isPlayer1 ? 'justify-end' : 'justify-start']">

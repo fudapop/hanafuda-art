@@ -9,6 +9,24 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Hide PostHog's viewport measurement SVG from layout */
+body > svg[style*="z-index: -99999999"] {
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* CSS app shell: paint a background immediately while JS loads */
+#__nuxt:empty::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--color-background, hsl(45 67% 97%));
+  z-index: 9999;
+  pointer-events: none;
+}
+
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still

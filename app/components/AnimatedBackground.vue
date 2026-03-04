@@ -25,6 +25,7 @@
         <img
           src="/images/sakura.webp"
           class="animate-spin [animation-duration:20s] drop-shadow-md"
+          alt=""
         />
       </div>
     </TransitionGroup>

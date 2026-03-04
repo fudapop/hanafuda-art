@@ -60,10 +60,10 @@ onMounted(async () => {
   // Initialize audio with background music
   audio.initAudio(audio.BGM.main)
 
-  // Setup autoplay after user interaction
-  audio.setupAutoplay()
-
-  // Preload
-  audio.preloadAudioCache()
+  // Setup autoplay after user interaction, then preload remaining audio
+  audio.setupAutoplay(() => {
+    audio.playAudio()
+    audio.preloadAudioCache()
+  })
 })
 </script>

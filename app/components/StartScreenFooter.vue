@@ -43,19 +43,19 @@
       <NuxtLink
         :to="localeRoute('/changelog')"
         title="View changelog"
-        class="block text-xs tracking-widest transition-colors select-none hover:text-primary text-text-secondary"
+        class="block py-1 text-xs tracking-widest transition-colors select-none hover:text-primary text-text-secondary"
         v-posthog-capture="'view_changelog'"
       >
         {{ $config.public.version }}
       </NuxtLink>
       <!-- LEGAL LINKS -->
       <div
-        class="flex items-center justify-center text-xs gap-x-2 text-text-secondary sm:justify-end"
+        class="flex items-center justify-center py-1 text-xs gap-x-2 text-text-secondary sm:justify-end"
       >
         <NuxtLink
           :to="localeRoute('/attributions')"
           title="View attributions"
-          class="transition-colors hover:text-primary"
+          class="py-1 transition-colors hover:text-primary"
           v-posthog-capture="'view_attributions'"
           >{{ t('footer.links.attributions') }}</NuxtLink
         >
@@ -63,7 +63,7 @@
         <NuxtLink
           :to="localeRoute('/terms')"
           title="View terms of use"
-          class="transition-colors hover:text-primary"
+          class="py-1 transition-colors hover:text-primary"
           v-posthog-capture="'view_terms_of_use'"
           >{{ t('footer.links.termsOfUse') }}</NuxtLink
         >
@@ -71,7 +71,7 @@
         <NuxtLink
           :to="localeRoute('/privacy')"
           title="View privacy policy"
-          class="transition-colors hover:text-primary"
+          class="py-1 transition-colors hover:text-primary"
           v-posthog-capture="'view_privacy_policy'"
           >{{ t('footer.links.privacyPolicy') }}</NuxtLink
         >

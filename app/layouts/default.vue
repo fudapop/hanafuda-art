@@ -36,7 +36,9 @@ const title = computed(() => t(route.meta.title ?? 'game.title'))
         </template>
       </Head>
       <Body>
-        <slot />
+        <main>
+          <slot />
+        </main>
       </Body>
     </Html>
   </div>

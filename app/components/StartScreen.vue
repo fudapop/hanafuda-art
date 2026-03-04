@@ -37,6 +37,7 @@
         width="1920"
         height="1091"
         sizes="(min-width: 1536px) 100vw, (min-width: 1280px) 75vw, (min-width: 768px) 50vw, 100vw"
+        fetchpriority="high"
         alt="background-image"
       />
     </div>
@@ -108,6 +109,8 @@
           /images/logo-title-240.webp 240w,
           /images/logo-title-360.webp 360w
         "
+        width="180"
+        height="330"
         :class="[
           'w-[100px] mb-1 sm:w-[120px] sm:mb-2',
           isMobile ? 'landscape:w-[25dvh]' : 'md:w-[180px]',
