@@ -10,37 +10,34 @@ NewHanafuda.art is a client-side web app for playing Koi-Koi, a traditional Japa
 
 ## Directory Structure
 
+This is a pnpm monorepo with four packages:
+
 ```
-app/                        # Nuxt 4 app directory (primary source code)
-  pages/                    # File-based routing (index, rankings, sign-in, etc.)
-  components/               # Vue components organized by feature area
-    cards/                  #   Card display and animation
-    play-area/              #   Game board (hand, field, deck, collections)
-    modal/                  #   Dialogs (round results, exit warning, announcements)
-    menu/                   #   Settings panels and options
-    multiplayer/            #   Multiplayer-specific UI
-    ui/                     #   shadcn-vue primitives (via reka-ui)
-  composables/              # Business logic composables
-    adapters/               #   Sync adapter implementations (Firestore, saves, multiplayer)
-  utils/                    # Pure functions, game logic constants, custom directives
-  assets/css/               # Tailwind v4 global styles and card CSS
-  plugins/                  # Nuxt client plugins
-  layouts/                  # Nuxt layouts
-  types/                    # App-scoped type declarations
-stores/                     # Pinia stores (root-level, outside app/)
-  cardStore.ts              #   Deck, hands, field, collections, staging
-  gameDataStore.ts          #   Game flow, phases, rounds, scoring, event log
-  playerStore.ts            #   Player identity, turns, dealer rotation
-  configStore.ts            #   Game settings, rule variations, UI preferences
-types/                      # Shared TypeScript type definitions (profile, sync, etc.)
-i18n/locales/               # Translation JSON files (en-us, ja-jp, pl-pl, ru-ru, fr-fr)
-content/                    # Nuxt Content markdown (localized static pages)
-supabase/                   # Migrations, generated types, config
-server/                     # Nuxt server routes
-lib/                        # Shared libraries (IndexedDB abstractions)
-docs/                       # Architecture documentation (markdown)
-notes/                      # Planning documents (FEAT_PLANNING_*, FIX_PLANNING_*)
-scripts/                    # Build and release tooling
+packages/
+  frontend/                   # Nuxt 4 SPA → Cloudflare Pages
+    app/                      # Nuxt 4 app directory (primary source code)
+      pages/                  # File-based routing (index, rankings, sign-in, etc.)
+      components/             # Vue components organized by feature area
+      composables/            # Business logic composables
+      utils/                  # Pure functions, game logic constants, custom directives
+      assets/css/             # Tailwind v4 global styles and card CSS
+      plugins/                # Nuxt client plugins
+      layouts/                # Nuxt layouts
+      types/                  # App-scoped type declarations
+    stores/                   # Pinia stores
+    types/                    # Shared TypeScript type definitions
+    i18n/locales/             # Translation JSON files
+    content/                  # Nuxt Content markdown (localized static pages)
+    lib/                      # Shared libraries (IndexedDB abstractions)
+    server/                   # Nuxt server routes
+  backend/                    # Hono server → Railway
+    src/                      # API routes, serves landing page
+  shared/                     # @hanafuda/shared types & constants
+    src/                      # Shared exports
+  landing/                    # Static marketing page for fudapop.com
+docs/                         # Architecture documentation (markdown)
+scripts/                      # Build and release tooling
+supabase/                     # Migrations, generated types, config (pending removal)
 ```
 
 ## Code Conventions

@@ -4,10 +4,18 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'packages/frontend/**'
+      - 'packages/shared/**'
+      - 'pnpm-lock.yaml'
   pull_request:
     branches:
       - main
       - development
+    paths:
+      - 'packages/frontend/**'
+      - 'packages/shared/**'
+      - 'pnpm-lock.yaml'
 
 jobs:
   test:
@@ -27,4 +35,4 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm -F @hanafuda/frontend test

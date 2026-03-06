@@ -4,14 +4,21 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
-const seoMeta = JSON.parse(readFileSync(resolve('./seo-meta.json'), 'utf-8'))
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'https://newhanafuda.art'
+const siteDomain = new URL(siteUrl).hostname
+
+const seoMeta = JSON.parse(
+  readFileSync(resolve('./seo-meta.json'), 'utf-8')
+    .replaceAll('__SITE_URL__', siteUrl)
+    .replaceAll('__SITE_DOMAIN__', siteDomain),
+)
 const localization = JSON.parse(readFileSync(resolve('./localization.json'), 'utf-8'))
 
 const headScripts = []
 
 // Apply color mode synchronously before render (critical for PWA)
 // Read from separate file for better maintainability
-const colorModeInitScript = readFileSync(resolve('./scripts/color-mode-init.js'), 'utf-8')
+const colorModeInitScript = readFileSync(resolve('../../scripts/color-mode-init.js'), 'utf-8')
 headScripts.push({
   innerHTML: colorModeInitScript,
   type: 'text/javascript',
@@ -120,7 +127,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true, vueDevTools: true },
   i18n: {
     autoDeclare: true,
-    baseUrl: 'https://newhanafuda.art',
+    baseUrl: siteUrl,
     defaultLocale: localization.defaultLocale,
     detectBrowserLanguage: {
       useCookie: true,
@@ -265,6 +272,7 @@ export default defineNuxtConfig({
     public: {
       nodeEnv: process.env.NODE_ENV,
       version: pkg.version,
+      siteUrl,
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
       supabasePublishableKey: process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
       saveIntegritySalt: process.env.NUXT_PUBLIC_SAVE_INTEGRITY_SALT,

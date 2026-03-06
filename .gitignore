@@ -27,6 +27,8 @@ archive/
 .claude/
 .cursor/
 .cursorrules
+.nuxtrc
+.context/
 
 # Local env files
 .env
