@@ -9,7 +9,7 @@
   >
     <div
       v-if="visible"
-      class="fixed top-0 inset-x-0 z-40 flex items-center justify-between gap-3 px-4 py-2.5 bg-surface/90 backdrop-blur-sm border-b border-border"
+      class="fixed top-0 inset-x-0 z-40 flex items-center justify-between gap-3 px-4 py-4 bg-surface/90 backdrop-blur-sm border-b border-border"
     >
       <NuxtLink
         :to="announcementsRoute"
@@ -42,7 +42,6 @@ import { MegaphoneIcon, XMarkIcon } from '@heroicons/vue/20/solid'
 
 const { t } = useI18n()
 const localeRoute = useLocaleRoute()
-const route = useRoute()
 
 const {
   newAnnouncements,
@@ -52,8 +51,6 @@ const {
 
 const announcementsRoute = computed(() => localeRoute('/announcements'))
 
-// Track which route the banner was shown on to avoid re-showing
-const bannerShownRoute = useState<string | null>('banner-shown-route', () => null)
 const dismissed = ref(false)
 
 const latestTitle = computed(() => newAnnouncements.value[0]?.title ?? '')
@@ -61,26 +58,10 @@ const latestTitle = computed(() => newAnnouncements.value[0]?.title ?? '')
 const visible = computed(() =>
   hasNewAnnouncements.value &&
   !dontShowAnnouncements.value &&
-  !dismissed.value &&
-  bannerShownRoute.value !== route.fullPath,
+  !dismissed.value,
 )
 
 const dismiss = () => {
   dismissed.value = true
-  bannerShownRoute.value = route.fullPath
 }
-
-// Auto-dismiss after 5 seconds
-let timer: ReturnType<typeof setTimeout> | undefined
-
-watch(visible, (isVisible) => {
-  clearTimeout(timer)
-  if (isVisible) {
-    timer = setTimeout(dismiss, 5000)
-  }
-}, { immediate: true })
-
-onUnmounted(() => {
-  if (timer) clearTimeout(timer)
-})
 </script>
