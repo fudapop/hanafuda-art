@@ -307,7 +307,10 @@
       "forfeitWarning": "Poddanie się zostanie uznane za przegraną."
     },
     "configure_rules_message": "Skonfiguruj zasady meczu. Przeciwnik zobaczy je przed dołączeniem.",
-    "preview_rules_message": "Przejrzyj zasady gospodarza przed dołączeniem."
+    "preview_rules_message": "Przejrzyj zasady gospodarza przed dołączeniem.",
+    "sync_error": "Nie udało się zsynchronizować stanu gry. Obaj gracze muszą korzystać z tej samej wersji aplikacji.",
+    "sync_error_retry": "Nie udało się zsynchronizować stanu gry po kilku próbach. Spróbuj dołączyć ponownie.",
+    "sync_error_update": "Nie udało się zastosować aktualizacji gry. Spróbuj odświeżyć stronę."
   },
   "settings": {
     "actions": {

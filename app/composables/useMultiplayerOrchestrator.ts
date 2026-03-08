@@ -1,4 +1,5 @@
 import { storeToRefs } from 'pinia'
+import { toast } from 'vue-sonner'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import type { PlayerKey } from '~~/stores/playerStore'
 import { usePlayerStore } from '~~/stores/playerStore'
@@ -19,6 +20,7 @@ type MultiplayerMeta = {
 type RemoteUpdateHandler = (game: MultiplayerGame) => Promise<void>
 
 export const useMultiplayerOrchestrator = () => {
+  const { t } = useI18n()
   const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
   const { setOpponentPlayer, subscribeToGame } = useMultiplayerMatch()
   const { subscribeToOpponentPresence } = usePresence()
@@ -161,9 +163,11 @@ export const useMultiplayerOrchestrator = () => {
             `[initGame] Failed to sync multiplayer game after ${maxAttempts} attempts`,
             multiplayerMeta.value.gameId,
           )
+          toast.error(t('multiplayer.sync_error_retry'), { duration: 8000 })
         }
       } catch (error) {
         console.error('Failed to sync/load multiplayer game for non-starting player:', error)
+        toast.error(t('multiplayer.sync_error'), { duration: 8000 })
       }
     }
 
@@ -235,6 +239,7 @@ export const useMultiplayerOrchestrator = () => {
     // Sync latest state from Firestore
     const synced = await syncMultiplayerGame(multiplayerMeta.value.gameId)
     if (!synced) {
+      toast.error(t('multiplayer.sync_error'), { duration: 8000 })
     }
 
     // Clean up any existing subscription

@@ -549,7 +549,10 @@
       "forfeitWarning": "Abandonner comptera comme une défaite."
     },
     "configure_rules_message": "Configurez les règles de votre match. Votre adversaire les verra avant de rejoindre.",
-    "preview_rules_message": "Consultez les règles de l'hôte avant de rejoindre."
+    "preview_rules_message": "Consultez les règles de l'hôte avant de rejoindre.",
+    "sync_error": "Impossible de synchroniser l'état du jeu. Les deux joueurs doivent utiliser la même version de l'application.",
+    "sync_error_retry": "Impossible de synchroniser l'état du jeu après plusieurs tentatives. Veuillez réessayer de rejoindre.",
+    "sync_error_update": "Impossible d'appliquer la mise à jour du jeu. Essayez de rafraîchir la page."
   },
   "pages": {
     "changelog": "Journal des modifications",

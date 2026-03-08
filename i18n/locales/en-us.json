@@ -321,7 +321,10 @@
       "reconnecting": "Reconnecting..."
     },
     "configure_rules_message": "Configure the rules for your match. Your opponent will see these before joining.",
-    "preview_rules_message": "Review the host's game rules before joining."
+    "preview_rules_message": "Review the host's game rules before joining.",
+    "sync_error": "Failed to sync game state. Both players must be on the same app version.",
+    "sync_error_retry": "Failed to sync game state after multiple attempts. Please try rejoining.",
+    "sync_error_update": "Failed to apply game update. Try refreshing the page."
   },
   "settings": {
     "actions": {

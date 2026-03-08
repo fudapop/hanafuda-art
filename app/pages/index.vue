@@ -127,6 +127,7 @@ import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
 import type { MultiplayerGame } from '~~/types/profile'
 import { checkForWin } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
+import { toast } from 'vue-sonner'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { type PlayerKey, usePlayerStore } from '~~/stores/playerStore'
 
@@ -459,6 +460,7 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
     } else {
       const synced = await syncMultiplayerGame(game.gameId)
       if (!synced) {
+        toast.error(t('multiplayer.sync_error_update'), { duration: 8000 })
       }
     }
 
