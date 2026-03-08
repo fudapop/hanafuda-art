@@ -287,7 +287,7 @@ export default defineNuxtConfig({
   ssr: false,
   vite: {
     optimizeDeps: {
-      include: ['class-variance-authority', 'reka-ui', 'lucide-vue-next', 'clsx', 'tailwind-merge'],
+      include: ['class-variance-authority', 'reka-ui', 'lucide-vue-next', 'clsx', 'tailwind-merge', 'striptags'],
       exclude: ['better-sqlite3'],
     },
     plugins: [tailwindcss()],
