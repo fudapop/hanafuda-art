@@ -13,14 +13,14 @@ import {
   updateDoc,
 } from 'firebase/firestore'
 
-export interface Announcement {
+export type Announcement = {
   id: string
   title: string
   description: string
   date: string
   features: string[]
-  // Content body from markdown
-  body?: any
+  // Content body from markdown (Nuxt Content parsed AST)
+  body?: object
   // Impression tracking
   impressions?: {
     views: number
@@ -28,7 +28,7 @@ export interface Announcement {
   }
 }
 
-export interface AnnouncementImpression {
+export type AnnouncementImpression = {
   date: string
   title: string
   views: number
@@ -130,8 +130,8 @@ export const useAnnouncements = async () => {
   // Check if there are new announcements to show
   const hasNewAnnouncements = computed(() => newAnnouncements.value.length > 0)
 
-  // Modal visibility state
-  const isAnnouncementModalOpen = ref(false)
+  // Count of new announcements for badge display
+  const newAnnouncementCount = computed(() => newAnnouncements.value.length)
 
   // Firestore impression tracking functions
   const trackView = async (announcementId: string) => {
@@ -268,40 +268,22 @@ export const useAnnouncements = async () => {
     return likedAnnouncements.value.includes(announcementId)
   }
 
-  // Show the modal if there are new announcements
-  const checkAndShowAnnouncements = () => {
-    if (hasNewAnnouncements.value) {
-      isAnnouncementModalOpen.value = true
-      // Track view for all new announcements
-      newAnnouncements.value.forEach((announcement) => {
-        trackView(announcement.id)
-      })
-    }
+  // Mark all new announcements as read
+  const markAllAsRead = () => {
+    const newIds = newAnnouncements.value.map((a) => a.id)
+    dismissedAnnouncements.value = [...dismissedAnnouncements.value, ...newIds]
   }
 
-  // Close the modal and mark current announcements as dismissed
-  const dismissAnnouncements = () => {
-    // Store the announcement IDs before closing the modal
-    const newIds = newAnnouncements.value.map((a) => a.id)
-
-    // Close the modal first
-    isAnnouncementModalOpen.value = false
-
-    // Delay marking announcements as dismissed to allow modal transition to complete
-    setTimeout(() => {
-      dismissedAnnouncements.value = [...dismissedAnnouncements.value, ...newIds]
-    }, 250) // Slightly longer than the modal's 200ms leave transition
+  // Mark a single announcement as read
+  const markAsRead = (id: string) => {
+    if (!dismissedAnnouncements.value.includes(id)) {
+      dismissedAnnouncements.value = [...dismissedAnnouncements.value, id]
+    }
   }
 
   // Permanently disable announcement notifications
   const dontShowAnnouncementsAgain = () => {
-    // Close the modal first
-    isAnnouncementModalOpen.value = false
-
-    // Delay setting the preference to allow modal transition to complete
-    setTimeout(() => {
-      dontShowAnnouncements.value = true
-    }, 250) // Slightly longer than the modal's 200ms leave transition
+    dontShowAnnouncements.value = true
   }
 
   // Reset announcement preferences (useful for testing or user preference reset)
@@ -315,10 +297,11 @@ export const useAnnouncements = async () => {
     announcements,
     newAnnouncements,
     hasNewAnnouncements,
-    isAnnouncementModalOpen,
-    checkAndShowAnnouncements,
-    dismissAnnouncements,
+    newAnnouncementCount,
+    markAllAsRead,
+    markAsRead,
     dontShowAnnouncementsAgain,
+    dontShowAnnouncements,
     resetAnnouncementPreferences,
     trackView,
     trackLike,

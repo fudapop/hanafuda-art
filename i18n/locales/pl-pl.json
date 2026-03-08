@@ -408,6 +408,10 @@
   },
   "announcements": {
     "whatsNewTitle": "Co nowego w Hanafuda Koi-Koi!",
+    "pageTitle": "Ogłoszenia",
+    "new": "Nowe",
+    "bannerCta": "Zobacz ogłoszenie",
+    "noAnnouncements": "Nie ma jeszcze żadnych ogłoszeń.",
     "dismiss": "Rozumiem!",
     "dontShowAgain": "Nie pokazuj ponownie",
     "resetAnnouncements": "Resetuj ogłoszenia",
@@ -554,9 +558,11 @@
     "rankings": "Rankingi",
     "signIn": "Zaloguj się",
     "terms": "Warunki Użytkowania",
+    "announcements": "Ogłoszenia",
     "home": "Strona Główna"
   },
   "pageDescriptions": {
+    "announcements": "Najnowsze wiadomości i aktualizacje dla {appName}",
     "changelog": "Dziennik zmian dla {appName}",
     "attributions": "Uznanie autorstwa dla {appName}",
     "privacy": "Polityka prywatności dla {appName}",

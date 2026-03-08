@@ -408,6 +408,10 @@
   },
   "announcements": {
     "whatsNewTitle": "Что нового в Hanafuda Koi-Koi!",
+    "pageTitle": "Объявления",
+    "new": "Новое",
+    "bannerCta": "Посмотреть объявление",
+    "noAnnouncements": "Пока нет объявлений.",
     "dismiss": "Понятно!",
     "dontShowAgain": "Больше не показывать",
     "resetAnnouncements": "Сбросить объявления",
@@ -554,9 +558,11 @@
     "rankings": "Рейтинги",
     "signIn": "Вход",
     "terms": "Условия использования",
+    "announcements": "Объявления",
     "home": "Главная"
   },
   "pageDescriptions": {
+    "announcements": "Последние новости и обновления для {appName}",
     "changelog": "Журнал изменений для {appName}",
     "attributions": "Авторство художников для {appName}",
     "privacy": "Политика конфиденциальности для {appName}",

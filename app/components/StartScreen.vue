@@ -286,7 +286,16 @@
       <StartScreenFooter />
     </div>
 
-    <AnnouncementModal />
+    <Teleport to="body">
+      <ClientOnly>
+        <Suspense>
+          <AnnouncementButton />
+        </Suspense>
+        <Suspense>
+          <AnnouncementBanner />
+        </Suspense>
+      </ClientOnly>
+    </Teleport>
     <NewMatchModal
       :open="showNewMatchModal"
       @close="showNewMatchModal = false"

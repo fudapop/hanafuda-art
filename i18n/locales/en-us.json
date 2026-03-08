@@ -422,6 +422,10 @@
   },
   "announcements": {
     "whatsNewTitle": "What's New in Hanafuda Koi-Koi!",
+    "pageTitle": "Announcements",
+    "new": "New",
+    "bannerCta": "View announcement",
+    "noAnnouncements": "No announcements yet.",
     "dismiss": "Got it!",
     "dontShowAgain": "Don't show again",
     "resetAnnouncements": "Reset Announcements",
@@ -568,9 +572,11 @@
     "rankings": "Rankings",
     "signIn": "Sign In",
     "terms": "Terms of Use",
+    "announcements": "Announcements",
     "home": "Home"
   },
   "pageDescriptions": {
+    "announcements": "Latest news and updates for {appName}",
     "changelog": "Changelog for {appName}",
     "attributions": "Artist Attributions for {appName}",
     "privacy": "Privacy Policy for {appName}",

@@ -408,6 +408,10 @@
   },
   "announcements": {
     "whatsNewTitle": "花札こいこいの新機能！",
+    "pageTitle": "お知らせ",
+    "new": "新着",
+    "bannerCta": "お知らせを見る",
+    "noAnnouncements": "まだお知らせはありません。",
     "dismiss": "了解！",
     "dontShowAgain": "再度表示しない",
     "resetAnnouncements": "お知らせをリセット",
@@ -554,9 +558,11 @@
     "rankings": "ランキング",
     "signIn": "サインイン",
     "terms": "利用規約",
+    "announcements": "お知らせ",
     "home": "ホーム"
   },
   "pageDescriptions": {
+    "announcements": "{appName}の最新ニュースとアップデート",
     "changelog": "{appName}の変更履歴",
     "attributions": "{appName}のアーティストの帰属",
     "privacy": "{appName}のプライバシーポリシー",
