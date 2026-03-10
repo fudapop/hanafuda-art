@@ -35,6 +35,7 @@ export const useMultiplayerOrchestrator = () => {
   const ds = useGameDataStore()
 
   const terminalStatus = useState<GameStatus | null>('terminal-status', () => null)
+  const snapshotLocked = ref(false)
 
   const gameUnsubscribe = ref<(() => void) | null>(null)
 
@@ -47,6 +48,10 @@ export const useMultiplayerOrchestrator = () => {
     activeKeyOverride?: PlayerKey,
     metadata?: SnapshotMetadata,
   ) => {
+    if (snapshotLocked.value) {
+      console.debug(`[pushSnapshot] Suppressed (${context}) — snapshot lock active`)
+      return
+    }
     if (!isMultiplayerGame.value) return
 
     const multiplayerMeta = useState<MultiplayerMeta>('multiplayer-game-meta', () => ({
@@ -278,5 +283,6 @@ export const useMultiplayerOrchestrator = () => {
     rejoinGame,
     cleanupSubscription,
     terminalStatus,
+    snapshotLocked,
   }
 }

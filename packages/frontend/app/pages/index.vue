@@ -188,6 +188,7 @@ const {
   rejoinGame: rejoinMultiplayerGame,
   cleanupSubscription: cleanupMultiplayerSubscription,
   terminalStatus,
+  snapshotLocked,
 } = useMultiplayerOrchestrator()
 
 const {
@@ -295,17 +296,26 @@ const advanceToNextRound = async () => {
   advancingRound.value = true
   showLoader.value = true
   terminalStatus.value = null
-  ds.nextRound()
-  showModal.value = false
-  await sleep(2000)
-  await startRound()
+  try {
+    snapshotLocked.value = true
+    try {
+      ds.nextRound()
+      showModal.value = false
+      await sleep(2000)
+      await startRound()
+    } finally {
+      snapshotLocked.value = false
+    }
 
-  // In multiplayer, push a fresh snapshot immediately after starting the new round
-  // so the opponent sees the new round state before the first turn completes.
-  await pushMultiplayerSnapshot('new-round', undefined, {
-    terminalStatus: null,
-  })
-  advancingRound.value = false
+    // In multiplayer, push a fresh snapshot immediately after starting the new round
+    // so the opponent sees the new round state before the first turn completes.
+    // This must happen AFTER the lock is released.
+    await pushMultiplayerSnapshot('new-round', undefined, {
+      terminalStatus: null,
+    })
+  } finally {
+    advancingRound.value = false
+  }
 }
 
 const handleNext = async () => {
@@ -659,7 +669,13 @@ onMounted(() => {
       if (isReplaying.value) return
 
       // Auto-select first card in hand at turn start for the local player
-      if (newActive?.id === selfKey.value && ds.checkCurrentPhase('select')) {
+      // Skip in multiplayer — the watcher also fires on remote deserialization,
+      // which leaks the selected card state to the opponent's view.
+      if (
+        !isMultiplayerGame.value
+        && newActive?.id === selfKey.value
+        && ds.checkCurrentPhase('select')
+      ) {
         const hand = cs.hand[selfKey.value]
         if (hand.size > 0) {
           const firstCard = [...hand][0]
