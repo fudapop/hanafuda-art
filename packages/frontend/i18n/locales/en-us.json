@@ -540,6 +540,17 @@
       "closePanel": "Close panel"
     }
   },
+  "results": {
+    "playAgain": "Play Again",
+    "backToMenu": "Back to Menu",
+    "matchStats": "Match Statistics",
+    "roundBreakdown": "Round Breakdown",
+    "roundsWon": "Record",
+    "yakuCompleted": "Yaku Completed",
+    "uniqueYaku": "Unique Yaku",
+    "koikoiRate": "Koi-Koi Success",
+    "bestRound": "Best Round"
+  },
   "rankings": {
     "title": "Rankings",
     "pageTitle": "New Hanafuda | Rankings",

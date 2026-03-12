@@ -446,6 +446,14 @@ onMounted(async () => {
   initializeSettingsFromProfile()
   initializeDesignFromProfile()
 
+  // Auto-start a new game if returning from results page via "Play Again"
+  const playAgain = useState('play-again', () => false)
+  if (playAgain.value) {
+    playAgain.value = false
+    await startNewSinglePlayerGame()
+    return
+  }
+
   // For existing guests: if a local guest profile already exists, load it so
   // the options menu reflects their saved settings and design before starting a game.
   if (!authUser.value && !currentProfile.value) {

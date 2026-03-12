@@ -526,6 +526,17 @@
       "closePanel": "Zamknij panel"
     }
   },
+  "results": {
+    "playAgain": "Zagraj ponownie",
+    "backToMenu": "Powrót do menu",
+    "matchStats": "Statystyki meczu",
+    "roundBreakdown": "Podsumowanie rund",
+    "roundsWon": "Wynik",
+    "yakuCompleted": "Ukończone yaku",
+    "uniqueYaku": "Unikalne yaku",
+    "koikoiRate": "Sukces Koi-Koi",
+    "bestRound": "Najlepsza runda"
+  },
   "rankings": {
     "title": "Rankingi",
     "pageTitle": "Nowe Hanafuda | Rankingi",

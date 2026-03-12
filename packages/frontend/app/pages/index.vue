@@ -350,17 +350,33 @@ const performFinalCleanup = async () => {
   }
 
   resetAllStores()
-  // Return to the start screen
-  gameStart.value = false
 }
+
+// Game results snapshot for post-game navigation
+const { snapshot: resultsSnapshot, captureSnapshot } = useGameResultsSnapshot()
 
 // Closing the final results modal
 const handleClose = async () => {
+  // Guard against re-entry (e.g. onBeforeUnmount during navigation to /results)
+  if (finalCleanupDone.value) return
+
   terminalStatus.value = 'completed'
   await pushMultiplayerSnapshot('final-close', undefined, {
     terminalStatus: 'completed',
   })
+
+  // Capture results snapshot before cleanup destroys store data
+  if (ds.gameOver) captureSnapshot()
+
   await performFinalCleanup()
+
+  // Navigate to results page instead of returning to start screen
+  if (resultsSnapshot.value) {
+    const localeRoute = useLocaleRoute()
+    navigateTo(localeRoute('/results'))
+  } else {
+    gameStart.value = false
+  }
 }
 
 // Handle cancelling the game when opponent disconnects (no stats recorded)

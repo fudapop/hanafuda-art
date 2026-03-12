@@ -483,6 +483,17 @@
       "closePanel": "Fermer le panneau"
     }
   },
+  "results": {
+    "playAgain": "Rejouer",
+    "backToMenu": "Retour au menu",
+    "matchStats": "Statistiques du match",
+    "roundBreakdown": "Détail des manches",
+    "roundsWon": "Résultat",
+    "yakuCompleted": "Yaku complétés",
+    "uniqueYaku": "Yaku uniques",
+    "koikoiRate": "Succès Koi-Koi",
+    "bestRound": "Meilleure manche"
+  },
   "rankings": {
     "title": "Classements",
     "pageTitle": "Nouveau Hanafuda | Classements",

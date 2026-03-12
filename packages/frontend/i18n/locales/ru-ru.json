@@ -526,6 +526,17 @@
       "closePanel": "Закрыть панель"
     }
   },
+  "results": {
+    "playAgain": "Играть снова",
+    "backToMenu": "В меню",
+    "matchStats": "Статистика матча",
+    "roundBreakdown": "Детали раундов",
+    "roundsWon": "Результат",
+    "yakuCompleted": "Яку завершены",
+    "uniqueYaku": "Уникальные яку",
+    "koikoiRate": "Успех Кои-Кои",
+    "bestRound": "Лучший раунд"
+  },
   "rankings": {
     "title": "Рейтинги",
     "pageTitle": "New Hanafuda | Рейтинги",

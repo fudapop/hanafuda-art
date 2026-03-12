@@ -526,6 +526,17 @@
       "closePanel": "パネルを閉じる"
     }
   },
+  "results": {
+    "playAgain": "もう一度",
+    "backToMenu": "メニューに戻る",
+    "matchStats": "試合統計",
+    "roundBreakdown": "ラウンド詳細",
+    "roundsWon": "戦績",
+    "yakuCompleted": "完成した役",
+    "uniqueYaku": "役の種類",
+    "koikoiRate": "こいこい成功",
+    "bestRound": "最高ラウンド"
+  },
   "rankings": {
     "title": "ランキング",
     "pageTitle": "新花札 | ランキング",
