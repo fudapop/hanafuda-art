@@ -105,7 +105,7 @@
         />
         <RoundResults
           v-else
-          :show-ack-controls="roundOver && !gameOver && (players[selfKey].isActive || isMultiplayerGame)"
+          :show-ack-controls="roundOver && !gameOver && (!isMultiplayerGame || players[selfKey].isActive)"
           @next="handleNext"
         />
       </ResultsModal>
@@ -175,7 +175,7 @@ const canInteractLocalHand = computed(() => {
   return can
 })
 
-const { useSelectedCard, selectCardFromHand } = useCardHandler()
+const { useSelectedCard } = useCardHandler()
 const selectedCard = useSelectedCard()
 
 const { opponentPlay, useOpponent } = useAutoplay()
@@ -667,21 +667,6 @@ onMounted(() => {
     async (newActive, oldActive) => {
       // Suppress all side-effects during opponent turn replay
       if (isReplaying.value) return
-
-      // Auto-select first card in hand at turn start for the local player
-      // Skip in multiplayer — the watcher also fires on remote deserialization,
-      // which leaks the selected card state to the opponent's view.
-      if (
-        !isMultiplayerGame.value
-        && newActive?.id === selfKey.value
-        && ds.checkCurrentPhase('select')
-      ) {
-        const hand = cs.hand[selfKey.value]
-        if (hand.size > 0) {
-          const firstCard = [...hand][0]
-          if (firstCard) selectCardFromHand(firstCard)
-        }
-      }
 
       // Single-player CPU opponent
       if (!isMultiplayerGame.value && autoOpponent.value && ps.players.p2.isActive) {

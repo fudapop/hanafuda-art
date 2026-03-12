@@ -1,9 +1,25 @@
 <template>
-  <ul
-    :role="id === selfKey ? 'listbox' : 'list'"
-    :aria-label="t(id === selfKey ? 'game.regions.yourHand' : 'game.regions.opponentHand')"
-    class="h-full mx-auto w-max isolate"
-  >
+  <div class="relative">
+    <Transition
+      enter-active-class="duration-300 delay-2000 ease-out"
+      enter-from-class="opacity-0 -translate-y-1"
+      enter-to-class="opacity-100"
+      leave-active-class="duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0 -translate-y-1"
+    >
+      <p
+        v-if="awaitingSelection"
+        class="absolute inset-x-0 -top-8 mx-auto max-w-3/4 text-center text-sm text-text/70 pointer-events-none bg-gradient-to-r from-transparent via-background to-transparent py-1"
+      >
+        {{ t('game.regions.yourTurn') }} &mdash; {{ t('game.hints.selectCard') }}
+      </p>
+    </Transition>
+    <ul
+      :role="id === selfKey ? 'listbox' : 'list'"
+      :aria-label="t(id === selfKey ? 'game.regions.yourHand' : 'game.regions.opponentHand')"
+      class="h-full mx-auto w-max isolate"
+    >
     <li
       v-for="(card, index) in displayedCards.filter((card) => card)"
       :key="index"
@@ -51,6 +67,7 @@
       />
     </li>
   </ul>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -107,13 +124,24 @@ const { selfKey } = useLocalPlayerPerspective()
 
 const matchedCards = useMatchedCards()
 
+const isLocalSelectPhase = computed(
+  () =>
+    id === selfKey.value &&
+    ds.checkCurrentPhase('select') &&
+    ps.players[id].isActive,
+)
+
 const showMatchHint = computed(
   () => (card: CardName) =>
     // Only show hints on the local player's hand, when they are active in select phase
-    id === selfKey.value &&
-    ds.checkCurrentPhase('select') &&
-    ps.players[id].isActive &&
+    isLocalSelectPhase.value &&
     (matchExists(card) as CardName[]).length,
+)
+
+// Prompt the player to select a card when it's their turn and nothing is selected yet
+const awaitingSelection = computed(() =>
+  isLocalSelectPhase.value &&
+  !selectedCard.value,
 )
 
 const handleClick = (card: CardName) => {

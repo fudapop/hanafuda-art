@@ -220,6 +220,9 @@
       "yourTurn": "Twoja kolej",
       "opponentTurn": "Oczekiwanie na przeciwnika"
     },
+    "hints": {
+      "selectCard": "Wybierz kartę"
+    },
     "cardTypes": {
       "bright": "światło",
       "animal": "zwierzę",

@@ -228,6 +228,9 @@
       "yourTurn": "Your turn",
       "opponentTurn": "Waiting for opponent"
     },
+    "hints": {
+      "selectCard": "Select a card"
+    },
     "cardTypes": {
       "bright": "bright",
       "animal": "animal",

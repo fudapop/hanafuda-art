@@ -220,6 +220,9 @@
       "yourTurn": "Ваш ход",
       "opponentTurn": "Ожидание хода соперника"
     },
+    "hints": {
+      "selectCard": "Выберите карту"
+    },
     "cardTypes": {
       "bright": "яркая",
       "animal": "животное",

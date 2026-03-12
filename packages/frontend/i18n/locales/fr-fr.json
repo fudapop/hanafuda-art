@@ -220,6 +220,9 @@
       "yourTurn": "Votre tour",
       "opponentTurn": "En attente de l'adversaire"
     },
+    "hints": {
+      "selectCard": "Choisissez une carte"
+    },
     "cardTypes": {
       "bright": "brillante",
       "animal": "animal",

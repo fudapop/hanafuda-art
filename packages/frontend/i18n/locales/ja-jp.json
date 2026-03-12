@@ -220,6 +220,9 @@
       "yourTurn": "あなたの番です",
       "opponentTurn": "相手の番を待っています"
     },
+    "hints": {
+      "selectCard": "札を選んでください"
+    },
     "cardTypes": {
       "bright": "光",
       "animal": "種",
