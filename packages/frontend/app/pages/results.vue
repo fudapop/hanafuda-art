@@ -27,6 +27,7 @@
         <!-- Action buttons -->
         <div class="flex justify-center gap-4 px-4 py-8">
           <button
+            v-if="!isMultiplayerGame"
             class="pri-btn"
             @click="handlePlayAgain"
           >
@@ -49,6 +50,8 @@ const { t } = useI18n()
 const localeRoute = useLocaleRoute()
 const { snapshot, clearSnapshot } = useGameResultsSnapshot()
 const gameStart = useState('start')
+
+const { isMultiplayerGame } = useLocalPlayerPerspective()
 
 // Guard: redirect to home if no snapshot data
 if (!snapshot.value) {
