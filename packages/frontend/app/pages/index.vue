@@ -366,7 +366,8 @@ const handleClose = async () => {
   })
 
   // Capture results snapshot before cleanup destroys store data
-  if (ds.gameOver) captureSnapshot()
+  // (skip if already pre-captured by remote update handler)
+  if (ds.gameOver && !resultsSnapshot.value) captureSnapshot()
 
   await performFinalCleanup()
 
@@ -499,8 +500,12 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
     }
 
     // If the updated state indicates the match is over, ensure this client
-    // also shows the final results modal.
+    // also shows the final results modal and pre-capture the results snapshot
+    // so it survives any subsequent store resets from remote updates.
     if (ds.gameOver) {
+      if (!resultsSnapshot.value) {
+        captureSnapshot()
+      }
       if (!showModal.value) {
         showModal.value = true
       }
