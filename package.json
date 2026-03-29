@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "pnpm -F @hanafuda/frontend dev",
     "build": "pnpm -F @hanafuda/frontend build",
+    "generate": "pnpm -F @hanafuda/frontend generate",
     "test": "pnpm -F @hanafuda/frontend test",
     "dev:backend": "pnpm -F @hanafuda/backend dev",
     "build:backend": "pnpm -F @hanafuda/backend build",
