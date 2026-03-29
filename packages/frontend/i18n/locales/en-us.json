@@ -426,6 +426,27 @@
       "placeholder": "Enter your comment here..."
     }
   },
+  "multiplayerFeedback": {
+    "title": "How was your multiplayer experience?",
+    "rateExperience": "Rate your overall experience",
+    "overallExperience": "Overall Experience",
+    "submitted": "Thanks for your feedback!",
+    "comments": {
+      "title": "Comments",
+      "type": "Comment Type",
+      "types": {
+        "idea": "💡 idea",
+        "error": "🪲 error",
+        "other": "💬 other"
+      },
+      "descriptions": {
+        "idea": "How can we improve multiplayer, or what would you like to see next?",
+        "error": "Did you encounter any bugs during the match? Please describe the issue.",
+        "other": "Your feedback is greatly appreciated! 🙏🏽"
+      },
+      "placeholder": "Enter your comment here..."
+    }
+  },
   "announcements": {
     "whatsNewTitle": "What's New in Hanafuda Koi-Koi!",
     "pageTitle": "Announcements",

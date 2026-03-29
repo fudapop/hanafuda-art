@@ -412,6 +412,27 @@
       "placeholder": "ここにコメントを入力してください..."
     }
   },
+  "multiplayerFeedback": {
+    "title": "マルチプレイヤー体験はいかがでしたか？",
+    "rateExperience": "総合的な体験を評価してください",
+    "overallExperience": "総合評価",
+    "submitted": "フィードバックありがとうございます！",
+    "comments": {
+      "title": "コメント",
+      "type": "コメントの種類",
+      "types": {
+        "idea": "💡 アイデア",
+        "error": "🪲 エラー",
+        "other": "💬 その他"
+      },
+      "descriptions": {
+        "idea": "マルチプレイヤーをどのように改善できますか？",
+        "error": "試合中にバグに遭遇しましたか？問題を説明してください。",
+        "other": "あなたのフィードバックは非常に感謝しています！🙏🏽"
+      },
+      "placeholder": "ここにコメントを入力してください..."
+    }
+  },
   "announcements": {
     "whatsNewTitle": "花札こいこいの新機能！",
     "pageTitle": "お知らせ",

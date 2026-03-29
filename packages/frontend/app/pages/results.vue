@@ -24,6 +24,12 @@
           :self-key="snapshot.selfKey"
         />
 
+        <MultiplayerFeedbackForm
+          v-if="snapshot.isMultiplayer"
+          :open="showFeedback"
+          @close="showFeedback = false"
+        />
+
         <!-- Action buttons -->
         <div class="flex justify-center gap-4 px-4 py-8">
           <button
@@ -52,6 +58,7 @@ const { snapshot, clearSnapshot } = useGameResultsSnapshot()
 const gameStart = useState('start')
 
 const { isMultiplayerGame } = useLocalPlayerPerspective()
+const showFeedback = ref(true)
 
 // Guard: redirect to home if no snapshot data
 if (!snapshot.value) {

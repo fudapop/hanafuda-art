@@ -412,6 +412,27 @@
       "placeholder": "Wprowadź swój komentarz tutaj..."
     }
   },
+  "multiplayerFeedback": {
+    "title": "Jak oceniasz rozgrywkę wieloosobową?",
+    "rateExperience": "Oceń swoje ogólne wrażenia",
+    "overallExperience": "Ogólne wrażenia",
+    "submitted": "Dziękujemy za opinię!",
+    "comments": {
+      "title": "Komentarze",
+      "type": "Typ komentarza",
+      "types": {
+        "idea": "💡 pomysł",
+        "error": "🪲 błąd",
+        "other": "💬 inne"
+      },
+      "descriptions": {
+        "idea": "Jak możemy ulepszyć tryb wieloosobowy?",
+        "error": "Czy napotkałeś jakieś błędy podczas meczu? Opisz problem.",
+        "other": "Bardzo cenimy Twoją opinię! 🙏🏽"
+      },
+      "placeholder": "Wprowadź swój komentarz tutaj..."
+    }
+  },
   "announcements": {
     "whatsNewTitle": "Co nowego w Hanafuda Koi-Koi!",
     "pageTitle": "Ogłoszenia",

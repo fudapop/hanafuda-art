@@ -1,35 +1,24 @@
 <template>
-  <div class="relative min-w-[150px] pt-8">
-    <input
-      :value="modelValue"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-      :id="ratingId"
-      type="range"
-      min="0"
-      max="5"
-      step="1"
-      class="absolute inset-0 opacity-0 appearance-none cursor-pointer peer"
-    />
-    <label
-      :for="ratingId"
-      class="absolute flex inset-0 m-auto pl-[1.5ch] -top-2 justify-between pointer-events-none text-3xl rounded-xs peer-focus-visible:ring-2 peer-focus-visible:ring-primary"
+  <fieldset
+    class="flex gap-1"
+    :aria-label="ratingId"
+  >
+    <button
+      v-for="n in 5"
+      :key="n"
+      type="button"
+      class="text-3xl transition-transform cursor-pointer select-none hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+      :class="n <= modelValue ? 'text-primary' : 'opacity-50 text-text-secondary'"
+      :aria-label="`${n} star${n > 1 ? 's' : ''}`"
+      :aria-pressed="n <= modelValue"
+      @click="$emit('update:modelValue', n === modelValue ? 0 : n)"
     >
-      <span
-        v-for="n in getRange(modelValue)"
-        class="text-primary"
-        >&starf;</span
-      >
-      <span
-        v-for="n in getRange(5 - modelValue)"
-        class="opacity-50 text-text-secondary"
-        >&star;</span
-      >
-    </label>
-  </div>
+      {{ n <= modelValue ? '★' : '☆' }}
+    </button>
+  </fieldset>
 </template>
 
 <script setup lang="ts">
-import { getRange } from '~/utils/myUtils'
 const { ratingId, modelValue } = defineProps<{ ratingId: string; modelValue: number }>()
 defineEmits(['update:modelValue'])
 </script>

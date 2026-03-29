@@ -369,6 +369,27 @@
       "placeholder": "Saisissez votre commentaire ici..."
     }
   },
+  "multiplayerFeedback": {
+    "title": "Comment était votre expérience multijoueur ?",
+    "rateExperience": "Évaluez votre expérience globale",
+    "overallExperience": "Expérience globale",
+    "submitted": "Merci pour vos commentaires !",
+    "comments": {
+      "title": "Commentaires",
+      "type": "Type de commentaire",
+      "types": {
+        "idea": "💡 idée",
+        "error": "🪲 erreur",
+        "other": "💬 autre"
+      },
+      "descriptions": {
+        "idea": "Comment pouvons-nous améliorer le multijoueur ?",
+        "error": "Avez-vous rencontré des bugs pendant le match ? Veuillez décrire le problème.",
+        "other": "Vos commentaires sont grandement appréciés ! 🙏🏽"
+      },
+      "placeholder": "Saisissez votre commentaire ici..."
+    }
+  },
   "announcements": {
     "whatsNewTitle": "Nouveautés dans Hanafuda Koi-Koi !",
     "pageTitle": "Annonces",

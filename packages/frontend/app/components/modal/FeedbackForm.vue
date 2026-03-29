@@ -47,7 +47,7 @@
           <div class="grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>{{ t('feedback.categories.animationSmoothness') }}</p>
             <StarRating
-              class="max-sm:mt-4 max-sm:-translate-x-2"
+              class="max-sm:mt-2"
               ratingId="animation"
               v-model.number="ratings['animation']"
             />
@@ -55,7 +55,7 @@
           <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>{{ t('feedback.categories.easeOfControls') }}</p>
             <StarRating
-              class="max-sm:mt-4 max-sm:-translate-x-2"
+              class="max-sm:mt-2"
               ratingId="controls"
               v-model.number="ratings['controls']"
             />
@@ -63,7 +63,7 @@
           <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>{{ t('feedback.categories.imageQuality') }}</p>
             <StarRating
-              class="max-sm:mt-4 max-sm:-translate-x-2"
+              class="max-sm:mt-2"
               ratingId="image"
               v-model.number="ratings['image']"
             />
@@ -71,7 +71,7 @@
           <div class="mt-10 sm:mt-5 grid grid-rows-2 min-w-[300px] sm:grid-cols-2 w-full h-8">
             <p>{{ t('feedback.categories.soundQuality') }}</p>
             <StarRating
-              class="max-sm:mt-4 max-sm:-translate-x-2"
+              class="max-sm:mt-2"
               ratingId="audio"
               v-model.number="ratings['audio']"
             />
