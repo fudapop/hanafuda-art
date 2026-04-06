@@ -16,7 +16,7 @@ import { join } from '@std/path/join'
 // Parse command line arguments
 const isDryRun = Deno.args.includes('--dry-run') || Deno.args.includes('-d')
 
-const PACKAGE_JSON = join(import.meta.dirname!, '../package.json')
+const PACKAGE_JSON = join(import.meta.dirname!, '../packages/frontend/package.json')
 
 /**
  * Parse command string into command and args, handling quoted strings
