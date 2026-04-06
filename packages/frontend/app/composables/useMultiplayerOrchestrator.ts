@@ -53,6 +53,12 @@ export const useMultiplayerOrchestrator = () => {
       console.debug(`[pushSnapshot] Suppressed (${context}) — snapshot lock active`)
       return
     }
+    // Suppress pushes during opponent replay — local state is transient
+    const isReplaying = useState('opponent-replay-active', () => false)
+    if (isReplaying.value) {
+      console.debug(`[pushSnapshot] Suppressed (${context}) — opponent replay active`)
+      return
+    }
     if (!isMultiplayerGame.value) return
 
     const multiplayerMeta = useState<MultiplayerMeta>('multiplayer-game-meta', () => ({

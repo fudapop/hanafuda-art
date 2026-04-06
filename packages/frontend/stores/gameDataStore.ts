@@ -179,6 +179,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     eventHistory.push(log)
   }
   function nextPhase() {
+    if (roundOver.value) return // Round ended — stale async code should not advance phase
     // Loop through phases; select -> draw -> select -> etc...
     const i = (PHASES.indexOf(turnPhase.value) + 1) % PHASES.length
     const next = PHASES[i]
@@ -216,6 +217,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   }
 
   function endRound() {
+    if (roundOver.value) return // Already ended — prevent double-call from overwriting result
     if (!getCurrent.value.result)
       saveResult({
         round: roundCounter.value,

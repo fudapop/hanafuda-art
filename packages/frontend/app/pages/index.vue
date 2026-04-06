@@ -672,6 +672,7 @@ onMounted(() => {
   applyCardSizeMultiplier(isMobile ? 0.8 : undefined)
 
   watch(decisionIsPending, () => {
+    if (isReplaying.value) return // Suppress during opponent replay
     if (decisionIsPending.value) showModal.value = true
     if (koikoiIsCalled.value) handleKoikoi()
     if (stopIsCalled.value) handleStop()
@@ -690,6 +691,7 @@ onMounted(() => {
   watch(turnCounter, () => {
     // Handle an exhaustive draw condition
     if (turnCounter.value !== 9) return
+    if (isReplaying.value || ds.roundOver) return // Suppress during replay or deserialization
     const drawConditions = [
       handsEmpty.value,
       ds.checkCurrentPhase('select'),

@@ -111,8 +111,10 @@ const isDrawPhase = computed(
 const autoOpponent = useState('opponent')
 
 const playDrawPhase = async () => {
+  if (ds.roundOver) return
   draw()
   await sleep()
+  if (ds.roundOver) return
   // Allow player to select match
   if (matchedCards.value.length === 2) {
     await errorOnTimeout(selectMatchFromField, 30000, 'match-on-draw', {
@@ -124,6 +126,7 @@ const playDrawPhase = async () => {
     matchOrDiscard()
   }
   await sleep()
+  if (ds.roundOver) return
   collect()
   await sleep()
   while (decisionIsPending.value) {
