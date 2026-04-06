@@ -1,5 +1,19 @@
 # Changelog
 
+## [2026.4.0] - 2026-04-05
+
+### New Features
+- **Real-Time Multiplayer (Open Beta)**: Challenge friends to live Koi-Koi matches via invite codes. Create or join games with a shareable code, with auto-save so you can resume if disconnected.
+- **Post-Game Results Page**: New match statistics screen with detailed breakdowns after each game.
+- **Multiplayer Feedback Form**: Share your experience and report issues directly after each multiplayer match, backed by Firestore.
+- **Forfeit & Accessibility**: Forfeit option for multiplayer matches, plus accessibility improvements across the multiplayer UI.
+- **Separate Match Rules**: Multiplayer games now have their own rule configuration, independent of single-player UI preferences.
+- **Announcement Banner**: Replaced the announcement modal with a quiet, persistent notification banner that stays until explicitly dismissed.
+
+### Performance & Technical Improvements
+- **Lighthouse Score Improvements**: Improved CLS, accessibility, and performance scores.
+- **Monorepo Restructure**: Restructured the project into a pnpm monorepo for better organization.
+
 ## [2026.2.0] - 2026-02-20
 
 ### Bug Fixes

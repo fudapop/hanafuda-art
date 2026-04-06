@@ -1,5 +1,19 @@
 # Journal des modifications
 
+## [2026.4.0] - 2026-04-05
+
+### Nouvelles fonctionnalités
+- **Multijoueur en temps réel (Bêta ouverte)** : Défiez vos amis en Koi-Koi en direct via des codes d'invitation. Créez ou rejoignez des parties avec un code partageable, avec sauvegarde automatique pour reprendre en cas de déconnexion.
+- **Page de résultats post-partie** : Nouvel écran de statistiques détaillées après chaque partie.
+- **Formulaire de retour multijoueur** : Partagez votre expérience et signalez les problèmes directement après chaque match multijoueur, sauvegardé dans Firestore.
+- **Abandon et accessibilité** : Option d'abandon pour les matchs multijoueur, ainsi que des améliorations d'accessibilité dans l'interface multijoueur.
+- **Règles de match séparées** : Les parties multijoueur ont désormais leur propre configuration de règles, indépendante des préférences du mode solo.
+- **Bannière d'annonces** : Remplacement du modal d'annonces par une bannière de notification discrète et persistante qui reste visible jusqu'à fermeture explicite.
+
+### Améliorations de performance et techniques
+- **Scores Lighthouse améliorés** : Amélioration des scores CLS, accessibilité et performance.
+- **Restructuration en monorepo** : Restructuration du projet en monorepo pnpm pour une meilleure organisation.
+
 ## [2026.2.0] - 2026-02-20
 
 ### Corrections de bugs

@@ -1,5 +1,19 @@
 # Dziennik zmian
 
+## [2026.4.0] - 2026-04-05
+
+### Nowe funkcje
+- **Multiplayer w czasie rzeczywistym (Otwarta Beta)**: Wyzwij przyjaciół na rozgrywki Koi-Koi na żywo za pomocą kodów zaproszeń. Twórz lub dołączaj do gier z udostępnianym kodem, z autozapisem umożliwiającym wznowienie po rozłączeniu.
+- **Strona wyników po meczu**: Nowy ekran ze szczegółowymi statystykami po każdej grze.
+- **Formularz opinii multiplayer**: Podziel się swoimi wrażeniami i zgłoś problemy bezpośrednio po każdym meczu multiplayer, z kopią zapasową w Firestore.
+- **Poddanie się i dostępność**: Opcja poddania się w meczach multiplayer oraz ulepszenia dostępności w interfejsie multiplayer.
+- **Osobne zasady meczu**: Gry multiplayer mają teraz własną konfigurację zasad, niezależną od preferencji trybu jednoosobowego.
+- **Baner ogłoszeń**: Zastąpienie okna modalnego ogłoszeń dyskretnym, trwałym banerem powiadomień, który pozostaje widoczny do jawnego zamknięcia.
+
+### Ulepszenia wydajności i techniczne
+- **Poprawione wyniki Lighthouse**: Ulepszenie wyników CLS, dostępności i wydajności.
+- **Restrukturyzacja na monorepo**: Restrukturyzacja projektu na monorepo pnpm dla lepszej organizacji.
+
 ## [2026.2.0] - 2026-02-20
 
 ### Naprawione błędy
