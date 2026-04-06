@@ -511,7 +511,9 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
       if (ds.roundOver && !decisionIsPending.value) {
         showModal.value = true
       }
-    } else {
+    } else if (!ds.roundOver && !ds.gameOver) {
+      // Only sync when the round/game is not already settled.
+      // Round-end and ack updates are handled by the ack logic below.
       const synced = await syncMultiplayerGame(game.gameId)
       if (!synced) {
         toast.error(t('multiplayer.sync_error_update'), { duration: 8000 })
