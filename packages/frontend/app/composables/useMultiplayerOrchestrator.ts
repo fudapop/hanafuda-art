@@ -3,10 +3,11 @@ import { toast } from 'vue-sonner'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import type { PlayerKey } from '~~/stores/playerStore'
 import { usePlayerStore } from '~~/stores/playerStore'
-import type { GameStatus, MultiplayerGame } from '~~/types/profile'
+import type { GameStatus, MultiplayerGame, RoundAckState } from '~~/types/profile'
 
 type SnapshotMetadata = {
   terminalStatus?: GameStatus | null
+  roundAcks?: RoundAckState | null
 }
 
 type MultiplayerMeta = {
@@ -74,6 +75,7 @@ export const useMultiplayerOrchestrator = () => {
 
     const plainMetadata: SnapshotMetadata = {
       terminalStatus: metadata?.terminalStatus ?? terminalStatus.value ?? null,
+      roundAcks: metadata?.roundAcks,
     }
 
     try {

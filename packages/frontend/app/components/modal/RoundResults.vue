@@ -88,11 +88,18 @@
         class="flex items-center justify-end shrink-0 gap-3 my-auto ml-4"
       >
         <button
+          v-if="!waitingForOpponent"
           class="text-base uppercase pri-btn lg:text-xl"
           @click="() => $emit('next')"
         >
           {{ t('common.actions.next') }}
         </button>
+        <p
+          v-else
+          class="text-sm font-semibold tracking-wide animate-pulse text-text-secondary"
+        >
+          {{ t('multiplayer.waiting_for_opponent') }}
+        </p>
       </div>
     </div>
   </div>
@@ -132,8 +139,10 @@ defineEmits(['next'])
 
 const {
   showAckControls = false,
+  waitingForOpponent = false,
 } = defineProps<{
   showAckControls?: boolean
+  waitingForOpponent?: boolean
 }>()
 
 const { p1Avatar, p2Avatar } = useAvatar()

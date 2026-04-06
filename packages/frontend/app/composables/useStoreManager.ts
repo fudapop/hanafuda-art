@@ -54,6 +54,7 @@ import type {
   GameStatus,
   LocalGameSaveStore,
   MultiplayerGame,
+  RoundAckState,
   SyncStatus,
 } from '~~/types/profile'
 import {
@@ -94,6 +95,7 @@ const memoryGameSaveStores = {
 
 type MultiplayerSyncMetadata = {
   terminalStatus?: GameStatus | null
+  roundAcks?: RoundAckState | null
 }
 
 const createMemoryGameSaveStore = (): LocalGameSaveStore => {
@@ -894,6 +896,7 @@ export const useStoreManager = () => {
 
     const plainMetadata: MultiplayerSyncMetadata = {
       terminalStatus: metadata?.terminalStatus ?? null,
+      roundAcks: metadata?.roundAcks ?? null,
     }
 
     // Serialize once for both IDB and Firestore.
@@ -938,6 +941,7 @@ export const useStoreManager = () => {
             activePlayer,
             status: statusToPersist,
             terminalStatus,
+            roundAcks: plainMetadata.roundAcks ?? null,
             lastUpdated: new Date(),
             createdAt: new Date(), // Will be overwritten if game already exists
           }

@@ -105,7 +105,8 @@
         />
         <RoundResults
           v-else
-          :show-ack-controls="roundOver && !gameOver && (!isMultiplayerGame || players[selfKey].isActive)"
+          :show-ack-controls="roundOver && !gameOver"
+          :waiting-for-opponent="waitingForRoundAck"
           @next="handleNext"
         />
       </ResultsModal>
@@ -152,6 +153,8 @@ const ds = useGameDataStore()
 
 const advancingRound = ref(false)
 const finalCleanupDone = ref(false)
+const waitingForRoundAck = ref(false)
+const remoteRoundAcks = ref<{ round: number; p1: boolean; p2: boolean } | null>(null)
 
 const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const {
@@ -307,11 +310,16 @@ const advanceToNextRound = async () => {
       snapshotLocked.value = false
     }
 
+    // Reset round ack state
+    waitingForRoundAck.value = false
+    remoteRoundAcks.value = null
+
     // In multiplayer, push a fresh snapshot immediately after starting the new round
     // so the opponent sees the new round state before the first turn completes.
     // This must happen AFTER the lock is released.
     await pushMultiplayerSnapshot('new-round', undefined, {
       terminalStatus: null,
+      roundAcks: null,
     })
   } finally {
     advancingRound.value = false
@@ -319,14 +327,31 @@ const advanceToNextRound = async () => {
 }
 
 const handleNext = async () => {
-  // In multiplayer, the non-active player just dismisses the modal locally.
-  // The active player will advance the round and push the new-round snapshot.
-  if (isMultiplayerGame.value && !players.value[selfKey.value].isActive) {
-    showModal.value = false
-    showLoader.value = true
+  if (!isMultiplayerGame.value) {
+    await advanceToNextRound()
     return
   }
-  await advanceToNextRound()
+
+  // In multiplayer, both players must ack before advancing.
+  // Merge our ack with any existing remote ack state.
+  const round = ds.roundHistory.length
+  const existing = remoteRoundAcks.value?.round === round ? remoteRoundAcks.value : null
+  const acks = {
+    round,
+    p1: existing?.p1 ?? false,
+    p2: existing?.p2 ?? false,
+    [selfKey.value]: true,
+  }
+
+  // If opponent already acked, both are ready — advance immediately
+  if (acks.p1 && acks.p2) {
+    waitingForRoundAck.value = false
+    await pushMultiplayerSnapshot('round-ack', undefined, { roundAcks: acks })
+    await advanceToNextRound()
+  } else {
+    waitingForRoundAck.value = true
+    await pushMultiplayerSnapshot('round-ack', undefined, { roundAcks: acks })
+  }
 }
 
 const performFinalCleanup = async () => {
@@ -441,6 +466,8 @@ const resetAllStores = () => {
   cs.reset() // Reset card store
   terminalStatus.value = null
   finalCleanupDone.value = false
+  waitingForRoundAck.value = false
+  remoteRoundAcks.value = null
 }
 
 // Buffer for remote updates that arrive while a replay is in progress.
@@ -497,6 +524,28 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
       await setMyStatus(isMyTurn ? 'playing' : 'online').catch((err) =>
         console.error('[Presence] Failed to update status after remote update:', err),
       )
+    }
+
+    // Track remote round ack state for merging when this player clicks Next.
+    if (game.roundAcks) {
+      remoteRoundAcks.value = game.roundAcks
+    }
+
+    // Handle round acknowledgement for multiplayer round transitions.
+    // When both players have acked, advance to the next round.
+    if (game.roundAcks && game.roundAcks.p1 && game.roundAcks.p2 && ds.roundOver && !ds.gameOver) {
+      waitingForRoundAck.value = false
+      await advanceToNextRound()
+    } else if (
+      game.roundAcks
+      && game.roundAcks[opponentKey.value]
+      && !game.roundAcks[selfKey.value]
+      && waitingForRoundAck.value
+    ) {
+      // Race condition: both players clicked Next simultaneously.
+      // Our ack was overwritten by the opponent's push. Re-push with both acks merged.
+      const mergedAcks = { ...game.roundAcks, [selfKey.value]: true }
+      await pushMultiplayerSnapshot('round-ack-merge', undefined, { roundAcks: mergedAcks })
     }
 
     // If the updated state indicates the match is over, ensure this client
