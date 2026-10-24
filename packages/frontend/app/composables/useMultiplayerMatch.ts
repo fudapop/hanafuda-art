@@ -74,7 +74,9 @@ export type MultiplayerMatchComposable = {
    * @param code The invite code to validate
    * @returns Object with validity status, optional error, and host's matchRules when valid
    */
-  validateInviteCode: (code: string) => Promise<{ valid: boolean; error?: string; matchRules?: GameRules }>
+  validateInviteCode: (
+    code: string,
+  ) => Promise<{ valid: boolean; error?: string; matchRules?: GameRules }>
 
   /**
    * List active multiplayer games for current user
@@ -141,7 +143,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
     useState<OpponentPlayer | null>('multiplayer-opponent', () => null)
 
   const setOpponentPlayer = async (opponentUid: string) => {
-    const opponentDoc = await getDoc(doc(db, 'users', `u_${opponentUid}`))
+    const opponentDoc = await getDoc(doc(db, 'leaderboard', opponentUid))
     if (opponentDoc.exists()) {
       const opponent = useOpponentPlayer()
       const opponentData = opponentDoc.data()
@@ -446,9 +448,9 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
           activePlayer: data.activePlayer,
           status: data.status,
           inviteCode: data.inviteCode,
-      roundAcks: data.roundAcks ?? null,
-      finalSeen: data.finalSeen ?? null,
-      terminalStatus: data.terminalStatus ?? null,
+          roundAcks: data.roundAcks ?? null,
+          finalSeen: data.finalSeen ?? null,
+          terminalStatus: data.terminalStatus ?? null,
           startedAt: data.startedAt ? convertTimestamp(data.startedAt) : undefined,
           lastUpdated: convertTimestamp(data.lastUpdated),
           createdAt: convertTimestamp(data.createdAt),

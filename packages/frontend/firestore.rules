@@ -14,10 +14,57 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      // Users can read all if authenticated
-      allow read: if request.auth != null;
-      // User can create/update/delete only their own profile document
-      allow write: if request.auth != null && userId == 'u_' + request.auth.uid;
+      function isOwner() {
+        return request.auth != null && userId == 'u_' + request.auth.uid;
+      }
+
+      // Private profile, including anything previously stored here.
+      // Other players read public fields from /leaderboard/{uid} instead.
+      allow read: if isOwner();
+
+      // Email is not a client-readable field. deleteField() removes an existing value;
+      // a merge that leaves `email` in place is rejected.
+      allow create, update: if isOwner()
+        && !request.resource.data.keys().hasAny(['email']);
+
+      allow delete: if isOwner();
+    }
+
+    match /leaderboard/{userId} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function isValidEntry() {
+        return request.resource.data.keys().hasOnly([
+            'uid', 'username', 'avatar', 'isGuest', 'record',
+            'totalGames', 'winRate', 'hasGames', 'meetsMinGames', 'lastUpdated'
+          ])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.username is string
+          && request.resource.data.username.size() > 0
+          && request.resource.data.username.size() <= 200
+          && request.resource.data.avatar is string
+          && request.resource.data.avatar.size() > 0
+          && request.resource.data.avatar.size() <= 2048
+          && request.resource.data.isGuest is bool
+          && request.resource.data.totalGames is number
+          && request.resource.data.winRate is number
+          && request.resource.data.hasGames is bool
+          && request.resource.data.meetsMinGames is bool
+          && request.resource.data.lastUpdated is timestamp
+          && request.resource.data.record.keys().hasOnly(['win', 'loss', 'draw', 'coins'])
+          && request.resource.data.record.win is number
+          && request.resource.data.record.loss is number
+          && request.resource.data.record.draw is number
+          && request.resource.data.record.coins is number;
+      }
+
+      // Public ranking fields only. Readable without signing in so the Rankings page
+      // does not need the private users collection.
+      allow read: if true;
+      allow create, update: if isOwner() && isValidEntry();
+      allow delete: if isOwner();
     }
 
     // NEW: per-user game saves
