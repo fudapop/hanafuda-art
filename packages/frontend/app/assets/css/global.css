@@ -596,6 +596,19 @@ body > svg[style*="z-index: -99999999"] {
   padding-right: calc(var(--board-card-used, 0px) * 0.5);
 }
 
+/* The two-row field fits at the normal card size. A third row used to be
+   scale-75, which only shrank the paint and still overlapped the hand on a
+   medium-height window. Cap the used height so three rows stay above the
+   collection and the hand. */
+.board-field:has(.field-dense) {
+  --card-height: min(
+    var(--card-height-pref, 140px),
+    var(--card-height-cap, 9999px),
+    18svh,
+    84px
+  );
+}
+
 .board-opponent {
   --opp-card-pref: 60px;
   --card-height: min(var(--opp-card-pref), var(--card-height-cap, 60px));

@@ -2,8 +2,10 @@
   <div class="w-full px-4 opacity-90 isolate">
     <div
       :class="[
-        'grid grid-rows-1 grid-cols-[repeat(4,minmax(0,max-content))] gap-x-2 sm:gap-x-8 [--card-height:60px] w-full max-w-full mx-auto justify-center',
-        isMobileLandscape && 'w-36 gap-x-0! grid-rows-2! grid-cols-2! absolute right-12',
+        'grid mx-auto [--card-height:60px]',
+        isMobileLandscape
+          ? 'w-36! max-w-36 gap-x-0! grid-rows-2! grid-cols-2! absolute right-12'
+          : 'grid-rows-1 grid-cols-[repeat(4,minmax(0,max-content))] gap-x-2 sm:gap-x-8 w-full max-w-full justify-center',
       ]"
     >
       <ul

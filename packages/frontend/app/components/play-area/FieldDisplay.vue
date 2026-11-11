@@ -3,6 +3,7 @@
     :aria-label="t('game.regions.field')"
     :class="[
       'field-cards transition-all duration-500 ease-out w-max grid gap-1',
+      thirdRowIsOccupied && 'field-dense',
       !thirdRowIsOccupied
         ? `
       grid-cols-auto grid-rows-2 grid-flow-col
