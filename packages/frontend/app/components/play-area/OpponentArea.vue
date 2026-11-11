@@ -1,7 +1,7 @@
 <template>
   <div class="relative w-full h-full isolate">
-    <div :class="['absolute bottom-0 inset-x-0', cardAreaClasses]">
-      <div class="relative mx-auto w-max">
+    <div class="board-opponent fit-cards absolute bottom-0 inset-x-0">
+      <div class="relative mx-auto w-max max-w-full">
         <!-- OPPONENT HAND -->
         <ListGrid
           :cols="8"
@@ -66,28 +66,11 @@
 </template>
 
 <script setup lang="ts">
-import { useBreakpoints, useScreenOrientation } from '@vueuse/core'
 import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { usePlayerStore } from '~~/stores/playerStore'
 
-// Breakpoint and orientation detection for responsive opponent area
-const breakpoints = useBreakpoints({
-  sm: 640,
-  lg: 1024,
-})
-
-const { orientation } = useScreenOrientation()
-const isLandscape = computed(() => orientation.value?.includes('landscape'))
-const isMobile = breakpoints.smaller('sm')
-
 const { opponentKey } = useLocalPlayerPerspective()
-
-// Responsive card area classes
-const cardAreaClasses = computed(() => ({
-  '[--card-height:60px] lg:[--card-height:75px]': !isMobile.value || !isLandscape.value, // Standard sizes
-  '[--card-height:45px]': isMobile.value && isLandscape.value, // Compact size for landscape mobile
-}))
 
 const { hand, staged } = useCardStore()
 const { players } = usePlayerStore()

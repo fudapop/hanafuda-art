@@ -42,6 +42,10 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'en',
       },
+      // viewport-fit=cover lets env(safe-area-inset-*) resolve on notched iPhones
+      // and in standalone PWA display. Do not lock zoom — accessibility text and
+      // pinch-zoom must keep working.
+      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
       link: [
         {
           rel: 'icon',

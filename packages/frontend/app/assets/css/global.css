@@ -267,14 +267,27 @@ body > svg[style*="z-index: -99999999"] {
     --chart-5: hsl(340 75% 55%);
   }
 
+  html {
+    /* Stop iOS from inflating text in landscape (that inflation overflows fixed
+       rows) while still honoring the user's text-size setting and pinch zoom. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--color-background);
-    --card-height: 140px;
+    --card-height-pref: 140px;
+    --card-height: var(--card-height-pref);
     --card-aspect: 2/3;
     --table-grid-rows: calc(var(--card-height) / 1.5) 1fr calc(var(--card-height) * 2) 1fr
       var(--card-height);
     --landscape-grid-rows: repeat(3, max-content);
-    min-width: 320px;
+    /* 100% wins below 320px so a zoomed or split visual viewport cannot force
+       a horizontal page scroll. */
+    min-width: min(320px, 100%);
+    max-width: 100%;
+    overflow-x: clip;
     max-height: 100vh;
     max-height: 100dvh;
     font-family: Rubik, sans-serif;
@@ -469,4 +482,151 @@ body > svg[style*="z-index: -99999999"] {
   /* to {
       transform: translate(0) rotate(0deg);
     } */
+}
+
+/*
+  Phone board fit
+  ---------------
+  Card rows used to be w-screen + overflow-x-auto, so a narrow viewport (or a
+  phone browser that is not detected as mobile and therefore keeps the desktop
+  card size) scrolled sideways instead of shrinking the cards. Each row is a
+  container and sets --card-max-width to the widest card that still fits:
+
+  - hand: 8 cards overlapped by 1rem (-ml-4)
+  - field: deck + 5 columns + a half-card stagger (the 2-row board always
+    lays out 10 slots; the dense 5-column board is the same width)
+  - opponent: 8 face-down cards with a 2px gap, inset so the exit button
+    does not cover the last card
+  - collections: 4 stacks
+
+  --card-aspect is a <number>/<number> token (for example 2/3). Substituting it
+  into calc() yields `height * w / h`, which is the card width.
+*/
+.board-fit {
+  --card-height-cap: 9999px;
+  --card-height: min(var(--card-height-pref, 140px), var(--card-height-cap));
+}
+
+@media (max-height: 700px) {
+  .board-fit {
+    --card-height-cap: min(120px, 22svh);
+  }
+}
+
+@media (max-height: 500px) {
+  .board-fit {
+    /* Two field rows plus both hands have to share a short landscape viewport. */
+    --card-height-cap: min(64px, 16svh);
+  }
+
+  /* Pull the opponent row and the field up so the hand is not stacked on the field. */
+  .board-opponent-slot {
+    height: 4.5rem;
+  }
+
+  .board-field {
+    top: 4.75rem;
+  }
+}
+
+.fit-cards .card,
+.fit-cards .card-slot {
+  aspect-ratio: var(--card-aspect, 2 / 3);
+  width: min(
+    calc(var(--card-height) * var(--card-aspect, 2 / 3)),
+    var(--card-max-width, calc(var(--card-height) * var(--card-aspect, 2 / 3)))
+  );
+  height: auto;
+}
+
+/* Face art must not contribute to (or collapse) the aspect-ratio box. */
+.fit-cards .card:not([class~='absolute']) {
+  position: relative;
+}
+
+.fit-cards .card > div {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.board-hand,
+.board-field,
+.board-opponent,
+.board-collection {
+  container-type: inline-size;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+.board-hand {
+  padding-inline: max(0.35rem, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  /* 8 cards, 7 overlaps of 1rem, plus a few px so a selected card's scale-105 stays inside. */
+  --card-max-width: calc((100cqi - 8px + 7 * 1rem) / 8);
+}
+
+.board-field {
+  max-width: 48rem;
+  margin-inline: auto;
+  padding-inline: max(0.5rem, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  /* deck + 5 columns + half-card stagger, minus the column gaps (0.5rem + 4 * 0.25rem). */
+  --board-card-max: calc((100cqi - 1.5rem - 4px) / 6.5);
+  --board-card-used: min(
+    calc(var(--card-height) * var(--card-aspect, 2 / 3)),
+    var(--board-card-max)
+  );
+  --card-max-width: var(--board-card-max);
+}
+
+.board-field-grid {
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  grid-template-columns: var(--board-card-used, max-content) max-content;
+  column-gap: 0.5rem;
+  align-items: stretch;
+}
+
+.board-field .field-cards {
+  box-sizing: border-box;
+  /* Reserve the half-card the staggered row paints past the last column. */
+  padding-right: calc(var(--board-card-used, 0px) * 0.5);
+}
+
+.board-opponent {
+  --opp-card-pref: 60px;
+  --card-height: min(var(--opp-card-pref), var(--card-height-cap, 60px));
+  padding-left: max(0.25rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.25rem, env(safe-area-inset-right, 0px));
+  --card-max-width: calc((100cqi - 7 * 2px) / 8);
+}
+
+@media (min-width: 1024px) {
+  .board-opponent {
+    --opp-card-pref: 75px;
+  }
+}
+
+@media (max-height: 500px) {
+  .board-opponent {
+    --opp-card-pref: 45px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .board-opponent {
+    /* The fixed exit button sits over the right end of this row. */
+    padding-right: max(3.5rem, env(safe-area-inset-right, 0px));
+  }
+}
+
+.board-collection {
+  max-width: 48rem;
+  margin-inline: auto;
+  overflow-x: clip;
+  padding-inline: max(0.5rem, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --card-max-width: calc((100cqi - 1.5rem) / 4);
 }

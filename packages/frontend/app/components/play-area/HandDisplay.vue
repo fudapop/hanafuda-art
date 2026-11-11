@@ -10,7 +10,7 @@
     >
       <p
         v-if="awaitingSelection"
-        class="absolute inset-x-0 -top-8 mx-auto max-w-3/4 text-center text-sm text-text/70 pointer-events-none bg-gradient-to-r from-transparent via-background to-transparent py-1"
+        class="relative z-10 mb-1 mx-auto max-w-3/4 text-center text-sm text-text/70 pointer-events-none"
       >
         {{ t('game.regions.yourTurn') }} &mdash; {{ t('game.hints.selectCard') }}
       </p>

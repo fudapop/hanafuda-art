@@ -2,14 +2,13 @@
   <ul
     :aria-label="t('game.regions.field')"
     :class="[
-      'transition-all duration-500 ease-out w-max grid gap-1',
+      'field-cards transition-all duration-500 ease-out w-max grid gap-1',
       !thirdRowIsOccupied
         ? `
       grid-cols-auto grid-rows-2 grid-flow-col
       [&>:nth-child(even)]:-translate-y-4 [&>:nth-child(even)]:translate-x-1/2 [&>:nth-child(even)]:z-10
       `
         : `
-      origin-left scale-75
       grid-rows-auto grid-cols-5 grid-flow-row
       [&>:nth-child(n+6)]:-translate-y-8 [&>:nth-child(n+6):nth-child(-n+10)]:translate-x-1/2
       [&>:nth-child(n+11):nth-child(-n+15)]:-translate-y-20
@@ -57,7 +56,7 @@
         <template v-else>
           <div
             v-show="isThirdRow(index) ? thirdRowIsOccupied : true"
-            class="z-0 h-(--card-height) aspect-(--card-aspect) rounded-(--card-radius) border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
+            class="card-slot z-0 rounded-(--card-radius) border-none relative after:opacity-10 after:absolute after:inset-0 after:m-auto after:h-[90%] after:w-[90%] after:border after:border-white after:rounded-[inherit]"
           >
             <span class="sr-only">empty field slot</span>
 

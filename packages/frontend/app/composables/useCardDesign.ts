@@ -152,6 +152,9 @@ export const useCardDesign = () => {
         if (document) {
           const baseHeight = 140 // Base card height in pixels
           const newHeight = baseHeight * multiplier
+          // Preferred size. Narrow boards cap the used --card-height against this
+          // so a phone viewport (or a desktop-mode mobile browser) cannot overflow.
+          document.body.style.setProperty('--card-height-pref', `${newHeight}px`)
           document.body.style.setProperty('--card-height', `${newHeight}px`)
         }
       },

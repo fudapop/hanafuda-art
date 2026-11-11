@@ -36,13 +36,13 @@
         <div
           v-else
           :class="[
-            'absolute px-4 py-8 overflow-hidden rounded-md shadow-lg -z-10 bg-white dark:bg-hanafuda-cream w-max h-max',
-            'landscape:h-screen landscape:top-0 landscape:right-0 landscape:w-1/2 landscape:max-w-none landscape:overflow-y-auto',
+            'absolute px-4 py-8 overflow-x-clip overflow-y-auto rounded-md shadow-lg -z-10 bg-white dark:bg-hanafuda-cream box-border w-full max-w-full min-w-0',
+            'inset-x-0 top-32 bottom-0',
+            'landscape:inset-y-0 landscape:left-auto landscape:right-0 landscape:top-0 landscape:bottom-0 landscape:h-auto landscape:w-1/2',
             !isMobile && 'landscape:flex landscape:items-center',
-            'portrait:bottom-1/4 portrait:inset-x-0 portrait:top-32 portrait:w-screen',
           ]"
         >
-          <div class="max-w-md mx-auto min-w-[300px] pt-8 w-full space-y-8">
+          <div class="max-w-md mx-auto min-w-0 pt-4 w-full space-y-8">
             <EmailLoginForm
               @success="handleLoginSuccess"
               @error="handleLoginError"

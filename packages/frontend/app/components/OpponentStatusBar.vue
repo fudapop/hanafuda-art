@@ -1,7 +1,7 @@
 <template>
-  <div class="relative w-full h-16 px-4 py-2">
-    <div class="size-full mx-auto flex items-start">
-      <div class="flex space-x-2 sm:space-x-4">
+  <div class="relative w-full min-h-16 max-w-full overflow-x-clip px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))]">
+    <div class="size-full mx-auto flex items-start min-w-0">
+      <div class="flex min-w-0 max-w-full space-x-2 sm:space-x-4">
         <div class="shrink-0">
           <img
             :src="opponentAvatar"
@@ -9,7 +9,7 @@
             :alt="opponentName"
           />
         </div>
-        <div class="flex items-start sm:flex-col sm:justify-start gap-x-2">
+        <div class="flex min-w-0 items-start sm:flex-col sm:justify-start gap-x-2">
           <div
             :class="[
               'flex text-sm gap-x-4  text-white/90',
@@ -17,7 +17,7 @@
             ]"
           >
             <p class="flex items-center font-bold gap-x-2">
-              <span class="">{{ opponentName }}</span>
+              <span class="truncate max-w-[42vw] sm:max-w-[16rem] lg:max-w-none">{{ opponentName }}</span>
               <span
                 class="flex items-center"
                 v-memo="[ds.roundOver, gameStart]"
