@@ -11,7 +11,11 @@ import {
 } from '~/utils/profile'
 import type { PlayerStatsKey } from '~/utils/stats'
 import { updateStatsWithOps, verifyStatsIntegrity } from '~/utils/stats'
-import { resolveConflict as resolveProfileConflict, type ConflictResolution } from '~/utils/sync'
+import {
+  preserveLocalEmail,
+  resolveConflict as resolveProfileConflict,
+  type ConflictResolution,
+} from '~/utils/sync'
 import { useConfigStore, type GameSettings } from '~~/stores/configStore'
 import type {
   LocalProfileStore,
@@ -340,11 +344,12 @@ export const usePlayerProfile = () => {
         console.info('No guest profile to transfer, creating new authenticated profile')
 
         if (remoteProfile) {
-          // Use existing remote profile
+          // Remote user docs no longer store email. Keep the address from Auth.
+          const loaded = preserveLocalEmail((user as any).email || '', remoteProfile)
           console.info('Loading existing remote profile')
-          await store.set(sanitizeProfile(remoteProfile))
-          profile.value = remoteProfile
-          return remoteProfile
+          await store.set(sanitizeProfile(loaded))
+          profile.value = loaded
+          return loaded
         } else {
           // No guest and no remote, create fresh authenticated profile
           const newProfile = await createDefaultProfile(
@@ -379,6 +384,7 @@ export const usePlayerProfile = () => {
 
         const mergedProfile: PlayerProfile = {
           ...existingAuthProfile,
+          email: existingAuthProfile.email || (user as any).email || '',
           // Merge game records by adding them together
           record: {
             win: guestProfile.record.win + existingAuthProfile.record.win,
@@ -616,8 +622,12 @@ export const usePlayerProfile = () => {
     // Use adapter's resolve method if provided
     if (syncAdapter.value?.resolve) {
       // Adapter's resolve returns PlayerProfile, wrap it in ConflictResolution
-      // We assume it's merged since we don't know the source
-      const resolved = await syncAdapter.value.resolve(local, remote)
+      // We assume it's merged since we don't know the source.
+      // Preserve email here as well: a newer remote doc has no email field.
+      const resolved = preserveLocalEmail(
+        local.email,
+        await syncAdapter.value.resolve(local, remote),
+      )
       return { resolved, source: 'merged' }
     }
 
@@ -705,8 +715,9 @@ export const usePlayerProfile = () => {
         const local = await store.get(uid)
 
         if (!local) {
-          // No local profile - use remote
-          await loadUserData({ uid } as any, remote)
+          // No local profile. Restore email from the in-memory profile when Firestore has none.
+          const adopted = preserveLocalEmail(profile.value?.email, remote)
+          await loadUserData({ uid } as any, adopted)
           await setLocalData() // Use setLocalData to properly sanitize before saving
           await store.setSyncMetadata(uid, {
             lastSyncedAt: new Date(),
@@ -848,7 +859,9 @@ export const usePlayerProfile = () => {
         pendingChanges: true,
         syncVersion: errorMeta?.syncVersion ?? 0,
       })
-      syncStatus.value = 'error'
+      // Stay idle with pendingChanges set. Auto-sync only runs while the status is idle,
+      // so leaving this at 'error' would drop later retries until a manual sync.
+      syncStatus.value = 'idle'
       return {
         success: false,
         error: error.message,

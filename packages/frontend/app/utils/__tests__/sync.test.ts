@@ -50,6 +50,26 @@ describe('resolveConflict', () => {
       expect(result.source).toBe('remote')
     })
 
+    it('keeps the local email when a newer remote profile has none', async () => {
+      const local = await createMockProfile({
+        lastUpdated: new Date('2025-01-01'),
+        email: 'local@test.com',
+        username: 'LocalUser',
+      })
+      const remote = await createMockProfile({
+        lastUpdated: new Date('2025-01-02'),
+        email: '',
+        username: 'RemoteUser',
+      })
+
+      const result = await resolveConflict(local, remote, 'last-write-wins')
+
+      expect(result.source).toBe('remote')
+      expect(result.resolved.email).toBe('local@test.com')
+      expect(result.resolved.username).toBe('RemoteUser')
+      expect(result.resolved).not.toBe(remote)
+    })
+
     it('should return remote when timestamps are equal', async () => {
       const timestamp = new Date('2025-01-01')
       const local = await createMockProfile({ lastUpdated: timestamp })

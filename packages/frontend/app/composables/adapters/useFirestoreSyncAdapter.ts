@@ -1,10 +1,23 @@
-import { doc, getDoc, setDoc, getFirestore, onSnapshot } from 'firebase/firestore'
+import {
+  deleteField,
+  doc,
+  getDoc,
+  getFirestore,
+  onSnapshot,
+  Timestamp,
+  writeBatch,
+} from 'firebase/firestore'
 import type { SyncAdapter, PlayerProfile } from '~/types/profile'
+import { buildLeaderboardEntry } from '~/utils/leaderboard'
 import { sanitizeFirestoreData } from '~/utils/profile'
+import { preserveLocalEmail } from '~/utils/sync'
 
 /**
- * Firestore sync adapter for remote profile storage
- * Collection: users/{u_{uid}}
+ * @fileoverview Firestore sync adapter for remote profile storage.
+ *
+ * Private data lives at `users/u_{uid}` and is readable only by that user.
+ * A public `leaderboard/{uid}` snapshot is written in the same push so Rankings
+ * and multiplayer can show a name, avatar, and record without reading email.
  */
 export function useFirestoreSyncAdapter(): SyncAdapter {
   const db = getFirestore()
@@ -33,17 +46,20 @@ export function useFirestoreSyncAdapter(): SyncAdapter {
 
     async push(profile: PlayerProfile): Promise<boolean> {
       try {
-        const docRef = doc(db, 'users', `u_${profile.uid}`)
+        const updatedAt =
+          profile.lastUpdated instanceof Date ? profile.lastUpdated : new Date(profile.lastUpdated)
+        const entry = buildLeaderboardEntry({ ...profile, lastUpdated: updatedAt })
+        if (!entry) return false
 
-        // Convert Date to Firestore Timestamp for storage
-        // Remove undefined values which Firestore doesn't accept
-        const firestoreData: Record<string, any> = {
+        // Email stays in Firebase Auth and IndexedDB. deleteField() is required in this
+        // same write so an older document that still has email passes the security rules.
+        const firestoreData: Record<string, unknown> = {
           uid: profile.uid,
-          email: profile.email,
+          email: deleteField(),
           avatar: profile.avatar,
           username: profile.username,
           record: profile.record,
-          lastUpdated: profile.lastUpdated,
+          lastUpdated: Timestamp.fromDate(updatedAt),
           designs: {
             unlocked: profile.designs.unlocked,
             liked: profile.designs.liked,
@@ -58,7 +74,14 @@ export function useFirestoreSyncAdapter(): SyncAdapter {
           firestoreData.isGuest = true
         }
 
-        await setDoc(docRef, firestoreData, { merge: true })
+        // One batch: a failed commit leaves the private profile and public row unchanged.
+        const batch = writeBatch(db)
+        batch.set(doc(db, 'users', `u_${profile.uid}`), firestoreData, { merge: true })
+        batch.set(doc(db, 'leaderboard', profile.uid), {
+          ...entry,
+          lastUpdated: Timestamp.fromDate(entry.lastUpdated),
+        })
+        await batch.commit()
         return true
       } catch (error) {
         console.error('Firestore push error:', error)
@@ -102,12 +125,15 @@ export function useFirestoreSyncAdapter(): SyncAdapter {
       // For now, use LWW but this can be customized
       if (local.lastUpdated > remote.lastUpdated) {
         return local
-      } else if (remote.lastUpdated > local.lastUpdated) {
-        return remote
+      }
+
+      if (remote.lastUpdated > local.lastUpdated) {
+        // Remote user docs no longer carry email. Keep the address from this device.
+        return preserveLocalEmail(local.email, remote)
       }
 
       // If timestamps are equal, merge intelligently
-      return {
+      return preserveLocalEmail(local.email, {
         ...remote,
         ...local,
         record: {
@@ -121,7 +147,7 @@ export function useFirestoreSyncAdapter(): SyncAdapter {
           liked: Array.from(new Set([...local.designs.liked, ...remote.designs.liked])),
         },
         lastUpdated: new Date(), // New merge timestamp
-      }
+      })
     },
   }
 }

@@ -111,7 +111,7 @@
               >
                 <PlayerRankingCard
                   :player="player"
-                  :rank="index + 1"
+                  :rank="leaderboardRanks[index] ?? index + 1"
                   :selected-filter="selectedFilter"
                   :is-current-user="player.uid === currentUserPlayer?.uid"
                 />
@@ -136,7 +136,15 @@
 </template>
 
 <script setup lang="ts">
-import { collection, getDocs, getFirestore } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore'
+import {
+  LEADERBOARD_MIN_GAMES,
+  buildLeaderboardEntry,
+  competitionRanks,
+  type LeaderboardEntry,
+  type LeaderboardFilter,
+} from '~/utils/leaderboard'
+import { fetchLeaderboardPage, fetchLeaderboardRank } from '~/utils/leaderboardQuery'
 
 const { isMobile } = useDevice()
 
@@ -154,66 +162,29 @@ useSeoMeta({
   twitterDescription: pageDescription.value,
 })
 
-interface LeaderboardPlayer {
-  uid: string
-  username: string
-  avatar: string
-  record: {
-    win: number
-    loss: number
-    draw: number
-    coins: number
-  }
-  totalGames: number
-  winRate: number
-  lastUpdated?: Date
-  isGuest?: boolean
-}
-
-interface FilterOption {
+type FilterOption = {
   label: string
-  value: string
+  value: LeaderboardFilter
 }
 
-const LIMIT = 50
-const MIN_GAMES = 50
+const MIN_GAMES = LEADERBOARD_MIN_GAMES
 
-// Reactive state
 const loading = ref(true)
 const error = ref(false)
-const leaderboard = ref<LeaderboardPlayer[]>([])
-const selectedFilter = ref('overall')
+const leaderboard = ref<LeaderboardEntry[]>([])
+const leaderboardRanks = ref<number[]>([])
+const selectedFilter = ref<LeaderboardFilter>('overall')
+const currentUserRank = ref<number | null>(null)
 
-// Current user's record
 const user = useProfile().current
 
-// Convert current user to LeaderboardPlayer format
-const currentUserPlayer = computed<LeaderboardPlayer | null>(() => {
-  if (!user.value?.uid || !user.value?.record) return null
-
-  const record = { ...user.value.record }
-  // Adjust for coins spent (same calculation as in fetchLeaderboard)
-  record.coins += Math.max((user.value.designs?.unlocked?.length || 0) - 3, 0) * 500
-  const totalGames = record.win + record.loss + record.draw
-
-  // Only show if user has played at least one game
-  if (totalGames === 0) return null
-
-  const winRate = totalGames > 0 ? (record.win / totalGames) * 100 : 0
-
-  return {
-    uid: user.value.uid,
-    username: user.value.username || 'Anonymous Player',
-    avatar: user.value.avatar || '/avatars/flat-crane.webp',
-    record,
-    totalGames,
-    winRate,
-    lastUpdated: user.value.lastUpdated,
-    isGuest: user.value.isGuest || false,
-  }
+const currentUserPlayer = computed<LeaderboardEntry | null>(() => {
+  const profile = user.value
+  if (!profile?.uid || !profile.record) return null
+  const entry = buildLeaderboardEntry(profile)
+  return entry?.hasGames ? entry : null
 })
 
-// Filter options
 const filterOptions: FilterOption[] = [
   { label: 'rankings.filters.overall', value: 'overall' },
   { label: 'rankings.filters.active', value: 'active' },
@@ -221,112 +192,50 @@ const filterOptions: FilterOption[] = [
   { label: 'rankings.filters.winrate', value: 'winrate' },
 ]
 
-// Helper function to get sorted leaderboard (without limit)
-const getSortedLeaderboard = (filter: string) => {
-  let sorted = [...leaderboard.value]
+const filteredLeaderboard = computed(() => leaderboard.value)
 
-  switch (filter) {
-    case 'active':
-      sorted = sorted.sort((a, b) => b.totalGames - a.totalGames)
-      break
-    case 'winrate':
-      sorted = sorted.filter((p) => p.totalGames >= MIN_GAMES).sort((a, b) => b.winRate - a.winRate)
-      break
-    case 'wins':
-      sorted = sorted.sort((a, b) => b.record.win - a.record.win)
-      break
-    case 'overall':
-    default:
-      // Overall ranking: prioritize players with minimum games, then coins, wins, and win rate
-      sorted = sorted.sort((a, b) => {
-        // First compare if they meet minimum games requirement
-        const aHasMinGames = a.totalGames >= MIN_GAMES
-        const bHasMinGames = b.totalGames >= MIN_GAMES
-        if (aHasMinGames !== bHasMinGames) {
-          return bHasMinGames ? 1 : -1
-        }
+let requestSerial = 0
 
-        // Then compare by coins
-        if (b.record.coins !== a.record.coins) {
-          return b.record.coins - a.record.coins
-        }
-
-        // If coins are equal, compare by wins
-        if (b.record.win !== a.record.win) {
-          return b.record.win - a.record.win
-        }
-
-        // If wins are equal, compare by win rate
-        return b.winRate - a.winRate
-      })
-      break
+const refreshCurrentUserRank = async (serial: number, filter: LeaderboardFilter) => {
+  const mine = currentUserPlayer.value
+  if (!mine || (filter === 'winrate' && !mine.meetsMinGames)) {
+    if (serial === requestSerial) currentUserRank.value = null
+    return
   }
 
-  return sorted
+  const index = leaderboard.value.findIndex((player) => player.uid === mine.uid)
+  if (index >= 0) {
+    if (serial === requestSerial) currentUserRank.value = leaderboardRanks.value[index] ?? null
+    return
+  }
+
+  const rank = await fetchLeaderboardRank(getFirestore(), filter, mine)
+  if (serial === requestSerial && selectedFilter.value === filter) {
+    currentUserRank.value = rank
+  }
 }
 
-// Computed properties
-const filteredLeaderboard = computed(() => {
-  return getSortedLeaderboard(selectedFilter.value).slice(0, LIMIT)
-})
-
-// Calculate current user's rank based on selected filter
-const currentUserRank = computed(() => {
-  if (!user.value?.uid) return null
-
-  const sorted = getSortedLeaderboard(selectedFilter.value)
-  const index = sorted.findIndex((p) => p.uid === user.value?.uid)
-
-  return index >= 0 ? index + 1 : null
-})
-
-// Methods
 const fetchLeaderboard = async () => {
+  const serial = ++requestSerial
+  const filter = selectedFilter.value
+
   try {
     loading.value = true
     error.value = false
 
-    // Wait for Firebase auth to initialize before attempting to fetch
-    // This ensures auth state is ready, even if user is not authenticated
-    // getCurrentUser() returns null if not authenticated, but waits for auth to initialize
+    // Wait for auth to finish initializing. Signed-out visitors can still read the public board.
     await getCurrentUser()
 
-    const db = getFirestore()
-    const usersRef = collection(db, 'users')
-    const snapshot = await getDocs(usersRef)
-
-    const players: LeaderboardPlayer[] = []
-
-    snapshot.forEach((doc) => {
-      const data = doc.data()
-      const record = data.record || { win: 0, loss: 0, draw: 0, coins: 0 }
-      // Adjust for coins spent
-      const unlockedLength = data.designs?.unlocked?.length || 0
-      record.coins += Math.max(unlockedLength - 3, 0) * 500
-      const totalGames = record.win + record.loss + record.draw
-
-      // Only include players who have played at least one game
-      if (totalGames > 0) {
-        const winRate = totalGames > 0 ? (record.win / totalGames) * 100 : 0
-
-        players.push({
-          uid: data.uid || doc.id.replace('u_', ''),
-          username: data.username || 'Anonymous Player',
-          avatar: data.avatar || '/avatars/flat-crane.webp', // TODO: change to default avatar
-          record,
-          totalGames,
-          winRate,
-          lastUpdated: data.lastUpdated?.toDate?.() || data.lastUpdated,
-          isGuest: data.isGuest || false,
-        })
-      }
-    })
+    const players = await fetchLeaderboardPage(getFirestore(), filter)
+    if (serial !== requestSerial) return
 
     leaderboard.value = players
+    leaderboardRanks.value = competitionRanks(players, filter)
+    await refreshCurrentUserRank(serial, filter)
   } catch (err: any) {
+    if (serial !== requestSerial) return
     console.error('Error fetching leaderboard:', err)
 
-    // Check if it's a permissions error
     if (err?.code === 'permission-denied' || err?.message?.includes('permissions')) {
       console.warn(
         'Firestore permissions error - leaderboard may require authentication or updated security rules',
@@ -335,12 +244,27 @@ const fetchLeaderboard = async () => {
 
     error.value = true
   } finally {
-    loading.value = false
+    if (serial === requestSerial) loading.value = false
   }
 }
 
-// Initialize
+watch(selectedFilter, () => {
+  void fetchLeaderboard()
+})
+
+watch(
+  () => {
+    const mine = currentUserPlayer.value
+    if (!mine) return null
+    return `${mine.uid}:${mine.meetsMinGames}:${mine.totalGames}:${mine.record.coins}:${mine.record.win}:${mine.winRate}`
+  },
+  () => {
+    if (loading.value || error.value) return
+    void refreshCurrentUserRank(requestSerial, selectedFilter.value)
+  },
+)
+
 onMounted(() => {
-  fetchLeaderboard()
+  void fetchLeaderboard()
 })
 </script>

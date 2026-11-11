@@ -1,0 +1,96 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "meetsMinGames", "order": "DESCENDING" },
+        { "fieldPath": "record.coins", "order": "DESCENDING" },
+        { "fieldPath": "record.win", "order": "DESCENDING" },
+        { "fieldPath": "winRate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "totalGames", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "record.win", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "meetsMinGames", "order": "ASCENDING" },
+        { "fieldPath": "winRate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "totalGames", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "record.win", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "meetsMinGames", "order": "ASCENDING" },
+        { "fieldPath": "winRate", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "meetsMinGames", "order": "ASCENDING" },
+        { "fieldPath": "record.coins", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "meetsMinGames", "order": "ASCENDING" },
+        { "fieldPath": "record.coins", "order": "ASCENDING" },
+        { "fieldPath": "record.win", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasGames", "order": "ASCENDING" },
+        { "fieldPath": "meetsMinGames", "order": "ASCENDING" },
+        { "fieldPath": "record.coins", "order": "ASCENDING" },
+        { "fieldPath": "record.win", "order": "ASCENDING" },
+        { "fieldPath": "winRate", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

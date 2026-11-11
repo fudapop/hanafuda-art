@@ -10,6 +10,23 @@ export interface ConflictResolution {
 }
 
 /**
+ * Keep a locally known email when the winning remote profile has none.
+ * Firestore user documents no longer store email, so a newer remote copy would
+ * otherwise wipe the address kept in IndexedDB and Firebase Auth.
+ *
+ * @param localEmail - Email already known on this device
+ * @param resolved - Profile selected by conflict resolution
+ * @returns The same profile, or a copy with the local email restored
+ */
+export function preserveLocalEmail(
+  localEmail: string | undefined,
+  resolved: PlayerProfile,
+): PlayerProfile {
+  if (resolved.email || !localEmail) return resolved
+  return { ...resolved, email: localEmail }
+}
+
+/**
  * Resolve conflicts between local and remote profiles
  * Pure function - no side effects, easily testable
  *
@@ -51,12 +68,16 @@ export async function resolveConflict(
       }
 
     case 'last-write-wins':
-    default:
+    default: {
       const isLocalNewer = local.lastUpdated > remote.lastUpdated
-      return {
-        resolved: isLocalNewer ? local : remote,
-        source: isLocalNewer ? 'local' : 'remote',
+      if (isLocalNewer) {
+        return { resolved: local, source: 'local' }
       }
+      return {
+        resolved: preserveLocalEmail(local.email, remote),
+        source: 'remote',
+      }
+    }
   }
 }
 
