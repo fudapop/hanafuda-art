@@ -24,7 +24,10 @@ service cloud.firestore {
 
       // Email is not a client-readable field. deleteField() removes an existing value;
       // a merge that leaves `email` in place is rejected.
+      // uid must be this user's auth id. The document path alone is not enough:
+      // the backfill and leaderboard id are derived from it.
       allow create, update: if isOwner()
+        && request.resource.data.uid == request.auth.uid
         && !request.resource.data.keys().hasAny(['email']);
 
       allow delete: if isOwner();

@@ -622,8 +622,12 @@ export const usePlayerProfile = () => {
     // Use adapter's resolve method if provided
     if (syncAdapter.value?.resolve) {
       // Adapter's resolve returns PlayerProfile, wrap it in ConflictResolution
-      // We assume it's merged since we don't know the source
-      const resolved = await syncAdapter.value.resolve(local, remote)
+      // We assume it's merged since we don't know the source.
+      // Preserve email here as well: a newer remote doc has no email field.
+      const resolved = preserveLocalEmail(
+        local.email,
+        await syncAdapter.value.resolve(local, remote),
+      )
       return { resolved, source: 'merged' }
     }
 
@@ -855,7 +859,9 @@ export const usePlayerProfile = () => {
         pendingChanges: true,
         syncVersion: errorMeta?.syncVersion ?? 0,
       })
-      syncStatus.value = 'error'
+      // Stay idle with pendingChanges set. Auto-sync only runs while the status is idle,
+      // so leaving this at 'error' would drop later retries until a manual sync.
+      syncStatus.value = 'idle'
       return {
         success: false,
         error: error.message,

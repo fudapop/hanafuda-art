@@ -58,7 +58,11 @@ describe('users documents', () => {
     const anon = testEnv.unauthenticatedContext().firestore()
 
     await assertSucceeds(
-      setDoc(doc(alice, 'users', 'u_alice'), { username: 'Ada', record: { coins: 1 } }),
+      setDoc(doc(alice, 'users', 'u_alice'), {
+        uid: 'alice',
+        username: 'Ada',
+        record: { coins: 1 },
+      }),
     )
     await assertSucceeds(getDoc(doc(alice, 'users', 'u_alice')))
 
@@ -73,6 +77,7 @@ describe('users documents', () => {
 
     await testEnv.withSecurityRulesDisabled(async (context) => {
       await setDoc(doc(context.firestore(), 'users', 'u_alice'), {
+        uid: 'alice',
         username: 'Ada',
         email: 'ada@example.com',
       })
@@ -93,6 +98,17 @@ describe('users documents', () => {
     expect(saved.exists()).toBe(true)
     expect(saved.data()).not.toHaveProperty('email')
     expect(saved.data()?.username).toBe('Ada Updated')
+  })
+
+  it('rejects a uid that does not match the authenticated user', async () => {
+    const alice = testEnv.authenticatedContext('alice').firestore()
+
+    await assertFails(setDoc(doc(alice, 'users', 'u_alice'), { uid: 'bob', username: 'Ada' }))
+    await assertSucceeds(setDoc(doc(alice, 'users', 'u_alice'), { uid: 'alice', username: 'Ada' }))
+    await assertFails(setDoc(doc(alice, 'users', 'u_alice'), { uid: 'bob' }, { merge: true }))
+
+    await assertFails(setDoc(doc(alice, 'leaderboard', 'alice'), validEntry('bob')))
+    await assertSucceeds(setDoc(doc(alice, 'leaderboard', 'alice'), validEntry('alice')))
   })
 })
 

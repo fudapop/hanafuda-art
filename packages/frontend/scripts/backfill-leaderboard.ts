@@ -15,6 +15,8 @@
  *
  * The service account needs Cloud Datastore User (or Firebase Admin) on project `new-hanafuda`.
  * Re-running is safe: leaderboard docs are replaced, and deleting a missing email is skipped.
+ * The leaderboard document id is the auth uid stored in the user document id (`u_{uid}`).
+ * A `uid` field inside the document is ignored, because the owner can set it to another player.
  */
 import { applicationDefault, initializeApp } from 'firebase-admin/app'
 import { FieldPath, FieldValue, getFirestore, Timestamp } from 'firebase-admin/firestore'
@@ -39,6 +41,7 @@ async function main() {
     scanned: 0,
     leaderboardWrites: 0,
     emailDeletes: 0,
+    uidCorrections: 0,
     missingUid: 0,
   }
 
@@ -68,20 +71,32 @@ async function main() {
     for (const userDoc of snap.docs) {
       summary.scanned += 1
       const data = userDoc.data()
-      const storedUid = typeof data.uid === 'string' ? data.uid.trim() : ''
-      const uid = storedUid || userDoc.id.replace(/^u_/, '')
-
-      if (!uid) {
-        summary.missingUid += 1
-        continue
-      }
+      const uid = uidFromUserDocId(userDoc.id)
+      const userUpdate: Record<string, unknown> = {}
 
       if (Object.prototype.hasOwnProperty.call(data, 'email')) {
         summary.emailDeletes += 1
-        if (apply) {
-          batch.update(userDoc.ref, { email: FieldValue.delete() })
+        userUpdate.email = FieldValue.delete()
+      }
+
+      if (!uid) {
+        summary.missingUid += 1
+        if (apply && Object.keys(userUpdate).length > 0) {
+          batch.update(userDoc.ref, userUpdate)
           ops += 1
         }
+        if (ops >= BATCH_LIMIT) await flush()
+        continue
+      }
+
+      if (data.uid !== uid) {
+        summary.uidCorrections += 1
+        userUpdate.uid = uid
+      }
+
+      if (apply && Object.keys(userUpdate).length > 0) {
+        batch.update(userDoc.ref, userUpdate)
+        ops += 1
       }
 
       const entry = buildLeaderboardEntry({
@@ -117,6 +132,12 @@ async function main() {
   }
 
   console.log(JSON.stringify(summary, null, 2))
+}
+
+/** Auth uid for a private profile document. Ids are `u_{authUid}`. */
+function uidFromUserDocId(id: string): string {
+  if (!id.startsWith('u_')) return ''
+  return id.slice(2)
 }
 
 main().catch((error: unknown) => {
