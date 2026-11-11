@@ -8,6 +8,7 @@ on:
       - 'packages/frontend/**'
       - 'packages/shared/**'
       - 'pnpm-lock.yaml'
+      - '.github/workflows/unit-test.yml'
   pull_request:
     branches:
       - main
@@ -16,6 +17,7 @@ on:
       - 'packages/frontend/**'
       - 'packages/shared/**'
       - 'pnpm-lock.yaml'
+      - '.github/workflows/unit-test.yml'
 
 jobs:
   test:
@@ -29,7 +31,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          # Pin to Node 22. `lts/*` now resolves to Node 26, and better-sqlite3
+          # 12.6.2 does not compile against that V8 (PropertyCallbackInfo::This
+          # was removed). Node 22 matches the engines field and has prebuilds.
+          node-version: 22
 
       - name: Install dependencies
         run: pnpm install
