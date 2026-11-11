@@ -1,7 +1,7 @@
 <template>
-  <div class="relative w-full h-16 px-4 py-2">
-    <div class="size-full mx-auto flex items-end">
-      <div class="flex space-x-2 sm:space-x-4">
+  <div class="relative w-full min-h-16 max-w-full overflow-x-clip px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <div class="size-full mx-auto flex items-end min-w-0">
+      <div class="flex min-w-0 max-w-full space-x-2 sm:space-x-4">
         <div class="shrink-0">
           <img
             v-if="user"
@@ -16,7 +16,7 @@
             alt=""
           />
         </div>
-        <div class="flex flex-col justify-end">
+        <div class="flex min-w-0 flex-col justify-end">
           <p class="text-sm font-normal lg:text-2xl lg:mb-2 text-white/80">
             {{ t('common.labels.round') }} {{ ds.roundCounter }} / {{ config.maxRounds }}
           </p>
@@ -27,7 +27,7 @@
             ]"
           >
             <p class="flex items-center font-bold gap-x-2">
-              <span class="">{{ user?.username || `${t('common.labels.player')} 1` }}</span>
+              <span class="truncate max-w-[42vw] sm:max-w-[16rem] lg:max-w-none">{{ user?.username || `${t('common.labels.player')} 1` }}</span>
               <span
                 class="flex items-center"
                 v-memo="[ds.roundOver, gameStart]"

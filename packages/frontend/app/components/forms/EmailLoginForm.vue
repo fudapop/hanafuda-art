@@ -1,7 +1,7 @@
 <template>
   <div>
     <form
-      class="space-y-4 min-w-[300px] border-border/20"
+      class="space-y-4 w-full min-w-0 border-border/20"
       action=""
       @submit.prevent="handleEmailLogin"
     >
@@ -55,7 +55,7 @@
         >
           <div class="space-y-2">
             <p>{{ t('auth.passwordRequirements.title') }}</p>
-            <ul class="grid grid-cols-2 list-none list-inside">
+            <ul class="grid grid-cols-1 xs:grid-cols-2 list-none list-inside">
               <li
                 v-for="requirement in requirements"
                 :key="requirement.text"
@@ -101,7 +101,7 @@
           v-else
           class="space-y-4 min-h-40"
         >
-          <div class="flex items-center justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
             <div class="flex items-center cursor-pointer">
               <input
                 id="remember-me"

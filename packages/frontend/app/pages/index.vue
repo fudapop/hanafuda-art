@@ -1,6 +1,6 @@
 <template>
   <GameLayout>
-    <div class="isolate">
+    <div class="board-fit isolate">
       <div
         v-show="showLoader"
         class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-1"
@@ -15,18 +15,13 @@
       </div>
 
       <!-- OPPONENT HAND -->
-      <div class="absolute inset-x-0 top-0 h-28">
+      <div class="board-opponent-slot absolute inset-x-0 top-[env(safe-area-inset-top,0px)] h-28">
         <OpponentArea />
       </div>
 
       <!-- OPPONENT COLLECTION -->
-      <div
-        :class="[
-          'absolute inset-x-0 -translate-y-3/4 top-1/4',
-          // 'lg:inset-x-auto lg:right-0'
-        ]"
-      >
-        <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
+      <div class="absolute inset-x-0 -translate-y-3/4 top-1/4">
+        <div class="board-collection fit-cards">
           <CollectionArea
             :player="opponentKey"
             @completed="handleCompletion"
@@ -35,30 +30,19 @@
       </div>
 
       <!-- FIELD -->
-      <div :class="['absolute inset-x-0 max-w-2xl top-1/4 w-max mx-auto isolate -z-10']">
-        <div class="w-screen overflow-x-auto touch-pan-x no-scrollbar">
-          <div
-            v-click-disabled:unless="players[selfKey].isActive && !!selectedCard"
-            :class="[
-              'grid grid-cols-[80px_1fr] gap-2',
-              'py-8 px-4 sm:px-8 lg:px-12',
-              'transition-transform duration-200 origin-left scale-75 sm:scale-100',
-            ]"
-          >
-            <Deck />
-            <FieldDisplay />
-          </div>
+      <div class="board-field fit-cards absolute inset-x-0 top-1/4 mx-auto isolate -z-10">
+        <div
+          v-click-disabled:unless="players[selfKey].isActive && !!selectedCard"
+          class="board-field-grid py-3 sm:py-8"
+        >
+          <Deck />
+          <FieldDisplay />
         </div>
       </div>
 
       <!-- PLAYER COLLECTION -->
-      <div
-        :class="[
-          'absolute inset-x-0 bottom-1/4',
-          // 'lg:inset-x-auto lg:right-0'
-        ]"
-      >
-        <div class="w-screen max-w-3xl mx-auto overflow-x-auto touch-pan-x no-scrollbar">
+      <div class="absolute inset-x-0 bottom-1/4">
+        <div class="board-collection fit-cards">
           <CollectionArea
             :player="selfKey"
             @completed="handleCompletion"
@@ -69,21 +53,16 @@
       <!-- PLAYER HAND -->
       <div
         :class="[
-          'absolute -bottom-4 inset-x-0 pb-8',
-          'transition-all duration-200 origin-left [&_ul]:scale-90 sm:[&_ul]:scale-100',
+          'absolute inset-x-0 bottom-0 pb-[max(3.5rem,env(safe-area-inset-bottom,0px))] sm:-bottom-4 sm:pb-8',
+          'transition-opacity duration-200',
           players[opponentKey].isActive && 'opacity-80',
-          isMobile && 'landscape:translate-y-8',
         ]"
       >
-        <div
-          class="w-screen max-w-full py-8 mx-auto overflow-x-auto overflow-y-visible no-scrollbar touch-pan-x"
-        >
-          <div>
-            <HandDisplay
-              :id="selfKey"
-              :can-interact="canInteractLocalHand"
-            />
-          </div>
+        <div class="board-hand fit-cards py-4 sm:py-8">
+          <HandDisplay
+            :id="selfKey"
+            :can-interact="canInteractLocalHand"
+          />
         </div>
       </div>
 

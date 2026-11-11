@@ -37,7 +37,7 @@
 
       <!-- DECK PILE -->
       <div
-        class="absolute inset-y-0 my-auto overflow-hidden -translate-x-1/2 shadow-md left-1/2 card down"
+        class="absolute top-1/2 -translate-y-1/2 overflow-hidden -translate-x-1/2 shadow-md left-1/2 card down"
       ></div>
 
       <!-- Show revealed card when drawing from deck         -->
