@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
+import { createPasswordResetRequest, emailLoginErrorMessageKey, passwordResetContinueUrl } from '~/utils/authAction'
 
 export const useAuth = () => {
   const PROVIDERS = {
@@ -24,6 +25,8 @@ export const useAuth = () => {
   const error = ref()
   const { t } = useI18n()
   const { $clientPosthog } = useNuxtApp()
+  const localePath = useLocalePath()
+  const runtimeConfig = useRuntimeConfig()
 
   const signUpWithEmail = async (email: string, password: string) => {
     try {
@@ -49,7 +52,7 @@ export const useAuth = () => {
       $clientPosthog?.capture('login', { method: 'email' })
       return true
     } catch (err) {
-      toast.error(t('auth.messages.invalidEmailOrPassword'), { duration: 8000 })
+      toast.error(t(emailLoginErrorMessageKey(err)), { duration: 8000 })
       error.value = err
       return false
     }
@@ -111,8 +114,11 @@ export const useAuth = () => {
 
   const resetPassword = async (email: string) => {
     try {
-      await sendPasswordResetEmail(auth, email)
-      toast.success(t('auth.messages.passwordResetSent', { email }))
+      const origin = import.meta.client ? window.location.origin : runtimeConfig.public.siteUrl
+      const continueUrl = passwordResetContinueUrl(origin, localePath('/sign-in'))
+      const request = createPasswordResetRequest(email, continueUrl)
+      await sendPasswordResetEmail(auth, request.email, request.settings)
+      toast.success(t('auth.messages.passwordResetSent', { email: request.email }))
       return true
     } catch (err) {
       toast.error(t('auth.messages.unableToSendPasswordReset'), { duration: 8000 })

@@ -26,6 +26,22 @@ vi.mock('firebase/auth', () => ({
   connectAuthEmulator: vi.fn(),
   signInAnonymously: vi.fn(),
   onAuthStateChanged: vi.fn(),
+  sendPasswordResetEmail: vi.fn(),
+  signInWithEmailAndPassword: vi.fn(),
+  createUserWithEmailAndPassword: vi.fn(),
+  signInWithPopup: vi.fn(),
+  signOut: vi.fn(),
+  verifyPasswordResetCode: vi.fn(),
+  confirmPasswordReset: vi.fn(),
+  applyActionCode: vi.fn(),
+  checkActionCode: vi.fn(),
+  EmailAuthProvider: { credential: vi.fn() },
+  GoogleAuthProvider: class GoogleAuthProvider {
+    static credentialFromResult = vi.fn()
+  },
+  GithubAuthProvider: class GithubAuthProvider {
+    static credentialFromResult = vi.fn()
+  },
 }))
 
 vi.mock('firebase/analytics', () => ({
