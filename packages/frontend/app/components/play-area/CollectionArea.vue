@@ -1,32 +1,35 @@
 <template>
-  <div class="w-full px-4 opacity-90 isolate">
+  <div
+    :class="['w-full px-4 opacity-90 isolate', isMobileLandscape && 'relative min-h-16']"
+  >
     <div
       :class="[
-        'grid mx-auto [--card-height:60px]',
+        'mx-auto [--card-height:60px]',
         isMobileLandscape
-          ? 'w-36! max-w-36 gap-x-0! grid-rows-2! grid-cols-2! absolute right-12'
-          : 'grid-rows-1 grid-cols-[repeat(4,minmax(0,max-content))] gap-x-2 sm:gap-x-8 w-full max-w-full justify-center',
+          ? 'grid w-36! max-w-36 gap-x-0! grid-rows-2! grid-cols-2! absolute right-12'
+          : 'coll-row gap-x-2 sm:gap-x-8',
       ]"
     >
       <ul
         v-for="type in cardTypes"
         :key="type"
+        :data-collection-pile="type"
+        :data-collection-owner="player === selfKey ? 'player' : 'opponent'"
         :aria-label="`${player === selfKey ? t('game.regions.yourCollection') : t('game.regions.opponentCollection')} - ${t(`game.cardTypes.${type}`)}`"
-        :class="[
-          'relative inline-flex flex-wrap justify-end w-full -gap-2',
-          isMobileLandscape && 'max-w-16 h-8',
-        ]"
+        :class="['coll-pile', isMobileLandscape && 'max-w-16 h-8']"
         @dblclick="modalOpen = true"
         @dbltap="modalOpen = true"
       >
         <template v-if="coll[type] && coll[type].size > 0">
           <span
-            class="uppercase absolute top-1 left-0 z-1 whitespace-nowrap bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
+            class="coll-label uppercase absolute top-1 left-0 z-10 inline-block bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
           >
-            <span class="mr-1 text-xs align-middle">
+            <span class="text-xs align-middle">
               {{ coll[type].size }}
             </span>
-            {{ t(`game.cardTypes.${type}`) }}
+            <span class="coll-label-name ml-1">
+              {{ t(`game.cardTypes.${type}`) }}
+            </span>
           </span>
           <template v-if="!isMobileLandscape">
             <CardList

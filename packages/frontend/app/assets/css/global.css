@@ -529,13 +529,10 @@ body > svg[style*="z-index: -99999999"] {
     --card-height-cap: min(64px, 16svh);
   }
 
-  /* Pull the opponent row and the field up so the hand is not stacked on the field. */
-  .board-opponent-slot {
-    height: 4.5rem;
-  }
-
-  .board-field {
-    top: 4.75rem;
+  .board-stack {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 2rem);
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
+    row-gap: 0.125rem;
   }
 }
 
@@ -652,4 +649,122 @@ body > svg[style*="z-index: -99999999"] {
   overflow-x: clip;
   padding-inline: max(0.5rem, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   --card-max-width: calc((100cqi - 1.5rem) / 4);
+}
+
+/*
+  Phone board stack
+  -----------------
+  Percentage anchors (top-1/4, bottom-1/4) let a wrapping collection grow over
+  the field. The five play rows share one grid: opponent hand, opponent
+  collection, field, player collection, player hand. The field row takes the
+  leftover space and centers its cards. Padding keeps both hands clear of the
+  fixed status bars and the safe area.
+*/
+.board-stack {
+  position: absolute;
+  inset: 0;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 3.5rem);
+  padding-bottom: max(4rem, env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  row-gap: 0.25rem;
+  min-width: 0;
+}
+
+.board-field-center {
+  display: grid;
+  align-content: center;
+  min-height: 0;
+  min-width: 0;
+  container-type: size;
+}
+
+/* Two field rows have to fit the middle track. On a tall window the preferred
+   card height is smaller than this cap, so desktop cards stay the same size. */
+.board-field-center .board-field {
+  --field-block: 1.25rem;
+  --card-height: min(
+    var(--card-height-pref, 140px),
+    var(--card-height-cap, 9999px),
+    calc((100cqb - var(--field-block)) / 2)
+  );
+}
+
+@media (min-width: 640px) {
+  .board-field-center .board-field {
+    --field-block: 1.75rem;
+  }
+}
+
+.board-field-center .board-field:has(.field-dense) {
+  --card-height: min(
+    var(--card-height-pref, 140px),
+    var(--card-height-cap, 9999px),
+    18svh,
+    84px,
+    calc((100cqb - var(--field-block, 1.25rem)) / 3)
+  );
+}
+
+/*
+  Collection piles stay one card tall. Each slot is a little narrower than a
+  card, and only the last card keeps its full width, so a long pile overlaps
+  more instead of wrapping onto another row.
+*/
+.coll-row {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.coll-row > .coll-pile {
+  flex: 0 1 max-content;
+  min-width: calc(var(--card-height) * var(--card-aspect, 2 / 3));
+  max-width: 100%;
+}
+
+.coll-row > .coll-pile:empty {
+  display: none;
+}
+
+.coll-pile {
+  --coll-card-w: calc(var(--card-height) * var(--card-aspect, 2 / 3));
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: flex-start;
+  position: relative;
+  /* Do not make this a container. Collection cards size themselves with
+     100cqi, which must stay the board-collection container. */
+  overflow: clip;
+}
+
+.coll-pile > .coll-pile-item {
+  flex: 0 1 calc(var(--coll-card-w) - 0.75rem);
+  width: calc(var(--coll-card-w) - 0.75rem);
+  min-width: 0.375rem;
+  margin-inline-end: 0;
+}
+
+.coll-pile > .coll-pile-item:last-child {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: auto;
+}
+
+.coll-pile > .coll-pile-item > .card,
+.coll-pile > .coll-pile-item .card {
+  flex: none;
+}
+
+.coll-label {
+  max-width: 100%;
+  width: max-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
