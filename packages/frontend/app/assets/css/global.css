@@ -9,6 +9,16 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+  iOS evaluates (orientation: landscape) against the visual viewport. Opening
+  the keyboard shrinks that viewport until a portrait phone is wider than it
+  is tall, and Tailwind's landscape: variant then switches to a side-by-side
+  layout. Phone portrait widths stay under 430px. A landscape phone is at
+  least ~568px wide, and a desktop window that should use the split layout
+  is wider than that. Require both.
+*/
+@custom-variant wide-landscape (@media (orientation: landscape) and (min-width: 480px));
+
 /* Hide PostHog's viewport measurement SVG from layout */
 body > svg[style*="z-index: -99999999"] {
   position: absolute !important;
