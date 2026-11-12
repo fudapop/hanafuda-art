@@ -6,18 +6,25 @@
       the containing block in Safari and clipped the form under the email field.
       flow-root keeps the logo's top margin inside this box; without it the margin
       collapses through and the panel hangs below the viewport.
+      The split layout uses wide-landscape (landscape and at least 480px wide).
+      Plain landscape: matches a portrait phone once the iOS keyboard shrinks
+      the visual viewport, which put the form beside the logo.
     -->
-    <div class="relative isolate flow-root h-dvh">
+    <div
+      data-sign-in-shell
+      class="relative isolate flow-root h-dvh"
+    >
       <div
         v-if="!loggingIn"
+        data-sign-in-logo
         :class="[
           'relative z-10 flex justify-center drop-shadow-xl my-12 w-full',
-          'landscape:w-1/2 landscape:h-full landscape:items-center landscape:my-0',
+          'wide-landscape:w-1/2 wide-landscape:h-full wide-landscape:items-center wide-landscape:my-0',
         ]"
       >
         <img
           src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/logo-title.webp"
-          class="landscape:max-h-[20vw] max-h-[120px] h-[40vh]"
+          class="wide-landscape:max-h-[20vw] max-h-[120px] h-[40vh]"
           :alt="t('game.title')"
         />
         <h1 class="sr-only">{{ t('game.title') }}</h1>
@@ -45,9 +52,10 @@
           :class="[
             'absolute z-0 px-4 py-8 overflow-x-hidden overflow-y-auto rounded-md shadow-lg bg-white dark:bg-hanafuda-cream box-border w-full max-w-full min-w-0',
             'inset-x-0 top-32 bottom-0',
-            'landscape:inset-y-0 landscape:left-auto landscape:right-0 landscape:top-0 landscape:bottom-0 landscape:h-auto landscape:w-1/2',
-            !isMobile && 'landscape:flex landscape:items-center',
+            'wide-landscape:inset-y-0 wide-landscape:left-auto wide-landscape:right-0 wide-landscape:top-0 wide-landscape:bottom-0 wide-landscape:h-auto wide-landscape:w-1/2',
+            !isMobile && 'wide-landscape:flex wide-landscape:items-center',
           ]"
+          data-sign-in-panel
         >
           <div class="max-w-md mx-auto min-w-0 pt-4 w-full space-y-8">
             <EmailLoginForm

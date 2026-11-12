@@ -78,10 +78,10 @@
           </div>
           <button
             type="submit"
-            :disabled="!isValidPassword.value || !values.email"
+            :disabled="!isValidPassword || !values.email"
             :class="{
               'mt-4 w-full text-gray-900 dark:text-white action-button bg-border': true,
-              'opacity-50 cursor-not-allowed': !isValidPassword.value || !values.email,
+              'opacity-50 cursor-not-allowed': !isValidPassword || !values.email,
             }"
           >
             {{ t('common.actions.signUp') }}
@@ -101,6 +101,9 @@
           v-else
           class="space-y-4 min-h-40"
         >
+          <p class="text-xs leading-5 text-text-secondary">
+            {{ t('auth.messages.providerAccountHint') }}
+          </p>
           <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
             <div class="flex items-center cursor-pointer">
               <input
@@ -157,6 +160,7 @@
 <script setup lang="ts">
 import { CheckIcon } from '@heroicons/vue/20/solid'
 import { useStorage } from '@vueuse/core'
+import { passwordMeetsPolicy, passwordRequirementFlags } from '~/utils/authAction'
 
 const { t } = useI18n()
 const emit = defineEmits(['success', 'error'])
@@ -178,7 +182,7 @@ const { query } = useRoute()
 const emailAction = computed(() => (newAccount.value ? signUpWithEmail : loginWithEmail))
 
 const handleEmailLogin = () => {
-  if (!isValidPassword.value) return
+  if (newAccount.value && !isValidPassword.value) return
   emailAction.value(values.email, values.password).then((success) => {
     if (success) {
       emit('success')
@@ -188,23 +192,17 @@ const handleEmailLogin = () => {
   })
 }
 
-const hasNumber = computed(() => /\d/.test(values.password))
-const hasUpper = computed(() => /[A-Z]/.test(values.password))
-const hasLower = computed(() => /[a-z]/.test(values.password))
-const hasSpecial = computed(() => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(values.password))
-const hasSufficientLength = computed(() => values.password.length >= 6)
+const passwordFlags = computed(() => passwordRequirementFlags(values.password))
 
 const requirements = computed(() => [
-  { valid: hasSufficientLength.value, text: t('auth.passwordRequirements.sixCharacters') },
-  { valid: hasNumber.value, text: t('auth.passwordRequirements.oneNumber') },
-  { valid: hasUpper.value, text: t('auth.passwordRequirements.oneUppercase') },
-  { valid: hasLower.value, text: t('auth.passwordRequirements.oneLowercase') },
-  { valid: hasSpecial.value, text: t('auth.passwordRequirements.oneSpecialCharacter') },
+  { valid: passwordFlags.value.length, text: t('auth.passwordRequirements.sixCharacters') },
+  { valid: passwordFlags.value.number, text: t('auth.passwordRequirements.oneNumber') },
+  { valid: passwordFlags.value.upper, text: t('auth.passwordRequirements.oneUppercase') },
+  { valid: passwordFlags.value.lower, text: t('auth.passwordRequirements.oneLowercase') },
+  { valid: passwordFlags.value.special, text: t('auth.passwordRequirements.oneSpecialCharacter') },
 ])
 
-const isValidPassword = computed(() => {
-  return hasSufficientLength && hasNumber && hasUpper && hasLower && hasSpecial
-})
+const isValidPassword = computed(() => passwordMeetsPolicy(values.password))
 
 const showResetModal = ref(false)
 const handleForgotPassword = () => {
