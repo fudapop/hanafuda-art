@@ -131,6 +131,28 @@ describe('safeContinuePath', () => {
     expect(safeContinuePath('not a url', 'https://newhanafuda.art')).toBe('/sign-in')
     expect(safeContinuePath(null, 'https://newhanafuda.art', '/ja/sign-in')).toBe('/ja/sign-in')
   })
+
+  it('does not return a protocol-relative path for a same-host URL', () => {
+    const fallback = '/sign-in'
+    expect(
+      safeContinuePath('https://newhanafuda.art//evil.example', 'https://newhanafuda.art'),
+    ).toBe(fallback)
+    expect(
+      safeContinuePath('https://newhanafuda.art/\\evil.example', 'https://newhanafuda.art'),
+    ).toBe(fallback)
+    expect(
+      safeContinuePath(
+        'https://newhanafuda.art/sign-in/../../\\evil.example',
+        'https://newhanafuda.art',
+      ),
+    ).toBe(fallback)
+    expect(
+      safeContinuePath('https://newhanafuda.art/%2F%2Fevil.example', 'https://newhanafuda.art'),
+    ).toBe(fallback)
+    expect(
+      safeContinuePath('https://newhanafuda.art/%5C%5Cevil.example', 'https://newhanafuda.art'),
+    ).toBe(fallback)
+  })
 })
 
 describe('password policy', () => {

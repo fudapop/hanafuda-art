@@ -150,8 +150,10 @@ export function createPasswordResetRequest(email: string, continueUrl: string) {
 
 /**
  * Same-origin path to send the player to after the action succeeds.
- * Anything off-origin (or unparseable) falls back to sign-in so a crafted
- * `continueUrl` cannot redirect away from the app.
+ * Anything off-origin, unparseable, or protocol-relative falls back to
+ * sign-in. `https://newhanafuda.art//evil.example` (and the same path written
+ * with backslashes, which the URL parser turns into slashes) has our origin
+ * but a pathname of `//evil.example`. NuxtLink treats that as another site.
  */
 export function safeContinuePath(
   continueUrl: string | null,
@@ -164,10 +166,20 @@ export function safeContinuePath(
     const allowed = new URL(origin)
     if (parsed.origin !== allowed.origin) return fallback
     if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return fallback
-    return `${parsed.pathname}${parsed.search}${parsed.hash}` || fallback
+    const { pathname } = parsed
+    if (!isSafeAppPathname(pathname)) return fallback
+    return `${pathname}${parsed.search}${parsed.hash}` || fallback
   } catch {
     return fallback
   }
+}
+
+function isSafeAppPathname(pathname: string): boolean {
+  if (!pathname.startsWith('/') || pathname.startsWith('//')) return false
+  // Encoded slashes survive one URL parse (`%2F`, `%5C`) and decode into
+  // another protocol-relative path if a router decodes them again.
+  if (/\\|%2f|%5c/i.test(pathname)) return false
+  return true
 }
 
 export function passwordRequirementFlags(password: string): PasswordRequirementFlags {
