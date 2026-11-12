@@ -528,12 +528,6 @@ body > svg[style*="z-index: -99999999"] {
     /* Two field rows plus both hands have to share a short landscape viewport. */
     --card-height-cap: min(64px, 16svh);
   }
-
-  .board-stack {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 2rem);
-    padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
-    row-gap: 0.125rem;
-  }
 }
 
 .fit-cards .card,
@@ -671,6 +665,43 @@ body > svg[style*="z-index: -99999999"] {
   min-width: 0;
 }
 
+@media (max-height: 500px) {
+  /* This follows the base rule so the shorter padding actually wins.
+     A 320px-tall landscape phone cannot also reserve the portrait status-bar
+     padding or the field track collapses and its cards shrink to nothing. */
+  .board-stack {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 1.25rem);
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+    row-gap: 0.125rem;
+  }
+
+  .board-collection .coll-row {
+    --card-height: 32px;
+  }
+
+  .board-field-grid,
+  .board-hand {
+    padding-block: 0.25rem;
+  }
+
+  /* The turn hint is a full line. On a 320px-tall screen that line is the
+     difference between a field and no field, so it overlays the hand. */
+  .board-hand p {
+    position: absolute;
+    z-index: 10;
+    inset-inline: 0;
+    top: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  /* Landscape collections are an absolute 2×2 overlay. min-h-16 on both rows
+     leaves no track for the field. */
+  .coll-landscape-frame {
+    min-height: 0;
+  }
+}
+
 .board-field-center {
   display: grid;
   align-content: center;
@@ -693,6 +724,13 @@ body > svg[style*="z-index: -99999999"] {
 @media (min-width: 640px) {
   .board-field-center .board-field {
     --field-block: 1.75rem;
+  }
+}
+
+@media (max-height: 500px) {
+  .board-field-center .board-field {
+    /* Matches the 0.25rem block padding set on .board-field-grid above. */
+    --field-block: 0.75rem;
   }
 }
 

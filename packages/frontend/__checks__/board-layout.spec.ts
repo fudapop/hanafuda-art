@@ -52,12 +52,11 @@ async function openBoard(page: Page, viewport: { width: number; height: number }
   await page.setViewportSize(viewport)
   await page.goto(`/dev/board-layout?case=${caseName}`, { waitUntil: 'domcontentloaded' })
   await page.waitForFunction(() => {
-    const pile = document.querySelector('[data-collection-pile] .card')
     const field = document.querySelector('[data-board-field] .card')
-    if (!pile || !field) return false
-    const pileBox = pile.getBoundingClientRect()
-    const fieldBox = field.getBoundingClientRect()
-    return pileBox.height > 24 && fieldBox.height > 24
+    if (!field || field.getBoundingClientRect().height <= 20) return false
+    const pile = document.querySelector('[data-collection-pile] .card')
+    if (!pile) return true
+    return pile.getBoundingClientRect().height > 20
   })
   // Card enter transitions move for 300ms. Measure after they settle.
   await page.waitForTimeout(400)
@@ -163,6 +162,21 @@ test.describe('phone board', () => {
       })
     }
   }
+
+  test('568x320 landscape keeps a visible field between the hands', async ({ page }) => {
+    await openBoard(page, { width: 568, height: 320 }, 'mid')
+    const layout = await metrics(page)
+    expectNoHorizontalScroll(layout)
+    expect(layout.fieldCards.length).toBeGreaterThan(0)
+    for (const card of layout.fieldCards) {
+      expect(card.height).toBeGreaterThanOrEqual(24)
+    }
+    const withCards = layout.piles.filter((pile) => pile.cardCount > 0)
+    if (withCards.length > 0) {
+      expectPilesAreOneRow(layout)
+      expectFieldClear(layout)
+    }
+  })
 })
 
 test.describe('desktop board', () => {

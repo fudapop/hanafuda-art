@@ -1,5 +1,5 @@
 <template>
-  <GameLayout>
+  <GameLayout v-if="isDev">
     <GameBoard
       :data-board-case="scenario"
       data-board-harness
@@ -13,24 +13,19 @@
 /**
  * Static board harness. Seeds Pinia locally so layout tests can render a
  * crowded collection without starting a match or contacting Firebase.
+ * Sample state is applied only in development. A production visit redirects
+ * and must not leave gameStart or the card store behind for the home page.
  */
 import { CARDS, DECK, type CardName, type CardType } from '~/utils/cards'
 import { useCardStore } from '~~/stores/cardStore'
 
 const isDev = import.meta.dev
 
-if (!isDev) {
-  navigateTo('/', { replace: true })
-}
-
 const route = useRoute()
 const scenario = computed(() => {
   const value = route.query.case
   return value === 'mid' || value === 'empty' || value === 'stress' ? value : 'stress'
 })
-
-const gameStart = useState('start', () => true)
-gameStart.value = true
 
 const { isMobile } = useDevice()
 const { applyCardSizeMultiplier } = useCardDesign()
@@ -97,9 +92,14 @@ const seedBoard = (caseName: string) => {
   })
 }
 
-seedBoard(scenario.value)
-
-onMounted(() => {
-  applyCardSizeMultiplier(isMobile ? 0.8 : undefined)
-})
+if (import.meta.dev) {
+  const gameStart = useState('start', () => false)
+  gameStart.value = true
+  seedBoard(scenario.value)
+  onMounted(() => {
+    applyCardSizeMultiplier(isMobile ? 0.8 : undefined)
+  })
+} else {
+  await navigateTo('/', { replace: true })
+}
 </script>

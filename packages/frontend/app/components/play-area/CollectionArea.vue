@@ -1,6 +1,9 @@
 <template>
   <div
-    :class="['w-full px-4 opacity-90 isolate', isMobileLandscape && 'relative min-h-16']"
+    :class="[
+      'w-full px-4 opacity-90 isolate',
+      isMobileLandscape && 'coll-landscape-frame relative min-h-16',
+    ]"
   >
     <div
       :class="[
