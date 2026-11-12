@@ -1,6 +1,6 @@
 <template>
-  <div class="relative w-full h-full isolate">
-    <div class="board-opponent fit-cards absolute bottom-0 inset-x-0">
+  <div class="relative w-full isolate">
+    <div class="board-opponent fit-cards">
       <div class="relative mx-auto w-max max-w-full">
         <!-- OPPONENT HAND -->
         <ListGrid

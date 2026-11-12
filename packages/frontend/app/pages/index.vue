@@ -1,10 +1,13 @@
 <template>
   <GameLayout>
-    <div class="board-fit isolate">
-      <div
-        v-show="showLoader"
-        class="fixed top-1/3 -translate-y-1/2 inset-x-0 mx-auto pointer-events-none z-1"
-      >
+    <GameBoard
+      :show-loader="showLoader"
+      :field-enabled="players[selfKey].isActive && !!selectedCard"
+      :hand-enabled="canInteractLocalHand"
+      :hand-dimmed="players[opponentKey].isActive"
+      @completed="handleCompletion"
+    >
+      <template #loader>
         <template v-if="isMultiplayerGame">
           <SakuraLoader class="mx-auto opacity-80 w-max" />
           <p class="font-semibold tracking-wide text-center drop-shadow-md animate-pulse">
@@ -12,59 +15,8 @@
           </p>
         </template>
         <CardsLoader v-else />
-      </div>
-
-      <!-- OPPONENT HAND -->
-      <div class="board-opponent-slot absolute inset-x-0 top-[env(safe-area-inset-top,0px)] h-28">
-        <OpponentArea />
-      </div>
-
-      <!-- OPPONENT COLLECTION -->
-      <div class="absolute inset-x-0 -translate-y-3/4 top-1/4">
-        <div class="board-collection fit-cards">
-          <CollectionArea
-            :player="opponentKey"
-            @completed="handleCompletion"
-          />
-        </div>
-      </div>
-
-      <!-- FIELD -->
-      <div class="board-field fit-cards absolute inset-x-0 top-1/4 mx-auto isolate -z-10">
-        <div
-          v-click-disabled:unless="players[selfKey].isActive && !!selectedCard"
-          class="board-field-grid py-3 sm:py-8"
-        >
-          <Deck />
-          <FieldDisplay />
-        </div>
-      </div>
-
-      <!-- PLAYER COLLECTION -->
-      <div class="absolute inset-x-0 bottom-1/4">
-        <div class="board-collection fit-cards">
-          <CollectionArea
-            :player="selfKey"
-            @completed="handleCompletion"
-          />
-        </div>
-      </div>
-
-      <!-- PLAYER HAND -->
-      <div
-        :class="[
-          'absolute inset-x-0 bottom-0 pb-[max(3.5rem,env(safe-area-inset-bottom,0px))] sm:-bottom-4 sm:pb-8',
-          'transition-opacity duration-200',
-          players[opponentKey].isActive && 'opacity-80',
-        ]"
-      >
-        <div class="board-hand fit-cards py-4 sm:py-8">
-          <HandDisplay
-            :id="selfKey"
-            :can-interact="canInteractLocalHand"
-          />
-        </div>
-      </div>
+      </template>
+    </GameBoard>
 
       <!-- KOI-KOI SHOUT -->
       <Shout
@@ -97,7 +49,6 @@
         :is-processing="isProcessingForfeit"
         @cancel-game="handleCancelGame"
       />
-    </div>
   </GameLayout>
 </template>
 

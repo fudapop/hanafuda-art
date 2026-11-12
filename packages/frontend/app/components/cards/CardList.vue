@@ -3,7 +3,7 @@
     v-for="card in cardImages"
     :key="card.name"
     :class="[
-      stack ? 'max-sm:not-last:-mr-3 sm:not-last:-mr-2' : '',
+      stack ? 'coll-pile-item max-sm:not-last:-mr-3 sm:not-last:-mr-2' : '',
       'origin-center',
       currentDesign,
       itemClass,

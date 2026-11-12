@@ -528,15 +528,6 @@ body > svg[style*="z-index: -99999999"] {
     /* Two field rows plus both hands have to share a short landscape viewport. */
     --card-height-cap: min(64px, 16svh);
   }
-
-  /* Pull the opponent row and the field up so the hand is not stacked on the field. */
-  .board-opponent-slot {
-    height: 4.5rem;
-  }
-
-  .board-field {
-    top: 4.75rem;
-  }
 }
 
 .fit-cards .card,
@@ -652,4 +643,174 @@ body > svg[style*="z-index: -99999999"] {
   overflow-x: clip;
   padding-inline: max(0.5rem, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   --card-max-width: calc((100cqi - 1.5rem) / 4);
+}
+
+/*
+  Phone board stack
+  -----------------
+  Percentage anchors (top-1/4, bottom-1/4) let a wrapping collection grow over
+  the field. The five play rows share one grid: opponent hand, opponent
+  collection, field, player collection, player hand. The field row takes the
+  leftover space and centers its cards. Padding keeps both hands clear of the
+  fixed status bars and the safe area.
+*/
+.board-stack {
+  position: absolute;
+  inset: 0;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 3.5rem);
+  padding-bottom: max(4rem, env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  row-gap: 0.25rem;
+  min-width: 0;
+}
+
+@media (max-height: 500px) {
+  /* This follows the base rule so the shorter padding actually wins.
+     A 320px-tall landscape phone cannot also reserve the portrait status-bar
+     padding or the field track collapses and its cards shrink to nothing. */
+  .board-stack {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 1.25rem);
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+    row-gap: 0.125rem;
+  }
+
+  .board-collection .coll-row {
+    --card-height: 32px;
+  }
+
+  .board-field-grid,
+  .board-hand {
+    padding-block: 0.25rem;
+  }
+
+  /* The turn hint is a full line. On a 320px-tall screen that line is the
+     difference between a field and no field, so it overlays the hand. */
+  .board-hand p {
+    position: absolute;
+    z-index: 10;
+    inset-inline: 0;
+    top: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  /* Landscape collections are an absolute 2×2 overlay. min-h-16 on both rows
+     leaves no track for the field, but the labels still have to sit in the
+     right gutter, beside the field and the hand, rather than on the cards. */
+  .coll-landscape-frame {
+    min-height: 0;
+  }
+
+  .coll-landscape-grid {
+    /* Stay in the right gutter: clear of the field, and left of the exit button. */
+    right: 3.25rem;
+    width: 7rem;
+    max-width: 7rem;
+  }
+}
+
+.board-field-center {
+  display: grid;
+  align-content: center;
+  min-height: 0;
+  min-width: 0;
+  container-type: size;
+}
+
+/* Two field rows have to fit the middle track. On a tall window the preferred
+   card height is smaller than this cap, so desktop cards stay the same size. */
+.board-field-center .board-field {
+  --field-block: 1.25rem;
+  --card-height: min(
+    var(--card-height-pref, 140px),
+    var(--card-height-cap, 9999px),
+    calc((100cqb - var(--field-block)) / 2)
+  );
+}
+
+@media (min-width: 640px) {
+  .board-field-center .board-field {
+    --field-block: 1.75rem;
+  }
+}
+
+@media (max-height: 500px) {
+  .board-field-center .board-field {
+    /* Matches the 0.25rem block padding set on .board-field-grid above. */
+    --field-block: 0.75rem;
+  }
+}
+
+.board-field-center .board-field:has(.field-dense) {
+  --card-height: min(
+    var(--card-height-pref, 140px),
+    var(--card-height-cap, 9999px),
+    18svh,
+    84px,
+    calc((100cqb - var(--field-block, 1.25rem)) / 3)
+  );
+}
+
+/*
+  Collection piles stay one card tall. Each slot is a little narrower than a
+  card, and only the last card keeps its full width, so a long pile overlaps
+  more instead of wrapping onto another row.
+*/
+.coll-row {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.coll-row > .coll-pile {
+  flex: 0 1 max-content;
+  min-width: calc(var(--card-height) * var(--card-aspect, 2 / 3));
+  max-width: 100%;
+}
+
+.coll-row > .coll-pile:empty {
+  display: none;
+}
+
+.coll-pile {
+  --coll-card-w: calc(var(--card-height) * var(--card-aspect, 2 / 3));
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: flex-start;
+  position: relative;
+  /* Do not make this a container. Collection cards size themselves with
+     100cqi, which must stay the board-collection container. */
+  overflow: clip;
+}
+
+.coll-pile > .coll-pile-item {
+  flex: 0 1 calc(var(--coll-card-w) - 0.75rem);
+  width: calc(var(--coll-card-w) - 0.75rem);
+  min-width: 0.375rem;
+  margin-inline-end: 0;
+}
+
+.coll-pile > .coll-pile-item:last-child {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: auto;
+}
+
+.coll-pile > .coll-pile-item > .card,
+.coll-pile > .coll-pile-item .card {
+  flex: none;
+}
+
+.coll-label {
+  max-width: 100%;
+  width: max-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
