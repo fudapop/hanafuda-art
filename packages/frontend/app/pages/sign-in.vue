@@ -4,8 +4,10 @@
       The panel is stretched with top/bottom and has no height of its own, so this
       box has to be the viewport. A logo-height wrapper with overflow:hidden became
       the containing block in Safari and clipped the form under the email field.
+      flow-root keeps the logo's top margin inside this box; without it the margin
+      collapses through and the panel hangs below the viewport.
     -->
-    <div class="relative isolate h-dvh">
+    <div class="relative isolate flow-root h-dvh">
       <div
         v-if="!loggingIn"
         :class="[
