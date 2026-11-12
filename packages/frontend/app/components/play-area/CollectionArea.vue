@@ -9,7 +9,7 @@
       :class="[
         'mx-auto [--card-height:60px]',
         isMobileLandscape
-          ? 'grid w-36! max-w-36 gap-x-0! grid-rows-2! grid-cols-2! absolute right-12'
+          ? 'coll-landscape-grid grid w-36 max-w-36 gap-x-0! grid-rows-2! grid-cols-2! absolute right-12'
           : 'coll-row gap-x-2 sm:gap-x-8',
       ]"
     >

@@ -30,6 +30,7 @@ type Metrics = {
   scrollHeight: number
   piles: Pile[]
   fieldCards: Box[]
+  handCards: Box[]
 }
 
 const { defaultBrowserType: _iphoneBrowser, ...iphone } = devices['iPhone 12']
@@ -58,8 +59,9 @@ async function openBoard(page: Page, viewport: { width: number; height: number }
     if (!pile) return true
     return pile.getBoundingClientRect().height > 20
   })
-  // Card enter transitions move for 300ms. Measure after they settle.
-  await page.waitForTimeout(400)
+  // Card enter transitions move for 300ms. WebKit can still be mid-transition
+  // a little after that, which makes a field card look like it overlaps a pile.
+  await page.waitForTimeout(600)
 }
 
 async function metrics(page: Page): Promise<Metrics> {
@@ -95,6 +97,7 @@ async function metrics(page: Page): Promise<Metrics> {
         }
       })
     const fieldCards = [...document.querySelectorAll('[data-board-field] .card, [data-board-field] .card-slot')].filter(visible).map(box)
+    const handCards = [...document.querySelectorAll('[data-board-player-hand] .card, [data-board-opponent-hand] .card')].filter(visible).map(box)
     return {
       innerWidth: window.innerWidth,
       innerHeight: window.innerHeight,
@@ -102,6 +105,7 @@ async function metrics(page: Page): Promise<Metrics> {
       scrollHeight: document.documentElement.scrollHeight,
       piles,
       fieldCards,
+      handCards,
     }
   })
 }
@@ -130,6 +134,20 @@ function expectFieldClear(layout: Metrics) {
   for (const pile of layout.piles) {
     for (const card of layout.fieldCards) {
       expect(intersects(pile.box, card), `${pile.owner} ${pile.type} overlaps a field card`).toBe(false)
+    }
+  }
+}
+
+function expectLabelsClear(layout: Metrics) {
+  const targets = [...layout.fieldCards, ...layout.handCards]
+  const labels = layout.piles.filter((pile) => pile.label)
+  expect(labels.length).toBeGreaterThan(0)
+  for (const pile of labels) {
+    for (const card of targets) {
+      expect(
+        intersects(pile.label!, card),
+        `${pile.owner} ${pile.type} label overlaps a card`,
+      ).toBe(false)
     }
   }
 }
@@ -176,6 +194,7 @@ test.describe('phone board', () => {
       expectPilesAreOneRow(layout)
       expectFieldClear(layout)
     }
+    expectLabelsClear(layout)
   })
 })
 

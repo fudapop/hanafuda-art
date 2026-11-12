@@ -696,9 +696,17 @@ body > svg[style*="z-index: -99999999"] {
   }
 
   /* Landscape collections are an absolute 2×2 overlay. min-h-16 on both rows
-     leaves no track for the field. */
+     leaves no track for the field, but the labels still have to sit in the
+     right gutter, beside the field and the hand, rather than on the cards. */
   .coll-landscape-frame {
     min-height: 0;
+  }
+
+  .coll-landscape-grid {
+    /* Stay in the right gutter: clear of the field, and left of the exit button. */
+    right: 3.25rem;
+    width: 7rem;
+    max-width: 7rem;
   }
 }
 
