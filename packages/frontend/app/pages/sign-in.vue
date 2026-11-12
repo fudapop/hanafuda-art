@@ -1,11 +1,18 @@
 <template>
   <ContentLayout>
-    <div class="overflow-hidden isolate">
+    <!--
+      The panel is stretched with top/bottom and has no height of its own, so this
+      box has to be the viewport. A logo-height wrapper with overflow:hidden became
+      the containing block in Safari and clipped the form under the email field.
+      flow-root keeps the logo's top margin inside this box; without it the margin
+      collapses through and the panel hangs below the viewport.
+    -->
+    <div class="relative isolate flow-root h-dvh">
       <div
         v-if="!loggingIn"
         :class="[
-          'flex justify-center drop-shadow-xl my-12 w-full',
-          'landscape:w-1/2 landscape:h-screen landscape:items-center landscape:my-auto',
+          'relative z-10 flex justify-center drop-shadow-xl my-12 w-full',
+          'landscape:w-1/2 landscape:h-full landscape:items-center landscape:my-0',
         ]"
       >
         <img
@@ -36,7 +43,7 @@
         <div
           v-else
           :class="[
-            'absolute px-4 py-8 overflow-x-clip overflow-y-auto rounded-md shadow-lg -z-10 bg-white dark:bg-hanafuda-cream box-border w-full max-w-full min-w-0',
+            'absolute z-0 px-4 py-8 overflow-x-hidden overflow-y-auto rounded-md shadow-lg bg-white dark:bg-hanafuda-cream box-border w-full max-w-full min-w-0',
             'inset-x-0 top-32 bottom-0',
             'landscape:inset-y-0 landscape:left-auto landscape:right-0 landscape:top-0 landscape:bottom-0 landscape:h-auto landscape:w-1/2',
             !isMobile && 'landscape:flex landscape:items-center',
