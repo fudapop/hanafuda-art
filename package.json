@@ -7,9 +7,11 @@
     "build": "pnpm -F @hanafuda/frontend build",
     "generate": "pnpm -F @hanafuda/frontend generate",
     "test": "pnpm -F @hanafuda/frontend test",
+    "test:release": "node --experimental-strip-types --test scripts/release-calver.test.ts",
     "dev:backend": "pnpm -F @hanafuda/backend dev",
     "build:backend": "pnpm -F @hanafuda/backend build",
-    "release": "deno run --allow-read --allow-write --allow-env --allow-run scripts/release-calver.ts"
+    "release": "node --experimental-strip-types scripts/release-calver.ts",
+    "release:dry-run": "node --experimental-strip-types scripts/release-calver.ts --dry-run"
   },
   "engines": {
     "node": ">=22.16.0"

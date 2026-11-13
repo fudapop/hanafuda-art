@@ -1,0 +1,36 @@
+name: Release script
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/release-calver.ts'
+      - 'scripts/release-calver-lib.ts'
+      - 'scripts/release-calver.test.ts'
+      - 'package.json'
+      - '.github/workflows/release-script.yml'
+  pull_request:
+    branches:
+      - main
+      - development
+    paths:
+      - 'scripts/release-calver.ts'
+      - 'scripts/release-calver-lib.ts'
+      - 'scripts/release-calver.test.ts'
+      - 'package.json'
+      - '.github/workflows/release-script.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run release script tests
+        run: node --experimental-strip-types --test scripts/release-calver.test.ts
