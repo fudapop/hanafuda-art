@@ -15,6 +15,8 @@
         leave-from-class="opacity-100"
         leave-to-class="translate-x-4 opacity-0"
       >
+        <!-- Always mounted. The transition only plays the initial enter. -->
+        <!-- eslint-disable-next-line vue/require-toggle-inside-transition -->
         <div class="h-[250px] xs:h-40 my-8">
           <p class="my-5 text-base text-center text-text-secondary text-balance">
             {{ t('auth.passwordReset.description') }}

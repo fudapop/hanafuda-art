@@ -82,7 +82,7 @@ import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { usePlayerStore } from '~~/stores/playerStore'
-import { type CardName } from '~/utils/cards'
+import type { CardName } from '~/utils/cards'
 
 const { t } = useI18n()
 
@@ -93,11 +93,6 @@ const thirdRowIsOccupied = computed(
     !!displayedCards.slice(10).filter((card) => !!card).length ||
     displayedCards.filter((card) => !!card).length > 9,
 )
-
-const gridStyle = computed(() => {
-  if (thirdRowIsOccupied) {
-  }
-})
 
 const ds = useGameDataStore()
 const cs = useCardStore()

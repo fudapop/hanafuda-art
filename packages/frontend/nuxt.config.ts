@@ -41,8 +41,6 @@ if (isProduction) {
   })
 }
 
-const bucketUrl = process.env.NUXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/static'
-
 export default defineNuxtConfig({
   app: {
     head: {
@@ -136,6 +134,14 @@ export default defineNuxtConfig({
     port: 8888,
   },
   devtools: { enabled: true, vueDevTools: true },
+  eslint: {
+    // Prettier owns formatting. The checker stays off so dev and build do not
+    // start linting; `pnpm lint` is the gate.
+    checker: false,
+    config: {
+      stylistic: false,
+    },
+  },
   i18n: {
     autoDeclare: true,
     baseUrl: siteUrl,
@@ -158,6 +164,7 @@ export default defineNuxtConfig({
     },
   },
   modules: [
+    '@nuxt/eslint',
     '@pinia/nuxt',
     'nuxt-headlessui',
     '@nuxt/image',

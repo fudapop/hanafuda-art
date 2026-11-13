@@ -22,7 +22,7 @@ type RemoteUpdateHandler = (game: MultiplayerGame) => Promise<void>
 
 export const useMultiplayerOrchestrator = () => {
   const { t } = useI18n()
-  const { localKey, selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
+  const { localKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
   const { setOpponentPlayer, subscribeToGame } = useMultiplayerMatch()
   const { subscribeToOpponentPresence } = usePresence()
   const {

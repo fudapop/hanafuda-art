@@ -4,9 +4,7 @@ import { useGameDataStore } from '~~/stores/gameDataStore'
 import { useCardHandler } from '~/composables/useCardHandler'
 import { storeToRefs } from 'pinia'
 
-const PLAY_SPEED = [0.75, 1, 1.25, 1.5, 2, 3] as const
-
-type speedMultiple = (typeof PLAY_SPEED)[number]
+type speedMultiple = 0.75 | 1 | 1.25 | 1.5 | 2 | 3
 
 type AutoplayOptions = {
   speed?: speedMultiple

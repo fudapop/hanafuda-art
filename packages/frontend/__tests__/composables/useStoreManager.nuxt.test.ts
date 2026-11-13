@@ -2,9 +2,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb'
 import { useCardStore } from '../../stores/cardStore'
-import { useConfigStore } from '../../stores/configStore'
 import { useGameDataStore } from '../../stores/gameDataStore'
-import { usePlayerStore } from '../../stores/playerStore'
 
 describe('useStoreManager', () => {
   // Store reference to fake IndexedDB to ensure we only clean up the fake one
@@ -81,7 +79,7 @@ describe('useStoreManager', () => {
       await deleteSavedGame('hanafuda-save-multiplayer').catch(() => {
         // Ignore if save doesn't exist
       })
-    } catch (error) {
+    } catch {
       // Ignore errors - cleanup is best effort
     }
 
@@ -113,7 +111,7 @@ describe('useStoreManager', () => {
             setTimeout(() => resolve(), 100)
           }
         })
-      } catch (error) {
+      } catch {
         // Ignore errors during cleanup - test isolation is best effort
       }
     }

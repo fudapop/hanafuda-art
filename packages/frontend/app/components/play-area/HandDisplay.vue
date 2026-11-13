@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { useCardDesign } from '~/composables/useCardDesign'
-import { type CardName } from '~/utils/cards'
+import type { CardName } from '~/utils/cards'
 import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
@@ -100,7 +100,8 @@ const placeCard = (cardName: CardName) => {
 }
 
 const removeCard = (cardName: CardName) => {
-  delete displayedCards[displayedCards.indexOf(cardName)]
+  const index = displayedCards.indexOf(cardName)
+  if (index >= 0) displayedCards[index] = undefined
 }
 
 const updateDisplayedCards = () => {

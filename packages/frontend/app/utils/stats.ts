@@ -104,7 +104,7 @@ function normalizeDatesForHashing(meta: Omit<PlayerStatsMetadata, 'hash' | 'alg'
  * @returns Promise resolving to hexadecimal hash string
  */
 async function generateStatsHash(stats: PlayerStats): Promise<string> {
-  const { hash, alg, ...metaWithoutHash } = stats._meta
+  const { hash: _hash, alg: _alg, ...metaWithoutHash } = stats._meta
   const { _meta, ...pureStats } = stats
 
   // Flatten structure for hashing by appending normalized timestamps directly

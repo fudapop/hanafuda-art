@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { type CardName } from '~/utils/cards'
+import type { CardName } from '~/utils/cards'
 import { useCardStore } from '~~/stores/cardStore'
 
 const {

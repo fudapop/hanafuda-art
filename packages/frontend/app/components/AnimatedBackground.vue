@@ -40,7 +40,7 @@ const { koikoiIsCalled } = useDecisionHandler()
 
 const posArr: Ref<any[]> = ref([])
 const generatedPositions = (n: number) => {
-  return getRange(n).map((n) => ({
+  return getRange(n).map(() => ({
     y: Math.floor(Math.random() * width.value),
     x: Math.floor(Math.random() * height.value),
   }))

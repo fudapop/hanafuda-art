@@ -166,17 +166,6 @@ const comments = reactive({
   message: '',
 })
 
-const commentBoxDescription = computed(() => {
-  switch (comments.tag) {
-    case 'idea':
-      return 'How can we improve the game, or what would you like to see next?'
-    case 'error':
-      return 'Did you encounter any bugs?  Please describe the issue.'
-    default:
-      return 'Your feedback is greatly appreciated!  🙏🏽'
-  }
-})
-
 const submitted = computed({
   get: () => user?.flags?.hasSubmittedFeedback,
   set: (value) => {

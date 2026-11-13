@@ -3,6 +3,7 @@
     <div :class="[currentDesign, 'grid grid-cols-4 sm:grid-cols-8 gap-0.5']">
       <CardImage
         v-for="cardName in cardArray"
+        :key="cardName"
         :card="cardName"
         :src="cardMap.get(cardName)"
       />
@@ -11,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { type CardName } from '~/utils/cards'
+import type { CardName } from '~/utils/cards'
 
 interface Props {
   design?: CardDesign

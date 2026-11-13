@@ -54,7 +54,7 @@ import { checkAll, type CompletedYaku, YAKU, type YakuName } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
-import { type PlayerKey } from '~~/stores/playerStore'
+import type { PlayerKey } from '~~/stores/playerStore'
 
 export type CompletionEvent = {
   player: PlayerKey
@@ -76,8 +76,6 @@ const emits = defineEmits<{
   (event: 'completed', data: CompletionEvent): void
 }>()
 
-const { p1Avatar, p2Avatar } = useAvatar()
-
 const { isMobile } = useDevice()
 const { orientation } = useScreenOrientation()
 const isMobileLandscape = computed(() => isMobile && orientation.value?.includes('landscape'))
@@ -97,7 +95,6 @@ const coll: Record<string, Set<CardName>> = reactive({
   ribbons: new Set([]),
   plains: new Set([]),
 })
-const hasCards = computed(() => Object.values(coll).some((c) => c.size))
 
 const collection = computed(() => sortByType([...cs.collection[player]]))
 const cBrights = computed(() => collection.value.brights)

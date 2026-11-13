@@ -108,7 +108,7 @@ export const useCardDesign = () => {
    * @returns Map of card names to URLs for the specified design.
    */
   const getCardUrlMap = (design: CardDesign) => {
-    let urlMap: CardMap = new Map()
+    const urlMap: CardMap = new Map()
 
     for (const cardName of DECK) {
       const url = getCardUrl(cardName, design)

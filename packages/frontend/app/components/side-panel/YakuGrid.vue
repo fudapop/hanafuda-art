@@ -99,7 +99,7 @@
 
 <script setup lang="ts">
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
-import { type CompletedYaku } from '~/utils/yaku'
+import type { CompletedYaku } from '~/utils/yaku'
 
 const { completed, showCards } = defineProps<{
   completed: CompletedYaku[]

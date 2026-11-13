@@ -38,12 +38,14 @@
               class="absolute bottom-0 inline-flex mb-1 ml-4"
             >
               <span
-                v-for="_ in yaku.cards.filter((card: CardName) => playerHas(card))"
+                v-for="(_, dot) in yaku.cards.filter((card: CardName) => playerHas(card))"
+                :key="`have-${dot}`"
                 class="self-center w-3 h-1 ml-1 bg-green-400 rounded-full ring-1 ring-inset ring-green-500"
               ></span>
               <span
-                v-for="_ in yaku.numRequired -
+                v-for="(_, dot) in yaku.numRequired -
                 yaku.cards.filter((card: CardName) => playerHas(card)).length"
+                :key="`need-${dot}`"
                 class="self-center w-3 h-1 ml-1 rounded-full bg-surface ring-1 ring-inset ring-border"
               ></span>
             </span>
@@ -323,7 +325,7 @@ import {
   XCircleIcon,
 } from '@heroicons/vue/20/solid'
 import { useStorage } from '@vueuse/core'
-import { type CardName } from '~/utils/cards'
+import type { CardName } from '~/utils/cards'
 import { type Yaku, teyaku, viewingYaku } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'

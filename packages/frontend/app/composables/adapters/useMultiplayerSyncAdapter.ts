@@ -1,7 +1,6 @@
 import {
   collection,
   doc,
-  getDoc,
   getDocFromCache,
   getDocFromServer,
   getDocs,
