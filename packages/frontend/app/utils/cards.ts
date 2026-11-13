@@ -385,7 +385,14 @@ function getCardsOfMonth(cards: CardName[], month: number): CardName[] {
   return cards.filter((card) => CARDS[card]?.month === month)
 }
 
-function sortByType(cards: CardName[]): Record<string, CardName[]> {
+type CardsByType = {
+  brights: CardName[]
+  animals: CardName[]
+  ribbons: CardName[]
+  plains: CardName[]
+}
+
+function sortByType(cards: CardName[]): CardsByType {
   return {
     brights: getCardsOfType(cards, 'bright'),
     animals: getCardsOfType(cards, 'animal'),
@@ -410,6 +417,7 @@ export {
   sortByType,
   TEST_DECKS,
   type CardName,
+  type CardsByType,
   type CardType,
   type FlowerCard,
 }

@@ -1,4 +1,4 @@
-import type { PlayerProfile, SyncResult, SyncOptions } from '~/types/profile'
+import type { PlayerProfile, SyncResult, SyncOptions } from '~~/types/profile'
 import { mergePlayerStats } from '~/utils/stats'
 
 /**
