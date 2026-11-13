@@ -133,8 +133,8 @@ export const getNextVersion = (currentVersion: string, now: Date): string => {
  * @param version - CalVer string already validated by the caller, or validated here.
  * @param date - `YYYY-MM-DD` release date.
  * @returns Changelog with one new version section and no Unreleased heading.
- * @throws {ReleaseError} When Unreleased is missing, empty, duplicated,
- * or the version heading already exists.
+ * @throws {ReleaseError} When Unreleased is missing, empty, only a category
+ * heading, duplicated, or the version heading already exists.
  */
 export const promoteUnreleased = (markdown: string, version: string, date: string): string => {
   if (!parseCalVer(version)) {
@@ -171,6 +171,15 @@ export const promoteUnreleased = (markdown: string, version: string, date: strin
   const notes = body.trim()
   if (!notes) {
     throw new ReleaseError('The Unreleased section is empty.')
+  }
+  const hasNote = notes.split('\n').some((line) => {
+    const trimmed = line.trim()
+    return trimmed.length > 0 && !trimmed.startsWith('#')
+  })
+  if (!hasNote) {
+    throw new ReleaseError(
+      'The Unreleased section has no notes. Add a bullet under the category heading.',
+    )
   }
 
   const prefix = start === 0 ? '' : normalized.slice(0, start).replace(/\s*$/, '\n\n')

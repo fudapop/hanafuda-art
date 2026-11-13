@@ -105,7 +105,7 @@ describe('promoteUnreleased', () => {
     )
   })
 
-  it('fails when Unreleased is missing, empty, or duplicated', () => {
+  it('fails when Unreleased is missing, empty, only a heading, or duplicated', () => {
     assert.throws(
       () => promoteUnreleased('# Changelog\n\n## [2026.4.0]\n', '2026.11.0', '2026-11-13'),
       /no "## Unreleased"/,
@@ -118,6 +118,15 @@ describe('promoteUnreleased', () => {
           '2026-11-13',
         ),
       /empty/,
+    )
+    assert.throws(
+      () =>
+        promoteUnreleased(
+          '# Changelog\n\n## Unreleased\n\n### Bug Fixes\n\n## [2026.4.0]\n',
+          '2026.11.0',
+          '2026-11-13',
+        ),
+      /no notes/,
     )
     assert.throws(
       () =>

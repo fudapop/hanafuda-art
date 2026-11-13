@@ -106,9 +106,15 @@ Pull requests are stacked and squash-merged, so a version bump in every PR confl
 
 Do this only when asked to ship a batch, on its own branch from latest `main`, after the work that belongs in the batch is already merged. Do not fold an open stack in unless asked.
 
-1. `pnpm release` (preview with `pnpm release:dry-run`). Optional `--date YYYY-MM-DD` pins the UTC calendar day. The command bumps `packages/frontend/package.json` and moves `## Unreleased` to `## [YYYY.M.MICRO] - YYYY-MM-DD`. It does not commit, tag, or push. It fails when `Unreleased` is missing or empty.
+1. `pnpm release` (preview with `pnpm release:dry-run`). Optional `--date YYYY-MM-DD` pins the UTC calendar day. The command bumps `packages/frontend/package.json` and moves `## Unreleased` to `## [YYYY.M.MICRO] - YYYY-MM-DD`. It does not commit, tag, or push. It fails when `Unreleased` is missing, empty, or only category headings with no bullets.
 2. Commit those two files. Title: `chore(release): vYYYY.M.MICRO`.
-3. Translations: when `GEMINI_API_KEY` is available, refresh `ja` / `fr` / `pl` / `ru` with `scripts/translate-content.ts`. Do not invent those translations by hand, and do not block the release when the key is missing. Say in the PR that locales are unchanged.
+3. Localized changelogs are not part of that command. When `GEMINI_API_KEY` is available, refresh `ja` / `fr` / `pl` / `ru` from `packages/frontend/content/en` (the translator reads `packages/frontend/localization.json`):
+
+   ```
+   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --include packages/frontend/content/en/misc
+   ```
+
+   Do not invent those translations by hand. Do not block the release when the key is missing. Say in the PR that the other locales are unchanged.
 4. Open the PR. Do not create a tag or a GitHub Release on the PR branch.
 
 After that PR squash-merges to `main`, check out the new `main` commit and tag it:
