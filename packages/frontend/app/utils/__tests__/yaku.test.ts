@@ -1,5 +1,5 @@
 import { it, describe, expect } from 'vitest'
-import { type CardName } from '../cards'
+import type { CardName } from '../cards'
 import { YAKU, type YakuName, checkAll, getCompleted } from '../yaku'
 
 describe('YAKU', () => {

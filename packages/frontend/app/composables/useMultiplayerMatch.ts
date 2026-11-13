@@ -329,9 +329,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
       // Ensure sync adapters (including multiplayer adapter) are initialized
       initializeSync()
 
-      const synced = await syncMultiplayerGame(gameId)
-      if (!synced) {
-      }
+      await syncMultiplayerGame(gameId)
     } catch (error) {
       console.error('Error syncing multiplayer game after join:', error)
       // Do not fail the join flow if local sync fails; remote state is still valid

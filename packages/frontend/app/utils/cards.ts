@@ -365,12 +365,12 @@ const CARDS: Readonly<Record<string, FlowerCard>> = {
 
 function shuffle(deck: CardName[]): CardName[] {
   const cards = [...deck]
-  let numberOfCards = () => cards.length
-  let shuffledCards: CardName[] = []
+  const numberOfCards = () => cards.length
+  const shuffledCards: CardName[] = []
 
   for (let n = 0; numberOfCards() > 0; n++) {
-    let index = Math.floor(Math.random() * (numberOfCards() - 1))
-    let randomCard = cards.splice(index, 1)
+    const index = Math.floor(Math.random() * (numberOfCards() - 1))
+    const randomCard = cards.splice(index, 1)
     if (randomCard[0]) shuffledCards.push(randomCard[0])
   }
 

@@ -62,7 +62,7 @@ watchEffect(() => {
   systemPreferences.value.colorMode = newMode
 
   // Dispatch custom event for plugin to sync immediately
-  if (process.client) {
+  if (import.meta.client) {
     window.dispatchEvent(new CustomEvent('color-mode-change'))
     
     // Also apply directly to HTML element for immediate effect in PWA

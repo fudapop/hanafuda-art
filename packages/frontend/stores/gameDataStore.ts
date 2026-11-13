@@ -142,8 +142,8 @@ export const useGameDataStore = defineStore('gameData', () => {
       return score
     }
 
-    let p1Score = limitScore(baseScore + calcScore('p1') - calcScore('p2'))
-    let p2Score = limitScore(baseScore + calcScore('p2') - calcScore('p1'))
+    const p1Score = limitScore(baseScore + calcScore('p1') - calcScore('p2'))
+    const p2Score = limitScore(baseScore + calcScore('p2') - calcScore('p1'))
     return {
       p1: p1Score,
       p2: p2Score,

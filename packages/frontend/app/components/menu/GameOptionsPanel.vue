@@ -135,7 +135,7 @@
 <script setup lang="ts">
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { EllipsisVertical } from 'lucide-vue-next'
-import { type GameOptionsTab } from '~/composables/useOptionsPanel'
+import type { GameOptionsTab } from '~/composables/useOptionsPanel'
 
 const { tabs } = defineProps<{
   tabs: GameOptionsTab[]

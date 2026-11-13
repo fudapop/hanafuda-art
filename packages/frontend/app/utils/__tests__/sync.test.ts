@@ -4,7 +4,6 @@ import {
   shouldSync,
   createSyncResult,
   shouldUseRemote,
-  type ConflictResolution,
 } from '../sync'
 import { getDefaultStats } from '../stats'
 import type { PlayerProfile } from '~~/types/profile'

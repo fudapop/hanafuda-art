@@ -386,11 +386,10 @@ describe('updateStatsWithOps', () => {
 
     const startTime2 = performance.now()
 
-    let stats = baseStats
-    stats = await incrementStat(stats, 'totalYakuCompleted')
+    let stats = await incrementStat(baseStats, 'totalYakuCompleted')
     stats = await incrementStat(stats, 'yakuCompleted_gokou')
     stats = await incrementStat(stats, 'yakuCompleted_shikou')
-    stats = await incrementStat(stats, 'yakuCompleted_sankou')
+    await incrementStat(stats, 'yakuCompleted_sankou')
 
     const individualTime = performance.now() - startTime2
 

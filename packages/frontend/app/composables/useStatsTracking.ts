@@ -32,7 +32,7 @@ export const useStatsTracking = () => {
   // Watch for new events in real-time by watching the array length
   const stopEventWatch = watch(
     () => ds.eventHistory.length,
-    (newLength, oldLength) => {
+    () => {
       // Remove excessive logging, retain only concise tracing if necessary
 
       // Process all new events since last check
@@ -178,7 +178,6 @@ export const useStatsTracking = () => {
       }
     } catch (e) {
       // Still log errors for troubleshooting
-      // eslint-disable-next-line no-console
       console.error('Failed to update player stats:', e)
     }
 

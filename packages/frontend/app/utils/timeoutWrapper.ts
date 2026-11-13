@@ -1,3 +1,5 @@
+type TimerCallback = (...args: any[]) => any
+
 class TimeoutWrapper {
   #fn
   #key
@@ -17,10 +19,10 @@ class TimeoutWrapper {
    * @param endMsg Message to log on timer end
    */
   constructor(
-    fn: Function,
+    fn: TimerCallback,
     ms: number,
     key: string,
-    callback?: Function,
+    callback?: TimerCallback,
     startMsg?: string,
     endMsg?: string,
   ) {

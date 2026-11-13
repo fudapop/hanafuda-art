@@ -20,6 +20,8 @@
         leave-from-class="opacity-100"
         leave-to-class="translate-x-4 opacity-0"
       >
+        <!-- Always mounted. The transition only plays the initial enter. -->
+        <!-- eslint-disable-next-line vue/require-toggle-inside-transition -->
         <div class="mt-8 space-y-8">
           <p class="text-center text-text">
             {{ t('signup.prompt.description') }}

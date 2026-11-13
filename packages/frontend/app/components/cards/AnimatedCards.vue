@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import { useImage } from '@vueuse/core'
-import { type CardName } from '~/utils/cards'
+import type { CardName } from '~/utils/cards'
 const { getCardUrl, currentDesign: selectedDesign } = useCardDesign()
 
 const loaded = ref(false)

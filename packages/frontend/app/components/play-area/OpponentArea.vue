@@ -12,6 +12,7 @@
           <!-- FACE-DOWN CARDS -->
           <div
             v-for="card in hand[opponentKey]"
+            :key="card"
             :class="{
               'card down bg-slate-800': true,
               'opacity-0 transition-opacity': card === selectedCard || staged.has(card),

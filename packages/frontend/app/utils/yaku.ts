@@ -1,4 +1,4 @@
-import { type CardName } from './cards'
+import type { CardName } from './cards'
 
 const YAKU_NAMES = [
   'gokou',
@@ -411,8 +411,7 @@ type YakuProgress = {
 }
 
 function getProgress(collection: Set<CardName>, opponentCollection: Set<CardName>): YakuProgress[] {
-  let progress: YakuProgress[] = []
-  progress = [...Object.values(YAKU)]
+  const progress = [...Object.values(YAKU)]
     .filter((yaku) => !teyaku.has(yaku.name))
     .filter((yaku) => {
       const yakuOpponentHas = getIntersection(opponentCollection, yaku.cards).length
@@ -467,14 +466,14 @@ function checkForTeyaku(cardArr: CardName[]): [YakuName | null, CardName[]] {
   // Check array for 4 of same suit/flower or 4 pairs
   // Returns name of found winning/voiding condition
   // Returns null if neither found
-  let suitArr = cardArr.reduce((acc, card) => {
+  const suitArr = cardArr.reduce((acc, card) => {
     if (CARDS[card]) {
       acc.push(CARDS[card].month)
     }
     return acc
   }, [] as number[])
-  let suitCount = new Map()
-  for (let suit of suitArr) {
+  const suitCount = new Map()
+  for (const suit of suitArr) {
     if (suitCount.has(suit)) {
       suitCount.set(suit, suitCount.get(suit) + 1)
     } else {

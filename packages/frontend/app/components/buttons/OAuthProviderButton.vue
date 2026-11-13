@@ -59,8 +59,7 @@
 </template>
 
 <script setup lang="ts">
-const providers = ['github', 'google'] as const
-type OAuthProvider = (typeof providers)[number]
+type OAuthProvider = 'github' | 'google'
 const { action, provider, onSuccess } = defineProps<{
   action: (providerName: OAuthProvider) => Promise<boolean>
   provider: OAuthProvider
@@ -71,6 +70,7 @@ const localeRoute = useLocaleRoute()
 
 const handleClick = async () => {
   const success = await action(provider)
-  success ? onSuccess?.() : navigateTo(localeRoute('/'))
+  if (success) onSuccess?.()
+  else navigateTo(localeRoute('/'))
 }
 </script>

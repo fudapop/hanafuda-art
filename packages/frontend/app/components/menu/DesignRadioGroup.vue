@@ -28,6 +28,7 @@
     <div class="grid justify-center w-full pt-4 pb-12 space-y-12">
       <HeadlessRadioGroupOption
         v-for="(design, index) in sortedDesigns"
+        :key="design"
         v-slot="{ checked }"
         :class="[
           design,
@@ -268,9 +269,6 @@ const sortedDesigns = computed(() => {
 })
 
 const { current: currentProfile } = useProfile()
-const isGuestProfile = computed(
-  () => !currentProfile.value || currentProfile.value?.isGuest === true,
-)
 
 const UNLOCK_COST = 500
 
