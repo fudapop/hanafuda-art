@@ -664,5 +664,11 @@
     "signIn": "Sign in to your {appName} account",
     "terms": "Terms of Use for {appName}",
     "home": "Play the Japanese card game Hanafuda Koi-Koi against an AI opponent."
+  },
+  "pwa": {
+    "deferred": "A new version is ready. It will load when you return to the menu.",
+    "available": "A new version is ready.",
+    "updating": "Updating to the latest version…",
+    "updateNow": "Update now"
   }
 }

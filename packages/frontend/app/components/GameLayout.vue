@@ -214,11 +214,25 @@ const { selfKey, opponentKey, isMultiplayerGame } = useLocalPlayerPerspective()
 const { current: user } = useProfile()
 
 const gameStart = useState('start', () => false)
+const { acquire: acquireUpdateHold } = usePwaUpdateGate()
 const leavingGame = ref(false)
 const isSaving = ref(false)
 // const promptFeedback = ref(false)
 const promptSignup = ref(false)
 const showLoader = ref(false)
+let releaseUpdateHold: (() => void) | null = null
+watch(
+  [leavingGame, promptSignup, isSaving, showLoader],
+  () => {
+    const held = leavingGame.value || promptSignup.value || isSaving.value || showLoader.value
+    if (held && !releaseUpdateHold) releaseUpdateHold = acquireUpdateHold()
+    if (!held && releaseUpdateHold) {
+      releaseUpdateHold()
+      releaseUpdateHold = null
+    }
+  },
+  { immediate: true },
+)
 
 const turnAnnouncement = computed(() => {
   if (!gameStart.value) return ''
@@ -352,11 +366,7 @@ const handleMultiplayerForfeit = async (message: string | null) => {
       activePlayerUid: '',
     }))
 
-    await forfeitMultiplayerGame(
-      multiplayerMeta.value.gameId,
-      currentProfile.value.uid,
-      'forfeit',
-    )
+    await forfeitMultiplayerGame(multiplayerMeta.value.gameId, currentProfile.value.uid, 'forfeit')
 
     // Record the loss in player stats
     await updateGameRecord('loss', 0)
@@ -412,6 +422,8 @@ const unwatchGame = watch([gameStart, leavingGame], async () => {
 })
 
 onUnmounted(() => {
+  releaseUpdateHold?.()
+  releaseUpdateHold = null
   unwatchGame?.()
 })
 </script>

@@ -650,5 +650,11 @@
     "signIn": "Zaloguj się na swoje konto {appName}",
     "terms": "Warunki użytkowania dla {appName}",
     "home": "Zagraj w japońską grę karcianą Hanafuda Koi-Koi przeciwko przeciwnikowi AI."
+  },
+  "pwa": {
+    "deferred": "Nowa wersja jest gotowa. Wczyta się po powrocie do menu.",
+    "available": "Nowa wersja jest gotowa.",
+    "updating": "Aktualizowanie do najnowszej wersji…",
+    "updateNow": "Aktualizuj"
   }
 }

@@ -20,6 +20,7 @@
       close-button-position="top-right"
     />
     <SystemOptionsPopover />
+    <PwaUpdateBanner />
     <NuxtPwaManifest />
     <NuxtPage />
   </NuxtLayout>

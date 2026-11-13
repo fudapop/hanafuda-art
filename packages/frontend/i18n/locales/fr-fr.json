@@ -650,5 +650,11 @@
     "signIn": "Connectez-vous à votre compte {appName}",
     "terms": "Conditions d'utilisation pour {appName}",
     "home": "Jouez au jeu de cartes japonais Hanafuda Koi-Koi contre un adversaire IA."
+  },
+  "pwa": {
+    "deferred": "Une nouvelle version est prête. Elle se chargera lorsque vous reviendrez au menu.",
+    "available": "Une nouvelle version est prête.",
+    "updating": "Mise à jour vers la dernière version…",
+    "updateNow": "Mettre à jour"
   }
 }
