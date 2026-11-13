@@ -36,9 +36,12 @@ vi.mock('firebase/auth', () => ({
   applyActionCode: vi.fn(),
   checkActionCode: vi.fn(),
   EmailAuthProvider: { credential: vi.fn() },
+  // Mirrors Firebase's static-only provider classes.
+  // eslint-disable-next-line @typescript-eslint/no-extraneous-class
   GoogleAuthProvider: class GoogleAuthProvider {
     static credentialFromResult = vi.fn()
   },
+  // eslint-disable-next-line @typescript-eslint/no-extraneous-class
   GithubAuthProvider: class GithubAuthProvider {
     static credentialFromResult = vi.fn()
   },

@@ -226,7 +226,7 @@ const migrateLocalStorageSaves = async (): Promise<void> => {
     }
 
     // Migrate to IndexedDB with NEW key format
-    for (const { key, data } of savesToMigrate) {
+    for (const { data } of savesToMigrate) {
       // Use new fixed key format instead of old key
       const newKey = 'hanafuda-save-single'
 
@@ -278,17 +278,12 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
 
     // Separate saves into those needing migration and those already migrated
     const savesToMigrate: GameSaveRecord[] = []
-    const alreadyMigrated: GameSaveRecord[] = []
 
     for (const save of saves) {
       if (save.saveKey === 'hanafuda-save-single' || save.saveKey === 'hanafuda-save-multiplayer') {
-        alreadyMigrated.push(save)
-      } else {
-        savesToMigrate.push(save)
+        continue
       }
-    }
-
-    if (alreadyMigrated.length > 0) {
+      savesToMigrate.push(save)
     }
 
     if (savesToMigrate.length === 0) {
@@ -310,9 +305,6 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
       savesByMode.get(mode)!.push(save)
     }
 
-    let migratedCount = 0
-    let skippedCount = 0
-
     // Process each mode group
     for (const [mode, modeSaves] of savesByMode.entries()) {
       const newKey = mode === 'multiplayer' ? 'hanafuda-save-multiplayer' : 'hanafuda-save-single'
@@ -333,7 +325,6 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
       }
 
       await store.set(updatedSave)
-      migratedCount++
 
       // Remove the migrated save's old key
       await store.remove(uid, mostRecentSave.saveKey)
@@ -344,7 +335,6 @@ const migrateIndexedDBSaveKeys = async (uid: string): Promise<void> => {
 
         // Remove the old save to prevent conflicts
         await store.remove(uid, save.saveKey)
-        skippedCount++
       }
     }
 
@@ -443,10 +433,6 @@ export const useStoreManager = () => {
       const gameDataStore = useGameDataStore()
       const playerStore = usePlayerStore()
       const configStore = useConfigStore()
-
-      // Validate version compatibility
-      if (!isVersionCompatible(serializedState.version)) {
-      }
 
       // Detect whether this config payload is rules-only (no cardLabels field).
       // Rules-only payloads are produced by multiplayer snapshots; use importGameRules
@@ -657,7 +643,7 @@ export const useStoreManager = () => {
    * Imports game state from JSON file
    */
   const importGameState = (file: File): Promise<boolean> => {
-    return new Promise(async (resolve) => {
+    return new Promise((resolve) => {
       const reader = new FileReader()
 
       reader.onload = async (event) => {
@@ -703,16 +689,6 @@ export const useStoreManager = () => {
     }
 
     return await loadGameFromStorage(saves[0]?.key || '')
-  }
-
-  /**
-   * Checks version compatibility
-   */
-  const isVersionCompatible = (version: string): boolean => {
-    const [major, minor] = version.split('.').map(Number)
-    const [currentMajor, currentMinor] = '1.0.0'.split('.').map(Number)
-
-    return major === currentMajor && (minor ?? 0) <= (currentMinor ?? 0)
   }
 
   /**
@@ -815,14 +791,12 @@ export const useStoreManager = () => {
         localMap.set(save.saveKey, save)
       })
 
-      let mergedCount = 0
       for (const remoteSave of remoteSaves) {
         const localSave = localMap.get(remoteSave.saveKey)
 
         if (!localSave) {
           // New remote save - add it
           await store.set(remoteSave)
-          mergedCount++
         } else {
           // Conflict: keep the one with newer timestamp
           const remoteTime = remoteSave.timestamp.getTime()
@@ -831,7 +805,6 @@ export const useStoreManager = () => {
           if (remoteTime > localTime) {
             // Remote is newer - replace local
             await store.set(remoteSave)
-            mergedCount++
           }
           // Otherwise keep local (already in IndexedDB)
         }
@@ -998,8 +971,6 @@ export const useStoreManager = () => {
             evt.message.startsWith('START ROUND'),
         )
 
-        if (!hasStartedRound) {
-        }
       } catch (error) {
         console.error('[syncMultiplayerGame] Failed to parse remote multiplayer gameData', error)
         hasStartedRound = true
@@ -1011,8 +982,7 @@ export const useStoreManager = () => {
 
       // Deserialize directly into stores — Firestore is the single source of truth.
       const success = await deserializeGameState(remoteState)
-      if (success) {
-      } else {
+      if (!success) {
         console.error('Failed to deserialize remote multiplayer game state')
       }
       return success

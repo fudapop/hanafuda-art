@@ -1,5 +1,5 @@
 import { it, describe, expect } from 'vitest'
-import { type CardName } from '../cards'
+import type { CardName } from '../cards'
 import { YAKU, type YakuName, checkAll, getCompleted } from '../yaku'
 
 describe('YAKU', () => {
@@ -119,6 +119,6 @@ describe('checkAll', () => {
     completed.push('sankou')
     const newReport = getCompleted(collected, completed)
     expect(newReport).toHaveLength(2)
-    expect(newReport[1].cards).toEqual(['matsu-ni-tsuru', 'sakura-ni-maku', 'susuki-ni-tsuki'])
+    expect(newReport[1]?.cards).toEqual(['matsu-ni-tsuru', 'sakura-ni-maku', 'susuki-ni-tsuki'])
   })
 })

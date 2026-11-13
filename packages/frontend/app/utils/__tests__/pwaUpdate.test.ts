@@ -299,6 +299,8 @@ describe('createPwaUpdateController', () => {
   })
 
   it('does not reload if a match starts while the worker is activating', async () => {
+    // The callback closes over this binding, which is assigned on the next line.
+    // eslint-disable-next-line prefer-const
     let duringActivation: (() => void) | undefined
     const update = harness(safe(), async () => {
       duringActivation?.()

@@ -1,7 +1,7 @@
 export default defineNuxtPlugin(() => {
   // Sync color mode between VueUse and localStorage preferences
   // This ensures PWA standalone mode works correctly
-  if (process.client) {
+  if (import.meta.client) {
     const syncColorMode = () => {
       try {
         // Get preferences from localStorage
@@ -12,7 +12,7 @@ export default defineNuxtPlugin(() => {
           try {
             const prefs = JSON.parse(storage)
             colorMode = prefs.colorMode || 'auto'
-          } catch (e) {
+          } catch {
             // Fallback to VueUse color mode storage
             colorMode = localStorage.getItem('vueuse-color-scheme') || 'auto'
           }
@@ -53,7 +53,7 @@ export default defineNuxtPlugin(() => {
         try {
           const prefs = JSON.parse(storage)
           colorMode = prefs.colorMode || 'auto'
-        } catch (e) {
+        } catch {
           colorMode = localStorage.getItem('vueuse-color-scheme') || 'auto'
         }
       }

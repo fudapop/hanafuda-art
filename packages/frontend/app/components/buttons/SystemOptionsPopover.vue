@@ -259,7 +259,7 @@
 
 <script setup lang="ts">
 import { onClickOutside, useColorMode, useCycleList, useFullscreen, useStorage } from '@vueuse/core'
-import { useAudio } from '~/composables/useAudio'
+import type { useAudio } from '~/composables/useAudio'
 
 type ColorMode = 'auto' | 'dark' | 'light'
 
@@ -319,7 +319,7 @@ watchEffect(() => {
   systemPreferences.value.colorMode = newMode
 
   // Dispatch custom event for plugin to sync immediately
-  if (process.client) {
+  if (import.meta.client) {
     window.dispatchEvent(new CustomEvent('color-mode-change'))
 
     // Also apply directly to HTML element for immediate effect in PWA
@@ -347,9 +347,6 @@ if (!audio) {
 }
 
 const {
-  isPlaying,
-  playAudio,
-  pauseAudio,
   currentTrackName,
 
   // BGM controls
@@ -363,12 +360,6 @@ const {
   sfxDisabled,
   setSfxVolume,
   toggleSfxDisabled,
-
-  // Legacy aliases for backward compatibility
-  currentVolume,
-  isMuted,
-  setVolume,
-  toggleMute: audioToggleMute,
 } = audio
 
 // No need for trackNames mapping or currentTrackName computed here!
@@ -396,15 +387,6 @@ const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value
 }
 
-// Toggle music play/pause
-const toggleMusic = () => {
-  if (isPlaying.value) {
-    pauseAudio()
-  } else {
-    playAudio()
-  }
-}
-
 // Handle BGM volume change
 const handleBgmVolumeChange = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -428,10 +410,6 @@ const toggleBgmMuteHandler = () => {
 const toggleSfxMuteHandler = () => {
   toggleSfxDisabled()
 }
-
-// Legacy handlers for backward compatibility
-const handleVolumeChange = handleBgmVolumeChange
-const toggleMute = toggleBgmMuteHandler
 </script>
 
 <style scoped>

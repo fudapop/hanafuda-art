@@ -70,14 +70,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { t } = useI18n()
-const { formatLastSeen } = usePresence()
 const { isReplaying } = useOpponentReplay()
 
 /**
  * Computed status text to display
  */
 const statusText = computed(() => {
-  const { state, lastSeen } = props.presence
+  const { state } = props.presence
 
   // During replay, always show "Playing..." regardless of presence state
   // (the opponent may have already updated their presence to 'online')

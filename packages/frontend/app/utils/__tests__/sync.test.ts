@@ -4,10 +4,9 @@ import {
   shouldSync,
   createSyncResult,
   shouldUseRemote,
-  type ConflictResolution,
 } from '../sync'
 import { getDefaultStats } from '../stats'
-import type { PlayerProfile } from '~/types/profile'
+import type { PlayerProfile } from '~~/types/profile'
 
 // Helper to create a mock profile with valid stats
 const createMockProfile = async (
@@ -19,9 +18,15 @@ const createMockProfile = async (
   avatar: 'avatar.webp',
   record: { coins: 500, win: 10, loss: 5, draw: 2 },
   lastUpdated: new Date('2025-01-01'),
-  // @ts-expect-error for testing
-  designs: { unlocked: ['design1'], liked: ['design2'] },
-  settings: {},
+  designs: { unlocked: ['cherry-version'], liked: ['flash-black'] },
+  settings: {
+    rounds: 3,
+    viewings: 'allow',
+    double: false,
+    wild: false,
+    labels: false,
+    cardSize: 1.0,
+  },
   flags: { isNewPlayer: false, hasSubmittedFeedback: true },
   isGuest: false,
   stats: await getDefaultStats(), // Valid stats with hash
@@ -104,18 +109,16 @@ describe('resolveConflict', () => {
 
     it('should merge unlocked designs (union)', async () => {
       const local = await createMockProfile({
-        // @ts-expect-error for testing
-        designs: { unlocked: ['design1', 'design2'], liked: [] },
+        designs: { unlocked: ['cherry-version', 'otwarte-karty'], liked: [] },
       })
       const remote = await createMockProfile({
-        // @ts-expect-error for testing
-        designs: { unlocked: ['design2', 'design3'], liked: [] },
+        designs: { unlocked: ['otwarte-karty', 'sabling-art'], liked: [] },
       })
 
       const result = await resolveConflict(local, remote, 'merge-fields')
 
       expect(result.resolved.designs.unlocked).toEqual(
-        expect.arrayContaining(['design1', 'design2', 'design3']),
+        expect.arrayContaining(['cherry-version', 'otwarte-karty', 'sabling-art']),
       )
       expect(result.resolved.designs.unlocked).toHaveLength(3)
       expect(result.source).toBe('merged')
@@ -123,18 +126,16 @@ describe('resolveConflict', () => {
 
     it('should merge liked designs (union)', async () => {
       const local = await createMockProfile({
-        // @ts-expect-error for testing
-        designs: { unlocked: [], liked: ['liked1', 'liked2'] },
+        designs: { unlocked: [], liked: ['hanamaki', 'hana-awase'] },
       })
       const remote = await createMockProfile({
-        // @ts-expect-error for testing
-        designs: { unlocked: [], liked: ['liked2', 'liked3'] },
+        designs: { unlocked: [], liked: ['hana-awase', 'kinbotan'] },
       })
 
       const result = await resolveConflict(local, remote, 'merge-fields')
 
       expect(result.resolved.designs.liked).toEqual(
-        expect.arrayContaining(['liked1', 'liked2', 'liked3']),
+        expect.arrayContaining(['hanamaki', 'hana-awase', 'kinbotan']),
       )
       expect(result.resolved.designs.liked).toHaveLength(3)
       expect(result.source).toBe('merged')

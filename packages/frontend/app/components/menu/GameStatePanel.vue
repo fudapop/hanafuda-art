@@ -167,7 +167,7 @@ const showStatus = (message: string, isError = false, isWarning = false) => {
 const handleQuickSave = async () => {
   isSaving.value = true
   try {
-    const saveKey = await quickSave()
+    await quickSave()
     savedGames.value = await listSavedGames()
     showStatus('Game saved successfully!')
   } catch (error) {

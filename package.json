@@ -8,6 +8,8 @@
     "generate": "pnpm -F @hanafuda/frontend generate",
     "test": "pnpm -F @hanafuda/frontend test",
     "test:release": "node --experimental-strip-types --test scripts/release-calver.test.ts",
+    "typecheck": "pnpm -F @hanafuda/frontend typecheck && pnpm -F @hanafuda/backend typecheck",
+    "lint": "pnpm -F @hanafuda/frontend lint",
     "dev:backend": "pnpm -F @hanafuda/backend dev",
     "build:backend": "pnpm -F @hanafuda/backend build",
     "release": "node --experimental-strip-types scripts/release-calver.ts",

@@ -1,4 +1,4 @@
-import type { PlayerProfile, SyncResult, SyncOptions } from '~/types/profile'
+import type { PlayerProfile, SyncResult, SyncOptions } from '~~/types/profile'
 import { mergePlayerStats } from '~/utils/stats'
 
 /**
@@ -37,8 +37,8 @@ export async function resolveConflict(
   remote: PlayerProfile,
   strategy: SyncOptions['conflictStrategy'] = 'last-write-wins',
 ): Promise<ConflictResolution> {
-  switch (strategy) {
-    case 'merge-fields':
+    switch (strategy) {
+    case 'merge-fields': {
       // Merge fields individually, adding stats together to prevent loss
       const mergedStats = await mergePlayerStats(local.stats, remote.stats)
 
@@ -66,6 +66,7 @@ export async function resolveConflict(
         },
         source: 'merged',
       }
+    }
 
     case 'last-write-wins':
     default: {

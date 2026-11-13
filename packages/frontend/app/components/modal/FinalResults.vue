@@ -56,7 +56,8 @@
   <!-- END HEADER -->
 
   <HeadlessDisclosure
-    v-for="result in results"
+    v-for="(result, index) in results"
+    :key="result.round ?? index"
     v-slot="{ open }"
   >
     <HeadlessDisclosureButton

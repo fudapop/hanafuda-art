@@ -4,7 +4,6 @@ import type { CardName } from '~/utils/cards'
 import type { PlayerKey } from '~~/stores/playerStore'
 import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
-import { usePlayerStore } from '~~/stores/playerStore'
 
 const REPLAY_STEP_DELAY = 1000
 const CARD_REVEAL_DELAY = 500
@@ -14,7 +13,6 @@ export const useOpponentReplay = () => {
 
   const cs = useCardStore()
   const ds = useGameDataStore()
-  const ps = usePlayerStore()
 
   const { useSelectedCard } = useCardHandler()
   const selectedCard = useSelectedCard()

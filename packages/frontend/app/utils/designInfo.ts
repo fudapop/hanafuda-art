@@ -58,7 +58,7 @@ async function loadLocaleDesignInfo(locale: string): Promise<Record<string, Part
 
     const localeDesignInfo = await importFn()
     return localeDesignInfo.default || localeDesignInfo || {}
-  } catch (error) {
+  } catch {
     // File doesn't exist, return empty object
     return {}
   }
@@ -94,7 +94,7 @@ export async function getLocalizedDesignInfo(locale: string = 'en'): Promise<Des
  * Get merged design info synchronously (for use in composables)
  * Uses a cache to avoid repeated async operations
  */
-let designInfoCache: Map<string, DesignInfoMap> = new Map()
+const designInfoCache: Map<string, DesignInfoMap> = new Map()
 
 export async function getLocalizedDesignInfoSync(locale: string = 'en'): Promise<DesignInfoMap> {
   if (designInfoCache.has(locale)) {

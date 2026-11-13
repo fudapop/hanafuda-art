@@ -100,7 +100,7 @@ export const useAudio = () => {
 
   // Enhanced track names mapping that works with any format
   const getTrackName = (src: string): string | null => {
-    for (const [trackKey, trackData] of Object.entries(BGM_TRACKS)) {
+    for (const [, trackData] of Object.entries(BGM_TRACKS)) {
       for (const sourceUrl of trackData.sources) {
         if (src.includes(sourceUrl) || sourceUrl.includes(src)) {
           return trackData.name
@@ -438,7 +438,6 @@ export const useAudio = () => {
 
   // Toggle BGM disabled state
   const toggleBgmDisabled = () => {
-    const wasDisabled = bgmDisabled.value
     bgmDisabled.value = !bgmDisabled.value
 
     if (bgmDisabled.value) {

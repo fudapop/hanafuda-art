@@ -43,9 +43,6 @@ export const useAnnouncements = async () => {
   const dontShowAnnouncements = useLocalStorage<boolean>('hanafuda-dont-show-announcements', false)
   const likedAnnouncements = useLocalStorage<string[]>('hanafuda-liked-announcements', [])
 
-  // Get current user for authentication checks
-  const user = useCurrentUser()
-
   // Fetch announcements from Nuxt Content with locale support
   const { queryAllLocaleDocuments } = useLocaleContent()
   const { data: contentAnnouncements } = await useAsyncData('announcements', () =>

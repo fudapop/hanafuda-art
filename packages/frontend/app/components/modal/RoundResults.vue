@@ -128,7 +128,7 @@
 <script setup lang="ts">
 import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import { storeToRefs } from 'pinia'
-import { type CompletedYaku } from '~/utils/yaku'
+import type { CompletedYaku } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
 import { useGameDataStore } from '~~/stores/gameDataStore'
 import { usePlayerStore } from '~~/stores/playerStore'

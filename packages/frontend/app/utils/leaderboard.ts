@@ -242,7 +242,11 @@ function clip(value: string, max: number): string {
 }
 
 function toDate(value: LeaderboardSource['lastUpdated']): Date {
-  if (value instanceof Date && !Number.isNaN(value.getTime())) return value
+  // An invalid Date used to fall through and become the epoch. Handle every
+  // Date here so the Firestore Timestamp branch is not still typed as Date.
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? new Date(0) : value
+  }
   if (value && typeof value === 'object' && typeof value.toDate === 'function') {
     const converted = value.toDate()
     if (converted instanceof Date && !Number.isNaN(converted.getTime())) return converted

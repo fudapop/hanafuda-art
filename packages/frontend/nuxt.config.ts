@@ -2,6 +2,13 @@
 import tailwindcss from '@tailwindcss/vite'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import type { NuxtConfig } from 'nuxt/schema'
+
+// Nuxt schema inlines Vite's UserConfig, so it does not see Vite's Rollup
+// module augmentation (`viteVersion` on PluginContextMeta). @tailwindcss/vite
+// still returns a Vite 7.3.1 plugin; the mismatch is type identity only.
+type VitePlugin = NonNullable<NonNullable<NuxtConfig['vite']>['plugins']>[number]
+const tailwindVitePlugin = tailwindcss() as unknown as VitePlugin
 
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'https://newhanafuda.art'
@@ -33,8 +40,6 @@ if (isProduction) {
     defer: true,
   })
 }
-
-const bucketUrl = process.env.NUXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/static'
 
 export default defineNuxtConfig({
   app: {
@@ -129,6 +134,14 @@ export default defineNuxtConfig({
     port: 8888,
   },
   devtools: { enabled: true, vueDevTools: true },
+  eslint: {
+    // Prettier owns formatting. The checker stays off so dev and build do not
+    // start linting; `pnpm lint` is the gate.
+    checker: false,
+    config: {
+      stylistic: false,
+    },
+  },
   i18n: {
     autoDeclare: true,
     baseUrl: siteUrl,
@@ -151,6 +164,7 @@ export default defineNuxtConfig({
     },
   },
   modules: [
+    '@nuxt/eslint',
     '@pinia/nuxt',
     'nuxt-headlessui',
     '@nuxt/image',
@@ -311,7 +325,7 @@ export default defineNuxtConfig({
       include: ['class-variance-authority', 'reka-ui', 'lucide-vue-next', 'clsx', 'tailwind-merge', 'striptags'],
       exclude: ['better-sqlite3'],
     },
-    plugins: [tailwindcss()],
+    plugins: [tailwindVitePlugin],
   },
   vuefire: {
     auth: true,

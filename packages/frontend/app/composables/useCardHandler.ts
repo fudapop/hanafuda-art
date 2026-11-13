@@ -42,21 +42,22 @@ export const useCardHandler = () => {
     switch (config.allowViewingsYaku) {
       case 'none':
         progress = filteredList
-
+      // fall through
       case 'limited':
         if (filteredList.length) {
           // NOP -- is it okay to only start trying when the prerequisit is fulfilled?
         } else {
           progress = filteredList
         }
-
+      // fall through
       case 'allow':
-      // NOP
+        // Viewing yaku stay in the rating.
+        break
     }
 
     let score = 0
     for (const { yaku, collectedCards, gotPoints } of progress) {
-      if (!!gotPoints) {
+      if (gotPoints) {
         score += gotPoints
       } else {
         // const rarity = yaku.cards.length / 48;
@@ -90,7 +91,7 @@ export const useCardHandler = () => {
         discardPenality = -1
         break
     } // [-20, -1]
-    let discardScore: number = matchByMonth(restCards, card).length / 3 // [0,1)
+    const discardScore: number = matchByMonth(restCards, card).length / 3 // [0,1)
     return discardPenality + discardScore // [-20, 0)
   }
 
@@ -228,7 +229,7 @@ export const useCardHandler = () => {
           // Hand card first, then field card(s) — see handleMatched convention
           ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, ...matches])
           break
-        case 2:
+        case 2: {
           const cardsInHand = [...cs.hand[ds.getCurrent.player]]
           const collection = [...cs.collection[ds.getCurrent.player]]
           const opponentCollection = new Set([...cs.collection[ds.getCurrent.inactivePlayer]])
@@ -245,6 +246,7 @@ export const useCardHandler = () => {
           // Hand card first, then field card — see handleMatched convention
           ds.logPlayerAction(ds.getCurrent.player, 'match', [selected, matches[best]!])
           break
+        }
       }
       selectedCard.value = null
       ds.nextPhase()

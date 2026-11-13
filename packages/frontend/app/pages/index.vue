@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { type CompletionEvent } from '~/components/play-area/CollectionArea.vue'
+import type { CompletionEvent } from '~/components/play-area/CollectionArea.vue'
 import type { MultiplayerGame } from '~~/types/profile'
 import { checkForWin } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
@@ -296,9 +296,7 @@ const performFinalCleanup = async () => {
   if (isMultiplayerGame.value) {
     try {
       const multiplayerKey = getSaveKeyForMode('multiplayer')
-      const success = await deleteSavedGame(multiplayerKey)
-      if (success) {
-      }
+      await deleteSavedGame(multiplayerKey)
     } catch (error) {
       console.error('Failed to delete multiplayer save after match completion:', error)
     }
@@ -548,7 +546,7 @@ const checkDeal = () => {
     { name: ps.inactivePlayer.id, cards: cs.hand[ps.inactivePlayer.id] },
   ]
   // If no condition exists, null will be returned
-  var result = null
+  let result = null
   for (const hand of hands) {
     const completedYaku = checkForWin(hand.cards)
     if (completedYaku) {

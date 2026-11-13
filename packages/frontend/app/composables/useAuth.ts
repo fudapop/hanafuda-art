@@ -1,6 +1,5 @@
 import {
   createUserWithEmailAndPassword,
-  EmailAuthProvider,
   GithubAuthProvider,
   GoogleAuthProvider,
   sendPasswordResetEmail,

@@ -194,7 +194,6 @@ export const usePresence = (): PresenceComposable => {
         }).catch((error) => {
           console.error('[Presence] Failed to set online status:', error)
         })
-      } else {
       }
     })
 

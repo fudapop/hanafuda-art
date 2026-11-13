@@ -436,7 +436,7 @@ export const usePlayerProfile = () => {
           uid: user.uid, // New UID
           email: (user as any).email || '',
           avatar: (user as any).photoURL || guestProfile.avatar,
-          username: guestProfile.username || generateRandomUsername(),
+          username,
           isGuest: undefined, // No longer a guest
           record: {
             ...guestProfile.record,
@@ -555,7 +555,7 @@ export const usePlayerProfile = () => {
     // Clear all storage locations
     try {
       await deleteLocalData(userId)
-    } catch (error) {
+    } catch {
       // Continue with cleanup even if IndexedDB fails
     }
   }

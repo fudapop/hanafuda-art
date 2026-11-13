@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "description": "Tooling that is not claimed by a stack group below.",
+      "groupName": "devDependencies",
+      "matchDepTypes": ["devDependencies"]
+    },
+    {
+      "description": "Nuxt, its modules, and Nitro should land together.",
+      "groupName": "Nuxt",
+      "matchPackageNames": [
+        "/^@nuxt\\//",
+        "/^@nuxtjs\\//",
+        "/^nuxt($|-)/",
+        "nitropack",
+        "@pinia/nuxt",
+        "@vite-pwa/nuxt"
+      ]
+    },
+    {
+      "description": "Vue, VueUse, Pinia, and the Vue typechecker should land together.",
+      "groupName": "Vue",
+      "matchPackageNames": ["/^@vue\\//", "/^vue($|-)/", "/^@vueuse\\//", "pinia", "vue-tsc"]
+    },
+    {
+      "description": "Firebase client, admin, and tooling should land together.",
+      "groupName": "Firebase",
+      "matchPackageNames": ["/^@firebase\\//", "/^firebase($|-)/"]
+    },
+    {
+      "description": "Tailwind and its Vite plugin should land together.",
+      "groupName": "Tailwind CSS",
+      "matchPackageNames": ["/^@tailwindcss\\//", "tailwindcss", "tailwind-merge"]
+    },
+    {
+      "description": "TypeScript should not ride along with unrelated devDependencies.",
+      "groupName": "TypeScript",
+      "matchPackageNames": ["typescript", "ts-node", "@types/node"]
+    },
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"]
+    }
+  ]
+}

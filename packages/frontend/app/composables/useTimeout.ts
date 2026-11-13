@@ -1,15 +1,17 @@
 const activeTimeouts = reactive(new Map())
 
+type TimerCallback = (...args: any[]) => any
+
 export const useTimeout = () => {
   type CreateTimeoutFn = (
-    fn: Function,
+    fn: TimerCallback,
     duration: number,
     key: string,
     options: TimeoutOptions,
   ) => () => Promise<void>
 
   interface TimeoutOptions {
-    callback?: Function
+    callback?: TimerCallback
     startMsg?: string
     endMsg?: string
   }

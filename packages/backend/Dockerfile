@@ -17,7 +17,14 @@ RUN pnpm install --frozen-lockfile --filter @hanafuda/backend...
 # Copy source
 COPY packages/shared/ packages/shared/
 COPY packages/backend/ packages/backend/
-COPY packages/landing/dist/ packages/landing/dist/
+COPY packages/landing/ packages/landing/
+
+# `pnpm start` runs node dist/index.js. The previous image never compiled.
+RUN pnpm --filter @hanafuda/backend build
+
+# The server serves ../landing/dist. The page in the repo is index.html.
+RUN mkdir -p packages/landing/dist \
+  && cp packages/landing/index.html packages/landing/dist/index.html
 
 WORKDIR /app/packages/backend
 
