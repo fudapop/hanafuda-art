@@ -1,1 +1,1 @@
-content/en/misc/changelog.md
+packages/frontend/content/en/misc/changelog.md

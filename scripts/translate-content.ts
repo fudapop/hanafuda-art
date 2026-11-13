@@ -12,13 +12,13 @@
  *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --dry-run
  *
  *   # Translate specific directories to multiple locales
- *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --include "content/en/policies,content/en/changelog" --locales "ja,pl"
+ *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --include "packages/frontend/content/en/policies,packages/frontend/content/en/misc" --locales "ja,pl"
  *
  *   # Translate announcements to Japanese only
- *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --include "content/en/announcements" --locales "ja"
+ *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --include "packages/frontend/content/en/announcements" --locales "ja"
  *
  *   # Translate all content with preview
- *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --dry-run --include "content/en" --locales "ja,pl"
+ *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --dry-run --include "packages/frontend/content/en" --locales "ja,pl"
  */
 
 import { googleAI } from '@genkit-ai/googleai'
@@ -27,8 +27,10 @@ import { existsSync } from '@std/fs/exists'
 import { dirname, join } from '@std/path'
 import { genkit, z } from 'genkit'
 import {
+  ENGLISH_CONTENT_DIR,
   formatLocaleList,
   getSupportedTargetLocales,
+  isEnglishContentDir,
   setupWorkingDirectory,
   TranslationMode,
   validateTargetLocales,
@@ -114,7 +116,7 @@ function parseCliArgs() {
       l: 'locales',
     },
     default: {
-      include: 'content/en',
+      include: ENGLISH_CONTENT_DIR,
       locales: defaultTargetLocales.join(','),
     },
   })
@@ -145,9 +147,9 @@ function parseCliArgs() {
 
   // Validate directories exist and are English source directories
   for (const dir of contentDirectories) {
-    if (!dir.startsWith('content/en')) {
-      console.error(`❌ Error: Directory must be under 'content/en' directory: ${dir}`)
-      console.error('   The script translates from English source files in content/en/')
+    if (!isEnglishContentDir(dir)) {
+      console.error(`❌ Error: Directory must be under '${ENGLISH_CONTENT_DIR}': ${dir}`)
+      console.error(`   The script translates from English source files in ${ENGLISH_CONTENT_DIR}/`)
       Deno.exit(1)
     }
     if (!existsSync(dir, { isDirectory: true })) {
@@ -187,15 +189,15 @@ function showHelpMessage() {
   console.log(`
 📖 Content Translation Script (Deno Version)
 
-Efficiently translates English files from content/en/ to multiple target locales
+Efficiently translates English files from ${ENGLISH_CONTENT_DIR}/ to multiple target locales
 using a single API call per file to minimize costs and input token usage.
 
 Directory Structure:
-  content/
+  packages/frontend/content/
     en/           ← English source files
       policies/
       announcements/
-      changelog/
+      misc/       ← changelog and attributions
     ja/           ← Japanese translations
     pl/           ← Polish translations
 
@@ -204,21 +206,21 @@ Usage: deno run --allow-read --allow-write --allow-env --allow-net translate-con
 Options:
   --dry-run                     Run in dry-run mode (show what would be done without executing)
   --help, -h                    Show this help message
-  --include, -i <directories>   Comma-separated list of directories to scan (default: content/en)
+  --include, -i <directories>   Comma-separated list of directories to scan (default: ${ENGLISH_CONTENT_DIR})
   --locales, -l <languages>     Comma-separated list of target locales (default: ${defaultTargetLocales.join(',')})
 
 Examples:
-  # Use defaults (content/en → ${defaultTargetLocales.join(',')})
+  # Use defaults (${ENGLISH_CONTENT_DIR} → ${defaultTargetLocales.join(',')})
   deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts
 
   # Translate specific directories to multiple locales
-  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts --include "content/en/policies,content/en/changelog" --locales "${defaultTargetLocales.join(',')}"
+  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts --include "${ENGLISH_CONTENT_DIR}/policies,${ENGLISH_CONTENT_DIR}/misc" --locales "${defaultTargetLocales.join(',')}"
 
   # Short form with preview
-  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts --dry-run -i "content/en/announcements" -l "${defaultTargetLocales[0]}"
+  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts --dry-run -i "${ENGLISH_CONTENT_DIR}/announcements" -l "${defaultTargetLocales[0]}"
 
   # Translate all content to specific locales
-  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts -i "content/en" -l "${defaultTargetLocales.join(',')}"
+  deno run --allow-read --allow-write --allow-env --allow-net translate-content.ts -i "${ENGLISH_CONTENT_DIR}" -l "${defaultTargetLocales.join(',')}"
 
 Supported Locales:
   ${supportedLocales}
@@ -335,8 +337,7 @@ async function getTranslationStatus(
  * Get the target path for a translated file
  */
 function getTranslatedPath(filePath: string, language: string): string {
-  // Convert from content/en/... to content/{language}/...
-  // Example: content/en/policies/privacy-policy.md → content/ja/policies/privacy-policy.md
+  // packages/frontend/content/en/... → packages/frontend/content/{language}/...
   return filePath.replace('/en/', `/${language}/`)
 }
 
@@ -476,7 +477,7 @@ async function translateContent(
   if (filesToTranslate.length === 0) {
     console.log('💡 No .md files found to translate in the specified directories.')
     console.log(
-      '   Make sure your English source files are in the content/en/ directory structure.',
+      `   Make sure your English source files are in the ${ENGLISH_CONTENT_DIR}/ directory structure.`,
     )
     return summary
   }

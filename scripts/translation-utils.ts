@@ -37,6 +37,21 @@ export const TranslationMode = {
 
 export type TranslationMode = (typeof TranslationMode)[keyof typeof TranslationMode]
 
+/** Frontend package root, relative to the repository root. */
+export const FRONTEND_ROOT = 'packages/frontend'
+
+/** English Nuxt Content sources, relative to the repository root. */
+export const ENGLISH_CONTENT_DIR = `${FRONTEND_ROOT}/content/en`
+
+/**
+ * Whether `dir` is the English content tree or a directory inside it.
+ *
+ * @param dir - Path relative to the repository root.
+ * @returns True for `packages/frontend/content/en` and its subdirectories.
+ */
+export const isEnglishContentDir = (dir: string): boolean =>
+  dir === ENGLISH_CONTENT_DIR || dir.startsWith(`${ENGLISH_CONTENT_DIR}/`)
+
 /**
  * Cache for the localization configuration
  */
@@ -54,7 +69,7 @@ function loadLocalizationConfig(): LocalizationConfig {
     const currentFileUrl = import.meta.url
     const currentDir = dirname(fromFileUrl(currentFileUrl))
     const projectRoot = join(currentDir, '..')
-    const configPath = join(projectRoot, 'localization.json')
+    const configPath = join(projectRoot, FRONTEND_ROOT, 'localization.json')
 
     if (!existsSync(configPath)) {
       throw new Error(`Localization config file not found at: ${configPath}`)
@@ -100,6 +115,20 @@ function loadLocalizationConfig(): LocalizationConfig {
           code: 'pl',
           language: 'pl-PL',
           file: 'pl-pl.json',
+          dir: 'ltr',
+        },
+        {
+          name: 'Русский',
+          code: 'ru',
+          language: 'ru-RU',
+          file: 'ru-ru.json',
+          dir: 'ltr',
+        },
+        {
+          name: 'Français',
+          code: 'fr',
+          language: 'fr-FR',
+          file: 'fr-fr.json',
           dir: 'ltr',
         },
       ],
@@ -164,6 +193,10 @@ export function getLanguageName(localeCode: string): string {
     'ja-jp': 'Japanese',
     'pl': 'Polish',
     'pl-pl': 'Polish',
+    'ru': 'Russian',
+    'ru-ru': 'Russian',
+    'fr': 'French',
+    'fr-fr': 'French',
   }
 
   return fallbackNames[localeCode] || localeCode

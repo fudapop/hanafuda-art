@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Bug Fixes
+- **Phone game board**: Hands, the field, and captured cards now fit on a phone without scrolling sideways.
+- **Collection piles on phones**: Captured-card piles stay on one overlapping row instead of wrapping over the field.
+- **Sign-in on Safari**: The sign-in form stays fully visible in Safari.
+- **iPhone sign-in**: The sign-in form stays stacked on an iPhone screen.
+- **Password reset**: Reset links now finish inside the app instead of failing on the hosted reset page.
+- **Installed app updates**: A new version applies when you are not in an active game, so a live match is not reloaded.
+
+### Privacy
+- **Player emails**: Rankings and other shared reads no longer include player email addresses. Public leaderboard profiles show the name, avatar, and record.
+
 ## [2026.4.0] - 2026-04-05
 
 ### New Features
