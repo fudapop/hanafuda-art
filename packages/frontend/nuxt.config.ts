@@ -174,9 +174,21 @@ export default defineNuxtConfig({
     },
   },
   pwa: {
+    // Prompt mode keeps the new worker waiting. autoUpdate reloads every open
+    // window as soon as that worker activates, including a live match.
+    // useAppUpdate posts SKIP_WAITING only when the player is off the board.
+    registerType: 'prompt',
+    injectRegister: false,
+    registerWebManifestInRouteRules: true,
+    client: {
+      // The module client reloads on the worker's controlling event. This app
+      // registers the worker itself so a match can finish first.
+      registerPlugin: false,
+    },
     devOptions: {
       enabled: true,
-      type: 'module',
+      // generateSW serves the dev worker as a classic script.
+      type: 'classic',
     },
     manifest: {
       id: 'com.fudapop.koikoi',
@@ -232,6 +244,11 @@ export default defineNuxtConfig({
       ],
     },
     workbox: {
+      // A waiting worker must not take control of a tab that is in a game.
+      // cleanupOutdatedCaches removes previous Workbox precaches only.
+      skipWaiting: false,
+      clientsClaim: false,
+      cleanupOutdatedCaches: true,
       disableDevLogs: true,
       globPatterns: ['**/*.{js,css,html,webp,png}'],
       navigateFallback: '/',
