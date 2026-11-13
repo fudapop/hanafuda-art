@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useProfile } from '~/composables/useProfile'
-import type { SyncMetadata } from '~/types/profile'
+import type { SyncMetadata } from '~~/types/profile'
 
 const { t } = useI18n()
 const { syncStatus, sync, getSyncMetadata } = useProfile()

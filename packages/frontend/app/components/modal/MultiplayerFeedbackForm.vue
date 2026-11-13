@@ -116,8 +116,9 @@ const { $clientPosthog } = useNuxtApp()
 const { current: user } = useProfile()
 
 const SURVEY_ID = '' // TODO: set after creating the PostHog survey
-const RATING_QUESTION_ID = '' // TODO: set after creating the PostHog survey
-const COMMENT_QUESTION_ID = '' // TODO: set after creating the PostHog survey
+// string, not '', so the two response keys are not the same literal type.
+const RATING_QUESTION_ID: string = '' // TODO: set after creating the PostHog survey
+const COMMENT_QUESTION_ID: string = '' // TODO: set after creating the PostHog survey
 const isSurveyConfigured = Boolean(SURVEY_ID)
 
 const tags = ['idea', 'error', 'other'] as const

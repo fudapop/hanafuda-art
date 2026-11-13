@@ -7,7 +7,7 @@ import {
   Timestamp,
   writeBatch,
 } from 'firebase/firestore'
-import type { SyncAdapter, PlayerProfile } from '~/types/profile'
+import type { SyncAdapter, PlayerProfile } from '~~/types/profile'
 import { buildLeaderboardEntry } from '~/utils/leaderboard'
 import { sanitizeFirestoreData } from '~/utils/profile'
 import { preserveLocalEmail } from '~/utils/sync'

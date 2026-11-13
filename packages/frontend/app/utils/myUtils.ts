@@ -15,8 +15,19 @@ export function withChance(percentSuccess: number, fn: Function, logFailure?: bo
   if (logFailure) console.log('Chance failed. Function not executed.')
 }
 
-export function getRandom<T>(arr: Array<T>): T {
-  return arr[Math.floor(Math.random() * arr.length)]
+/**
+ * Pick one item from a list.
+ *
+ * @param arr - Non-empty list to choose from
+ * @returns A random element of `arr`
+ * @throws When `arr` is empty
+ */
+export function getRandom<T>(arr: readonly T[]): T {
+  const item = arr[Math.floor(Math.random() * arr.length)]
+  if (item === undefined) {
+    throw new Error('getRandom requires a non-empty array')
+  }
+  return item
 }
 
 export function getRandomString(length: number) {

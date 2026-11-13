@@ -60,8 +60,8 @@ export const useGameResultsSnapshot = () => {
     let currentRound = 1
     for (const event of ds.eventHistory) {
       if (event.type === 'system' && event.message.includes('Round')) {
-        const match = event.message.match(/Round (\d+)/)
-        if (match) currentRound = parseInt(match[1])
+        const roundText = event.message.match(/Round (\d+)/)?.[1]
+        if (roundText) currentRound = parseInt(roundText, 10)
       }
       if (
         event.type === 'player' &&

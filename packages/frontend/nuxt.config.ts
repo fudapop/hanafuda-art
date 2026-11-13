@@ -2,6 +2,13 @@
 import tailwindcss from '@tailwindcss/vite'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import type { NuxtConfig } from 'nuxt/schema'
+
+// Nuxt schema inlines Vite's UserConfig, so it does not see Vite's Rollup
+// module augmentation (`viteVersion` on PluginContextMeta). @tailwindcss/vite
+// still returns a Vite 7.3.1 plugin; the mismatch is type identity only.
+type VitePlugin = NonNullable<NonNullable<NuxtConfig['vite']>['plugins']>[number]
+const tailwindVitePlugin = tailwindcss() as unknown as VitePlugin
 
 const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'))
 const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'https://newhanafuda.art'
@@ -311,7 +318,7 @@ export default defineNuxtConfig({
       include: ['class-variance-authority', 'reka-ui', 'lucide-vue-next', 'clsx', 'tailwind-merge', 'striptags'],
       exclude: ['better-sqlite3'],
     },
-    plugins: [tailwindcss()],
+    plugins: [tailwindVitePlugin],
   },
   vuefire: {
     auth: true,
