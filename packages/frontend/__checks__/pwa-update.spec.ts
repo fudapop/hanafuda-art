@@ -1,11 +1,17 @@
 import { createServer, type Server } from 'node:http'
 import { expect, test, type Page } from '@playwright/test'
-import { canApplyPwaUpdate, type PwaUpdateSnapshot } from '../app/utils/pwaUpdate'
+import { build } from 'esbuild'
+import {
+  canApplyPwaUpdate,
+  PWA_UPDATE_APPLY_DELAY_MS,
+  type PwaUpdateSnapshot,
+} from '../app/utils/pwaUpdate'
 
 /**
- * An already-controlled client must keep showing the installed build while a
- * game is in progress, then pick up the next build after SKIP_WAITING and a
- * reload. localStorage and IndexedDB survive that reload.
+ * An already-controlled client runs the real update monitor. While a game is
+ * in progress the monitor must not reload. After the game flag clears, the
+ * monitor itself activates the waiting worker and reloads onto the new build.
+ * The test does not post SKIP_WAITING or call reload for that update.
  *
  * Chromium only. Run from packages/frontend:
  *   pnpm exec playwright test __checks__/pwa-update.spec.ts --project=chromium
@@ -15,6 +21,7 @@ test.skip(({ browserName }) => browserName !== 'chromium', 'Chromium only')
 let version = 'v1'
 let server: Server
 let origin = ''
+let updaterSource = ''
 
 function pageHtml(current: string) {
   return `<!doctype html>
@@ -22,15 +29,8 @@ function pageHtml(current: string) {
   <head><meta charset="utf-8"><title>${current}</title></head>
   <body>
     <h1 id="version">${current}</h1>
-    <script>
-      if (!localStorage.getItem('hanafuda-test-coins')) {
-        localStorage.setItem('hanafuda-test-coins', '40')
-      }
-      if (!localStorage.getItem('hanafuda-test-design')) {
-        localStorage.setItem('hanafuda-test-design', 'moon')
-      }
-      navigator.serviceWorker.register('/sw.js', { scope: '/' })
-    </script>
+    <p id="notice" data-pwa-update-state="hidden"></p>
+    <script type="module" src="/updater.js"></script>
   </body>
 </html>`
 }
@@ -48,6 +48,8 @@ self.addEventListener('install', (event) => {
   )
 })
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url)
+  if (url.pathname === '/updater.js' || url.pathname === '/sw.js') return
   if (event.request.mode !== 'navigate') return
   event.respondWith(
     caches.open('app-' + VERSION)
@@ -62,10 +64,28 @@ self.addEventListener('message', (event) => {
 }
 
 test.beforeAll(async () => {
+  const bundled = await build({
+    entryPoints: [new URL('./pwa-update-client.ts', import.meta.url).pathname],
+    bundle: true,
+    format: 'esm',
+    platform: 'browser',
+    target: 'es2022',
+    write: false,
+  })
+  updaterSource = bundled.outputFiles[0]?.text ?? ''
+  if (!updaterSource.includes('SKIP_WAITING')) {
+    throw new Error('bundled updater does not activate the waiting worker')
+  }
+
   version = 'v1'
   server = createServer((req, res) => {
     const path = (req.url || '/').split('?')[0]
     res.setHeader('Cache-Control', 'no-cache')
+    if (path === '/updater.js') {
+      res.setHeader('Content-Type', 'text/javascript; charset=utf-8')
+      res.end(updaterSource)
+      return
+    }
     if (path === '/sw.js') {
       res.setHeader('Content-Type', 'application/javascript; charset=utf-8')
       res.end(workerScript(version))
@@ -96,16 +116,24 @@ const inGame: PwaUpdateSnapshot = {
 
 async function installAndControl(page: Page) {
   await page.goto(origin + '/', { waitUntil: 'domcontentloaded' })
+  await page.waitForFunction(() => typeof window.__setPwaScene === 'function')
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready
   })
+  // The first reload only lets the installed worker control the page.
+  // The update under test must reload on its own after this.
   await page.reload({ waitUntil: 'domcontentloaded' })
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null)
+  await page.waitForFunction(() => typeof window.__setPwaScene === 'function')
 }
 
-test('an installed client picks up the next build without clearing local data', async ({
-  page,
-}) => {
+async function setGameInProgress(page: Page, gameInProgress: boolean) {
+  await page.evaluate((inProgress) => {
+    window.__setPwaScene?.({ gameInProgress: inProgress })
+  }, gameInProgress)
+}
+
+test('the updater reloads a safe screen and waits through an active game', async ({ page }) => {
   test.setTimeout(60_000)
   version = 'v1'
   await installAndControl(page)
@@ -133,64 +161,19 @@ test('an installed client picks up the next build without clearing local data', 
     })
   })
 
-  version = 'v2'
-  await page.evaluate(async () => {
-    const registration = await navigator.serviceWorker.getRegistration()
-    if (!registration) throw new Error('missing registration')
-    await registration.update()
-    if (registration.waiting) return
-    await new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(
-        () => reject(new Error('timed out waiting for the next worker')),
-        20_000,
-      )
-      const watch = (worker: ServiceWorker | null) => {
-        if (!worker) return
-        if (worker.state === 'installed' || worker.state === 'activated') {
-          clearTimeout(timer)
-          resolve()
-          return
-        }
-        worker.addEventListener('statechange', () => {
-          if (worker.state === 'installed' || worker.state === 'activated') {
-            clearTimeout(timer)
-            resolve()
-          }
-        })
-      }
-      watch(registration.installing)
-      registration.addEventListener('updatefound', () => watch(registration.installing))
-    })
-  })
-
-  await page.waitForFunction(async () => {
-    const registration = await navigator.serviceWorker.getRegistration()
-    return registration?.waiting != null
-  })
-
-  // A waiting worker must not replace a match that is still on screen.
   expect(canApplyPwaUpdate(inGame)).toBe(false)
-  await expect(page.locator('#version')).toHaveText('v1')
+  await setGameInProgress(page, true)
+  version = 'v2'
 
-  expect(canApplyPwaUpdate({ ...inGame, gameInProgress: false })).toBe(true)
-  await page.evaluate(async () => {
-    const registration = await navigator.serviceWorker.getRegistration()
-    const waiting = registration?.waiting
-    if (!waiting) throw new Error('expected a waiting worker')
-    waiting.postMessage({ type: 'SKIP_WAITING' })
-    await new Promise<void>((resolve) => {
-      if (waiting.state === 'activated' || waiting.state === 'redundant') {
-        resolve()
-        return
-      }
-      waiting.addEventListener('statechange', () => {
-        if (waiting.state === 'activated' || waiting.state === 'redundant') resolve()
-      })
-    })
+  await expect(page.locator('#notice')).toHaveAttribute('data-pwa-update-state', 'deferred', {
+    timeout: 15_000,
   })
+  await page.waitForTimeout(PWA_UPDATE_APPLY_DELAY_MS + 500)
+  await expect(page.locator('#version')).toHaveText('v1')
+  await expect(page.locator('#notice')).toHaveAttribute('data-pwa-update-state', 'deferred')
 
-  await page.reload({ waitUntil: 'domcontentloaded' })
-  await expect(page.locator('#version')).toHaveText('v2')
+  await setGameInProgress(page, false)
+  await expect(page.locator('#version')).toHaveText('v2', { timeout: 15_000 })
 
   const stored = await page.evaluate(async () => {
     const record = await new Promise<{ coins: number; design: string } | undefined>(

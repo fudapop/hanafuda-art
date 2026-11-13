@@ -55,6 +55,9 @@ export type PwaUpdateSnapshot = {
   textEntryFocused: boolean
 }
 
+/** Game and focus state the page owns. The monitor adds `updateReady`. */
+export type PwaUpdateScene = Omit<PwaUpdateSnapshot, 'updateReady'>
+
 export type PwaUpdateNotice = 'hidden' | 'deferred' | 'applying'
 
 export type PwaUpdateView = {
@@ -363,6 +366,174 @@ export function createPwaUpdateController(options: {
       disposed = true
       cancelPending()
       interval.cancel()
+    },
+  }
+}
+
+/**
+ * Registers the service worker and applies a downloaded update from a safe screen.
+ * The Vue composable and the browser test both use this, so the test cannot
+ * pass by posting `SKIP_WAITING` or reloading on its own.
+ *
+ * @param options.dev - Register the dev worker when true
+ * @param options.getSnapshot - Current game and focus state, without `updateReady`
+ * @param options.onChange - Banner state
+ * @param options.applyDelayMs - Quiet period before activation. Defaults to {@link PWA_UPDATE_APPLY_DELAY_MS}
+ * @param options.checkIntervalMs - How often to look for a deploy. Defaults to {@link PWA_UPDATE_CHECK_INTERVAL_MS}
+ * @param options.minCheckGapMs - Shortest time between non-forced checks
+ * @returns Sync, manual apply, and dispose. No-ops when the browser has no service workers
+ */
+export function startPwaUpdateMonitor(options: {
+  dev: boolean
+  getSnapshot: () => PwaUpdateScene
+  onChange?: (view: PwaUpdateView) => void
+  applyDelayMs?: number
+  checkIntervalMs?: number
+  minCheckGapMs?: number
+}): { sync: () => void; requestApply: () => boolean; dispose: () => void } {
+  const noop = { sync() {}, requestApply: () => false, dispose() {} }
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return noop
+
+  let registration: ServiceWorkerRegistration | null = null
+  let updateReady = false
+  let removed = false
+  let lastCheck = 0
+  let controller: ReturnType<typeof createPwaUpdateController> | null = null
+  const minCheckGapMs = options.minCheckGapMs ?? PWA_UPDATE_MIN_CHECK_GAP_MS
+  const cleanups: Array<() => void> = []
+
+  const snapshot = (): PwaUpdateSnapshot => ({
+    ...options.getSnapshot(),
+    updateReady,
+  })
+
+  const refreshReady = () => {
+    if (!registration) return
+    const controllerWorker = navigator.serviceWorker.controller
+    updateReady = nextUpdateReady(
+      updateReady,
+      installedWorkerIsAhead({
+        hasController: controllerWorker != null,
+        hasWaitingWorker: registration.waiting != null,
+        activeIsController: registration.active == null || registration.active === controllerWorker,
+      }),
+    )
+    controller?.sync()
+  }
+
+  const checkForUpdate = async (force: boolean) => {
+    if (!registration || removed) return
+    if (typeof navigator.onLine === 'boolean' && !navigator.onLine) return
+    if (registration.installing) return
+    const now = Date.now()
+    if (!force && now - lastCheck < minCheckGapMs) return
+    lastCheck = now
+    try {
+      await registration.update()
+    } catch {
+      // Offline or the browser throttled the check. The current precache
+      // keeps offline play working.
+    }
+    refreshReady()
+  }
+
+  controller = createPwaUpdateController({
+    getSnapshot: snapshot,
+    onChange: options.onChange,
+    applyDelayMs: options.applyDelayMs,
+    checkIntervalMs: options.checkIntervalMs,
+    schedule: {
+      delay(ms, fn) {
+        const id = window.setTimeout(fn, ms)
+        return { cancel: () => window.clearTimeout(id) }
+      },
+      interval(ms, fn) {
+        const id = window.setInterval(fn, ms)
+        return { cancel: () => window.clearInterval(id) }
+      },
+    },
+    client: {
+      checkForUpdate: () => checkForUpdate(false),
+      activateWaitingWorker: async () => {
+        if (!registration) return false
+        const waiting = registration.waiting
+        if (waiting) return activateWaitingWorker(waiting)
+        const controllerWorker = navigator.serviceWorker.controller
+        const active = registration.active
+        return controllerWorker != null && active != null && active !== controllerWorker
+      },
+      reload() {
+        // A normal reload keeps localStorage, sessionStorage, and IndexedDB.
+        window.location.reload()
+      },
+    },
+  })
+
+  const onFocus = () => controller.sync()
+  const onVisible = () => {
+    if (document.visibilityState === 'visible') void checkForUpdate(false)
+  }
+  const onOnline = () => {
+    void checkForUpdate(true)
+  }
+  const onPageShow = (event: PageTransitionEvent) => {
+    if (event.persisted) void checkForUpdate(true)
+  }
+
+  window.addEventListener('focusin', onFocus)
+  window.addEventListener('focusout', onFocus)
+  document.addEventListener('visibilitychange', onVisible)
+  window.addEventListener('online', onOnline)
+  window.addEventListener('pageshow', onPageShow)
+  cleanups.push(() => {
+    window.removeEventListener('focusin', onFocus)
+    window.removeEventListener('focusout', onFocus)
+    document.removeEventListener('visibilitychange', onVisible)
+    window.removeEventListener('online', onOnline)
+    window.removeEventListener('pageshow', onPageShow)
+  })
+
+  const { scriptURL, options: registerOptions } = pwaServiceWorkerRegistration(options.dev)
+  navigator.serviceWorker
+    .register(scriptURL, registerOptions)
+    .then((next) => {
+      if (removed) return
+      registration = next
+      const initialController = navigator.serviceWorker.controller
+      const onControllerChange = () => {
+        const nextController = navigator.serviceWorker.controller
+        if (initialController && nextController && nextController !== initialController)
+          refreshReady()
+      }
+      navigator.serviceWorker.addEventListener('controllerchange', onControllerChange)
+      cleanups.push(() => {
+        navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange)
+      })
+
+      const track = (worker: ServiceWorker | null) => {
+        if (!worker) return
+        const onState = () => {
+          if (worker.state === 'installed' || worker.state === 'activated') refreshReady()
+        }
+        worker.addEventListener('statechange', onState)
+      }
+      track(next.installing)
+      track(next.waiting)
+      next.addEventListener('updatefound', () => track(next.installing))
+      refreshReady()
+      void checkForUpdate(true)
+    })
+    .catch((error: unknown) => {
+      console.error('Service worker registration failed', error)
+    })
+
+  return {
+    sync: () => controller?.sync(),
+    requestApply: () => controller?.requestApply() ?? false,
+    dispose() {
+      removed = true
+      controller?.dispose()
+      for (const cleanup of cleanups) cleanup()
     },
   }
 }

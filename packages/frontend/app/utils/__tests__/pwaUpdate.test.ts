@@ -351,6 +351,7 @@ describe('update flow does not clear local data', () => {
       'app/composables/usePwaUpdateGate.ts',
       'app/plugins/pwa-update.client.ts',
       'app/components/PwaUpdateBanner.vue',
+      '__checks__/pwa-update-client.ts',
     ].map((file) => readFileSync(resolve(file), 'utf8'))
 
     for (const source of sources) {
