@@ -185,6 +185,13 @@ export const useGameDataStore = defineStore('gameData', () => {
   }
 
   function endExhaustedRound() {
+    // Koi-koi may already have saved a winner. Running out of cards is a draw
+    // and replaces that result. endRound() only writes a draw when none exists.
+    saveResult({
+      round: roundCounter.value,
+      winner: null,
+      score: 0,
+    })
     endRound()
     exhaustedDraw.value = true
   }

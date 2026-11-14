@@ -77,6 +77,25 @@ describe('deck exhaustion', () => {
     expect(() => draw()).not.toThrow()
   })
 
+  it('replaces an earlier koi-koi score with a draw when the hands run out', () => {
+    const cs = useCardStore()
+    const ds = useGameDataStore()
+
+    ds.startRound()
+    ds.saveResult({ winner: 'p1', score: 5 })
+    cs.hand.p1.clear()
+    cs.hand.p2.clear()
+
+    ds.nextPhase()
+    ds.nextPhase()
+    ds.nextPhase()
+
+    expect(ds.roundOver).toBe(true)
+    expect(ds.exhaustedDraw).toBe(true)
+    expect(ds.getCurrent.result?.winner).toBeNull()
+    expect(ds.getCurrent.result?.score).toBe(0)
+  })
+
   it('ends the round instead of throwing when a draw finds an empty deck', () => {
     const cs = useCardStore()
     const ds = useGameDataStore()
