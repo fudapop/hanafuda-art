@@ -1,0 +1,91 @@
+name: Terraform apply
+
+# Applies infra/new-hanafuda on main, after a reviewer approves the GitHub
+# environment named terraform. Bootstrap is not applied here. Auth is
+# Workload Identity Federation. There is no JSON key.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+      - '.github/workflows/terraform-apply.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: apply
+    runs-on: ubuntu-latest
+    environment: terraform
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      TF_IN_AUTOMATION: '1'
+      TF_VAR_region: ${{ vars.TF_VAR_region }}
+      TF_VAR_billing_account_id: ${{ vars.TF_VAR_billing_account_id }}
+      TF_VAR_budget_amount: ${{ vars.TF_VAR_budget_amount }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 2
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.17.2
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive -diff infra
+
+      - name: Require Workload Identity settings
+        env:
+          GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT: ${{ vars.GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in GCP_WORKLOAD_IDENTITY_PROVIDER GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT; do
+            if [ -z "${!name}" ]; then
+              echo "Missing repository variable ${name}."
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "Apply infra/bootstrap by hand, then set the variables listed in infra/README.md."
+            echo "This workflow does not apply bootstrap and does not use a JSON key."
+            exit 1
+          fi
+
+      - name: Note bootstrap changes
+        run: |
+          set -euo pipefail
+          if git diff --name-only HEAD^ HEAD -- infra/bootstrap | grep -q .; then
+            echo "::warning::infra/bootstrap changed. CI does not apply bootstrap. Apply that directory by hand."
+          fi
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: new-hanafuda
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT }}
+
+      - name: Terraform init
+        working-directory: infra/new-hanafuda
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        working-directory: infra/new-hanafuda
+        run: terraform validate
+
+      - name: Terraform apply
+        working-directory: infra/new-hanafuda
+        run: terraform apply -input=false -auto-approve -lock-timeout=5m

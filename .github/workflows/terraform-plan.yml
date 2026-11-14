@@ -1,0 +1,259 @@
+name: Terraform plan
+
+# Plans infra/new-hanafuda on pull requests. Bootstrap is applied by hand and
+# is not planned here. Auth is Workload Identity Federation. There is no JSON key.
+on:
+  pull_request:
+    branches:
+      - main
+      - development
+    paths:
+      - 'infra/**'
+      - '.github/workflows/terraform-plan.yml'
+      - '.github/workflows/terraform-apply.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-plan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fmt:
+    name: fmt and validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.17.2
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive -diff infra
+
+      - name: Validate bootstrap
+        working-directory: infra/bootstrap
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+      - name: Validate new-hanafuda
+        working-directory: infra/new-hanafuda
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+  plan:
+    name: plan
+    needs: fmt
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    env:
+      TF_IN_AUTOMATION: '1'
+      TF_VAR_region: ${{ vars.TF_VAR_region }}
+      TF_VAR_billing_account_id: ${{ vars.TF_VAR_billing_account_id }}
+      TF_VAR_budget_amount: ${{ vars.TF_VAR_budget_amount }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.17.2
+          terraform_wrapper: false
+
+      - name: Detect bootstrap changes
+        id: bootstrap
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files" --jq '.[].filename' | grep -q '^infra/bootstrap/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check Workload Identity settings
+        id: wif
+        env:
+          PROVIDER: ${{ vars.GCP_TERRAFORM_PLAN_WORKLOAD_IDENTITY_PROVIDER }}
+          SERVICE_ACCOUNT: ${{ vars.GCP_TERRAFORM_PLAN_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          if [ -z "$PROVIDER" ] || [ -z "$SERVICE_ACCOUNT" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Plan identity is not configured yet. fmt and validate already ran."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        if: steps.wif.outputs.ready == 'true'
+        continue-on-error: true
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: new-hanafuda
+          workload_identity_provider: ${{ vars.GCP_TERRAFORM_PLAN_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_TERRAFORM_PLAN_SERVICE_ACCOUNT }}
+
+      # -lock=false because the plan identity can read the state object and
+      # cannot create the lock object. Apply, on main, locks as usual.
+      # Output stays in files so the plan text is not interpolated into the workflow.
+      - name: Terraform init
+        id: init
+        if: steps.auth.outcome == 'success'
+        working-directory: infra/new-hanafuda
+        run: |
+          set +e
+          terraform init -input=false -no-color > "$RUNNER_TEMP/init.txt" 2>&1
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Terraform plan
+        id: plan
+        if: steps.init.outputs.result == 'success'
+        working-directory: infra/new-hanafuda
+        run: |
+          set +e
+          terraform plan -no-color -input=false -lock=false > "$RUNNER_TEMP/plan.txt" 2>&1
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Post the plan
+        if: steps.wif.outcome == 'success'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        env:
+          WIF_READY: ${{ steps.wif.outputs.ready }}
+          AUTH_OUTCOME: ${{ steps.auth.outcome }}
+          INIT_RESULT: ${{ steps.init.outputs.result }}
+          PLAN_RESULT: ${{ steps.plan.outputs.result }}
+          BOOTSTRAP_CHANGED: ${{ steps.bootstrap.outputs.changed }}
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- terraform-plan -->';
+            const ready = process.env.WIF_READY === 'true';
+            const authOutcome = process.env.AUTH_OUTCOME || 'skipped';
+            const initResult = process.env.INIT_RESULT || 'skipped';
+            const planResult = process.env.PLAN_RESULT || 'skipped';
+            const bootstrapChanged = process.env.BOOTSTRAP_CHANGED === 'true';
+
+            function readTemp(name) {
+              try {
+                return fs.readFileSync(`${process.env.RUNNER_TEMP}/${name}`, 'utf8');
+              } catch (error) {
+                return '';
+              }
+            }
+
+            function clip(value) {
+              const text = (value || '').trim();
+              const limit = 20000;
+              if (text.length <= limit) {
+                return text || '(no output)';
+              }
+              return `${text.slice(0, limit)}\n...[truncated]`;
+            }
+
+            function fenced(value) {
+              return ['```', clip(value).split('```').join("'''"), '```'].join('\n');
+            }
+
+            let status;
+            let detail;
+            if (!ready) {
+              status = 'skipped';
+              detail = [
+                'Plan did not run. These repository variables are not set yet:',
+                '',
+                '- `GCP_TERRAFORM_PLAN_WORKLOAD_IDENTITY_PROVIDER`',
+                '- `GCP_TERRAFORM_PLAN_SERVICE_ACCOUNT`',
+                '',
+                'Apply `infra/bootstrap` by hand, then set the variables listed in `infra/README.md`. `terraform fmt` and `terraform validate` still ran.',
+              ].join('\n');
+            } else if (authOutcome !== 'success') {
+              status = 'failed';
+              detail = 'Authentication to Google Cloud failed, so the plan did not run.';
+            } else if (initResult !== 'success') {
+              status = 'failed';
+              detail = ['`terraform init` failed.', '', fenced(readTemp('init.txt'))].join('\n');
+            } else if (planResult !== 'success') {
+              status = 'failed';
+              detail = ['`terraform plan` failed.', '', fenced(readTemp('plan.txt'))].join('\n');
+            } else {
+              status = 'succeeded';
+              detail = fenced(readTemp('plan.txt'));
+            }
+
+            const bootstrapNote = bootstrapChanged
+              ? '\n\n**`infra/bootstrap` changed in this pull request.** CI does not plan or apply that directory. Apply it by hand before relying on the plan above.\n'
+              : '';
+
+            const body = [
+              marker,
+              `#### Terraform plan (\`infra/new-hanafuda\`): ${status}`,
+              '',
+              'Read-only plan of the CI-managed stack. It does not apply, and it does not lock state.',
+              bootstrapNote,
+              '',
+              '<details><summary>Output</summary>',
+              '',
+              detail,
+              '',
+              '</details>',
+              '',
+              'Firestore rules and indexes are not in this plan. They deploy with `firebase deploy`.',
+            ].join('\n');
+
+            const max = 65000;
+            const finalBody = body.length > max ? `${body.slice(0, max - 20)}\n...[truncated]` : body;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user && comment.user.login === 'github-actions[bot]' &&
+              typeof comment.body === 'string' &&
+              comment.body.includes(marker)
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body: finalBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: finalBody,
+              });
+            }
+
+      - name: Fail when the plan did not succeed
+        if: steps.wif.outputs.ready == 'true' && (steps.auth.outcome != 'success' || steps.init.outputs.result != 'success' || steps.plan.outputs.result != 'success')
+        run: exit 1
