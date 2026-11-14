@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, it } from 'node:test'
 import { loadGlossary } from './i18n/glossary.ts'
 import { applyJsonEdits, planJsonEdits, type JsonObject } from './i18n/json-locale.ts'
 import { parseLocalization, targetLocales } from './i18n/locales.ts'
 import { assembleMarkdown, planMarkdownFile, renderFrontMatter, parseFrontSlots } from './i18n/markdown.ts'
+import { restorePendingTranslations, selectPendingFiles } from './i18n/pending.ts'
 import { LOCALIZATION_PATH, assertTranslationTarget } from './i18n/paths.ts'
 import { buildPlan, formatPlan, parseNameStatus, type Snapshot } from './i18n/plan.ts'
 import { assertPreserved, maskText, unmaskText } from './i18n/protect.ts'
@@ -32,6 +34,11 @@ const echoClient = (): { client: ModelClient; calls: number } => {
   const client: ModelClient = async (request) => {
     state.calls += 1
     if (request.echo?.kind === 'prose') return JSON.stringify({ text: request.echo.masked })
+    if (request.echo?.kind === 'prose-batch') {
+      return JSON.stringify({
+        parts: Object.fromEntries(request.echo.parts.map((part) => [part.id, part.masked])),
+      })
+    }
     if (request.echo?.kind === 'strings') {
       return JSON.stringify({
         strings: Object.fromEntries(request.echo.entries.map((entry) => [entry.key, entry.masked])),
@@ -51,6 +58,13 @@ describe('maskText', () => {
     assert.equal(masked.masked.includes('{name}'), false)
     assert.equal(masked.masked.includes('matsu-ni-tsuru'), false)
     assert.equal(masked.masked.includes('target='), false)
+    assert.equal(unmaskText(masked.masked, masked.tokens), source)
+  })
+
+  it('restores an image url without protecting it twice', () => {
+    const source = '![card](https://example.com/card.png)'
+    const masked = maskText(source, glossary.identifiers)
+    assert.equal(masked.tokens.length, 1)
     assert.equal(unmaskText(masked.masked, masked.tokens), source)
   })
 
@@ -334,5 +348,142 @@ describe('runPlan guards', () => {
       /exactly once|brace group|emoji/,
     )
     assert.deepEqual(writes, [])
+  })
+})
+
+describe('removed front matter', () => {
+  it('drops locale front matter when English removes the block and the body is unchanged', () => {
+    const before = '---\ntitle: Hello\ndate: 2026-04-05\n---\n\nBody\n'
+    const after = 'Body\n'
+    const existing = '---\ntitle: こんにちは\ndate: 2026-04-05\n---\n\n本文\n'
+    const planned = planMarkdownFile({
+      mode: 'changed',
+      locale: 'ja',
+      sourcePath: 'packages/frontend/content/en/misc/note.md',
+      targetPath: 'packages/frontend/content/ja/misc/note.md',
+      before,
+      after,
+      existing,
+      glossary,
+    })
+    assert.ok(planned && planned.kind === 'markdown')
+    assert.equal(planned.front.type, 'none')
+    assert.equal(planned.prose.length, 0)
+    const assembled = assembleMarkdown(planned, { strings: {}, prose: {} })
+    assert.equal(assembled.includes('---'), false)
+    assert.match(assembled, /本文/)
+  })
+})
+
+describe('prose batches', () => {
+  it('translates two changed sections in one reply and keeps protected tokens', async () => {
+    const before = '# Changelog\n\n## [2026.4.0] - 2026-04-05\n\n### Features\n- Old\n'
+    const after = [
+      '# Changelog',
+      '',
+      '## [2026.11.0] - 2026-11-14',
+      '',
+      '- New [a](https://example.com/a) {name}',
+      '',
+      '## [2026.5.0] - 2026-05-01',
+      '',
+      '- Also [b](https://example.com/b)',
+      '',
+      '## [2026.4.0] - 2026-04-05',
+      '',
+      '### Features',
+      '- Old',
+      '',
+    ].join('\n')
+    const existing = '# 更新履歴\n\n## [2026.4.0] - 2026-04-05\n\n### 新機能\n- 古い\n'
+    const planned = planMarkdownFile({
+      mode: 'changed',
+      locale: 'ja',
+      sourcePath: 'packages/frontend/content/en/misc/changelog.md',
+      targetPath: 'packages/frontend/content/ja/misc/changelog.md',
+      before,
+      after,
+      existing,
+      glossary,
+    })
+    assert.ok(planned && planned.kind === 'markdown')
+    assert.deepEqual(planned.prose.map((part) => part.id), ['2026.11.0', '2026.5.0'])
+    const echo = echoClient()
+    const files = new Map<string, string>()
+    await runPlan({
+      plan: { mode: 'changed', locales: ['ja'], files: [planned] },
+      client: echo.client,
+      glossary,
+      locales,
+      delayMs: 0,
+      workspace: {
+        read: (path) => files.get(path) ?? null,
+        write: (path, contents) => files.set(path, contents),
+        remove: (path) => files.delete(path),
+      },
+    })
+    const written = files.get(planned.targetPath) ?? ''
+    assert.equal(echo.calls, 1)
+    assert.match(written, /https:\/\/example.com\/a/)
+    assert.match(written, /https:\/\/example.com\/b/)
+    assert.match(written, /\{name\}/)
+    assert.match(written, /- 古い/)
+    assert.doesNotMatch(written, /- Old/)
+  })
+})
+
+describe('pending translations', () => {
+  it('keeps locale edits from an open branch and ignores English paths', () => {
+    const selected = selectPendingFiles(
+      [
+        'M\tpackages/frontend/content/ja/misc/changelog.md',
+        'D\tpackages/frontend/content/pl/announcements/old.md',
+        'M\tpackages/frontend/content/en/misc/changelog.md',
+        'M\tpackages/frontend/i18n/locales/en-us.json',
+        'M\tpackages/frontend/i18n/locales/fr-fr.json',
+      ].join('\n'),
+    )
+    assert.deepEqual(selected.checkout, [
+      'packages/frontend/content/ja/misc/changelog.md',
+      'packages/frontend/i18n/locales/fr-fr.json',
+    ])
+    assert.deepEqual(selected.remove, ['packages/frontend/content/pl/announcements/old.md'])
+  })
+
+  it('plans the next English commit from the last translated commit and restores the open branch', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'i18n-pending-'))
+    const git = (args: string[]) =>
+      execFileSync('git', args, { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+    const write = (path: string, contents: string) => {
+      mkdirSync(join(dir, path, '..'), { recursive: true })
+      writeFileSync(join(dir, path), contents)
+    }
+    const previous = process.cwd()
+    try {
+      git(['init', '-b', 'main'])
+      git(['config', 'user.email', 'test@example.com'])
+      git(['config', 'user.name', 'Test'])
+      write('packages/frontend/content/en/misc/note.md', 'English one\n')
+      write('packages/frontend/content/ja/misc/note.md', '日本語一\n')
+      git(['add', '.'])
+      git(['commit', '-m', 'base'])
+      const translatedBase = git(['rev-parse', 'HEAD']).trim()
+      git(['checkout', '-b', 'i18n/update-translations'])
+      write('packages/frontend/content/ja/misc/note.md', '日本語いち\n')
+      git(['add', '.'])
+      git(['commit', '-m', 'chore(i18n): update translations'])
+      git(['checkout', 'main'])
+      write('packages/frontend/content/en/misc/note.md', 'English two\n')
+      git(['add', '.'])
+      git(['commit', '-m', 'english two'])
+      process.chdir(dir)
+      const base = restorePendingTranslations('i18n/update-translations', dir)
+      assert.equal(base, translatedBase)
+      assert.equal(readFileSync(join(dir, 'packages/frontend/content/ja/misc/note.md'), 'utf8'), '日本語いち\n')
+      assert.equal(readFileSync(join(dir, 'packages/frontend/content/en/misc/note.md'), 'utf8'), 'English two\n')
+    } finally {
+      process.chdir(previous)
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
 })

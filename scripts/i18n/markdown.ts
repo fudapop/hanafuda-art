@@ -286,7 +286,8 @@ export const planMarkdownFile = (args: {
 
   const pieces: MarkdownPiece[] = []
   const prose: ProseEdit[] = []
-  let dirty = front.type === 'build' || args.existing === null
+  const removedFrontMatter = Boolean(existingDoc?.inner) && afterDoc.inner === null
+  let dirty = front.type === 'build' || args.existing === null || removedFrontMatter
 
   const afterSections = splitStableSections(afterDoc.body)
   const beforeSections = beforeDoc ? splitStableSections(beforeDoc.body) : null

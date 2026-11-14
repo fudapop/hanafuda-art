@@ -20,6 +20,7 @@ import { dirname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
 import { loadGlossary } from './i18n/glossary.ts'
+import { restorePendingTranslations } from './i18n/pending.ts'
 import { parseLocalization, targetLocales } from './i18n/locales.ts'
 import {
   ENGLISH_CONTENT_PREFIX,
@@ -37,6 +38,7 @@ const HELP = `Usage: node --experimental-strip-types scripts/i18n-translate.ts [
 --mode changed|full   changed reads --base and --head. full retranslates every source.
 --base <sha>          Parent commit for changed mode.
 --head <sha>          Checked-out commit for changed mode. Must be HEAD.
+--pending-ref <ref>   Open translation branch. When it exists, plan from its merge-base and restore its locale files first.
 --plan                Print the plan and do not call Vertex or write files.
 --github-output <path>  Append count= and api= for Actions.
 --help
@@ -46,6 +48,7 @@ type Options = {
   mode: 'changed' | 'full'
   base?: string
   head?: string
+  pendingRef?: string
   plan: boolean
   githubOutput?: string
 }
@@ -64,6 +67,7 @@ const readOptions = (argv: string[]): Options => {
       head: { type: 'string' },
       plan: { type: 'boolean', default: false },
       help: { type: 'boolean', default: false },
+      'pending-ref': { type: 'string' },
       'github-output': { type: 'string' },
     },
     strict: true,
@@ -79,6 +83,7 @@ const readOptions = (argv: string[]): Options => {
     mode: values.mode,
     base: values.base,
     head: values.head,
+    pendingRef: values['pending-ref'],
     plan: values.plan,
     githubOutput: values['github-output'],
   }
@@ -171,13 +176,18 @@ const createPlan = (options: Options): Plan => {
     })
   }
   if (!options.base || !options.head) throw new Error('changed mode requires --base and --head')
-  if (isZeroSha(options.base)) {
+  const pendingBase = options.pendingRef ? restorePendingTranslations(options.pendingRef) : null
+  const base = pendingBase ?? options.base
+  if (pendingBase) {
+    console.log(`Pending translations restored from ${options.pendingRef} through ${pendingBase}`)
+  }
+  if (isZeroSha(base)) {
     console.log(
       '::notice::Previous commit is unavailable, so incremental translation was skipped. Run the workflow manually for a full backfill.',
     )
     return emptyPlan('changed')
   }
-  if (!isCommitSha(options.base) || !isCommitSha(options.head)) {
+  if (!isCommitSha(base) || !isCommitSha(options.head)) {
     throw new Error('--base and --head must be full commit SHAs')
   }
   const head = git(['rev-parse', 'HEAD']).trim()
@@ -188,7 +198,7 @@ const createPlan = (options: Options): Plan => {
     'diff',
     '--name-status',
     '--find-renames',
-    options.base,
+    base,
     options.head,
     '--',
     ENGLISH_CONTENT_PREFIX,
@@ -198,7 +208,7 @@ const createPlan = (options: Options): Plan => {
   return buildPlan({
     mode: 'changed',
     changes: parseNameStatus(diff),
-    before: gitSnapshot(options.base),
+    before: gitSnapshot(base),
     after: filesystemSnapshot(),
     glossary,
   })

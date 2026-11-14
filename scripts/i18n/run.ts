@@ -21,6 +21,7 @@ export type ModelRequest = {
   user: string
   echo?:
     | { kind: 'prose'; masked: string }
+    | { kind: 'prose-batch'; parts: Array<{ id: string; masked: string }> }
     | { kind: 'strings'; entries: Array<{ key: string; masked: string }> }
 }
 
@@ -186,13 +187,14 @@ const translateMarkdown = async (
         parts: batch.map((part) => ({ id: part.id, masked: part.masked })),
       })
       console.log(`translate ${file.locale} ${file.targetPath} prose ${batch.map((part) => part.id).join(', ')}`)
-      const first = batch[0]
-      if (!first) throw new Error('Empty prose batch')
       const translated = await complete(
         client,
         prompt.system,
         prompt.user,
-        { kind: 'prose', masked: first.masked },
+        {
+          kind: 'prose-batch',
+          parts: batch.map((part) => ({ id: part.id, masked: part.masked })),
+        },
         (text) => {
           const parsed = parseModelJson(text) as { parts?: Record<string, unknown> }
           const parts = parsed?.parts

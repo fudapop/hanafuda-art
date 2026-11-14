@@ -35,8 +35,10 @@ export const maskText = (input: string, identifiers: string[] = []): MaskedText 
   text = text.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_match, alt: string, url: string) => {
     return `![${alt}](${protect(url)})`
   })
+  // The image pass already protected `![alt](url)`. A plain link pattern would
+  // match the `[alt](token)` inside it and replace that token with a new one.
   text = text.replace(
-    /\[([^\]]*)\]\(([^)\s]+)\)(\{[^}\n]*\})?/g,
+    /(?<!!)\[([^\]]*)\]\(([^)\s]+)\)(\{[^}\n]*\})?/g,
     (_match, label: string, url: string, attrs: string | undefined) => {
       return `[${label}](${protect(url)})${attrs ? protect(attrs) : ''}`
     },
