@@ -59,13 +59,8 @@
             </ul>
           </section>
 
-          <!-- Impression stats and like -->
+          <!-- Personal like. Totals are not public. -->
           <div class="flex items-center gap-4 mt-4 text-sm text-text-secondary">
-            <span class="flex items-center gap-1">
-              <Icon name="mdi:eye-outline" />
-              {{ impressions[announcement.id]?.views || 0 }}
-              <span class="sr-only">{{ t('announcements.metrics.views') }}</span>
-            </span>
             <button
               type="button"
               :class="[
@@ -81,11 +76,8 @@
                 :name="isLiked(announcement.id) ? 'mdi:heart' : 'mdi:heart-outline'"
                 class="text-sm"
               />
-              {{ impressions[announcement.id]?.likes || 0 }}
               <span class="sr-only">{{
-                isLiked(announcement.id)
-                  ? t('common.actions.unlike')
-                  : t('common.actions.like')
+                isLiked(announcement.id) ? t('common.actions.unlike') : t('common.actions.like')
               }}</span>
             </button>
           </div>
@@ -112,15 +104,8 @@ useSeoMeta({
   twitterDescription: pageDescription,
 })
 
-const {
-  announcements,
-  newAnnouncements,
-  markAllAsRead,
-  trackView,
-  trackLike,
-  isLiked,
-  impressions,
-} = await useAnnouncements()
+const { announcements, newAnnouncements, markAllAsRead, trackView, trackLike, isLiked } =
+  await useAnnouncements()
 
 // Track which announcements are "new" (unread) before marking as read
 const unreadIds = new Set(newAnnouncements.value.map((a) => a.id))
@@ -129,8 +114,6 @@ const isNew = (id: string) => unreadIds.has(id)
 // Mark all as read and track views for unread announcements on mount
 onMounted(() => {
   markAllAsRead()
-  announcements.value
-    .filter((a) => unreadIds.has(a.id))
-    .forEach((a) => trackView(a.id))
+  announcements.value.filter((a) => unreadIds.has(a.id)).forEach((a) => trackView(a.id))
 })
 </script>

@@ -9,9 +9,12 @@
 - **iPhone sign-in**: The sign-in form stays stacked on an iPhone screen.
 - **Password reset**: Reset links now finish inside the app instead of failing on the hosted reset page.
 - **Installed app updates**: A new version applies when you are not in an active game, so a live match is not reloaded.
+- **Feedback length**: Comments longer than 2000 characters stay in the form, and the thank-you message appears only after the comment is saved.
+- **Announcement likes**: A like or unlike made on one device shows on your other devices.
 
 ### Privacy
 - **Player emails**: Rankings and other shared reads no longer include player email addresses. Public leaderboard profiles show the name, avatar, and record.
+- **Announcement reactions**: Public view and like totals are hidden. A like is saved to your account instead of a shared counter.
 
 ## [2026.4.0] - 2026-04-05
 

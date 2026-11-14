@@ -43,7 +43,9 @@
             :model-value="comments.tag"
             :value-options="tags"
             :update-callback="(option) => (comments.tag = option as CommentTag)"
-            :label-template="(option) => t(`multiplayerFeedback.comments.types.${option as CommentTag}`)"
+            :label-template="
+              (option) => t(`multiplayerFeedback.comments.types.${option as CommentTag}`)
+            "
             class-name="mt-3 mb-3 grid grid-cols-3 gap-x-2 text-xs"
           >
             <span class="sr-only">{{ t('multiplayerFeedback.comments.type') }}</span>
@@ -54,6 +56,7 @@
           <textarea
             id="mp-comment-box"
             rows="3"
+            maxlength="2000"
             v-model="comments.message"
             class="w-full p-3 text-sm border rounded-xs text-text bg-background/60 border-border/80 placeholder:text-text-secondary/50 focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none transition-colors"
             :disabled="submitted"
@@ -66,15 +69,20 @@
           <button
             type="button"
             class="sec-btn"
-            @click="() => { handleDismiss(); $emit('close') }"
+            @click="
+              () => {
+                handleDismiss()
+                $emit('close')
+              }
+            "
           >
             {{ t('common.actions.close') }}
           </button>
           <button
             type="submit"
             class="pri-btn"
-            :disabled="!rating || submitting"
-            :aria-disabled="!rating || submitting"
+            :disabled="!rating || submitting || commentTooLong"
+            :aria-disabled="!rating || submitting || commentTooLong"
           >
             {{ t('common.actions.submit') }}
           </button>
@@ -124,6 +132,8 @@ const isSurveyConfigured = Boolean(SURVEY_ID)
 const tags = ['idea', 'error', 'other'] as const
 type CommentTag = (typeof tags)[number]
 
+const MAX_FEEDBACK_LENGTH = 2000
+
 const rating = ref(0)
 const comments = reactive({
   tag: 'other' as CommentTag,
@@ -131,14 +141,18 @@ const comments = reactive({
 })
 const submitted = useState('mp-feedback-submitted', () => false)
 const submitting = ref(false)
+const commentTooLong = computed(() => comments.message.length > MAX_FEEDBACK_LENGTH)
 
 const surveyEventProps = { $survey_id: SURVEY_ID }
 
-watch(() => props.open, (isOpen) => {
-  if (isOpen && !submitted.value && isSurveyConfigured) {
-    $clientPosthog?.capture('survey shown', surveyEventProps)
-  }
-})
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (isOpen && !submitted.value && isSurveyConfigured) {
+      $clientPosthog?.capture('survey shown', surveyEventProps)
+    }
+  },
+)
 
 const handleDismiss = () => {
   if (!submitted.value && isSurveyConfigured) {
@@ -148,7 +162,10 @@ const handleDismiss = () => {
 
 const saveToFirestore = async () => {
   const profile = toValue(user)
-  if (!profile) return
+  if (!profile) throw new Error('Must be signed in to send feedback')
+  if (comments.message.length > MAX_FEEDBACK_LENGTH) {
+    throw new Error('Feedback comment is too long')
+  }
   await setDoc(doc(getFirestore(), 'mp-feedback', `mpfb_${nanoid(15)}${Date.now()}`), {
     rating: rating.value,
     comments: { tag: comments.tag, message: comments.message },
@@ -158,7 +175,7 @@ const saveToFirestore = async () => {
 }
 
 const handleSubmit = async () => {
-  if (submitting.value) return
+  if (submitting.value || commentTooLong.value) return
   submitting.value = true
   try {
     await saveToFirestore()

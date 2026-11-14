@@ -92,6 +92,7 @@
           <textarea
             id="comment-box"
             rows="3"
+            maxlength="2000"
             v-model="comments.message"
             class="w-full p-2 border rounded-xs text-text bg-background border-border placeholder:text-text-secondary placeholder:opacity-50"
             :disabled="submitted"
@@ -110,8 +111,8 @@
             type="submit"
             class="pri-btn"
             @click="() => handleSubmit"
-            :disabled="incomplete"
-            :aria-disabled="incomplete"
+            :disabled="incomplete || submitting"
+            :aria-disabled="incomplete || submitting"
           >
             {{ t('common.actions.submit') }}
           </button>
@@ -175,15 +176,24 @@ const submitted = computed({
   },
 })
 
-const incomplete = computed(() =>
-  [ratings['animation'], ratings['controls'], ratings['image'], ratings['audio']].some((fb) => !fb),
+const MAX_FEEDBACK_LENGTH = 2000
+const submitting = ref(false)
+
+const incomplete = computed(
+  () =>
+    [ratings['animation'], ratings['controls'], ratings['image'], ratings['audio']].some(
+      (fb) => !fb,
+    ) || comments.message.length > MAX_FEEDBACK_LENGTH,
 )
 
 defineEmits(['close'])
 
 const saveFeedback = async () => {
-  if (!user) return
-  setDoc(doc(getFirestore(), 'feedback', `fb_${nanoid(15)}${Date.now()}`), {
+  if (!user) throw new Error('Must be signed in to send feedback')
+  if (comments.message.length > MAX_FEEDBACK_LENGTH) {
+    throw new Error('Feedback comment is too long')
+  }
+  await setDoc(doc(getFirestore(), 'feedback', `fb_${nanoid(15)}${Date.now()}`), {
     ratings: ratings,
     comments,
     submitted_at: Timestamp.now(),
@@ -193,11 +203,15 @@ const saveFeedback = async () => {
 
 const handleSubmit = async (ev: Event) => {
   ev.preventDefault()
+  if (submitting.value || incomplete.value) return
+  submitting.value = true
   try {
-    saveFeedback()
+    await saveFeedback()
     submitted.value = true
   } catch (err) {
     console.error('Error saving feedback:', err)
+  } finally {
+    submitting.value = false
   }
 }
 </script>

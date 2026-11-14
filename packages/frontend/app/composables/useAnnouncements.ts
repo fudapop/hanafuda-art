@@ -1,16 +1,16 @@
 import { useLocalStorage } from '@vueuse/core'
+import { getAuth } from 'firebase/auth'
 import {
   collection,
   doc,
   getDoc,
   getDocs,
   getFirestore,
-  increment,
-  orderBy,
   query,
   setDoc,
   Timestamp,
   updateDoc,
+  where,
 } from 'firebase/firestore'
 
 export type Announcement = {
@@ -37,11 +37,62 @@ export type AnnouncementImpression = {
   lastLiked?: string
 }
 
+/** Firestore document id for this player's private impression. Slashes are not allowed in ids. */
+const impressionDocId = (uid: string, announcementId: string) =>
+  `${uid}_${announcementId.replaceAll('/', '_')}`
+
+const currentUid = () => {
+  try {
+    return getAuth().currentUser?.uid ?? null
+  } catch {
+    return null
+  }
+}
+
+const accountLikesKey = (uid: string | null) => `hanafuda-liked-announcements:${uid ?? 'guest'}`
+
+const readAccountLikes = (uid: string | null): string[] => {
+  if (!import.meta.client) return []
+  try {
+    const parsed = JSON.parse(localStorage.getItem(accountLikesKey(uid)) ?? '[]') as unknown
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+const writeAccountLikes = (uid: string | null, ids: string[]) => {
+  if (!import.meta.client) return
+  localStorage.setItem(accountLikesKey(uid), JSON.stringify(ids))
+}
+
+/**
+ * For impressions Firestore returned, the saved like replaces the cache.
+ * A like that has no saved document yet stays cached.
+ *
+ * @param cached - Announcement ids liked in this account's local cache
+ * @param saved - Impressions loaded for this account, keyed by announcement id
+ * @returns The liked ids after applying saved likes and unlikes
+ */
+export function applySavedLikes(
+  cached: readonly string[],
+  saved: Readonly<Record<string, { likes: number }>>,
+): string[] {
+  const returned = new Set(Object.keys(saved))
+  const unsaved = cached.filter((id) => !returned.has(id))
+  const liked = Object.entries(saved)
+    .filter(([, impression]) => impression.likes > 0)
+    .map(([id]) => id)
+  return [...unsaved, ...liked]
+}
+
 export const useAnnouncements = async () => {
   // Store which announcements have been dismissed in localStorage
   const dismissedAnnouncements = useLocalStorage<string[]>('hanafuda-dismissed-announcements', [])
   const dontShowAnnouncements = useLocalStorage<boolean>('hanafuda-dont-show-announcements', false)
-  const likedAnnouncements = useLocalStorage<string[]>('hanafuda-liked-announcements', [])
+  // Likes follow the signed-in account. A device-wide list used to mark another
+  // account's saved like as unliked, and a later view then stored liked: false.
+  const likedIds = ref<string[]>(readAccountLikes(currentUid()))
 
   // Fetch announcements from Nuxt Content with locale support
   const { queryAllLocaleDocuments } = useLocaleContent()
@@ -52,34 +103,101 @@ export const useAnnouncements = async () => {
   // Impression tracking state - now synced with Firestore
   const impressions = ref<Record<string, AnnouncementImpression>>({})
 
-  // Load impressions from Firestore on initialization
+  // Load this player's impressions. Other players' records are not readable.
   const loadImpressionsFromFirestore = async () => {
+    const uid = currentUid()
+    if (!uid) return
+
     try {
       const db = getFirestore()
       const impressionsQuery = query(
         collection(db, 'announcement_impressions'),
-        orderBy('lastUpdated', 'desc'),
+        where('uid', '==', uid),
       )
       const snapshot = await getDocs(impressionsQuery)
 
       const firestoreImpressions: Record<string, AnnouncementImpression> = {}
-      snapshot.forEach((doc) => {
-        const data = doc.data()
-        firestoreImpressions[doc.id] = {
-          title: data.title,
-          date: data.date,
+      snapshot.forEach((entry) => {
+        const data = entry.data()
+        const announcementId =
+          typeof data.announcementId === 'string' ? data.announcementId : entry.id
+        firestoreImpressions[announcementId] = {
+          title: announcementId,
+          date: '',
           views: data.views || 0,
-          likes: data.likes || 0,
-          lastViewed: data.lastViewed?.toDate?.()?.toISOString() || data.lastViewed,
-          lastLiked: data.lastLiked?.toDate?.()?.toISOString() || data.lastLiked,
+          likes: data.liked ? 1 : 0,
         }
       })
 
       impressions.value = firestoreImpressions
+      likedIds.value = applySavedLikes(likedIds.value, firestoreImpressions)
+      writeAccountLikes(uid, likedIds.value)
     } catch (error) {
       console.warn('Failed to load announcement impressions:', error)
       // Continue with local state if Firestore fails
     }
+  }
+
+  const setLiked = (announcementId: string, liked: boolean) => {
+    const next = new Set(likedIds.value)
+    if (liked) next.add(announcementId)
+    else next.delete(announcementId)
+    likedIds.value = [...next]
+    writeAccountLikes(currentUid(), likedIds.value)
+  }
+
+  const saveView = async (announcementId: string) => {
+    const uid = currentUid()
+    if (!uid) return
+
+    const db = getFirestore()
+    const impressionRef = doc(db, 'announcement_impressions', impressionDocId(uid, announcementId))
+    const existing = await getDoc(impressionRef)
+    const views = existing.exists() ? Number(existing.data().views ?? 0) : 0
+
+    if (existing.exists()) {
+      // Leave `liked` untouched so a view cannot clear a like saved on this account.
+      await updateDoc(impressionRef, {
+        views: views + 1,
+        updatedAt: Timestamp.now(),
+      })
+      return
+    }
+
+    await setDoc(impressionRef, {
+      uid,
+      announcementId,
+      views: 1,
+      liked: false,
+      updatedAt: Timestamp.now(),
+    })
+  }
+
+  const saveLike = async (announcementId: string, liked: boolean) => {
+    const uid = currentUid()
+    if (!uid) return
+
+    const db = getFirestore()
+    const impressionRef = doc(db, 'announcement_impressions', impressionDocId(uid, announcementId))
+    const existing = await getDoc(impressionRef)
+    const views = existing.exists() ? Number(existing.data().views ?? 0) : 0
+
+    if (existing.exists()) {
+      await updateDoc(impressionRef, {
+        views,
+        liked,
+        updatedAt: Timestamp.now(),
+      })
+      return
+    }
+
+    await setDoc(impressionRef, {
+      uid,
+      announcementId,
+      views: 0,
+      liked,
+      updatedAt: Timestamp.now(),
+    })
   }
 
   // Initialize impressions from Firestore
@@ -151,35 +269,7 @@ export const useAnnouncements = async () => {
       impressions.value[announcementId].views++
       impressions.value[announcementId].lastViewed = new Date().toISOString()
 
-      // Update Firestore
-      const db = getFirestore()
-      const impressionRef = doc(db, 'announcement_impressions', announcementId)
-
-      // Check if document exists
-      const docSnap = await getDoc(impressionRef)
-
-      if (docSnap.exists()) {
-        // Update existing document
-        await updateDoc(impressionRef, {
-          views: increment(1),
-          lastViewed: Timestamp.now(),
-          lastUpdated: Timestamp.now(),
-        })
-      } else {
-        // Create new document
-        const [date, title] = new TextDecoder()
-          .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
-          .split('::')
-        await setDoc(impressionRef, {
-          title,
-          date,
-          views: 1,
-          likes: 0,
-          lastViewed: Timestamp.now(),
-          lastUpdated: Timestamp.now(),
-          createdAt: Timestamp.now(),
-        })
-      }
+      await saveView(announcementId)
     } catch (error) {
       console.warn('Failed to track announcement view:', error)
       // Don't throw error - continue with local tracking only
@@ -188,7 +278,7 @@ export const useAnnouncements = async () => {
 
   const trackLike = async (announcementId: string) => {
     try {
-      const wasLiked = likedAnnouncements.value.includes(announcementId)
+      const wasLiked = likedIds.value.includes(announcementId)
 
       // Use nextTick to prevent reactive loops
       await nextTick()
@@ -207,51 +297,14 @@ export const useAnnouncements = async () => {
       }
 
       if (wasLiked) {
-        // Unlike
         impressions.value[announcementId].likes--
-        likedAnnouncements.value = likedAnnouncements.value.filter((id) => id !== announcementId)
       } else {
-        // Like
         impressions.value[announcementId].likes++
         impressions.value[announcementId].lastLiked = new Date().toISOString()
-        likedAnnouncements.value.push(announcementId)
       }
+      setLiked(announcementId, !wasLiked)
 
-      // Update Firestore
-      const db = getFirestore()
-      const impressionRef = doc(db, 'announcement_impressions', announcementId)
-
-      // Check if document exists
-      const docSnap = await getDoc(impressionRef)
-
-      if (docSnap.exists()) {
-        // Update existing document
-        const updateData: any = {
-          likes: increment(wasLiked ? -1 : 1),
-          lastUpdated: Timestamp.now(),
-        }
-
-        if (!wasLiked) {
-          updateData.lastLiked = Timestamp.now()
-        }
-
-        await updateDoc(impressionRef, updateData)
-      } else {
-        // Create new document
-        const [date, title] = new TextDecoder()
-          .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
-          .split('::')
-        await setDoc(impressionRef, {
-          announcementId,
-          title,
-          date,
-          views: 0,
-          likes: wasLiked ? 0 : 1,
-          lastLiked: wasLiked ? null : Timestamp.now(),
-          lastUpdated: Timestamp.now(),
-          createdAt: Timestamp.now(),
-        })
-      }
+      await saveLike(announcementId, !wasLiked)
 
       return !wasLiked // Return new like state
     } catch (error) {
@@ -262,7 +315,7 @@ export const useAnnouncements = async () => {
   }
 
   const isLiked = (announcementId: string) => {
-    return likedAnnouncements.value.includes(announcementId)
+    return likedIds.value.includes(announcementId)
   }
 
   // Mark all new announcements as read
@@ -287,7 +340,8 @@ export const useAnnouncements = async () => {
   const resetAnnouncementPreferences = () => {
     dismissedAnnouncements.value = []
     dontShowAnnouncements.value = false
-    likedAnnouncements.value = []
+    likedIds.value = []
+    writeAccountLikes(currentUid(), [])
   }
 
   return {
