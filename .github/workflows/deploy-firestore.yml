@@ -47,7 +47,14 @@ jobs:
           RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
+          git fetch --no-tags origin main
           paths='^(packages/frontend/firestore\.rules|packages/frontend/firestore\.indexes\.json|packages/frontend/firebase\.json)$'
+          head_sha="$(git rev-parse HEAD)"
+          if ! git merge-base --is-ancestor "$head_sha" origin/main; then
+            echo "Tested commit ${head_sha} is not on origin/main; refusing to deploy."
+            exit 1
+          fi
+
           last_sha=""
           ids="$(gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=firestore&per_page=20" --jq '.[].id')"
           for id in $ids; do
@@ -58,7 +65,18 @@ jobs:
             fi
           done
 
-          if [ -n "$last_sha" ] && git cat-file -e "${last_sha}^{commit}" >/dev/null 2>&1; then
+          if [ -n "$last_sha" ]; then
+            git cat-file -e "${last_sha}^{commit}" >/dev/null 2>&1 || git fetch --no-tags origin "$last_sha"
+            # A rerun of an older CI run must not publish that commit over a newer one.
+            if [ "$head_sha" != "$last_sha" ] && git merge-base --is-ancestor "$head_sha" "$last_sha"; then
+              echo "Tested commit ${head_sha} is older than published ${last_sha}; not rolling back."
+              echo "deploy=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if ! git merge-base --is-ancestor "$last_sha" "$head_sha"; then
+              echo "Published commit ${last_sha} is not an ancestor of ${head_sha}; refusing to deploy out of order."
+              exit 1
+            fi
             base="$last_sha"
           elif git rev-parse --verify HEAD^ >/dev/null 2>&1; then
             base="HEAD^"
