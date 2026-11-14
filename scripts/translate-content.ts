@@ -19,6 +19,10 @@
  *
  *   # Translate all content with preview
  *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --dry-run --include "packages/frontend/content/en" --locales "ja,pl"
+ *
+ * GitHub Actions does not run this script. `.github/workflows/translate-content.yml`
+ * runs `scripts/i18n-translate.ts` on Vertex AI and opens a pull request.
+ * This entry point remains for a local `GEMINI_API_KEY` run.
  */
 
 import { googleAI } from '@genkit-ai/googleai'

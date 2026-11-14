@@ -16,6 +16,10 @@
  *
  *   # Force update all keys (not just missing ones)
  *   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-json.ts --force
+ *
+ * GitHub Actions does not run this script. `.github/workflows/translate-content.yml`
+ * runs `scripts/i18n-translate.ts` on Vertex AI and opens a pull request.
+ * This entry point remains for a local `GEMINI_API_KEY` run.
  */
 
 import { googleAI } from '@genkit-ai/googleai'
@@ -24,6 +28,7 @@ import { existsSync } from '@std/fs/exists'
 import { genkit, z } from 'genkit'
 import {
   formatLocaleList,
+  FRONTEND_ROOT,
   getDefaultSourceLocale,
   getLanguageName,
   getTargetLocaleFiles,
@@ -179,7 +184,7 @@ function parseCliArgs() {
   setupWorkingDirectory()
 
   // Validate source locale file exists
-  const sourceFile = `i18n/locales/${sourceLocale}.json`
+  const sourceFile = `${FRONTEND_ROOT}/i18n/locales/${sourceLocale}.json`
   if (!existsSync(sourceFile)) {
     console.error(`❌ Error: Source locale file does not exist: ${sourceFile}`)
     Deno.exit(1)
@@ -221,9 +226,9 @@ Translates missing keys from a source JSON locale file to target locale files,
 maintaining JSON structure and preserving placeholders and technical terms.
 
 Directory Structure:
-  i18n/locales/
+  packages/frontend/i18n/locales/
     en-us.json      ← English source file
-    ja-jp.json      ← Japanese translations  
+    ja-jp.json      ← Japanese translations
     pl-pl.json      ← Polish translations
 
 Usage: deno run --allow-read --allow-write --allow-env --allow-net translate-json.ts [options]
@@ -401,7 +406,7 @@ async function translateLocale(
   }
 
   const dryRunPrefix = isDryRun ? '[DRY RUN] ' : ''
-  const targetFile = `i18n/locales/${targetLocale}.json`
+  const targetFile = `${FRONTEND_ROOT}/i18n/locales/${targetLocale}.json`
 
   try {
     // Load existing target JSON (if exists)

@@ -1,0 +1,178 @@
+# Translate English content and UI strings when they change on main.
+#
+# The job never pushes to main. It writes locale files on `i18n/update-translations`
+# and opens a pull request for review. Squash-merge that pull request.
+#
+# Incremental pushes retranslate only changed markdown sections and UI strings
+# whose English text changed, plus UI keys that are still missing in a locale
+# file this push edited. workflow_dispatch retranslates every English source.
+#
+# Removing a locale from localization.json does not delete its files.
+# Adding a locale plans a full translation for that locale only.
+#
+# The workflow skips, with a notice, until these repository variables exist
+# (Settings → Secrets and variables → Actions → Variables):
+#
+#   GCP_WORKLOAD_IDENTITY_PROVIDER
+#     projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL/providers/PROVIDER
+#   GCP_SERVICE_ACCOUNT
+#     hanafuda-github-translate@PROJECT_ID.iam.gserviceaccount.com
+#   GCP_PROJECT_ID
+#     PROJECT_ID
+#
+# Optional variables:
+#
+#   GCP_LOCATION   default us-central1. Use global for a global Gemini endpoint.
+#   GCP_MODEL      default gemini-2.5-flash
+#
+# Terraform in infra/ should add, and only add, the following for this workflow.
+# The workload identity pool and provider are owned by the foundation change
+# that locks the provider to fudapop/hanafuda-art. Do not create those here.
+#
+#   API: aiplatform.googleapis.com
+#   Service account: hanafuda-github-translate
+#   Role on the project: roles/aiplatform.user
+#     (permission used: aiplatform.endpoints.predict)
+#   Binding on that service account:
+#     role: roles/iam.workloadIdentityUser
+#     member: principalSet://iam.googleapis.com/projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL/attribute.repository/fudapop/hanafuda-art
+#
+# The google-github-actions/auth action requests an OIDC token whose audience
+# is the provider resource name. The provider's audience must allow that.
+# Repository Actions permissions must let this workflow create a branch and a
+# pull request (contents: write and pull-requests: write on the job).
+#
+# Translation pull requests should not add a changelog bullet. They translate
+# English that already describes the player-facing change. The English
+# changelog remains the source of truth.
+
+name: Translate content
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/frontend/content/en/**'
+      - 'packages/frontend/i18n/locales/en-us.json'
+      - 'packages/frontend/localization.json'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Print the full backfill plan and skip Vertex AI and the pull request
+        type: boolean
+        default: false
+
+# A second push waits. Cancelling mid-translation would leave a half-updated branch.
+concurrency:
+  group: i18n-translate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Plan translations
+        id: plan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -eu
+          MODE=changed
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            MODE=full
+          fi
+          ARGS=(--mode "$MODE" --plan --github-output "$GITHUB_OUTPUT")
+          if [ "$MODE" = "changed" ]; then
+            ARGS+=(--base "$BASE_SHA" --head "$HEAD_SHA")
+          fi
+          node --experimental-strip-types scripts/i18n-translate.ts "${ARGS[@]}"
+
+      - name: Check translation identity
+        id: identity
+        if: steps.plan.outputs.count != '0' && github.event.inputs.dry_run != 'true'
+        env:
+          PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+        run: |
+          set -eu
+          if [ -z "$PROVIDER" ] || [ -z "$SERVICE_ACCOUNT" ] || [ -z "$PROJECT_ID" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Translation skipped::Set repository variables GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_SERVICE_ACCOUNT, and GCP_PROJECT_ID to open a translation pull request. Vertex AI was not called. The service account, role, and API are documented at the top of .github/workflows/translate-content.yml."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        if: steps.identity.outputs.ready == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          token_format: access_token
+
+      - name: Translate
+        if: steps.identity.outputs.ready == 'true'
+        env:
+          GCP_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_LOCATION: ${{ vars.GCP_LOCATION || 'us-central1' }}
+          GCP_MODEL: ${{ vars.GCP_MODEL || 'gemini-2.5-flash' }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -eu
+          MODE=changed
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            MODE=full
+          fi
+          ARGS=(--mode "$MODE")
+          if [ "$MODE" = "changed" ]; then
+            ARGS+=(--base "$BASE_SHA" --head "$HEAD_SHA")
+          fi
+          node --experimental-strip-types scripts/i18n-translate.ts "${ARGS[@]}"
+
+      - name: Open translation pull request
+        if: steps.identity.outputs.ready == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: i18n/update-translations
+          base: main
+          commit-message: 'chore(i18n): update translations'
+          title: 'chore(i18n): update translations'
+          add-paths: |
+            packages/frontend/content/**
+            packages/frontend/i18n/locales/**
+          delete-branch: true
+          body: |
+            Automated translation of English content and UI strings that changed on `main`.
+
+            Locales: ja, pl, ru, fr. A person should review the wording before merging. This branch is not applied directly to `main`.
+
+            No changelog bullet. These files translate English that already describes the player-facing change. The English changelog stays the source of truth, and a new bullet here would need another translation pass.
+
+            Confirm English sources under `packages/frontend/content/en` and `packages/frontend/i18n/locales/en-us.json` are untouched. Check glossary terms (yaku names, Koi-Koi, card names) and that placeholders, links, and front matter survived.
+
+            Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
