@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Bug Fixes
+- **End of the round**: A round that uses every card in both hands ends in a draw instead of crashing once the deck runs out.
 - **Phone game board**: Hands, the field, and captured cards now fit on a phone without scrolling sideways.
 - **Collection piles on phones**: Captured-card piles stay on one overlapping row instead of wrapping over the field.
 - **Sign-in on Safari**: The sign-in form stays fully visible in Safari.

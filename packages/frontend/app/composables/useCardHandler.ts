@@ -253,13 +253,16 @@ export const useCardHandler = () => {
     },
 
     draw() {
+      if (ds.roundOver) return
       console.assert(
         ds.checkCurrentPhase('draw'),
         `Phase check failed. Expected: 'draw'; Received: '${ds.getCurrent.phase}'`,
       )
       const revealed = cs.revealCard()
       if (!revealed) {
-        throw new Error('Error during draw. No card revealed.')
+        // The deck is empty. End the round instead of throwing.
+        ds.endExhaustedRound()
+        return
       }
       selectedCard.value = revealed
       ds.logPlayerAction(ds.getCurrent.player, 'draw', [selectedCard.value])

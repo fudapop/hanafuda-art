@@ -39,7 +39,7 @@
  */
 
 import { defineStore } from 'pinia'
-import type { CardName } from '~/utils/cards'
+import { DECK, type CardName } from '~/utils/cards'
 import { consoleLogColor, getRandomString } from '~/utils/myUtils'
 import type { CompletedYaku, YakuName } from '~/utils/yaku'
 import { useCardStore } from '~~/stores/cardStore'
@@ -113,6 +113,8 @@ export const useGameDataStore = defineStore('gameData', () => {
   const turnPhase = ref('select' as TurnPhase)
   const roundOver = ref(false)
   const gameOver = ref(false)
+  // Set when a round ends because both hands are empty or the deck has nothing left to draw.
+  const exhaustedDraw = ref(false)
   const eventHistory = reactive<EventLog[]>([])
 
   // Getters
@@ -178,6 +180,15 @@ export const useGameDataStore = defineStore('gameData', () => {
     }
     eventHistory.push(log)
   }
+  function deckHasBeenDealt() {
+    return useCardStore().deck.size < DECK.length
+  }
+
+  function endExhaustedRound() {
+    endRound()
+    exhaustedDraw.value = true
+  }
+
   function nextPhase() {
     if (roundOver.value) return // Round ended — stale async code should not advance phase
     // Loop through phases; select -> draw -> select -> etc...
@@ -189,6 +200,11 @@ export const useGameDataStore = defineStore('gameData', () => {
     if (next === 'select') {
       usePlayerStore().toggleActivePlayer()
       if (usePlayerStore().activePlayer.isDealer) _incrementTurn()
+      // Both players have played every card in hand. The deck still holds the
+      // undealt remainder; drawing it used to throw around turn 13.
+      if (useCardStore().handsEmpty && deckHasBeenDealt()) {
+        endExhaustedRound()
+      }
     }
     return next
   }
@@ -202,6 +218,7 @@ export const useGameDataStore = defineStore('gameData', () => {
       console.error("Failed to start game. State variable ('roundOver') not reset.")
       return
     }
+    exhaustedDraw.value = false
     turnPhase.value = PHASES[0]
     turnCounter.value = 1
     roundCounter.value = roundHistory.value.length + 1
@@ -260,6 +277,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     turnPhase.value = 'select'
     roundOver.value = false
     gameOver.value = false
+    exhaustedDraw.value = false
     eventHistory.splice(0, eventHistory.length)
     const record = JSON.stringify(roundHistory.value.splice(0))
     return record
@@ -317,6 +335,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     roundHistory,
     roundOver,
     gameOver,
+    exhaustedDraw,
     eventHistory,
     // Getters
     getCurrent,
@@ -331,6 +350,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     startRound,
     saveResult,
     endRound,
+    endExhaustedRound,
     nextRound,
     generateGameId,
     reset,
