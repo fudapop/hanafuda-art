@@ -1,0 +1,106 @@
+name: Deploy Firestore
+
+# Deploys Firestore rules and indexes to new-hanafuda after CI has tested them.
+# This workflow lives on main and only starts from a push to main, so pull
+# requests and forks never receive these credentials.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-firestore
+  cancel-in-progress: false
+
+jobs:
+  deploy-firestore:
+    if: >-
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.repository == 'fudapop/hanafuda-art' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout the tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 2
+
+      - name: Detect Firestore config changes
+        id: changes
+        run: |
+          if ! git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git diff --name-only --diff-filter=ACMR HEAD^ HEAD | grep -Eq '^(packages/frontend/firestore\.rules|packages/frontend/firestore\.indexes\.json|packages/frontend/firebase\.json)$'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Confirm firestore-rules passed
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          conclusion="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" --jq '.jobs[] | select(.name == "firestore-rules") | .conclusion' | tail -n 1)"
+          if [ "$conclusion" != "success" ]; then
+            echo "Refusing to deploy. CI / firestore-rules conclusion is '${conclusion:-missing}'."
+            exit 1
+          fi
+
+      - name: Require Workload Identity settings
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          SERVICE_ACCOUNT: ${{ vars.GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$WORKLOAD_IDENTITY_PROVIDER" ] || [ -z "$SERVICE_ACCOUNT" ]; then
+            echo "Missing repository variables GCP_WORKLOAD_IDENTITY_PROVIDER and/or GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT."
+            echo "The one-time Google Cloud setup is in the pull request that added this workflow."
+            exit 1
+          fi
+
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.changed == 'true'
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: new-hanafuda
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Install pnpm
+        if: steps.changes.outputs.changed == 'true'
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install frontend tools
+        if: steps.changes.outputs.changed == 'true'
+        run: pnpm install --frozen-lockfile --filter @hanafuda/frontend
+
+      - name: Deploy Firestore rules and indexes
+        if: steps.changes.outputs.changed == 'true'
+        working-directory: packages/frontend
+        run: >-
+          pnpm exec firebase deploy
+          --only firestore:rules,firestore:indexes
+          --project new-hanafuda
+          --non-interactive
+          --force
