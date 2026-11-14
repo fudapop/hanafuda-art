@@ -27,41 +27,77 @@ jobs:
     permissions:
       actions: read
       contents: read
+      deployments: write
       id-token: write
     steps:
       - name: Checkout the tested commit
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Detect Firestore config changes
-        id: changes
-        run: |
-          if ! git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if git diff --name-only --diff-filter=ACMR HEAD^ HEAD | grep -Eq '^(packages/frontend/firestore\.rules|packages/frontend/firestore\.indexes\.json|packages/frontend/firebase\.json)$'; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Confirm firestore-rules passed
-        if: steps.changes.outputs.changed == 'true'
+      # Diff against the last successful publish, not just the previous commit.
+      # CI cancels an in-progress main run when the next merge lands. The newer
+      # run can be an unrelated commit whose own diff does not touch the rules,
+      # while the tree still contains the unpublished rules from the cancelled run.
+      - name: Decide whether to deploy
+        id: plan
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
-          conclusion="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" --jq '.jobs[] | select(.name == "firestore-rules") | .conclusion' | tail -n 1)"
-          if [ "$conclusion" != "success" ]; then
-            echo "Refusing to deploy. CI / firestore-rules conclusion is '${conclusion:-missing}'."
-            exit 1
+          set -euo pipefail
+          paths='^(packages/frontend/firestore\.rules|packages/frontend/firestore\.indexes\.json|packages/frontend/firebase\.json)$'
+          last_sha=""
+          ids="$(gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=firestore&per_page=20" --jq '.[].id')"
+          for id in $ids; do
+            state="$(gh api "repos/${GITHUB_REPOSITORY}/deployments/${id}/statuses" --jq '.[0].state // empty')"
+            if [ "$state" = "success" ]; then
+              last_sha="$(gh api "repos/${GITHUB_REPOSITORY}/deployments/${id}" --jq .sha)"
+              break
+            fi
+          done
+
+          if [ -n "$last_sha" ] && git cat-file -e "${last_sha}^{commit}" >/dev/null 2>&1; then
+            base="$last_sha"
+          elif git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            base="HEAD^"
+          else
+            base=""
           fi
 
+          if [ -z "$base" ]; then
+            changed=true
+          elif git diff --name-only "$base" HEAD | grep -Eq "$paths"; then
+            echo "Firestore config differs from ${base}."
+            changed=true
+          else
+            echo "Firestore config matches ${base}; nothing to deploy."
+            changed=false
+          fi
+
+          if [ "$changed" != true ]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          conclusion="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" --jq '.jobs[] | select(.name == "firestore-rules") | .conclusion' | tail -n 1)"
+          case "$conclusion" in
+            success)
+              echo "deploy=true" >> "$GITHUB_OUTPUT"
+              ;;
+            cancelled|skipped)
+              echo "CI / firestore-rules was ${conclusion}. A later successful run will publish rules that are still undeployed."
+              echo "deploy=false" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Refusing to deploy. CI / firestore-rules conclusion is '${conclusion:-missing}'."
+              exit 1
+              ;;
+          esac
+
       - name: Require Workload Identity settings
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.plan.outputs.deploy == 'true'
         env:
           WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           SERVICE_ACCOUNT: ${{ vars.GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT }}
@@ -73,7 +109,7 @@ jobs:
           fi
 
       - name: Authenticate to Google Cloud
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.plan.outputs.deploy == 'true'
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           project_id: new-hanafuda
@@ -81,22 +117,22 @@ jobs:
           service_account: ${{ vars.GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT }}
 
       - name: Install pnpm
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.plan.outputs.deploy == 'true'
         uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.plan.outputs.deploy == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
       - name: Install frontend tools
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.plan.outputs.deploy == 'true'
         run: pnpm install --frozen-lockfile --filter @hanafuda/frontend
 
       - name: Deploy Firestore rules and indexes
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.plan.outputs.deploy == 'true'
         working-directory: packages/frontend
         run: >-
           pnpm exec firebase deploy
@@ -104,3 +140,30 @@ jobs:
           --project new-hanafuda
           --non-interactive
           --force
+
+      - name: Record the published commit
+        if: steps.plan.outputs.deploy == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          published="$(git rev-parse HEAD)"
+          deployment_id="$(gh api "repos/${GITHUB_REPOSITORY}/deployments" \
+            --method POST \
+            --input - <<EOF | jq -r .id
+          {
+            "ref": "${published}",
+            "environment": "firestore",
+            "auto_merge": false,
+            "required_contexts": [],
+            "description": "Firestore rules and indexes",
+            "transient_environment": false,
+            "production_environment": false
+          }
+          EOF
+          )"
+          gh api "repos/${GITHUB_REPOSITORY}/deployments/${deployment_id}/statuses" \
+            --method POST \
+            -f state=success \
+            -f environment=firestore \
+            -f description="Deployed Firestore rules and indexes"
