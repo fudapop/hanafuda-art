@@ -20,7 +20,12 @@ import { dirname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { parseArgs } from 'node:util'
 import { loadGlossary } from './i18n/glossary.ts'
-import { restorePendingTranslations } from './i18n/pending.ts'
+import {
+  loadPendingTranslations,
+  materializePendingTranslations,
+  snapshotWithPending,
+  type PendingTranslations,
+} from './i18n/pending.ts'
 import { parseLocalization, targetLocales } from './i18n/locales.ts'
 import {
   ENGLISH_CONTENT_PREFIX,
@@ -160,32 +165,36 @@ const emptyPlan = (mode: 'changed' | 'full'): Plan => ({ mode, locales: [], file
 
 /**
  * Build the plan for the requested mode.
+ * An open translation branch is merged in memory. `--plan` does not write files.
  *
  * @param options - CLI options.
- * @returns The plan. A zero parent SHA yields an empty changed plan.
+ * @returns The plan and any pending locale merge. A zero parent SHA yields an empty changed plan.
  */
-const createPlan = (options: Options): Plan => {
+const createPlan = (options: Options): { plan: Plan; pending: PendingTranslations | null } => {
   const glossary = loadGlossary()
   if (options.mode === 'full') {
-    return buildPlan({
-      mode: 'full',
-      changes: [],
-      before: null,
-      after: filesystemSnapshot(),
-      glossary,
-    })
+    return {
+      plan: buildPlan({
+        mode: 'full',
+        changes: [],
+        before: null,
+        after: filesystemSnapshot(),
+        glossary,
+      }),
+      pending: null,
+    }
   }
   if (!options.base || !options.head) throw new Error('changed mode requires --base and --head')
-  const pendingBase = options.pendingRef ? restorePendingTranslations(options.pendingRef) : null
-  const base = pendingBase ?? options.base
-  if (pendingBase) {
-    console.log(`Pending translations restored from ${options.pendingRef} through ${pendingBase}`)
+  const pending = options.pendingRef ? loadPendingTranslations(options.pendingRef) : null
+  const base = pending?.base ?? options.base
+  if (pending) {
+    console.log(`Pending translations merged from ${options.pendingRef} through ${pending.base}`)
   }
   if (isZeroSha(base)) {
     console.log(
       '::notice::Previous commit is unavailable, so incremental translation was skipped. Run the workflow manually for a full backfill.',
     )
-    return emptyPlan('changed')
+    return { plan: emptyPlan('changed'), pending: null }
   }
   if (!isCommitSha(base) || !isCommitSha(options.head)) {
     throw new Error('--base and --head must be full commit SHAs')
@@ -205,21 +214,26 @@ const createPlan = (options: Options): Plan => {
     ENGLISH_JSON_PATH,
     LOCALIZATION_PATH,
   ])
-  return buildPlan({
-    mode: 'changed',
-    changes: parseNameStatus(diff),
-    before: gitSnapshot(base),
-    after: filesystemSnapshot(),
-    glossary,
-  })
+  const current = filesystemSnapshot()
+  return {
+    plan: buildPlan({
+      mode: 'changed',
+      changes: parseNameStatus(diff),
+      before: gitSnapshot(base),
+      after: pending ? snapshotWithPending(current, pending) : current,
+      glossary,
+    }),
+    pending,
+  }
 }
 
 const main = async (): Promise<void> => {
   const options = readOptions(process.argv.slice(2))
-  const plan = createPlan(options)
-  console.log(formatPlan(plan))
-  writeGithubOutput(options.githubOutput, plan)
-  if (options.plan || plan.files.length === 0) return
+  const prepared = createPlan(options)
+  console.log(formatPlan(prepared.plan))
+  writeGithubOutput(options.githubOutput, prepared.plan)
+  if (options.plan || prepared.plan.files.length === 0) return
+  if (prepared.pending) materializePendingTranslations(prepared.pending)
 
   const token = process.env.GCP_ACCESS_TOKEN ?? ''
   const projectId = process.env.GCP_PROJECT_ID ?? ''
@@ -231,7 +245,7 @@ const main = async (): Promise<void> => {
   const localization = parseLocalization(readFileSync(LOCALIZATION_PATH, 'utf8'))
   const glossary = loadGlossary()
   await runPlan({
-    plan,
+    plan: prepared.plan,
     glossary,
     locales: targetLocales(localization),
     workspace: repositoryWorkspace(),

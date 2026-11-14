@@ -8,7 +8,12 @@ import { loadGlossary } from './i18n/glossary.ts'
 import { applyJsonEdits, planJsonEdits, type JsonObject } from './i18n/json-locale.ts'
 import { parseLocalization, targetLocales } from './i18n/locales.ts'
 import { assembleMarkdown, planMarkdownFile, renderFrontMatter, parseFrontSlots } from './i18n/markdown.ts'
-import { restorePendingTranslations, selectPendingFiles } from './i18n/pending.ts'
+import {
+  loadPendingTranslations,
+  materializePendingTranslations,
+  mergeLocaleContents,
+  selectPendingFiles,
+} from './i18n/pending.ts'
 import { LOCALIZATION_PATH, assertTranslationTarget } from './i18n/paths.ts'
 import { buildPlan, formatPlan, parseNameStatus, type Snapshot } from './i18n/plan.ts'
 import { assertPreserved, maskText, unmaskText } from './i18n/protect.ts'
@@ -450,7 +455,19 @@ describe('pending translations', () => {
     assert.deepEqual(selected.remove, ['packages/frontend/content/pl/announcements/old.md'])
   })
 
-  it('plans the next English commit from the last translated commit and restores the open branch', () => {
+  it('keeps a reviewed locale fix when merging an open translation branch', () => {
+    const merged = mergeLocaleContents(
+      'packages/frontend/i18n/locales/ja-jp.json',
+      JSON.stringify({ common: { a: 'old', b: 'old' } }, null, 2) + '\n',
+      JSON.stringify({ common: { a: 'reviewed', b: 'old' } }, null, 2) + '\n',
+      JSON.stringify({ common: { a: 'old', b: 'translated' } }, null, 2) + '\n',
+    )
+    const parsed = JSON.parse(merged ?? '{}') as { common: { a: string; b: string } }
+    assert.equal(parsed.common.a, 'reviewed')
+    assert.equal(parsed.common.b, 'translated')
+  })
+
+  it('plans from the last translated commit without writing during a preview', () => {
     const dir = mkdtempSync(join(tmpdir(), 'i18n-pending-'))
     const git = (args: string[]) =>
       execFileSync('git', args, { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
@@ -458,31 +475,36 @@ describe('pending translations', () => {
       mkdirSync(join(dir, path, '..'), { recursive: true })
       writeFileSync(join(dir, path), contents)
     }
-    const previous = process.cwd()
+    const note = 'packages/frontend/content/ja/misc/note.md'
     try {
       git(['init', '-b', 'main'])
       git(['config', 'user.email', 'test@example.com'])
       git(['config', 'user.name', 'Test'])
       write('packages/frontend/content/en/misc/note.md', 'English one\n')
-      write('packages/frontend/content/ja/misc/note.md', '日本語一\n')
+      write(note, '# Note\n\nSame.\n\nOld pending.\n')
       git(['add', '.'])
       git(['commit', '-m', 'base'])
       const translatedBase = git(['rev-parse', 'HEAD']).trim()
       git(['checkout', '-b', 'i18n/update-translations'])
-      write('packages/frontend/content/ja/misc/note.md', '日本語いち\n')
+      write(note, '# Note\n\nSame.\n\nNew pending.\n')
       git(['add', '.'])
       git(['commit', '-m', 'chore(i18n): update translations'])
       git(['checkout', 'main'])
       write('packages/frontend/content/en/misc/note.md', 'English two\n')
+      write(note, '# Note\n\nReviewed fix.\n\nOld pending.\n')
       git(['add', '.'])
-      git(['commit', '-m', 'english two'])
-      process.chdir(dir)
-      const base = restorePendingTranslations('i18n/update-translations', dir)
-      assert.equal(base, translatedBase)
-      assert.equal(readFileSync(join(dir, 'packages/frontend/content/ja/misc/note.md'), 'utf8'), '日本語いち\n')
+      git(['commit', '-m', 'reviewed fix'])
+      const pending = loadPendingTranslations('i18n/update-translations', dir)
+      assert.equal(pending?.base, translatedBase)
+      assert.equal(readFileSync(join(dir, note), 'utf8'), '# Note\n\nReviewed fix.\n\nOld pending.\n')
+      assert.match(pending?.files.get(note) ?? '', /Reviewed fix/)
+      assert.match(pending?.files.get(note) ?? '', /New pending/)
+      assert.doesNotMatch(pending?.files.get(note) ?? '', /Old pending/)
+      materializePendingTranslations(pending!, dir)
+      assert.match(readFileSync(join(dir, note), 'utf8'), /Reviewed fix/)
+      assert.match(readFileSync(join(dir, note), 'utf8'), /New pending/)
       assert.equal(readFileSync(join(dir, 'packages/frontend/content/en/misc/note.md'), 'utf8'), 'English two\n')
     } finally {
-      process.chdir(previous)
       rmSync(dir, { recursive: true, force: true })
     }
   })
