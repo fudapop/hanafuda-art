@@ -1,16 +1,97 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /feedback/{document=**} {
-      allow create: if true;
+    match /feedback/{feedbackId} {
+      function validStars(n) {
+        return n is int && n >= 1 && n <= 5;
+      }
+
+      function isValidFeedback() {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['ratings', 'comments', 'submitted_at', 'submitted_by'])
+          && data.ratings.keys().hasOnly(['animation', 'controls', 'image', 'audio'])
+          && validStars(data.ratings.animation)
+          && validStars(data.ratings.controls)
+          && validStars(data.ratings.image)
+          && validStars(data.ratings.audio)
+          && data.comments.keys().hasOnly(['tag', 'message'])
+          && data.comments.tag in ['idea', 'error', 'other']
+          && data.comments.message is string
+          && data.comments.message.size() <= 2000
+          && data.submitted_at is timestamp
+          && data.submitted_by is string
+          && data.submitted_by.size() > 0
+          && data.submitted_by.size() <= 128;
+      }
+
+      // Guests submit this form without Firebase Auth. The shape below is what
+      // rules can enforce here. Requiring request.app != null is not enforceable
+      // in the rules emulator (request.app is always null), and a hard check
+      // would reject every local and CI write, including real players in dev.
+      allow create: if isValidFeedback();
+      allow read, update, delete: if false;
     }
 
-    match /mp-feedback/{document=**} {
-      allow create: if request.auth != null;
+    match /mp-feedback/{feedbackId} {
+      function isValidMpFeedback() {
+        let data = request.resource.data;
+        return request.auth != null
+          && data.keys().hasOnly(['rating', 'comments', 'submitted_at', 'submitted_by'])
+          && data.rating is int
+          && data.rating >= 1
+          && data.rating <= 5
+          && data.comments.keys().hasOnly(['tag', 'message'])
+          && data.comments.tag in ['idea', 'error', 'other']
+          && data.comments.message is string
+          && data.comments.message.size() <= 2000
+          && data.submitted_at is timestamp
+          && data.submitted_by == request.auth.uid;
+      }
+
+      allow create: if isValidMpFeedback();
+      allow read, update, delete: if false;
     }
 
-    match /announcement_impressions/{document=**} {
-      allow read, update, create: if true;
+    // One document per player per announcement. Aggregate counters used to live
+    // here and were world-writable; those totals are no longer client-readable.
+    match /announcement_impressions/{impressionId} {
+      function isOwnerCreate() {
+        return request.auth != null
+          && impressionId.matches('^' + request.auth.uid + '_.+')
+          && request.resource.data.uid == request.auth.uid;
+      }
+
+      function isValidImpression(data) {
+        return data.keys().hasOnly(['uid', 'announcementId', 'views', 'liked', 'updatedAt'])
+          && data.uid is string
+          && data.uid.size() > 0
+          && data.uid.size() <= 128
+          && data.announcementId is string
+          && data.announcementId.size() > 0
+          && data.announcementId.size() <= 256
+          && data.views is int
+          && data.views >= 0
+          && data.views <= 1000
+          && data.liked is bool
+          && data.updatedAt is timestamp;
+      }
+
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+
+      allow create: if isOwnerCreate()
+        && isValidImpression(request.resource.data)
+        && request.resource.data.views <= 1;
+
+      allow update: if request.auth != null
+        && resource.data.uid == request.auth.uid
+        && impressionId.matches('^' + request.auth.uid + '_.+')
+        && isValidImpression(request.resource.data)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.announcementId == resource.data.announcementId
+        && request.resource.data.views >= resource.data.views
+        && request.resource.data.views <= resource.data.views + 1;
+
+      allow delete: if false;
     }
 
     match /users/{userId} {
@@ -110,56 +191,228 @@ service cloud.firestore {
                     && !resource.data.used;
     }
 
-    // NEW: shared multiplayer game states
+    // Shared multiplayer game state.
+    // p1, mode, createdAt, gameId, matchRules, and inviteCode never change.
+    // p2 can change once: from empty to the joining player.
+    // gameState and activePlayer are turn state. Only the current activePlayer
+    // may change them, except when both players have acked a round and either
+    // participant deals the next one.
     match /multiplayer_games/{gameId} {
-      // Helper function to check if user is a participant
+      function changedKeys() {
+        return request.resource.data.diff(resource.data).affectedKeys();
+      }
+
+      function onlyChanged(keys) {
+        return changedKeys().hasOnly(keys);
+      }
+
       function isParticipant() {
         return request.auth.uid == resource.data.p1
             || request.auth.uid == resource.data.p2;
       }
 
-      function isRequestParticipant() {
-        return request.auth.uid == request.resource.data.p1
-            || request.auth.uid == request.resource.data.p2;
+      function activeIsSeated(data) {
+        return data.activePlayer == data.p1
+            || (data.p2 is string && data.p2.size() > 0 && data.activePlayer == data.p2);
       }
 
-      // Helper to check if user is joining a waiting game
+      function validGameState(gs) {
+        return gs.keys().hasOnly(['version', 'timestamp', 'gameId', 'cards', 'gameData', 'players', 'config'])
+          && gs.version is string
+          && gs.version.size() > 0
+          && gs.version.size() <= 20
+          && gs.timestamp is number
+          && gs.gameId is string
+          && gs.gameId.size() > 0
+          && gs.gameId.size() <= 64
+          && gs.cards is string
+          && gs.cards.size() <= 500000
+          && gs.gameData is string
+          && gs.gameData.size() <= 500000
+          && gs.players is string
+          && gs.players.size() <= 50000
+          && gs.config is string
+          && gs.config.size() <= 50000;
+      }
+
+      function validMatchRules(rules) {
+        return rules.keys().hasOnly(['rounds', 'viewings', 'double', 'wild'])
+          && rules.rounds in [3, 6, 12]
+          && rules.viewings in ['allow', 'limited', 'none']
+          && rules.double is bool
+          && rules.wild is bool;
+      }
+
+      function validRoundAcks(acks) {
+        return acks.keys().hasOnly(['round', 'p1', 'p2'])
+          && acks.round is int
+          && acks.round > 0
+          && acks.round < 100
+          && acks.p1 is bool
+          && acks.p2 is bool;
+      }
+
+      function validFinalSeen(seen) {
+        return seen.keys().hasOnly(['p1', 'p2'])
+          && seen.p1 is bool
+          && seen.p2 is bool;
+      }
+
+      function optionalMapOrNull(data, key) {
+        return !data.keys().hasAny([key]) || data[key] == null;
+      }
+
+      function validGame(data) {
+        return data.keys().hasOnly([
+            'gameId', 'gameState', 'mode', 'p1', 'p2', 'activePlayer', 'status',
+            'roundAcks', 'finalSeen', 'terminalStatus', 'forfeitedBy', 'forfeitReason',
+            'cancelReason', 'inviteCode', 'matchRules', 'createdAt', 'lastUpdated', 'startedAt'
+          ])
+          && data.gameId == gameId
+          && data.gameId is string
+          && validGameState(data.gameState)
+          && data.mode == 'multiplayer'
+          && data.p1 is string
+          && data.p1.size() > 0
+          && data.p1.size() <= 128
+          && data.p2 is string
+          && data.p2.size() <= 128
+          && data.activePlayer is string
+          && activeIsSeated(data)
+          && data.status in ['waiting', 'active', 'completed', 'abandoned', 'cancelled']
+          && data.createdAt is timestamp
+          && data.lastUpdated is timestamp
+          && (data.startedAt == null || data.startedAt is timestamp)
+          && (
+            optionalMapOrNull(data, 'roundAcks')
+            || validRoundAcks(data.roundAcks)
+          )
+          && (
+            optionalMapOrNull(data, 'finalSeen')
+            || validFinalSeen(data.finalSeen)
+          )
+          && (
+            optionalMapOrNull(data, 'terminalStatus')
+            || data.terminalStatus in ['completed', 'abandoned', 'cancelled']
+          )
+          && (
+            optionalMapOrNull(data, 'forfeitedBy')
+            || (
+              data.forfeitedBy is string
+              && (data.forfeitedBy == data.p1 || data.forfeitedBy == data.p2)
+            )
+          )
+          && (
+            optionalMapOrNull(data, 'forfeitReason')
+            || (data.forfeitReason is string && data.forfeitReason.size() <= 64)
+          )
+          && (
+            optionalMapOrNull(data, 'cancelReason')
+            || (data.cancelReason is string && data.cancelReason.size() <= 64)
+          )
+          && (
+            optionalMapOrNull(data, 'inviteCode')
+            || (data.inviteCode is string && data.inviteCode.size() <= 16)
+          )
+          && (
+            !data.keys().hasAny(['matchRules'])
+            || validMatchRules(data.matchRules)
+          );
+      }
+
       function isJoiningWaitingGame() {
         return resource.data.status == 'waiting'
-            && resource.data.p2 == ''
-            && request.resource.data.p2 == request.auth.uid
-            && request.resource.data.status == 'active';
+          && resource.data.p2 == ''
+          && request.resource.data.p2 == request.auth.uid
+          && request.resource.data.p2 != resource.data.p1
+          && request.resource.data.status == 'active'
+          && (
+            request.resource.data.activePlayer == resource.data.p1
+            || request.resource.data.activePlayer == request.resource.data.p2
+          )
+          && request.resource.data.startedAt is timestamp
+          && onlyChanged(['p2', 'activePlayer', 'status', 'startedAt', 'lastUpdated']);
       }
 
-      // Participants can read their games
+      function isRoundAdvance() {
+        return resource.data.roundAcks is map
+          && resource.data.roundAcks.p1 == true
+          && resource.data.roundAcks.p2 == true
+          && request.resource.data.roundAcks == null;
+      }
+
+      // A player may set their own ack bit. They may not set the opponent's.
+      function honestOwnAck() {
+        let next = request.resource.data.roundAcks;
+        let prev = resource.data.roundAcks;
+        return next is map
+          && validRoundAcks(next)
+          && (
+            (
+              request.auth.uid == resource.data.p1
+              && next.p1 == true
+              && next.p2 == (prev == null ? false : prev.p2)
+            )
+            || (
+              request.auth.uid == resource.data.p2
+              && next.p2 == true
+              && next.p1 == (prev == null ? false : prev.p1)
+            )
+          );
+      }
+
+      function roundAcksChangeOk() {
+        return !changedKeys().hasAny(['roundAcks'])
+          || request.auth.uid == resource.data.activePlayer
+          || honestOwnAck()
+          || isRoundAdvance();
+      }
+
+      function turnStateChangeOk() {
+        return !changedKeys().hasAny(['gameState', 'activePlayer'])
+          || request.auth.uid == resource.data.activePlayer
+          || isRoundAdvance();
+      }
+
+      function statusTransitionOk() {
+        let from = resource.data.status;
+        let to = request.resource.data.status;
+        return from == to
+          || (from == 'waiting' && to == 'abandoned')
+          || (from == 'active' && (to == 'completed' || to == 'abandoned' || to == 'cancelled'));
+      }
+
+      function isLiveUpdate() {
+        return isParticipant()
+          && !changedKeys().hasAny(['p1', 'p2', 'mode', 'createdAt', 'gameId', 'matchRules', 'inviteCode', 'startedAt'])
+          && turnStateChangeOk()
+          && roundAcksChangeOk()
+          && statusTransitionOk()
+          && onlyChanged([
+            'gameState', 'activePlayer', 'status', 'roundAcks', 'finalSeen',
+            'terminalStatus', 'forfeitedBy', 'forfeitReason', 'cancelReason', 'lastUpdated'
+          ]);
+      }
+
+      // Waiting games are readable so a signed-in player can join with an invite.
+      // Active games are readable by the two participants. Hand contents live in
+      // gameState; hiding them requires the backend and is intentionally not done here.
       allow read: if request.auth != null && (
         resource.data.status == 'waiting' || isParticipant());
 
-      // Any authenticated user can create a game (matchmaking)
       allow create: if request.auth != null
-                    && isRequestParticipant()
-                    && request.resource.data.mode == 'multiplayer'
-                    && request.resource.data.p1 is string
-                    && request.resource.data.p2 is string
-                    && request.resource.data.activePlayer is string
-                    && request.resource.data.status is string;
+        && validGame(request.resource.data)
+        && request.resource.data.p1 == request.auth.uid
+        && request.resource.data.p2 == ''
+        && request.resource.data.activePlayer == request.auth.uid
+        && request.resource.data.status == 'waiting'
+        && request.resource.data.startedAt == null;
 
-      // Allow updates in two cases:
-      // 1. Participant updating game state (client/enforced active player)
-      // 2. Second player joining a waiting game
       allow update: if request.auth != null
-                    && (
-                      // Case 1: Participant making a move / updating game state
-                      (isParticipant()
-                        && request.resource.data.mode == 'multiplayer')
-                      ||
-                      // Case 2: Second player joining
-                      isJoiningWaitingGame()
-                    );
+        && validGame(request.resource.data)
+        && (isJoiningWaitingGame() || isLiveUpdate());
 
-      // Participants can delete their games
       allow delete: if request.auth != null && isParticipant();
     }
   }
 }
-

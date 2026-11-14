@@ -1,16 +1,16 @@
 import { useLocalStorage } from '@vueuse/core'
+import { getAuth } from 'firebase/auth'
 import {
   collection,
   doc,
   getDoc,
   getDocs,
   getFirestore,
-  increment,
-  orderBy,
   query,
   setDoc,
   Timestamp,
   updateDoc,
+  where,
 } from 'firebase/firestore'
 
 export type Announcement = {
@@ -37,6 +37,18 @@ export type AnnouncementImpression = {
   lastLiked?: string
 }
 
+/** Firestore document id for this player's private impression. Slashes are not allowed in ids. */
+const impressionDocId = (uid: string, announcementId: string) =>
+  `${uid}_${announcementId.replaceAll('/', '_')}`
+
+const currentUid = () => {
+  try {
+    return getAuth().currentUser?.uid ?? null
+  } catch {
+    return null
+  }
+}
+
 export const useAnnouncements = async () => {
   // Store which announcements have been dismissed in localStorage
   const dismissedAnnouncements = useLocalStorage<string[]>('hanafuda-dismissed-announcements', [])
@@ -52,26 +64,29 @@ export const useAnnouncements = async () => {
   // Impression tracking state - now synced with Firestore
   const impressions = ref<Record<string, AnnouncementImpression>>({})
 
-  // Load impressions from Firestore on initialization
+  // Load this player's impressions. Other players' records are not readable.
   const loadImpressionsFromFirestore = async () => {
+    const uid = currentUid()
+    if (!uid) return
+
     try {
       const db = getFirestore()
       const impressionsQuery = query(
         collection(db, 'announcement_impressions'),
-        orderBy('lastUpdated', 'desc'),
+        where('uid', '==', uid),
       )
       const snapshot = await getDocs(impressionsQuery)
 
       const firestoreImpressions: Record<string, AnnouncementImpression> = {}
-      snapshot.forEach((doc) => {
-        const data = doc.data()
-        firestoreImpressions[doc.id] = {
-          title: data.title,
-          date: data.date,
+      snapshot.forEach((entry) => {
+        const data = entry.data()
+        const announcementId =
+          typeof data.announcementId === 'string' ? data.announcementId : entry.id
+        firestoreImpressions[announcementId] = {
+          title: announcementId,
+          date: '',
           views: data.views || 0,
-          likes: data.likes || 0,
-          lastViewed: data.lastViewed?.toDate?.()?.toISOString() || data.lastViewed,
-          lastLiked: data.lastLiked?.toDate?.()?.toISOString() || data.lastLiked,
+          likes: data.liked ? 1 : 0,
         }
       })
 
@@ -80,6 +95,33 @@ export const useAnnouncements = async () => {
       console.warn('Failed to load announcement impressions:', error)
       // Continue with local state if Firestore fails
     }
+  }
+
+  const saveImpression = async (announcementId: string, liked: boolean, recordView: boolean) => {
+    const uid = currentUid()
+    if (!uid) return
+
+    const db = getFirestore()
+    const impressionRef = doc(db, 'announcement_impressions', impressionDocId(uid, announcementId))
+    const existing = await getDoc(impressionRef)
+    const views = existing.exists() ? Number(existing.data().views ?? 0) : 0
+
+    if (existing.exists()) {
+      await updateDoc(impressionRef, {
+        views: recordView ? views + 1 : views,
+        liked,
+        updatedAt: Timestamp.now(),
+      })
+      return
+    }
+
+    await setDoc(impressionRef, {
+      uid,
+      announcementId,
+      views: recordView ? 1 : 0,
+      liked,
+      updatedAt: Timestamp.now(),
+    })
   }
 
   // Initialize impressions from Firestore
@@ -151,35 +193,7 @@ export const useAnnouncements = async () => {
       impressions.value[announcementId].views++
       impressions.value[announcementId].lastViewed = new Date().toISOString()
 
-      // Update Firestore
-      const db = getFirestore()
-      const impressionRef = doc(db, 'announcement_impressions', announcementId)
-
-      // Check if document exists
-      const docSnap = await getDoc(impressionRef)
-
-      if (docSnap.exists()) {
-        // Update existing document
-        await updateDoc(impressionRef, {
-          views: increment(1),
-          lastViewed: Timestamp.now(),
-          lastUpdated: Timestamp.now(),
-        })
-      } else {
-        // Create new document
-        const [date, title] = new TextDecoder()
-          .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
-          .split('::')
-        await setDoc(impressionRef, {
-          title,
-          date,
-          views: 1,
-          likes: 0,
-          lastViewed: Timestamp.now(),
-          lastUpdated: Timestamp.now(),
-          createdAt: Timestamp.now(),
-        })
-      }
+      await saveImpression(announcementId, likedAnnouncements.value.includes(announcementId), true)
     } catch (error) {
       console.warn('Failed to track announcement view:', error)
       // Don't throw error - continue with local tracking only
@@ -217,41 +231,7 @@ export const useAnnouncements = async () => {
         likedAnnouncements.value.push(announcementId)
       }
 
-      // Update Firestore
-      const db = getFirestore()
-      const impressionRef = doc(db, 'announcement_impressions', announcementId)
-
-      // Check if document exists
-      const docSnap = await getDoc(impressionRef)
-
-      if (docSnap.exists()) {
-        // Update existing document
-        const updateData: any = {
-          likes: increment(wasLiked ? -1 : 1),
-          lastUpdated: Timestamp.now(),
-        }
-
-        if (!wasLiked) {
-          updateData.lastLiked = Timestamp.now()
-        }
-
-        await updateDoc(impressionRef, updateData)
-      } else {
-        // Create new document
-        const [date, title] = new TextDecoder()
-          .decode(new Uint8Array([...atob(announcementId)].map((c) => c.charCodeAt(0))))
-          .split('::')
-        await setDoc(impressionRef, {
-          announcementId,
-          title,
-          date,
-          views: 0,
-          likes: wasLiked ? 0 : 1,
-          lastLiked: wasLiked ? null : Timestamp.now(),
-          lastUpdated: Timestamp.now(),
-          createdAt: Timestamp.now(),
-        })
-      }
+      await saveImpression(announcementId, !wasLiked, false)
 
       return !wasLiked // Return new like state
     } catch (error) {

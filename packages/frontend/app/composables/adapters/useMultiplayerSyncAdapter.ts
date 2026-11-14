@@ -7,7 +7,6 @@ import {
   getFirestore,
   query,
   runTransaction,
-  setDoc,
   Timestamp,
   where,
 } from 'firebase/firestore'
@@ -80,7 +79,9 @@ function parseMultiplayerGame(
 
   // For active / completed games, p2 must be a non-empty string.
   // For waiting games, p2 may legitimately be empty until an opponent joins.
-  const hasValidP2 = typeof data.p2 === 'string' && (data.p2 !== '' || status === 'waiting' || status === 'abandoned' || status === 'cancelled')
+  const hasValidP2 =
+    typeof data.p2 === 'string' &&
+    (data.p2 !== '' || status === 'waiting' || status === 'abandoned' || status === 'cancelled')
 
   const hasValidActivePlayer = typeof data.activePlayer === 'string' && data.activePlayer !== ''
 
@@ -185,6 +186,25 @@ function parseMultiplayerGame(
   } as MultiplayerGame
 }
 
+/**
+ * A player may set their own round-ack bit and must leave the opponent's bit alone.
+ * Matches the multiplayer_games rules.
+ */
+function isHonestOwnAck(
+  previous: { p1?: boolean; p2?: boolean } | null,
+  next: { round?: number; p1?: boolean; p2?: boolean } | null,
+  callerUid: string,
+  p1Uid: unknown,
+): boolean {
+  if (!next || typeof next.round !== 'number') return false
+  const previousP1 = previous?.p1 === true
+  const previousP2 = previous?.p2 === true
+  if (callerUid === p1Uid) {
+    return next.p1 === true && next.p2 === previousP2
+  }
+  return next.p2 === true && next.p1 === previousP1
+}
+
 export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
   const db = getFirestore()
 
@@ -269,7 +289,7 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
         const firestoreData = {
           gameId: game.gameId,
           gameState: game.gameState,
-          mode: 'multiplayer',
+          mode: 'multiplayer' as const,
           p1: game.p1,
           p2: game.p2,
           activePlayer: game.activePlayer,
@@ -287,7 +307,49 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
             game.createdAt instanceof Date ? Timestamp.fromDate(game.createdAt) : game.createdAt,
         }
 
-        await setDoc(docRef, firestoreData, { merge: true })
+        // Rules lock p1, p2, mode, and createdAt. Turn fields (gameState,
+        // activePlayer) can change only for the current active player, or for
+        // either player when both have acked and this write deals the next round.
+        await runTransaction(db, async (tx) => {
+          const existingSnap = await tx.get(docRef)
+          if (!existingSnap.exists()) {
+            tx.set(docRef, firestoreData)
+            return
+          }
+
+          const existing = existingSnap.data()
+          const isActive = existing.activePlayer === callerUid
+          const acks = existing.roundAcks as { p1?: boolean; p2?: boolean } | null
+          const bothAcked = !!acks && acks.p1 === true && acks.p2 === true
+          const advancing = bothAcked && firestoreData.roundAcks == null
+          const next: Record<string, unknown> = {
+            ...firestoreData,
+            p1: existing.p1,
+            p2: existing.p2,
+            mode: 'multiplayer',
+            gameId: existing.gameId ?? firestoreData.gameId,
+            createdAt: existing.createdAt ?? firestoreData.createdAt,
+          }
+
+          if (!isActive && !advancing) {
+            next.gameState = existing.gameState
+            next.activePlayer = existing.activePlayer
+            // A metadata save (leave, forfeit, final close) must not clear the
+            // opponent's ack. Own-ack writes still go through.
+            if (
+              !isHonestOwnAck(
+                acks,
+                firestoreData.roundAcks as { round?: number; p1?: boolean; p2?: boolean } | null,
+                callerUid,
+                existing.p1,
+              )
+            ) {
+              next.roundAcks = existing.roundAcks ?? null
+            }
+          }
+
+          tx.set(docRef, next, { merge: true })
+        })
         return true
       } catch (error) {
         console.error('Firestore multiplayer game push error:', error)

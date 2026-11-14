@@ -12,6 +12,7 @@
 
 ### Privacy
 - **Player emails**: Rankings and other shared reads no longer include player email addresses. Public leaderboard profiles show the name, avatar, and record.
+- **Announcement reactions**: Public view and like totals are hidden. A like is saved to your account instead of a shared counter.
 
 ## [2026.4.0] - 2026-04-05
 
