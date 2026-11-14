@@ -13,21 +13,25 @@
 # The workflow skips, with a notice, until these repository variables exist
 # (Settings → Secrets and variables → Actions → Variables):
 #
-#   GCP_WORKLOAD_IDENTITY_PROVIDER
+#   GCP_WORKLOAD_IDENTITY_PROVIDER   shared with the other GCP workflows
 #     projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL/providers/PROVIDER
-#   GCP_SERVICE_ACCOUNT
-#     hanafuda-github-translate@PROJECT_ID.iam.gserviceaccount.com
-#   GCP_PROJECT_ID
+#   GCP_PROJECT_ID                   shared with the other GCP workflows
 #     PROJECT_ID
+#   GCP_TRANSLATE_SERVICE_ACCOUNT    this workflow only
+#     hanafuda-github-translate@PROJECT_ID.iam.gserviceaccount.com
+#
+# Firestore deploy uses GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT. Keep the
+# translate account in its own variable so the two cannot be mixed.
 #
 # Optional variables:
 #
 #   GCP_LOCATION   default us-central1. Use global for a global Gemini endpoint.
 #   GCP_MODEL      default gemini-2.5-flash
 #
-# Terraform in infra/ should add, and only add, the following for this workflow.
-# The workload identity pool and provider are owned by the foundation change
-# that locks the provider to fudapop/hanafuda-art. Do not create those here.
+# The foundation Terraform change adds the service account below and wires it to
+# the shared workload identity pool. This workflow only reads that account from
+# GCP_TRANSLATE_SERVICE_ACCOUNT. It does not create cloud resources. The pool
+# and provider stay locked to fudapop/hanafuda-art.
 #
 #   API: aiplatform.googleapis.com
 #   Service account: hanafuda-github-translate
@@ -112,13 +116,13 @@ jobs:
         if: steps.plan.outputs.count != '0' && github.event.inputs.dry_run != 'true'
         env:
           PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          SERVICE_ACCOUNT: ${{ vars.GCP_TRANSLATE_SERVICE_ACCOUNT }}
           PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
         run: |
           set -eu
           if [ -z "$PROVIDER" ] || [ -z "$SERVICE_ACCOUNT" ] || [ -z "$PROJECT_ID" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=Translation skipped::Set repository variables GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_SERVICE_ACCOUNT, and GCP_PROJECT_ID to open a translation pull request. Vertex AI was not called. The service account, role, and API are documented at the top of .github/workflows/translate-content.yml."
+            echo "::notice title=Translation skipped::Set repository variables GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_TRANSLATE_SERVICE_ACCOUNT, and GCP_PROJECT_ID to open a translation pull request. Vertex AI was not called. The service account, role, and API are documented at the top of .github/workflows/translate-content.yml."
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
@@ -129,7 +133,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          service_account: ${{ vars.GCP_TRANSLATE_SERVICE_ACCOUNT }}
           token_format: access_token
 
       - name: Translate
