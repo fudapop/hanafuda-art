@@ -66,6 +66,26 @@ const writeAccountLikes = (uid: string | null, ids: string[]) => {
   localStorage.setItem(accountLikesKey(uid), JSON.stringify(ids))
 }
 
+/**
+ * For impressions Firestore returned, the saved like replaces the cache.
+ * A like that has no saved document yet stays cached.
+ *
+ * @param cached - Announcement ids liked in this account's local cache
+ * @param saved - Impressions loaded for this account, keyed by announcement id
+ * @returns The liked ids after applying saved likes and unlikes
+ */
+export function applySavedLikes(
+  cached: readonly string[],
+  saved: Readonly<Record<string, { likes: number }>>,
+): string[] {
+  const returned = new Set(Object.keys(saved))
+  const unsaved = cached.filter((id) => !returned.has(id))
+  const liked = Object.entries(saved)
+    .filter(([, impression]) => impression.likes > 0)
+    .map(([id]) => id)
+  return [...unsaved, ...liked]
+}
+
 export const useAnnouncements = async () => {
   // Store which announcements have been dismissed in localStorage
   const dismissedAnnouncements = useLocalStorage<string[]>('hanafuda-dismissed-announcements', [])
@@ -110,10 +130,7 @@ export const useAnnouncements = async () => {
       })
 
       impressions.value = firestoreImpressions
-      const serverLiked = Object.entries(firestoreImpressions)
-        .filter(([, impression]) => impression.likes > 0)
-        .map(([id]) => id)
-      likedIds.value = [...new Set([...likedIds.value, ...serverLiked])]
+      likedIds.value = applySavedLikes(likedIds.value, firestoreImpressions)
       writeAccountLikes(uid, likedIds.value)
     } catch (error) {
       console.warn('Failed to load announcement impressions:', error)
