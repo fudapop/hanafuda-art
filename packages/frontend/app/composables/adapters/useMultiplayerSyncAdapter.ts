@@ -331,21 +331,21 @@ export function useMultiplayerSyncAdapter(): MultiplayerSyncAdapter {
             createdAt: existing.createdAt ?? firestoreData.createdAt,
           }
 
+          const proposedAcks = firestoreData.roundAcks as {
+            round?: number
+            p1?: boolean
+            p2?: boolean
+          } | null
+          const clearingGenuineAcks = bothAcked && proposedAcks == null
+          // Every player, including the one whose turn it is, may set only
+          // their own ack bit. Clearing acks is limited to a real double ack.
+          if (!isHonestOwnAck(acks, proposedAcks, callerUid, existing.p1) && !clearingGenuineAcks) {
+            next.roundAcks = existing.roundAcks ?? null
+          }
+
           if (!isActive && !advancing) {
             next.gameState = existing.gameState
             next.activePlayer = existing.activePlayer
-            // A metadata save (leave, forfeit, final close) must not clear the
-            // opponent's ack. Own-ack writes still go through.
-            if (
-              !isHonestOwnAck(
-                acks,
-                firestoreData.roundAcks as { round?: number; p1?: boolean; p2?: boolean } | null,
-                callerUid,
-                existing.p1,
-              )
-            ) {
-              next.roundAcks = existing.roundAcks ?? null
-            }
           }
 
           tx.set(docRef, next, { merge: true })

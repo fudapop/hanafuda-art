@@ -311,6 +311,26 @@ describe('announcement impression documents', () => {
     )
     await assertFails(deleteDoc(aliceImpression))
   })
+
+  it('lets a player read a missing impression, then save the first view or like', async () => {
+    const alice = testEnv.authenticatedContext('alice').firestore()
+    const bob = testEnv.authenticatedContext('bob').firestore()
+    const firstView = doc(alice, 'announcement_impressions', 'alice_first-view')
+    const firstLike = doc(alice, 'announcement_impressions', 'alice_first-like')
+
+    await assertSucceeds(getDoc(firstView))
+    expect((await getDoc(firstView)).exists()).toBe(false)
+    await assertSucceeds(setDoc(firstView, validImpression('alice', 'first-view')))
+
+    await assertSucceeds(getDoc(firstLike))
+    await assertSucceeds(
+      setDoc(firstLike, { ...validImpression('alice', 'first-like'), views: 0, liked: true }),
+    )
+
+    await assertFails(getDoc(doc(bob, 'announcement_impressions', 'alice_first-view')))
+    await assertFails(getDoc(doc(bob, 'announcement_impressions', 'alice_not-created')))
+    await assertSucceeds(getDoc(doc(bob, 'announcement_impressions', 'bob_not-created')))
+  })
 })
 
 describe('multiplayer game documents', () => {
@@ -424,6 +444,87 @@ describe('multiplayer game documents', () => {
           ...base,
           activePlayer: 'bob',
           gameState: gameState('game-1', 4),
+          lastUpdated: Timestamp.fromDate(new Date('2026-04-05T00:00:00Z')),
+        },
+        { merge: true },
+      ),
+    )
+  })
+
+  it('rejects an active player forging the opponent ack, and allows clearing two real acks', async () => {
+    const alice = testEnv.authenticatedContext('alice').firestore()
+    const bob = testEnv.authenticatedContext('bob').firestore()
+    const createdAt = Timestamp.fromDate(new Date('2026-04-01T00:00:00Z'))
+    const startedAt = Timestamp.fromDate(new Date('2026-04-02T00:00:00Z'))
+
+    await assertSucceeds(
+      setDoc(doc(alice, 'multiplayer_games', 'game-acks'), waitingGame('alice', 'game-acks')),
+    )
+    await assertSucceeds(
+      updateDoc(doc(bob, 'multiplayer_games', 'game-acks'), {
+        p2: 'bob',
+        activePlayer: 'alice',
+        status: 'active',
+        startedAt,
+        lastUpdated: startedAt,
+      }),
+    )
+
+    const base = activeGame('alice', 'bob', createdAt, startedAt, 'game-acks')
+    const ownAck = { round: 1, p1: true, p2: false }
+    const bothAcks = { round: 1, p1: true, p2: true }
+
+    await assertFails(
+      setDoc(
+        doc(alice, 'multiplayer_games', 'game-acks'),
+        {
+          ...base,
+          roundAcks: bothAcks,
+          lastUpdated: Timestamp.fromDate(new Date('2026-04-03T00:00:00Z')),
+        },
+        { merge: true },
+      ),
+    )
+    await assertSucceeds(
+      setDoc(
+        doc(alice, 'multiplayer_games', 'game-acks'),
+        {
+          ...base,
+          roundAcks: ownAck,
+          lastUpdated: Timestamp.fromDate(new Date('2026-04-03T00:00:00Z')),
+        },
+        { merge: true },
+      ),
+    )
+    await assertFails(
+      setDoc(
+        doc(alice, 'multiplayer_games', 'game-acks'),
+        {
+          ...base,
+          roundAcks: null,
+          lastUpdated: Timestamp.fromDate(new Date('2026-04-04T00:00:00Z')),
+        },
+        { merge: true },
+      ),
+    )
+    await assertSucceeds(
+      setDoc(
+        doc(bob, 'multiplayer_games', 'game-acks'),
+        {
+          ...base,
+          roundAcks: bothAcks,
+          lastUpdated: Timestamp.fromDate(new Date('2026-04-04T00:00:00Z')),
+        },
+        { merge: true },
+      ),
+    )
+    await assertSucceeds(
+      setDoc(
+        doc(alice, 'multiplayer_games', 'game-acks'),
+        {
+          ...base,
+          roundAcks: null,
+          gameState: gameState('game-acks', 9),
           lastUpdated: Timestamp.fromDate(new Date('2026-04-05T00:00:00Z')),
         },
         { merge: true },

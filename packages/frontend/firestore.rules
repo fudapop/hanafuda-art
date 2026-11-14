@@ -76,7 +76,14 @@ service cloud.firestore {
           && data.updatedAt is timestamp;
       }
 
-      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      // get of a missing doc has no resource. The owner may check their own id
+      // before the first view or like; list stays limited to existing own docs.
+      allow get: if request.auth != null && (
+        (resource == null && impressionId.matches('^' + request.auth.uid + '_.+'))
+        || (resource != null && resource.data.uid == request.auth.uid)
+      );
+
+      allow list: if request.auth != null && resource.data.uid == request.auth.uid;
 
       allow create: if isOwnerCreate()
         && isValidImpression(request.resource.data)
@@ -363,7 +370,6 @@ service cloud.firestore {
 
       function roundAcksChangeOk() {
         return !changedKeys().hasAny(['roundAcks'])
-          || request.auth.uid == resource.data.activePlayer
           || honestOwnAck()
           || isRoundAdvance();
       }
