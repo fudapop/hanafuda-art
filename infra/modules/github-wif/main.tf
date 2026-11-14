@@ -26,6 +26,8 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   }
 
   oidc {
+    # allowed_audiences stays unset. The default audience is this provider's
+    # resource name, which is what google-github-actions/auth requests.
     issuer_uri = "https://token.actions.githubusercontent.com"
   }
 
@@ -42,6 +44,7 @@ resource "google_iam_workload_identity_pool_provider" "additional" {
   workload_identity_pool_provider_id = each.key
   display_name                       = each.value.display_name
   description                        = each.value.description
+  disabled                           = each.value.disabled
   attribute_condition                = each.value.attribute_condition
   attribute_mapping = {
     "google.subject"       = "assertion.sub"
@@ -50,6 +53,7 @@ resource "google_iam_workload_identity_pool_provider" "additional" {
   }
 
   oidc {
+    # Same default audience as the primary provider: its own resource name.
     issuer_uri = "https://token.actions.githubusercontent.com"
   }
 }

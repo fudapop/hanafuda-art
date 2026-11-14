@@ -7,3 +7,7 @@ region = ""
 
 project_id        = "new-hanafuda"
 state_bucket_name = "new-hanafuda-tfstate"
+
+# Leave false until any repository-wide firestore-deploy binding is replaced
+# with attribute.ref/refs/heads/main. A disabled provider rejects tokens.
+enable_pull_request_provider = false

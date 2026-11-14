@@ -19,6 +19,17 @@ variable "region" {
   }
 }
 
+variable "enable_pull_request_provider" {
+  type        = bool
+  description = <<-EOT
+    Enable the github-pull-request Workload Identity provider.
+    Leave this false until any repository-wide firestore-deploy binding is gone.
+    That binding matches every provider in the pool. Enabling this provider while
+    it still exists lets a pull-request workflow assume firestore-deploy.
+  EOT
+  default     = false
+}
+
 variable "state_bucket_name" {
   type        = string
   description = "Globally unique name of the remote state bucket. Keep this identical to the bucket in infra/new-hanafuda/backend.tf and infra/bootstrap/backend.tf.example."

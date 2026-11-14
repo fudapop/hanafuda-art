@@ -3,8 +3,13 @@ output "state_bucket" {
   value       = google_storage_bucket.tfstate.name
 }
 
+output "gcp_project_id" {
+  description = "Value for the GitHub variable GCP_PROJECT_ID."
+  value       = var.project_id
+}
+
 output "gcp_workload_identity_provider" {
-  description = "Value for the GitHub variable GCP_WORKLOAD_IDENTITY_PROVIDER. Used by Terraform apply and by the Firestore deploy workflow."
+  description = "Value for the GitHub variable GCP_WORKLOAD_IDENTITY_PROVIDER. Used by Terraform apply, Firestore deploy, and content translation."
   value       = module.github_wif.provider_name
 }
 

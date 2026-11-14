@@ -52,7 +52,8 @@ variable "additional_providers" {
     display_name        = string
     description         = string
     attribute_condition = string
+    disabled            = optional(bool, false)
   }))
-  description = "Extra OIDC providers in the same pool, keyed by provider id. Bindings are pool-wide, so each extra provider needs its own attribute condition."
+  description = "Extra OIDC providers in the same pool, keyed by provider id. Bindings are pool-wide, so each extra provider needs its own attribute condition. A disabled provider rejects tokens."
   default     = {}
 }

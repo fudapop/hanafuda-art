@@ -11,8 +11,9 @@ module "github_wif" {
   additional_providers = {
     (local.plan_provider_id) = {
       display_name        = "GitHub OIDC pull requests"
-      description         = "Pull-request tokens from fudapop/hanafuda-art, used only by the read-only Terraform plan identity."
+      description         = "Pull-request tokens from fudapop/hanafuda-art, used only by the read-only Terraform plan identity. Disabled until enable_pull_request_provider is true."
       attribute_condition = local.plan_provider_condition
+      disabled            = !var.enable_pull_request_provider
     }
   }
 

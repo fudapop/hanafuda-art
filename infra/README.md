@@ -11,7 +11,7 @@ Terraform 1.17.2 and the Google provider 8.11.0 are pinned in each root module. 
 | Path | What it manages | Who applies it |
 | --- | --- | --- |
 | `infra/bootstrap` | State bucket, APIs, Workload Identity pool and providers, Terraform plan and apply service accounts | Andre, once, from a machine with user credentials |
-| `infra/new-hanafuda` | `firestore-deploy` service account and the monthly billing budget | GitHub Actions, from `main`, after approval |
+| `infra/new-hanafuda` | `firestore-deploy`, `hanafuda-github-translate`, and the monthly billing budget | GitHub Actions, from `main`, after approval |
 | `infra/modules/github-wif` | Workload Identity pool and GitHub OIDC providers | Called by bootstrap |
 | `infra/modules/budget` | A billing budget with alerts at 50%, 90%, and 100% of actual spend | Called by `new-hanafuda` |
 
@@ -103,9 +103,9 @@ terraform import module.github_wif.google_iam_workload_identity_pool_provider.gi
   projects/new-hanafuda/locations/global/workloadIdentityPools/github/providers/github
 ```
 
-Then `terraform plan`. You should see a new pull-request provider, the state bucket, and the Terraform service accounts. You should not see Terraform replacing the `github` pool. An in-place change to the provider description is expected. If the plan wants to recreate the pool or the `github` provider, stop.
+Then `terraform plan`. You should see a new pull-request provider with `disabled = true`, the state bucket, and the Terraform service accounts. You should not see Terraform replacing the `github` pool. An in-place change to the provider description is expected. If the plan wants to recreate the pool or the `github` provider, stop.
 
-The pull-request provider (`github-pull-request`) is new. Do not import it.
+The pull-request provider (`github-pull-request`) is new. Do not import it. Leave `enable_pull_request_provider` false for this apply.
 
 ### 6. Apply bootstrap
 
@@ -123,14 +123,17 @@ This creates:
 - The APIs the rest of this stack calls. APIs are not disabled when this Terraform is destroyed.
 - Workload Identity pool `github`.
 - Provider `github`, whose condition is `assertion.repository=='fudapop/hanafuda-art' && assertion.ref=='refs/heads/main'`. Terraform apply and Firestore deploy use this provider.
-- Provider `github-pull-request`, limited to this repository and `refs/pull/*`. Only the read-only plan identity uses it. Pull-request tokens cannot pass the `github` provider, so they cannot apply or deploy rules.
+- Provider `github-pull-request`, limited to this repository and `refs/pull/*`, created disabled. A disabled provider rejects tokens. Leave it disabled until step 9. The `github` provider still rejects every token whose ref is not `refs/heads/main`. Bindings are on the pool, so enabling `github-pull-request` while a repository-wide `firestore-deploy` binding exists would let a pull request deploy rules.
 - Service accounts `terraform-plan` and `terraform-apply`, with no keys.
 
-`terraform-plan` can read IAM and project metadata and the state object. It does not get `roles/viewer`, because that role can read Firestore and Cloud Storage data. `terraform-apply` can manage service accounts and project IAM for this stack. `roles/resourcemanager.projectIamAdmin` can grant any project role; that is what lets it attach the Firestore deploy roles, and it is not `roles/editor` or `roles/owner`.
+`terraform-plan` can read IAM, enabled APIs, project metadata, and the state object. It does not get `roles/viewer`, because that role can read Firestore and Cloud Storage data. `terraform-apply` can manage service accounts and project IAM, and it can enable APIs. `roles/resourcemanager.projectIamAdmin` can grant any project role; that is what lets it attach the Firestore and Vertex roles. `roles/serviceusage.serviceUsageAdmin` is what lets it enable `aiplatform.googleapis.com`. Neither role is `roles/editor` or `roles/owner`. The managed API resource sets `disable_on_destroy` to false.
+
+If you already applied an older bootstrap, apply this one again before the managed stack. The apply identity needs the service-usage admin role before it can enable Vertex AI.
 
 Copy the outputs:
 
 ```bash
+terraform output -raw gcp_project_id
 terraform output -raw gcp_workload_identity_provider
 terraform output -raw gcp_terraform_plan_workload_identity_provider
 terraform output -raw gcp_terraform_plan_service_account
@@ -187,13 +190,62 @@ terraform import google_service_account_iam_member.firestore_deploy_wif \
   "projects/new-hanafuda/serviceAccounts/firestore-deploy@new-hanafuda.iam.gserviceaccount.com roles/iam.workloadIdentityUser ${OLD}"
 ```
 
-The next plan replaces that member with `attribute.ref/refs/heads/main`. Main-branch deploys still match. Pull-request tokens do not. Apply that replacement. It removes the wider binding.
+The next plan replaces that member with `attribute.ref/refs/heads/main`. Main-branch deploys still match. Pull-request tokens do not. Apply that replacement before step 9. It removes the wider binding.
 
 If the binding is already `attribute.ref/refs/heads/main`, import that member instead of `OLD`.
 
-`terraform plan` in this directory should then show only the billing budget, and only when both budget variables are set. It must not show a new Firestore database, ruleset, or Auth config.
+Confirm the repository-wide member is gone:
 
-### 9. Grant billing roles when you want the budget
+```bash
+gcloud iam service-accounts get-iam-policy \
+  firestore-deploy@new-hanafuda.iam.gserviceaccount.com \
+  --project=new-hanafuda \
+  --format='value(bindings.members)'
+```
+
+On `firestore-deploy`, the output must not contain `attribute.repository/fudapop/hanafuda-art`. If that service account does not exist yet, there is no such binding. `hanafuda-github-translate` is a different account and does use that member.
+
+`terraform plan` in this directory should show `hanafuda-github-translate`, `roles/aiplatform.user`, its repository Workload Identity binding, and `aiplatform.googleapis.com`. It shows the billing budget only when both budget variables are set. It must not show a new Firestore database, ruleset, or Auth config.
+
+If `hanafuda-github-translate` already exists, import it before that apply:
+
+```bash
+terraform import google_service_account.translate \
+  projects/new-hanafuda/serviceAccounts/hanafuda-github-translate@new-hanafuda.iam.gserviceaccount.com
+
+terraform import google_project_iam_member.translate \
+  "new-hanafuda roles/aiplatform.user serviceAccount:hanafuda-github-translate@new-hanafuda.iam.gserviceaccount.com"
+```
+
+Import the Workload Identity member only when it already uses `attribute.repository/fudapop/hanafuda-art`.
+
+```bash
+NUMBER="$(gcloud projects describe new-hanafuda --format='value(projectNumber)')"
+TRANSLATE="principalSet://iam.googleapis.com/projects/${NUMBER}/locations/global/workloadIdentityPools/github/attribute.repository/fudapop/hanafuda-art"
+
+terraform import google_service_account_iam_member.translate_wif \
+  "projects/new-hanafuda/serviceAccounts/hanafuda-github-translate@new-hanafuda.iam.gserviceaccount.com roles/iam.workloadIdentityUser ${TRANSLATE}"
+```
+
+### 9. Enable the pull-request provider
+
+Do this only after step 8. In `infra/bootstrap/terraform.tfvars`:
+
+```hcl
+enable_pull_request_provider = true
+```
+
+Then, from `infra/bootstrap`:
+
+```bash
+terraform apply
+```
+
+That sets `disabled = false` on `github-pull-request`. Until this apply, pull-request tokens cannot be exchanged, including tokens that would otherwise match a leftover repository-wide binding.
+
+If `firestore-deploy` was never created, step 8 does not apply and this enable is safe on its own.
+
+### 10. Grant billing roles when you want the budget
 
 The billing account id and the amount are variables. Leave both unset and Terraform skips the budget. Set both and it creates a monthly budget on `new-hanafuda` with alerts at 50%, 90%, and 100% of actual spend. Billing administrators receive the alerts. Credits count toward the spend.
 
@@ -213,14 +265,16 @@ gcloud billing accounts add-iam-policy-binding "$BILLING" \
 
 There is no default amount. Pick one, for example `25` for $25.
 
-### 10. Set GitHub Actions variables
+### 11. Set GitHub Actions variables
 
 In `fudapop/hanafuda-art` → Settings → Secrets and variables → Actions → Variables. These are identifiers, not secrets. Do not put them in Secrets, and do not add a JSON key.
 
 | Variable | Value |
 | --- | --- |
+| `GCP_PROJECT_ID` | Bootstrap output `gcp_project_id`. `new-hanafuda` |
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | Bootstrap output `gcp_workload_identity_provider`. Shape: `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github/providers/github` |
 | `GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT` | `firestore-deploy@new-hanafuda.iam.gserviceaccount.com` |
+| `GCP_TRANSLATE_SERVICE_ACCOUNT` | `hanafuda-github-translate@new-hanafuda.iam.gserviceaccount.com` |
 | `GCP_TERRAFORM_PLAN_WORKLOAD_IDENTITY_PROVIDER` | Bootstrap output `gcp_terraform_plan_workload_identity_provider`. The provider id is `github-pull-request` |
 | `GCP_TERRAFORM_PLAN_SERVICE_ACCOUNT` | `terraform-plan@new-hanafuda.iam.gserviceaccount.com` |
 | `GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT` | `terraform-apply@new-hanafuda.iam.gserviceaccount.com` |
@@ -228,20 +282,24 @@ In `fudapop/hanafuda-art` → Settings → Secrets and variables → Actions →
 | `TF_VAR_billing_account_id` | Optional. The billing account id. Set together with the amount |
 | `TF_VAR_budget_amount` | Optional. Whole US dollars, such as `25` |
 
-`GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT` are the names the Firestore deploy workflow reads. The same provider variable is what Terraform apply uses. Plan uses the pull-request provider, because the `github` provider rejects every token whose ref is not `refs/heads/main`.
+`GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT` are the names the Firestore deploy workflow reads. The same provider variable is what Terraform apply and content translation use. Plan uses the pull-request provider, because the `github` provider rejects every token whose ref is not `refs/heads/main`.
 
-`infra/new-hanafuda` prints the two Firestore values again:
+`GCP_PROJECT_ID` and `GCP_TRANSLATE_SERVICE_ACCOUNT` are for the content translation workflow. That workflow calls Vertex AI Gemini as `hanafuda-github-translate`, which has `roles/aiplatform.user` and a Workload Identity binding of `attribute.repository/fudapop/hanafuda-art` on the `github` pool. The workflow currently reads the email from `GCP_SERVICE_ACCOUNT`. Set `GCP_SERVICE_ACCOUNT` to the same address as `GCP_TRANSLATE_SERVICE_ACCOUNT`.
+
+`infra/new-hanafuda` prints the same identifiers after that stack has been applied:
 
 ```bash
+terraform output -raw gcp_project_id
 terraform output -raw gcp_workload_identity_provider
 terraform output -raw gcp_firestore_deploy_service_account
+terraform output -raw gcp_translate_service_account
 ```
 
-The service account output appears after that stack has been applied. The email is the value in the table above either way.
+The service account emails are the values in the table above either way. The translation email exists only after `infra/new-hanafuda` has been applied.
 
 The repository is public. A plan comment includes the billing account id and the amount once those variables are set. Do not put secrets in `TF_VAR_` variables.
 
-### 11. Merge, then approve the apply
+### 12. Merge, then approve the apply
 
 Merging does not apply bootstrap. The apply workflow runs on `main` when `infra/` changes, waits for the `terraform` environment, and applies `infra/new-hanafuda`.
 

@@ -31,16 +31,20 @@ locals {
     "roles/iam.securityReviewer",
     "roles/iam.serviceAccountViewer",
     "roles/serviceusage.serviceUsageConsumer",
+    "roles/serviceusage.serviceUsageViewer",
   ])
 
   # projectIamAdmin can grant any project role, including owner. The managed
-  # stack needs it to attach the three Firestore deploy roles. It is not
-  # roles/editor and it is not roles/owner.
+  # stack needs it to attach the Firestore deploy roles and roles/aiplatform.user.
+  # serviceUsageAdmin lets that stack enable aiplatform.googleapis.com. It can
+  # also disable APIs; the managed service sets disable_on_destroy to false.
+  # Neither role is roles/editor or roles/owner.
   terraform_apply_roles = toset([
     "roles/browser",
     "roles/iam.securityReviewer",
     "roles/iam.serviceAccountAdmin",
     "roles/resourcemanager.projectIamAdmin",
+    "roles/serviceusage.serviceUsageAdmin",
     "roles/serviceusage.serviceUsageConsumer",
   ])
 }
