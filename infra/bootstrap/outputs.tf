@@ -9,7 +9,7 @@ output "gcp_project_id" {
 }
 
 output "gcp_workload_identity_provider" {
-  description = "Value for the GitHub variable GCP_WORKLOAD_IDENTITY_PROVIDER. Used by Terraform apply, Firestore deploy, and content translation."
+  description = "Value for the GitHub variable GCP_WORKLOAD_IDENTITY_PROVIDER. Used by Terraform apply and Firestore deploy. The translation workflow in pull request 90 uses it too, once that workflow is merged."
   value       = module.github_wif.provider_name
 }
 

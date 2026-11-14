@@ -1,5 +1,6 @@
-# Vertex AI Gemini for the content translation workflow. This stack does not
-# call the model and does not manage the translated files.
+# Vertex AI identity for the content translation workflow proposed in pull
+# request 90. This stack does not add that workflow, call the model, or
+# change the Deno scripts that still use GEMINI_API_KEY.
 resource "google_project_service" "aiplatform" {
   project = var.project_id
   service = "aiplatform.googleapis.com"

@@ -282,9 +282,9 @@ In `fudapop/hanafuda-art` → Settings → Secrets and variables → Actions →
 | `TF_VAR_billing_account_id` | Optional. The billing account id. Set together with the amount |
 | `TF_VAR_budget_amount` | Optional. Whole US dollars, such as `25` |
 
-`GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT` are the names the Firestore deploy workflow reads. The same provider variable is what Terraform apply and content translation use. Plan uses the pull-request provider, because the `github` provider rejects every token whose ref is not `refs/heads/main`.
+`GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT` are the names the Firestore deploy workflow reads. Terraform apply uses the same provider variable. Plan uses the pull-request provider, because the `github` provider rejects every token whose ref is not `refs/heads/main`.
 
-`GCP_PROJECT_ID` and `GCP_TRANSLATE_SERVICE_ACCOUNT` are for the content translation workflow. That workflow calls Vertex AI Gemini as `hanafuda-github-translate`, which has `roles/aiplatform.user` and a Workload Identity binding of `attribute.repository/fudapop/hanafuda-art` on the `github` pool. The workflow currently reads the email from `GCP_SERVICE_ACCOUNT`. Set `GCP_SERVICE_ACCOUNT` to the same address as `GCP_TRANSLATE_SERVICE_ACCOUNT`.
+`GCP_PROJECT_ID` and `GCP_TRANSLATE_SERVICE_ACCOUNT` are the identity for content translation. This pull request does not add that workflow, and the Deno scripts in this checkout still call Gemini with `GEMINI_API_KEY`. The workflow that will use this service account is [pull request #90](https://github.com/fudapop/hanafuda-art/pull/90). It calls Vertex AI as `hanafuda-github-translate` (`roles/aiplatform.user`, bound to `attribute.repository/fudapop/hanafuda-art` on the `github` pool). That workflow reads the email from `GCP_SERVICE_ACCOUNT`, so set `GCP_SERVICE_ACCOUNT` to the same address as `GCP_TRANSLATE_SERVICE_ACCOUNT` when #90 is merged. Until then, these two variables do not change how translation runs.
 
 `infra/new-hanafuda` prints the same identifiers after that stack has been applied:
 
