@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import type { NuxtConfig } from 'nuxt/schema'
+import { appCheckDebugToken } from './app/utils/appCheckDebug'
 
 // Nuxt schema inlines Vite's UserConfig, so it does not see Vite's Rollup
 // module augmentation (`viteVersion` on PluginContextMeta). @tailwindcss/vite
@@ -330,7 +331,9 @@ export default defineNuxtConfig({
   vuefire: {
     auth: true,
     appCheck: {
-      debug: process.env.APPCHECK_DEBUG_TOKEN,
+      // VueFire copies this value into public runtime config. Only a dev build
+      // may receive the token; production must get false so the bundle cannot ship it.
+      debug: appCheckDebugToken(process.env.NODE_ENV, process.env.APPCHECK_DEBUG_TOKEN),
       isTokenAutoRefreshEnabled: true,
       provider: 'ReCaptchaV3',
       key: process.env.RECAPTCHA_KEY!,
