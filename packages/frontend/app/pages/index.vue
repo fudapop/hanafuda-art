@@ -18,37 +18,37 @@
       </template>
     </GameBoard>
 
-      <!-- KOI-KOI SHOUT -->
-      <Shout
-        v-if="!!shoutTimeout && getCaller !== null"
-        :called-by="getCaller!"
-        msg="KOI KOI"
+    <!-- KOI-KOI SHOUT -->
+    <Shout
+      v-if="!!shoutTimeout && getCaller !== null"
+      :called-by="getCaller!"
+      msg="KOI KOI"
+    />
+
+    <!-- ACTION LOG -->
+    <EventLog />
+
+    <ResultsModal :show="showModal">
+      <FinalResults
+        v-if="gameOver"
+        :results="ds.roundHistory"
+        @close="handleClose"
       />
-
-      <!-- ACTION LOG -->
-      <EventLog />
-
-      <ResultsModal :show="showModal">
-        <FinalResults
-          v-if="gameOver"
-          :results="ds.roundHistory"
-          @close="handleClose"
-        />
-        <RoundResults
-          v-else
-          :show-ack-controls="roundOver && !gameOver"
-          :waiting-for-opponent="waitingForRoundAck"
-          @next="handleNext"
-        />
-      </ResultsModal>
-
-      <!-- Opponent Disconnected Modal -->
-      <OpponentDisconnectedModal
-        :open="showDisconnectModal"
-        :opponent-message="opponentPresence.message"
-        :is-processing="isProcessingForfeit"
-        @cancel-game="handleCancelGame"
+      <RoundResults
+        v-else
+        :show-ack-controls="roundOver && !gameOver"
+        :waiting-for-opponent="waitingForRoundAck"
+        @next="handleNext"
       />
+    </ResultsModal>
+
+    <!-- Opponent Disconnected Modal -->
+    <OpponentDisconnectedModal
+      :open="showDisconnectModal"
+      :opponent-message="opponentPresence.message"
+      :is-processing="isProcessingForfeit"
+      @cancel-game="handleCancelGame"
+    />
   </GameLayout>
 </template>
 
@@ -96,7 +96,7 @@ const {
 
 const { handsEmpty } = storeToRefs(cs)
 const { players, activePlayer } = storeToRefs(ps)
-const { roundOver, gameOver, turnCounter } = storeToRefs(ds)
+const { roundOver, gameOver, turnCounter, exhaustedDraw } = storeToRefs(ds)
 
 // Derived flag: whether the local player's hand should be interactive
 const canInteractLocalHand = computed(() => {
@@ -133,11 +133,7 @@ const {
 } = useStoreManager()
 
 // Opponent turn replay for multiplayer
-const {
-  isReplaying,
-  shouldReplayTurn,
-  replayOpponentTurn,
-} = useOpponentReplay()
+const { isReplaying, shouldReplayTurn, replayOpponentTurn } = useOpponentReplay()
 
 const showModal = ref(false)
 const showLoader = ref(false)
@@ -359,7 +355,6 @@ const handleCancelGame = async () => {
     )
 
     if (success) {
-
       // Return to start screen — no stats, no results modal
       showDisconnectModal.value = false
       showModal.value = false
@@ -467,10 +462,10 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
       waitingForRoundAck.value = false
       await advanceToNextRound()
     } else if (
-      game.roundAcks
-      && game.roundAcks[opponentKey.value]
-      && !game.roundAcks[selfKey.value]
-      && waitingForRoundAck.value
+      game.roundAcks &&
+      game.roundAcks[opponentKey.value] &&
+      !game.roundAcks[selfKey.value] &&
+      waitingForRoundAck.value
     ) {
       // Race condition: both players clicked Next simultaneously.
       // Our ack was overwritten by the opponent's push. Re-push with both acks merged.
@@ -498,10 +493,7 @@ const handleRemoteUpdate = async (game: MultiplayerGame) => {
 const initializeNewMultiplayerGame = async () => {
   finalCleanupDone.value = false
 
-  await initMultiplayerGame(
-    { resetAllStores, startRound },
-    handleRemoteUpdate,
-  )
+  await initMultiplayerGame({ resetAllStores, startRound }, handleRemoteUpdate)
 }
 
 const startRound = async () => {
@@ -616,10 +608,20 @@ onMounted(() => {
     }
   })
 
+  watch(exhaustedDraw, async (exhausted) => {
+    // The engine ends the round when both hands are empty. Open the draw
+    // result and sync it. Replay reconciles from the remote snapshot instead.
+    if (!exhausted || isReplaying.value) return
+    showModal.value = true
+    await handleStop()
+  })
+
   watch(turnCounter, () => {
-    // Handle an exhaustive draw condition
-    if (turnCounter.value !== 9) return
-    if (isReplaying.value || ds.roundOver) return // Suppress during replay or deserialization
+    // Backup for a round that is still going after both hands are empty.
+    // Turn 9 is the first select after 8 cards each. Continuing used to drain
+    // the remaining deck and throw on the next draw, around turn 13.
+    if (turnCounter.value < 9) return
+    if (isReplaying.value || ds.roundOver) return
     const drawConditions = [
       handsEmpty.value,
       ds.checkCurrentPhase('select'),
@@ -631,8 +633,7 @@ onMounted(() => {
       // @ts-expect-error: CompletionEvent 'player' should not be null
       handleCompletion({ player: null, score: 0 })
       callStop()
-      ds.endRound()
-      // Stats are automatically tracked by useStatsTracking composable
+      ds.endExhaustedRound()
     }
   })
 
@@ -796,7 +797,6 @@ onMounted(() => {
         startRound()
       }
     } else {
-
       if (isMultiplayerGame.value) {
         // Multiplayer leave: the game was already saved by handleMultiplayerLeave.
         // Just clean up local subscriptions and state without touching Firestore
