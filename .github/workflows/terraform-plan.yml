@@ -113,7 +113,7 @@ jobs:
         working-directory: infra/new-hanafuda
         run: |
           set +e
-          terraform init -input=false -no-color > "$RUNNER_TEMP/init.txt" 2>&1
+          terraform init -input=false -lock=false -no-color > "$RUNNER_TEMP/init.txt" 2>&1
           code=$?
           set -e
           if [ "$code" -eq 0 ]; then
