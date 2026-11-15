@@ -11,6 +11,7 @@
   "nodeModulesDir": "auto",
   "tasks": {
     "upload-to-static": "deno run --allow-read --allow-write --allow-env --allow-net --allow-run ./upload-to-static.ts",
+    "upload-to-gcs": "deno run --allow-read --allow-env --allow-net --allow-run ./upload-to-gcs.ts",
     "translate-content": "export $(cat ../.env | grep GEMINI_API_KEY | tr -d ' \t\r\n') && deno run --allow-read --allow-write --allow-env --allow-net --allow-run --allow-sys ./translate-content.ts",
     "translate-json": "export $(cat ../.env | grep GEMINI_API_KEY | tr -d ' \t\r\n') && deno run --allow-read --allow-write --allow-env --allow-net --allow-run --allow-sys ./translate-json.ts",
     "release": "node --experimental-strip-types ./release-calver.ts",

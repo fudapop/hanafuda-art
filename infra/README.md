@@ -11,9 +11,11 @@ Terraform 1.17.2 and the Google provider 8.11.0 are pinned in each root module. 
 | Path | What it manages | Who applies it |
 | --- | --- | --- |
 | `infra/bootstrap` | State bucket, APIs, Workload Identity pool and providers, Terraform plan and apply service accounts | Andre, once, from a machine with user credentials |
-| `infra/new-hanafuda` | `firestore-deploy`, `hanafuda-github-translate`, and the monthly billing budget | GitHub Actions, from `main`, after approval |
+| `infra/new-hanafuda` | `firestore-deploy`, `hanafuda-github-translate`, the static asset bucket, imgproxy, and the monthly billing budget | GitHub Actions, from `main`, after approval |
 | `infra/modules/github-wif` | Workload Identity pool and GitHub OIDC providers | Called by bootstrap |
 | `infra/modules/budget` | A billing budget with alerts at 50%, 90%, and 100% of actual spend | Called by `new-hanafuda` |
+| `infra/modules/static-bucket` | Public bucket `fudapop-static`, its CORS policy, and the uploader service account | Called by `new-hanafuda` |
+| `infra/modules/imgproxy` | Docker Hub pull-through repository and Cloud Run imgproxy | Called by `new-hanafuda` |
 
 `infra/bootstrap` stores its state in `gs://new-hanafuda-tfstate` with prefix `bootstrap`. That bucket already exists, so `backend.tf` is in git. `backend.tf.example` is the same block, for a first apply in a project where the bucket does not exist yet.
 
@@ -22,7 +24,7 @@ Terraform 1.17.2 and the Google provider 8.11.0 are pinned in each root module. 
 - This Terraform does not create the Google Cloud project and does not attach a billing account.
 - Firestore rules and indexes stay in `packages/frontend` and deploy with `firebase deploy`, the workflow from the Firestore rules pull request. Terraform only creates the identity that workflow assumes.
 - Firebase Auth email templates are not managed here. Do not import or edit Identity Platform config to make Terraform quiet.
-- There is no module yet for the card-art bucket or for Cloud Run.
+- Cloudflare DNS for `img.fudapop.com` and `assets.fudapop.com` is not in this Terraform. The manual steps are under Static assets. The game still requests Supabase URLs.
 
 ## One-time setup
 
@@ -56,7 +58,7 @@ cp terraform.tfvars.example terraform.tfvars
 
 Edit `region` in `terraform.tfvars`. Leave the project id as `new-hanafuda` unless that project is wrong. `terraform.tfvars` is gitignored.
 
-Use the same region later for the GitHub variable `TF_VAR_region`. Nothing in `infra/new-hanafuda` is regional yet, so that variable can stay empty until you need it.
+Use the same region later for the GitHub variable `TF_VAR_region`. When that variable is empty, the static bucket, Artifact Registry, and imgproxy are created in `us-central1`. Set the variable before the first apply of those resources if the state bucket is in `us-east1` or `us-west1`. Cloud Run cannot use a multi-region location.
 
 ### 3. Create the GitHub environment before merging
 
@@ -130,8 +132,9 @@ This creates:
 - Provider `github-pull-request`, limited to this repository and `refs/pull/*`, created disabled. It also rejects tokens whose subject is a GitHub environment. That rejection stays as a second safeguard after the provider is enabled. A disabled provider rejects tokens. Leave it disabled until step 9. Bindings on this pool are visible to every provider in it, so enabling `github-pull-request` while a repository-wide `firestore-deploy` binding exists would let a pull request deploy rules.
 - Workload Identity pool `github-terraform-apply` and provider `github`. Its condition requires this repository, `refs/heads/main`, subject `repo:fudapop/hanafuda-art:environment:terraform`, and `environment` claim `terraform`. Only `terraform-apply` is bound to this pool.
 - Service accounts `terraform-plan` and `terraform-apply`, with no keys.
+- Custom roles `terraformPlanStorage` and `terraformApplyStorage`. They read and update bucket metadata. They do not grant object read. Project roles for Cloud Run and Artifact Registry are on the same two service accounts. `run.googleapis.com` and `artifactregistry.googleapis.com` are enabled here. Re-apply bootstrap after pulling this, or the static-asset plan fails with 403 or with the API disabled.
 
-`terraform-plan` can read IAM, enabled APIs, project metadata, and the state object. It can also create and delete objects whose names end in `.tflock`, because `terraform init` locks state and `-lock=false` only skips the lock during a backend migration. It cannot replace the state file. It does not get `roles/viewer`, because that role can read Firestore and Cloud Storage data. Re-apply bootstrap after pulling this change or plan init fails with 403 on the lock object. `terraform-apply` can manage service accounts and project IAM, and it can enable APIs. `roles/resourcemanager.projectIamAdmin` can grant any project role; that is what lets it attach the Firestore and Vertex roles. `roles/serviceusage.serviceUsageAdmin` is what lets it enable `aiplatform.googleapis.com`. Neither role is `roles/editor` or `roles/owner`. The managed API resource sets `disable_on_destroy` to false.
+`terraform-plan` can read IAM, enabled APIs, project metadata, and the state object. It can also create and delete objects whose names end in `.tflock`, because `terraform init` locks state and `-lock=false` only skips the lock during a backend migration. It cannot replace the state file. It does not get `roles/viewer`, because that role can read Firestore and Cloud Storage data. It can read Cloud Run services and Artifact Registry repositories. The custom role `terraformPlanStorage` lets it read bucket metadata, not object bytes. Re-apply bootstrap after pulling this change or plan init fails with 403 on the lock object, and the static-asset plan fails with 403 on the bucket. `terraform-apply` can manage service accounts and project IAM, and it can enable APIs. `roles/resourcemanager.projectIamAdmin` can grant any project role; that is what lets it attach the Firestore and Vertex roles. `roles/serviceusage.serviceUsageAdmin` is what lets it enable `aiplatform.googleapis.com`. `run.googleapis.com` and `artifactregistry.googleapis.com` are enabled in this bootstrap apply, next to `storage.googleapis.com`, so the plan can read Cloud Run and Artifact Registry. `roles/run.admin` creates the imgproxy service. `roles/iam.serviceAccountAdmin` already includes `iam.serviceAccounts.actAs`, which that create requires. `roles/artifactregistry.repoAdmin` creates the Docker Hub remote repository. The custom role `terraformApplyStorage` creates buckets and sets bucket IAM. It does not grant object read. None of these roles is `roles/editor` or `roles/owner`. The managed API resource sets `disable_on_destroy` to false.
 
 If you already applied an older bootstrap, apply this one again before the managed stack. The apply identity needs the service-usage admin role before it can enable Vertex AI.
 
@@ -288,7 +291,8 @@ In `fudapop/hanafuda-art` → Settings → Secrets and variables → Actions →
 | `GCP_TERRAFORM_PLAN_WORKLOAD_IDENTITY_PROVIDER` | Bootstrap output `gcp_terraform_plan_workload_identity_provider`. The provider id is `github-pull-request` |
 | `GCP_TERRAFORM_PLAN_SERVICE_ACCOUNT` | `terraform-plan@new-hanafuda.iam.gserviceaccount.com` |
 | `GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT` | `terraform-apply@new-hanafuda.iam.gserviceaccount.com` |
-| `TF_VAR_region` | Optional. The region you chose in step 2, once you want it recorded for later regional resources |
+| `TF_VAR_region` | Optional. The region from step 2. Empty means the static bucket, Artifact Registry, and imgproxy use `us-central1`. Set this before the first apply of those resources if you want another region. Cloud Run cannot use a multi-region location |
+| `TF_VAR_static_cors_extra_origins` | Optional. Comma-separated extra browser origins for the static bucket, such as `https://abc123.project.pages.dev`. Empty adds none. GCS does not accept a wildcard inside a hostname |
 | `TF_VAR_billing_account_id` | Optional. The billing account id. Set together with the amount |
 | `TF_VAR_budget_amount` | Optional. Whole US dollars, such as `25` |
 
@@ -322,6 +326,234 @@ Fork pull requests do not get the plan identity. A fork can still edit the workf
 Do not change these workflows to `pull_request_target`. That event's token carries `refs/heads/main`, so it would pass the apply provider.
 
 The plan locks state only long enough to read it, and both `terraform init` and `terraform plan` wait up to five minutes if another job holds the lock. The plan identity can write only `*.tflock` objects. The apply identity writes the state, and its init and apply wait the same five minutes.
+
+## Static assets
+
+This adds a public bucket and imgproxy. It does not change the URLs the game requests. Those stay on Supabase until a later change, after `img.fudapop.com` and `assets.fudapop.com` answer. Workload Identity conditions are unchanged. There is no Cloudflare provider in this repository, so DNS stays a manual step.
+
+Object keys match the Supabase bucket `static` on project `ymoriyakbittfgocvxbw`: `cards/`, `avatars/`, `audio/`, `assets/`, and anything else already stored there.
+
+| Resource | Name | Notes |
+| --- | --- | --- |
+| Bucket | `fudapop-static` | Uniform access. Public object get via `roles/storage.legacyObjectReader` for `allUsers`. That role is object get only, so the public cannot list keys. `public_access_prevention` stays `inherited`. Bucket names are global. If `fudapop-static` is taken, change `static_bucket_name` before the first apply. |
+| Uploader | `static-uploader@new-hanafuda.iam.gserviceaccount.com` | Object admin on that bucket, plus bucket metadata get so rclone can open it. No JSON key. |
+| imgproxy runtime | `imgproxy@new-hanafuda.iam.gserviceaccount.com` | Object get on that bucket only. No JSON key. Cloud Run uses Application Default Credentials. `IMGPROXY_GCS_KEY` is unset. |
+| Repository | `dockerhub` | Artifact Registry remote repository. Upstream is public Docker Hub. No Docker Hub credentials are stored. |
+| Cloud Run | `imgproxy` | Image `darthsim/imgproxy:v4.0.24`, pulled as `REGION-docker.pkg.dev/new-hanafuda/dockerhub/darthsim/imgproxy:v4.0.24`. Scales to zero, at most 10 instances, one request at a time, 1 CPU and 1 GiB. |
+
+`storage.googleapis.com`, `run.googleapis.com`, and `artifactregistry.googleapis.com` are enabled in bootstrap, with `disable_on_destroy` left false. The managed stack does not enable them again. Vertex AI stays the API that `infra/new-hanafuda` enables itself.
+
+imgproxy accepts only the presets `card` (`rs:fit:120:0`) and `card2x` (`rs:fit:240:0`). `fit` with height `0` keeps the aspect ratio and does not enlarge, which is the Supabase transform `width=120&resize=contain`. Sources are limited to `gs://fudapop-static/`. `IMGPROXY_TTL` is 31536000 seconds. WebP and AVIF detection are on (`IMGPROXY_AUTO_WEBP` and `IMGPROXY_AUTO_AVIF`; the older names `IMGPROXY_ENABLE_WEBP_DETECTION` and `IMGPROXY_ENABLE_AVIF_DETECTION` are aliases of those). Key and salt are unset, so URLs are unsigned. The first path segment can be any word. Examples use `insecure`. A source larger than 20 MiB is rejected.
+
+The default Cloud Run URL is public because `invoker_iam_disabled` is true. That does not add an `allUsers` Cloud Run binding, which domain restricted sharing often blocks. The restrictions on the proxy are the preset list and the bucket allowlist.
+
+### Apply order
+
+Do this when bootstrap has already been applied from an older revision. A first-time bootstrap apply already includes the new roles.
+
+1. From `infra/bootstrap`, on a machine with user credentials:
+
+```bash
+terraform init -input=false
+terraform plan
+terraform apply
+```
+
+The plan enables `run.googleapis.com` and `artifactregistry.googleapis.com`, and it adds the Cloud Run and Artifact Registry roles plus the two custom storage roles. It must not recreate the Workload Identity pools or providers. An in-place change that is not one of those roles or API enables is a reason to stop.
+
+2. Set `TF_VAR_region` in GitHub if the static resources should not land in `us-central1`. Changing the region after the first apply replaces Cloud Run and the repository. The bucket location changes only by replacing the bucket, and `prevent_destroy` blocks that.
+
+3. Merge, then approve the `terraform` environment. CI applies `infra/new-hanafuda`. The plan before step 1 fails with 403, because the plan identity cannot read the new resources yet. `terraform fmt` and `terraform validate` still pass.
+
+4. If the apply fails while pulling `darthsim/imgproxy`, run it again. The Cloud Run service agent binding can take a minute to propagate, and an anonymous Docker Hub pull can be rate-limited. This stack does not store Docker Hub credentials.
+
+5. If the `allUsers` binding on the bucket fails, the organization is blocking public objects. `constraints/iam.allowedPolicyMemberDomains` has to allow `allUsers` for this project, and `constraints/storage.publicAccessPrevention` has to stay unset or unenforced. imgproxy can still read the bucket with its own service account. `assets.fudapop.com` cannot serve objects until the public binding exists.
+
+6. Copy objects, then configure DNS. Both are below. The game keeps using Supabase until a later pull request.
+
+After the apply, from `infra/new-hanafuda`:
+
+```bash
+terraform output static_region
+terraform output static_bucket_url
+terraform output static_uploader_service_account
+terraform output imgproxy_uri
+terraform output imgproxy_service_account
+```
+
+`imgproxy_uri` looks like `https://imgproxy-HASH.REGION.run.app`. The Cloudflare steps use the hostname with no scheme.
+
+### Copy from Supabase
+
+rclone copies keys unchanged from `supabase:static` to `gcs:fudapop-static`. `rclone copy` does not delete destination objects that are absent from the source.
+
+Credentials:
+
+| Side | What | Where it lives |
+| --- | --- | --- |
+| Supabase | S3 access key from Storage → S3 configuration. The secret is shown once and can read and write every bucket in the project. Copy the region from that same page. | The operator's rclone config, mode `600`, outside git. `scripts/rclone/rclone.conf` is gitignored. Revoke the key after the copy. Do not put it in GitHub Secrets for this change. |
+| GCS | Application Default Credentials impersonating `static-uploader`. No JSON key. | `gcloud auth application-default login` on the machine that runs rclone. |
+
+The example config is `scripts/rclone/static-assets.conf.example`. Copy it and fill in the Supabase key, secret, and region:
+
+```bash
+install -m 600 /dev/null ~/.config/rclone/rclone.conf
+# paste the example, then edit the three YOUR_* values
+```
+
+Grant your user permission to impersonate the uploader. Terraform does not know your email, so this stays a manual binding. `USER_EMAIL` is the address you use with `gcloud auth login`.
+
+```bash
+gcloud auth login
+gcloud auth application-default login
+gcloud auth application-default set-quota-project new-hanafuda
+
+gcloud iam service-accounts add-iam-policy-binding \
+  static-uploader@new-hanafuda.iam.gserviceaccount.com \
+  --project=new-hanafuda \
+  --member="user:USER_EMAIL" \
+  --role="roles/iam.serviceAccountTokenCreator"
+```
+
+Confirm both remotes, then copy and compare:
+
+```bash
+rclone lsd supabase:
+rclone lsd gcs:
+
+rclone copy supabase:static gcs:fudapop-static \
+  --checksum \
+  --fast-list \
+  --transfers 8 \
+  --progress
+
+rclone check supabase:static gcs:fudapop-static --checksum
+```
+
+`lsd` on `supabase:` lists buckets. You want a bucket named `static`. A signature error means the endpoint, region, or key does not match the dashboard. The endpoint in the example is `https://ymoriyakbittfgocvxbw.storage.supabase.co/storage/v1/s3`, which is the direct storage host. `force_path_style = true` is required.
+
+The live game still reads Supabase. A new file has to land in both places until the URL switch. Use `scripts/upload-to-static.ts` for Supabase and the command below for GCS, or upload to Supabase and run `rclone copy` again. `rclone copy` skips objects that are already the same.
+
+### New uploads to GCS
+
+From the repository root, with the same Application Default Credentials:
+
+```bash
+export GCS_IMPERSONATE_SERVICE_ACCOUNT=static-uploader@new-hanafuda.iam.gserviceaccount.com
+
+deno task --config scripts/deno.json upload-to-gcs -- \
+  --dir ./path/to/images \
+  --path cards/cherry-version
+```
+
+`--path` is the key prefix. The script uploads one directory of images and does not descend into subdirectories, same as the Supabase script. Supported types are png, jpeg, gif, webp, and avif. Add `--upsert` to overwrite an object that already exists. Without it, an existing object is left in place. Audio files are not handled by this script. rclone copies those.
+
+The script shells out to `gcloud auth application-default print-access-token`. It does not read `.env` and it does not take a key path. `GCS_STATIC_BUCKET` overrides the bucket name. The default is `fudapop-static`.
+
+`pnpm test:upload-gcs` checks key and content-type helpers. It does not call Google.
+
+### DNS
+
+Do this after the apply, in the Cloudflare account that serves `fudapop.com`. Leave the records proxied (orange cloud) and set SSL/TLS mode to Full (strict).
+
+Cloud Run rejects a request whose `Host` is `img.fudapop.com` unless that hostname is a mapped domain. A proxied CNAME forwards the browser `Host`. Something has to rewrite `Host` to the Cloud Run hostname from `imgproxy_uri`.
+
+**img.fudapop.com**, when the Cloudflare plan can override the Host header with an Origin Rule:
+
+1. DNS CNAME `img` to the `imgproxy_uri` hostname, proxied.
+2. Origin Rule: if the hostname equals `img.fudapop.com`, set the Host header to that same Cloud Run hostname, and set the origin to it.
+3. Cache Rule for `img.fudapop.com`: cache successful responses, respect the origin `Cache-Control` (`max-age=31536000`), and include the `Accept` header in the cache key. WebP and AVIF detection varies on `Accept`. A cache key that ignores `Accept` serves the wrong format.
+
+When the plan cannot override Host, use a Worker on the route `img.fudapop.com/*` instead of the Origin Rule. The CNAME still has to exist and be proxied. Replace `CLOUD_RUN_HOST` with the hostname from `imgproxy_uri`.
+
+```js
+const ORIGIN = 'https://CLOUD_RUN_HOST'
+
+export default {
+  async fetch(request) {
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      return new Response('Method not allowed', { status: 405 })
+    }
+    const incoming = new URL(request.url)
+    const cacheUrl = new URL(incoming.pathname + incoming.search, ORIGIN)
+    cacheUrl.searchParams.set('__accept', request.headers.get('Accept') || '')
+    const cacheKey = new Request(cacheUrl.toString(), { method: 'GET' })
+    const cache = caches.default
+    const cached = await cache.match(cacheKey)
+    if (cached) {
+      return cached
+    }
+    const headers = new Headers(request.headers)
+    headers.set('Host', cacheUrl.host)
+    const response = await fetch(new URL(incoming.pathname + incoming.search, ORIGIN), {
+      method: request.method,
+      headers,
+    })
+    if (response.ok && request.method === 'GET') {
+      const stored = new Response(response.body, response)
+      stored.headers.set('Cache-Control', 'public, max-age=31536000')
+      await cache.put(cacheKey, stored.clone())
+      return stored
+    }
+    return response
+  },
+}
+```
+
+**assets.fudapop.com** serves the object key as the URL path. `https://assets.fudapop.com/avatars/flat-crane.webp` is object `avatars/flat-crane.webp`.
+
+Origin Rule path:
+
+1. DNS CNAME `assets` to `fudapop-static.storage.googleapis.com`, proxied.
+2. Origin Rule: Host header `fudapop-static.storage.googleapis.com`.
+3. Cache Rule: cache successful responses and respect the object's `Cache-Control`. The upload script sets `public, max-age=31536000`.
+
+Worker path, route `assets.fudapop.com/*`, if Host override is unavailable:
+
+```js
+export default {
+  async fetch(request) {
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      return new Response('Method not allowed', { status: 405 })
+    }
+    const incoming = new URL(request.url)
+    const origin = new URL(`https://storage.googleapis.com/fudapop-static${incoming.pathname}${incoming.search}`)
+    const headers = new Headers(request.headers)
+    headers.set('Host', 'storage.googleapis.com')
+    return fetch(origin, { method: request.method, headers })
+  },
+}
+```
+
+The bucket CORS policy answers the browser `Origin` for `https://newhanafuda.art`, `https://www.newhanafuda.art`, `https://play.fudapop.com`, and local dev (`http://localhost:3000`, `http://127.0.0.1:3000`, `http://127.0.0.1:8888`). Add each Cloudflare Pages preview origin in `TF_VAR_static_cors_extra_origins` and apply again. A pattern such as `https://*.pages.dev` is rejected by GCS.
+
+Two other ways to attach the hostnames, and why they are not the default:
+
+- Cloud Run domain mapping (`gcloud run domain-mappings create --service=imgproxy --domain=img.fudapop.com --region=REGION`) plus a DNS-only CNAME to `ghs.googlehosted.com`. Google issues the certificate. The record has to stay grey-cloud, so Cloudflare does not proxy or cache. That misses the reason for putting the host on Cloudflare.
+- A global external Application Load Balancer, a serverless NEG, and a backend bucket. That is a billed Google front end. It is not in this Terraform. Use it when you want the hostname on a Google certificate and Cloudflare in front of a stable IP.
+
+### URLs for the later app change
+
+Leave these unused until the hosts answer. Card faces go through imgproxy. Omit an output extension so Accept detection can choose AVIF or WebP. The `.webp` in the path is the object name, not an imgproxy format suffix.
+
+```text
+https://img.fudapop.com/insecure/card/plain/gs://fudapop-static/cards/{design}/{card}.webp
+https://img.fudapop.com/insecure/card2x/plain/gs://fudapop-static/cards/{design}/{card}.webp
+https://assets.fudapop.com/avatars/{name}.webp
+https://assets.fudapop.com/audio/...
+https://assets.fudapop.com/assets/...
+```
+
+Today the game builds card faces as `{supabaseUrl}/storage/v1/render/image/public/static/cards/{design}/{card}.webp?width=120&resize=contain`, and other files as `{supabaseUrl}/storage/v1/object/public/static/{key}`.
+
+Check one object after DNS, before any app change:
+
+```bash
+curl -sI "https://img.fudapop.com/insecure/card/plain/gs://fudapop-static/cards/DESIGN/CARD.webp"
+curl -sI "https://assets.fudapop.com/assets/logo-title.webp"
+```
+
+A 200 from imgproxy with `cache-control: max-age=31536000` means the preset and the bucket read worked. The Supabase URLs should still be what the running site requests.
 
 ## Local checks
 

@@ -4,9 +4,14 @@
 
 project_id = "new-hanafuda"
 
-# TODO: Same region as infra/bootstrap. Cloud Storage Always Free covers only
-# us-central1, us-east1, and us-west1. Leave empty until a region is chosen.
+# Same region as infra/bootstrap when that bucket is in a single region.
+# Cloud Storage Always Free covers only us-central1, us-east1, and us-west1.
+# Leave empty to place the static bucket, Artifact Registry, and imgproxy in
+# us-central1. Cloud Run cannot use a multi-region location such as us.
 region = ""
+
+# Comma-separated extra CORS origins. Leave empty for the built-in list.
+# static_cors_extra_origins = "https://abc123.project.pages.dev"
 
 # Leave both empty to skip the budget. Set both to create it.
 # billing_account_id is the id from `gcloud billing accounts list`,

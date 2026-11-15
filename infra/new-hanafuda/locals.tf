@@ -20,6 +20,28 @@ locals {
   budget_amount_set   = trimspace(var.budget_amount) != ""
   billing_account_set = trimspace(var.billing_account_id) != ""
   budget_enabled      = local.budget_amount_set && local.billing_account_set
+
+  # Cloud Run and Artifact Registry need a region. TF_VAR_region is empty
+  # until one is chosen, and an empty GitHub variable overrides the Terraform
+  # default. us-central1 is the first Cloud Storage Always Free region named
+  # in infra/README.md. Set TF_VAR_region before the first apply to use
+  # another region. Changing it later replaces the service and the registry.
+  static_region = trimspace(var.region) != "" ? trimspace(var.region) : "us-central1"
+  static_cors_extra_origins = [
+    for origin in split(",", var.static_cors_extra_origins) : trimspace(origin)
+    if trimspace(origin) != ""
+  ]
+  static_cors_origins = distinct(concat(
+    [
+      "https://newhanafuda.art",
+      "https://www.newhanafuda.art",
+      "https://play.fudapop.com",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:8888",
+    ],
+    local.static_cors_extra_origins,
+  ))
   firestore_deploy_roles = toset([
     "roles/firebaserules.admin",
     "roles/datastore.indexAdmin",

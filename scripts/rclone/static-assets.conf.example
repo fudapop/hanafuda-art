@@ -1,0 +1,29 @@
+# Copy to a file outside the repo, or to scripts/rclone/rclone.conf (gitignored).
+# Do not commit access keys. infra/README.md has the copy commands and the
+# grants this file expects.
+#
+# Supabase S3 credentials come from the dashboard:
+#   Storage → S3 configuration → access keys
+# The secret is shown once. It can read and write every bucket in the project.
+# Revoke it after the copy. Region is the value shown on that same page.
+#
+# GCS uses Application Default Credentials. Leave service_account_file unset.
+# Impersonate static-uploader so the copy cannot delete the bucket.
+
+[supabase]
+type = s3
+provider = Other
+access_key_id = YOUR_SUPABASE_S3_ACCESS_KEY_ID
+secret_access_key = YOUR_SUPABASE_S3_SECRET_ACCESS_KEY
+endpoint = https://ymoriyakbittfgocvxbw.storage.supabase.co/storage/v1/s3
+region = YOUR_SUPABASE_S3_REGION
+force_path_style = true
+
+[gcs]
+type = google cloud storage
+# rclone names this field project_number. The project id is accepted.
+project_number = new-hanafuda
+bucket_policy_only = true
+# Do not set location. Terraform creates the bucket. A location here can make
+# rclone try to create a bucket in the wrong region.
+impersonate_service_account = static-uploader@new-hanafuda.iam.gserviceaccount.com

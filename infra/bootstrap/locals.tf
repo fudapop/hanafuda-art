@@ -38,6 +38,11 @@ locals {
     "iamcredentials.googleapis.com",
     "sts.googleapis.com",
     "storage.googleapis.com",
+    # Enabled here so a plan of the static-asset stack can read Cloud Run and
+    # Artifact Registry after this bootstrap apply. The managed stack does not
+    # enable them again.
+    "run.googleapis.com",
+    "artifactregistry.googleapis.com",
     "cloudbilling.googleapis.com",
     "billingbudgets.googleapis.com",
     "firebase.googleapis.com",
@@ -47,19 +52,32 @@ locals {
 
   # Read what the CI-managed stack contains. This is not roles/viewer: that
   # role can read Firestore and Cloud Storage data.
+  # run.viewer and artifactregistry.reader are for the static-assets stack.
+  # reader can also pull images. It is the predefined role that includes
+  # artifactregistry.repositories.get. Bucket metadata is a custom role in
+  # iam.tf. roles/storage.admin and roles/viewer can read object bytes, so
+  # they are not used here.
   terraform_plan_roles = toset([
     "roles/browser",
     "roles/iam.securityReviewer",
     "roles/iam.serviceAccountViewer",
     "roles/serviceusage.serviceUsageConsumer",
     "roles/serviceusage.serviceUsageViewer",
+    "roles/run.viewer",
+    "roles/artifactregistry.reader",
   ])
 
   # projectIamAdmin can grant any project role, including owner. The managed
   # stack needs it to attach the Firestore deploy roles and roles/aiplatform.user.
-  # serviceUsageAdmin lets that stack enable aiplatform.googleapis.com. It can
-  # also disable APIs; the managed service sets disable_on_destroy to false.
-  # Neither role is roles/editor or roles/owner.
+  # serviceUsageAdmin lets that stack enable APIs, including aiplatform,
+  # run, and artifactregistry. It can also disable APIs; the managed service
+  # sets disable_on_destroy to false.
+  # run.admin creates the imgproxy service. serviceAccountAdmin already
+  # includes iam.serviceAccounts.actAs, which Cloud Run requires on the
+  # runtime service account. repoAdmin creates the Docker Hub remote
+  # repository and its IAM. Neither role is roles/editor or roles/owner.
+  # Bucket create and bucket IAM are a custom role below so this identity
+  # cannot read object bytes on the public bucket.
   terraform_apply_roles = toset([
     "roles/browser",
     "roles/iam.securityReviewer",
@@ -67,6 +85,8 @@ locals {
     "roles/resourcemanager.projectIamAdmin",
     "roles/serviceusage.serviceUsageAdmin",
     "roles/serviceusage.serviceUsageConsumer",
+    "roles/run.admin",
+    "roles/artifactregistry.repoAdmin",
   ])
 }
 

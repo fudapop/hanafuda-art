@@ -9,6 +9,7 @@
     "test": "pnpm -F @hanafuda/frontend test",
     "test:release": "node --experimental-strip-types --test scripts/release-calver.test.ts",
     "test:i18n": "node --experimental-strip-types --test scripts/i18n-lib.test.ts",
+    "test:upload-gcs": "node --experimental-strip-types --test scripts/upload-to-gcs.test.ts",
     "typecheck": "pnpm -F @hanafuda/frontend typecheck && pnpm -F @hanafuda/backend typecheck",
     "lint": "pnpm -F @hanafuda/frontend lint",
     "dev:backend": "pnpm -F @hanafuda/backend dev",

@@ -32,6 +32,7 @@ jobs:
       TF_VAR_region: ${{ vars.TF_VAR_region }}
       TF_VAR_billing_account_id: ${{ vars.TF_VAR_billing_account_id }}
       TF_VAR_budget_amount: ${{ vars.TF_VAR_budget_amount }}
+      TF_VAR_static_cors_extra_origins: ${{ vars.TF_VAR_static_cors_extra_origins }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
