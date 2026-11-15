@@ -105,14 +105,15 @@ jobs:
           service_account: ${{ vars.GCP_TERRAFORM_PLAN_SERVICE_ACCOUNT }}
 
       # Output stays in files so the plan text is not interpolated into the workflow.
-      # Init takes a state lock. The plan identity may write only *.tflock objects.
+      # Init and plan take the state lock. Wait if apply or another plan holds it.
+      # The plan identity may write only *.tflock objects.
       - name: Terraform init
         id: init
         if: steps.auth.outcome == 'success'
         working-directory: infra/new-hanafuda
         run: |
           set +e
-          terraform init -input=false -no-color > "$RUNNER_TEMP/init.txt" 2>&1
+          terraform init -input=false -no-color -lock-timeout=5m > "$RUNNER_TEMP/init.txt" 2>&1
           code=$?
           set -e
           if [ "$code" -eq 0 ]; then
@@ -127,7 +128,7 @@ jobs:
         working-directory: infra/new-hanafuda
         run: |
           set +e
-          terraform plan -no-color -input=false > "$RUNNER_TEMP/plan.txt" 2>&1
+          terraform plan -no-color -input=false -lock-timeout=5m > "$RUNNER_TEMP/plan.txt" 2>&1
           code=$?
           set -e
           if [ "$code" -eq 0 ]; then
@@ -210,7 +211,7 @@ jobs:
               marker,
               `#### Terraform plan (\`infra/new-hanafuda\`): ${status}`,
               '',
-              'Read-only plan of the CI-managed stack. It does not apply, and it does not lock state.',
+              'Read-only plan of the CI-managed stack. It does not apply. It locks state only long enough to read it, and waits up to five minutes if another job holds the lock.',
               bootstrapNote,
               '',
               '<details><summary>Output</summary>',

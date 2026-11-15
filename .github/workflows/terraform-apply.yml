@@ -80,7 +80,7 @@ jobs:
 
       - name: Terraform init
         working-directory: infra/new-hanafuda
-        run: terraform init -input=false
+        run: terraform init -input=false -lock-timeout=5m
 
       - name: Terraform validate
         working-directory: infra/new-hanafuda

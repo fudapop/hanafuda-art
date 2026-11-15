@@ -318,7 +318,7 @@ Fork pull requests do not get the plan identity. A fork can still edit the workf
 
 Do not change these workflows to `pull_request_target`. That event's token carries `refs/heads/main`, so it would pass the apply provider.
 
-The plan does not lock state. The apply identity is the one that writes the lock and the state.
+The plan locks state only long enough to read it, and both `terraform init` and `terraform plan` wait up to five minutes if another job holds the lock. The plan identity can write only `*.tflock` objects. The apply identity writes the state, and its init and apply wait the same five minutes.
 
 ## Local checks
 
