@@ -13,10 +13,9 @@ locals {
   # && ref=='refs/heads/main'. This member requires the ref again.
   firestore_deploy_principal = "principalSet://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${local.workload_identity_pool_id}/attribute.ref/refs/heads/main"
 
-  # Repository-wide, unlike the Firestore deploy binding. Bindings are on the
-  # pool, so once github-pull-request is enabled a pull-request workflow in
-  # this repository can assume the translation account and call Vertex AI.
-  translate_principal = "principalSet://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${local.workload_identity_pool_id}/attribute.repository/${local.github_repository}"
+  # Same main-branch limit as Firestore deploy. The translation workflow runs
+  # from main. A repository principal would let a pull request call Vertex AI.
+  translate_principal = "principalSet://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${local.workload_identity_pool_id}/attribute.ref/refs/heads/main"
 
   budget_amount_set   = trimspace(var.budget_amount) != ""
   billing_account_set = trimspace(var.billing_account_id) != ""

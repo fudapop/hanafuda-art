@@ -20,13 +20,15 @@ module "github_wif" {
   depends_on = [google_project_service.required, terraform_data.main_provider_condition]
 }
 
-# Bindings are on the pool, so they match tokens from every provider in it.
-# Apply is limited to refs/heads/main. A pull-request ref is refs/pull/<n>/merge,
-# so that token cannot impersonate this account.
+# GitHub puts the environment name in the subject only for jobs that declare
+# that environment. The main provider still requires refs/heads/main. A job on
+# main that skips the terraform environment gets a different subject and cannot
+# impersonate this account. The pull-request provider rejects environment
+# subjects, so a pull request cannot exchange this one either.
 resource "google_service_account_iam_member" "terraform_apply" {
   service_account_id = google_service_account.terraform_apply.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${module.github_wif.pool_name}/attribute.ref/refs/heads/main"
+  member             = "principal://iam.googleapis.com/${module.github_wif.pool_name}/subject/repo:${local.github_repository}:environment:terraform"
 }
 
 # GitHub's default pull_request subject. This does not match a push to main.

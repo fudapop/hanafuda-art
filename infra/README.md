@@ -123,7 +123,7 @@ This creates:
 - The APIs the rest of this stack calls. APIs are not disabled when this Terraform is destroyed.
 - Workload Identity pool `github`.
 - Provider `github`, whose condition is `assertion.repository=='fudapop/hanafuda-art' && assertion.ref=='refs/heads/main'`. Terraform apply and Firestore deploy use this provider.
-- Provider `github-pull-request`, limited to this repository and `refs/pull/*`, created disabled. A disabled provider rejects tokens. Leave it disabled until step 9. The `github` provider still rejects every token whose ref is not `refs/heads/main`. Bindings are on the pool, so enabling `github-pull-request` while a repository-wide `firestore-deploy` binding exists would let a pull request deploy rules.
+- Provider `github-pull-request`, limited to this repository and `refs/pull/*`, created disabled. It also rejects tokens whose subject is a GitHub environment. A disabled provider rejects tokens. Leave it disabled until step 9. The `github` provider still rejects every token whose ref is not `refs/heads/main`. Bindings are on the pool, so enabling `github-pull-request` while a repository-wide `firestore-deploy` binding exists would let a pull request deploy rules.
 - Service accounts `terraform-plan` and `terraform-apply`, with no keys.
 
 `terraform-plan` can read IAM, enabled APIs, project metadata, and the state object. It does not get `roles/viewer`, because that role can read Firestore and Cloud Storage data. `terraform-apply` can manage service accounts and project IAM, and it can enable APIs. `roles/resourcemanager.projectIamAdmin` can grant any project role; that is what lets it attach the Firestore and Vertex roles. `roles/serviceusage.serviceUsageAdmin` is what lets it enable `aiplatform.googleapis.com`. Neither role is `roles/editor` or `roles/owner`. The managed API resource sets `disable_on_destroy` to false.
@@ -203,9 +203,9 @@ gcloud iam service-accounts get-iam-policy \
   --format='value(bindings.members)'
 ```
 
-On `firestore-deploy`, the output must not contain `attribute.repository/fudapop/hanafuda-art`. If that service account does not exist yet, there is no such binding. `hanafuda-github-translate` is a different account and does use that member.
+On `firestore-deploy`, the output must not contain `attribute.repository/fudapop/hanafuda-art`. If that service account does not exist yet, there is no such binding. `hanafuda-github-translate` is also limited to `refs/heads/main`. If a repository-wide member was created for it, import that member and apply the replacement the same way.
 
-`terraform plan` in this directory should show `hanafuda-github-translate`, `roles/aiplatform.user`, its repository Workload Identity binding, and `aiplatform.googleapis.com`. It shows the billing budget only when both budget variables are set. It must not show a new Firestore database, ruleset, or Auth config.
+`terraform plan` in this directory should show `hanafuda-github-translate`, `roles/aiplatform.user`, its main-branch Workload Identity binding, and `aiplatform.googleapis.com`. It shows the billing budget only when both budget variables are set. It must not show a new Firestore database, ruleset, or Auth config.
 
 If `hanafuda-github-translate` already exists, import it before that apply:
 
@@ -217,7 +217,7 @@ terraform import google_project_iam_member.translate \
   "new-hanafuda roles/aiplatform.user serviceAccount:hanafuda-github-translate@new-hanafuda.iam.gserviceaccount.com"
 ```
 
-Import the Workload Identity member only when it already uses `attribute.repository/fudapop/hanafuda-art`.
+If the Workload Identity member already exists, import the member that is actually on the account. A repository-wide member is replaced on the next apply by `attribute.ref/refs/heads/main`.
 
 ```bash
 NUMBER="$(gcloud projects describe new-hanafuda --format='value(projectNumber)')"
@@ -241,7 +241,7 @@ Then, from `infra/bootstrap`:
 terraform apply
 ```
 
-That sets `disabled = false` on `github-pull-request`. Until this apply, pull-request tokens cannot be exchanged, including tokens that would otherwise match a leftover repository-wide binding.
+That sets `disabled = false` on `github-pull-request`. Until this apply, pull-request tokens cannot be exchanged, including tokens that would otherwise match a leftover repository-wide binding. The provider also rejects tokens whose subject is a GitHub environment, so a pull request cannot mint the Terraform apply identity by naming the `terraform` environment.
 
 If `firestore-deploy` was never created, step 8 does not apply and this enable is safe on its own.
 
@@ -284,7 +284,9 @@ In `fudapop/hanafuda-art` → Settings → Secrets and variables → Actions →
 
 `GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT` are the names the Firestore deploy workflow reads. Terraform apply uses the same provider variable. Plan uses the pull-request provider, because the `github` provider rejects every token whose ref is not `refs/heads/main`.
 
-`GCP_PROJECT_ID` and `GCP_TRANSLATE_SERVICE_ACCOUNT` are the identity for content translation. This pull request does not add that workflow, and the Deno scripts in this checkout still call Gemini with `GEMINI_API_KEY`. The workflow that will use this service account is [pull request #90](https://github.com/fudapop/hanafuda-art/pull/90). It calls Vertex AI as `hanafuda-github-translate` (`roles/aiplatform.user`, bound to `attribute.repository/fudapop/hanafuda-art` on the `github` pool). That workflow reads the email from `GCP_SERVICE_ACCOUNT`, so set `GCP_SERVICE_ACCOUNT` to the same address as `GCP_TRANSLATE_SERVICE_ACCOUNT` when #90 is merged. Until then, these two variables do not change how translation runs.
+`GCP_PROJECT_ID` and `GCP_TRANSLATE_SERVICE_ACCOUNT` are the identity for content translation. This pull request does not add that workflow, and the Deno scripts in this checkout still call Gemini with `GEMINI_API_KEY`. The workflow that will use this service account is [pull request #90](https://github.com/fudapop/hanafuda-art/pull/90). It calls Vertex AI as `hanafuda-github-translate` (`roles/aiplatform.user`). The binding is `attribute.ref/refs/heads/main` on the `github` pool, the same limit as Firestore deploy. That workflow reads the email from `GCP_SERVICE_ACCOUNT`, so set `GCP_SERVICE_ACCOUNT` to the same address as `GCP_TRANSLATE_SERVICE_ACCOUNT` when #90 is merged. Until then, these two variables do not change how translation runs.
+
+`terraform-apply` can be assumed only by a job on `main` whose GitHub environment is `terraform`. The workflow already names that environment, which is what waits for approval. Another workflow on `main` does not get this subject. The environment name in GitHub and in the binding have to stay `terraform`.
 
 `infra/new-hanafuda` prints the same identifiers after that stack has been applied:
 

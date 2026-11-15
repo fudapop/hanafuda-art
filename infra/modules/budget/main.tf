@@ -1,11 +1,12 @@
 locals {
   billing_account_raw = trimspace(var.billing_account_id)
-  billing_account_id  = startswith(local.billing_account_raw, "billingAccounts/") ? trimprefix(local.billing_account_raw, "billingAccounts/") : local.billing_account_raw
-  billing_account     = "billingAccounts/${upper(local.billing_account_id)}"
+  # Provider 8.11.0 builds billingAccounts/{{billing_account}}/budgets itself.
+  # Passing the resource name here produces billingAccounts/billingAccounts/...
+  billing_account_id = upper(startswith(local.billing_account_raw, "billingAccounts/") ? trimprefix(local.billing_account_raw, "billingAccounts/") : local.billing_account_raw)
 }
 
 resource "google_billing_budget" "this" {
-  billing_account = local.billing_account
+  billing_account = local.billing_account_id
   display_name    = var.display_name
 
   budget_filter {

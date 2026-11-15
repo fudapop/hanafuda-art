@@ -1,6 +1,6 @@
 variable "billing_account_id" {
   type        = string
-  description = "Billing account id, with or without the billingAccounts/ prefix. There is no default: the caller supplies the account."
+  description = "Billing account id, with or without the billingAccounts/ prefix. The module strips the prefix because Google provider 8.11.0 adds it when building the budget URL. There is no default."
 
   validation {
     condition     = can(regex("^(billingAccounts/)?[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}$", var.billing_account_id))
