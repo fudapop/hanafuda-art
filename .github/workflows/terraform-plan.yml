@@ -104,16 +104,15 @@ jobs:
           workload_identity_provider: ${{ vars.GCP_TERRAFORM_PLAN_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_TERRAFORM_PLAN_SERVICE_ACCOUNT }}
 
-      # -lock=false because the plan identity can read the state object and
-      # cannot create the lock object. Apply, on main, locks as usual.
       # Output stays in files so the plan text is not interpolated into the workflow.
+      # Init takes a state lock. The plan identity may write only *.tflock objects.
       - name: Terraform init
         id: init
         if: steps.auth.outcome == 'success'
         working-directory: infra/new-hanafuda
         run: |
           set +e
-          terraform init -input=false -lock=false -no-color > "$RUNNER_TEMP/init.txt" 2>&1
+          terraform init -input=false -no-color > "$RUNNER_TEMP/init.txt" 2>&1
           code=$?
           set -e
           if [ "$code" -eq 0 ]; then
@@ -128,7 +127,7 @@ jobs:
         working-directory: infra/new-hanafuda
         run: |
           set +e
-          terraform plan -no-color -input=false -lock=false > "$RUNNER_TEMP/plan.txt" 2>&1
+          terraform plan -no-color -input=false > "$RUNNER_TEMP/plan.txt" 2>&1
           code=$?
           set -e
           if [ "$code" -eq 0 ]; then
