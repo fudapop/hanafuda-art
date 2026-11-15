@@ -1,0 +1,15 @@
+# Optional. CI reads TF_VAR_region, TF_VAR_billing_account_id, and
+# TF_VAR_budget_amount from repository variables. A local plan can use this
+# file instead. terraform.tfvars is gitignored.
+
+project_id = "new-hanafuda"
+
+# TODO: Same region as infra/bootstrap. Cloud Storage Always Free covers only
+# us-central1, us-east1, and us-west1. Leave empty until a region is chosen.
+region = ""
+
+# Leave both empty to skip the budget. Set both to create it.
+# billing_account_id is the id from `gcloud billing accounts list`,
+# for example 012345-6789AB-CDEF01.
+billing_account_id = ""
+budget_amount      = ""

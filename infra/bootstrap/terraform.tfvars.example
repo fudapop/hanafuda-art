@@ -1,0 +1,13 @@
+# Copy to terraform.tfvars and edit the region before the first apply.
+# terraform.tfvars is gitignored.
+
+# TODO: Choose a region. Cloud Storage Always Free covers only
+# us-central1, us-east1, and us-west1. A bucket elsewhere is billed.
+region = ""
+
+project_id        = "new-hanafuda"
+state_bucket_name = "new-hanafuda-tfstate"
+
+# Leave false until any repository-wide firestore-deploy binding is replaced
+# with attribute.ref/refs/heads/main. A disabled provider rejects tokens.
+enable_pull_request_provider = false
