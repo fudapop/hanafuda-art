@@ -32,7 +32,7 @@ variable "enable_pull_request_provider" {
 
 variable "state_bucket_name" {
   type        = string
-  description = "Globally unique name of the remote state bucket. Keep this identical to the bucket in infra/new-hanafuda/backend.tf and infra/bootstrap/backend.tf.example."
+  description = "Globally unique name of the remote state bucket. Keep this identical to the bucket in infra/bootstrap/backend.tf, infra/bootstrap/backend.tf.example, and infra/new-hanafuda/backend.tf."
   default     = "new-hanafuda-tfstate"
 
   validation {

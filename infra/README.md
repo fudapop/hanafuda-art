@@ -15,7 +15,7 @@ Terraform 1.17.2 and the Google provider 8.11.0 are pinned in each root module. 
 | `infra/modules/github-wif` | Workload Identity pool and GitHub OIDC providers | Called by bootstrap |
 | `infra/modules/budget` | A billing budget with alerts at 50%, 90%, and 100% of actual spend | Called by `new-hanafuda` |
 
-`infra/bootstrap` has no remote backend in git. The bucket it creates cannot be its own backend until after the first apply. `backend.tf.example` is the config to copy once the bucket exists.
+`infra/bootstrap` stores its state in `gs://new-hanafuda-tfstate` with prefix `bootstrap`. That bucket already exists, so `backend.tf` is in git. `backend.tf.example` is the same block, for a first apply in a project where the bucket does not exist yet.
 
 ## Out of scope
 
@@ -111,7 +111,7 @@ The pull-request provider (`github-pull-request`) and the apply pool are new. Do
 
 ### 6. Apply bootstrap
 
-From `infra/bootstrap`. There is no `backend.tf` in git yet, so this init uses local state. Do not copy `backend.tf.example` over first: `terraform init` would look for `new-hanafuda-tfstate` before this apply creates it.
+From `infra/bootstrap`. `backend.tf` is committed and points at `gs://new-hanafuda-tfstate`, which already exists, so this init uses remote state.
 
 ```bash
 terraform init -input=false
@@ -119,9 +119,11 @@ terraform plan
 terraform apply
 ```
 
+If the bucket does not exist yet, move `backend.tf` aside before these commands. `terraform init` would otherwise look for `new-hanafuda-tfstate` before this apply creates it. After the apply, move `backend.tf` back and run `terraform init -migrate-state`.
+
 This creates:
 
-- A versioned state bucket, `new-hanafuda-tfstate`, with uniform access and public access prevention. The name is global. If it is taken, change `state_bucket_name` and the bucket in `infra/new-hanafuda/backend.tf` and `infra/bootstrap/backend.tf.example` together.
+- A versioned state bucket, `new-hanafuda-tfstate`, with uniform access and public access prevention. The name is global. If it is taken, change `state_bucket_name` and the bucket in `infra/bootstrap/backend.tf`, `infra/bootstrap/backend.tf.example`, and `infra/new-hanafuda/backend.tf` together.
 - The APIs the rest of this stack calls. APIs are not disabled when this Terraform is destroyed.
 - Workload Identity pool `github`.
 - Provider `github`, whose condition is `assertion.repository=='fudapop/hanafuda-art' && assertion.ref=='refs/heads/main' && assertion.event_name!='pull_request_target'`. Firestore deploy and, once merged, content translation use this provider. Terraform apply does not.
@@ -144,17 +146,18 @@ terraform output -raw gcp_terraform_plan_service_account
 terraform output -raw gcp_terraform_apply_service_account
 ```
 
-### 7. Move bootstrap state into the bucket
+### 7. Confirm bootstrap state is in the bucket
 
-Do this only after step 6 has created the bucket. `backend.tf` stays out of git until then.
+Bootstrap state is in `gs://new-hanafuda-tfstate` under prefix `bootstrap`. `infra/bootstrap/backend.tf` stays in git. CI does not apply bootstrap, and its validate step uses `terraform init -backend=false`, so that step does not need the bucket.
+
+If state is still only in a local `terraform.tfstate`, migrate it:
 
 ```bash
-cp backend.tf.example backend.tf
 terraform init -migrate-state
 terraform state list
 ```
 
-After `state list` shows the resources, delete the local `terraform.tfstate.backup`. Do not commit either state file. Commit `infra/bootstrap/backend.tf` only after `gcloud storage buckets describe gs://new-hanafuda-tfstate` succeeds, so a fresh clone is not asked to initialize a backend that does not exist yet. CI does not apply bootstrap, and its validate step uses `terraform init -backend=false`.
+After `state list` shows the resources, delete the local `terraform.tfstate.backup`. Do not commit either state file.
 
 ### 8. Import the Firestore deploy identity if it already exists
 
