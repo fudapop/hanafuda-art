@@ -84,6 +84,16 @@ resource "google_artifact_registry_repository_iam_member" "cloud_run_agent" {
   member     = "serviceAccount:service-${var.project_number}@serverless-robot-prod.iam.gserviceaccount.com"
 }
 
+# Deploying also requires the caller to read the image. The custom repository
+# role does not include downloadArtifacts. Reader is limited to this repository.
+resource "google_artifact_registry_repository_iam_member" "terraform_apply" {
+  project    = var.project_id
+  location   = google_artifact_registry_repository.dockerhub.location
+  repository = google_artifact_registry_repository.dockerhub.repository_id
+  role       = "roles/artifactregistry.reader"
+  member     = var.terraform_apply_member
+}
+
 resource "google_cloud_run_v2_service" "imgproxy" {
   name     = "imgproxy"
   project  = var.project_id
@@ -156,6 +166,7 @@ resource "google_cloud_run_v2_service" "imgproxy" {
 
   depends_on = [
     google_artifact_registry_repository_iam_member.cloud_run_agent,
+    google_artifact_registry_repository_iam_member.terraform_apply,
     google_service_account_iam_member.terraform_apply,
     google_storage_bucket_iam_member.runtime,
   ]
