@@ -9,8 +9,8 @@ locals {
 
   # attribute.ref, not attribute.repository. The pool also has a pull-request
   # provider, and a repository principal would let those tokens deploy rules.
-  # The provider condition still requires repository=='fudapop/hanafuda-art'
-  # && ref=='refs/heads/main'. This member requires the ref again.
+  # The shared provider also rejects pull_request_target. This member requires
+  # the ref again, because that pool still has a pull-request provider.
   firestore_deploy_principal = "principalSet://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${local.workload_identity_pool_id}/attribute.ref/refs/heads/main"
 
   # Same main-branch limit as Firestore deploy. The translation workflow runs

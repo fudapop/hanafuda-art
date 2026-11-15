@@ -7,6 +7,12 @@ module "github_wif" {
   provider_id           = "github"
   provider_display_name = "GitHub OIDC"
   attribute_condition   = local.main_provider_condition
+  attribute_mapping = {
+    "google.subject"       = "assertion.sub"
+    "attribute.repository" = "assertion.repository"
+    "attribute.ref"        = "assertion.ref"
+    "attribute.event_name" = "assertion.event_name"
+  }
 
   additional_providers = {
     (local.plan_provider_id) = {
@@ -20,15 +26,35 @@ module "github_wif" {
   depends_on = [google_project_service.required, terraform_data.main_provider_condition]
 }
 
-# GitHub puts the environment name in the subject only for jobs that declare
-# that environment. The main provider still requires refs/heads/main. A job on
-# main that skips the terraform environment gets a different subject and cannot
-# impersonate this account. The pull-request provider rejects environment
-# subjects, so a pull request cannot exchange this one either.
+# Separate pool so a token accepted by github or github-pull-request cannot
+# match the apply binding. Bindings are pool-wide.
+module "github_wif_apply" {
+  source = "../modules/github-wif"
+
+  project_id            = var.project_id
+  pool_id               = local.apply_pool_id
+  pool_display_name     = "GitHub Actions Terraform apply"
+  pool_description      = "Only jobs on main that use the terraform GitHub environment."
+  provider_id           = local.apply_provider_id
+  provider_display_name = "GitHub OIDC Terraform apply"
+  provider_description  = "Tokens whose subject is the terraform environment on refs/heads/main."
+  attribute_condition   = local.apply_provider_condition
+  attribute_mapping = {
+    "google.subject"        = "assertion.sub"
+    "attribute.repository"  = "assertion.repository"
+    "attribute.ref"         = "assertion.ref"
+    "attribute.environment" = "assertion.environment"
+  }
+
+  depends_on = [google_project_service.required, terraform_data.main_provider_condition]
+}
+
+# Exact subject, and only in the apply pool. The provider condition also
+# requires that subject, refs/heads/main, and environment terraform.
 resource "google_service_account_iam_member" "terraform_apply" {
   service_account_id = google_service_account.terraform_apply.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principal://iam.googleapis.com/${module.github_wif.pool_name}/subject/repo:${local.github_repository}:environment:terraform"
+  member             = "principal://iam.googleapis.com/${module.github_wif_apply.pool_name}/subject/${local.apply_subject}"
 }
 
 # GitHub's default pull_request subject. This does not match a push to main.

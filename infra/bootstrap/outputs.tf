@@ -9,8 +9,13 @@ output "gcp_project_id" {
 }
 
 output "gcp_workload_identity_provider" {
-  description = "Value for the GitHub variable GCP_WORKLOAD_IDENTITY_PROVIDER. Used by Terraform apply and Firestore deploy. The translation workflow in pull request 90 uses it too, once that workflow is merged."
+  description = "Value for the GitHub variable GCP_WORKLOAD_IDENTITY_PROVIDER. Used by Firestore deploy. The translation workflow in pull request 90 uses it too, once that workflow is merged. Terraform apply uses a different provider."
   value       = module.github_wif.provider_name
+}
+
+output "gcp_terraform_apply_workload_identity_provider" {
+  description = "Value for the GitHub variable GCP_TERRAFORM_APPLY_WORKLOAD_IDENTITY_PROVIDER."
+  value       = module.github_wif_apply.provider_name
 }
 
 output "gcp_terraform_plan_workload_identity_provider" {

@@ -20,6 +20,12 @@ variable "pool_display_name" {
   default     = "GitHub Actions"
 }
 
+variable "pool_description" {
+  type        = string
+  description = "Description of the Workload Identity pool."
+  default     = "GitHub Actions identities for this repository."
+}
+
 variable "provider_id" {
   type        = string
   description = "Id of the primary GitHub OIDC provider."
@@ -35,6 +41,22 @@ variable "provider_display_name" {
   type        = string
   description = "Display name for the primary GitHub OIDC provider."
   default     = "GitHub OIDC"
+}
+
+variable "provider_description" {
+  type        = string
+  description = "Description of the primary GitHub OIDC provider."
+  default     = "GitHub OIDC tokens that pass the primary attribute condition."
+}
+
+variable "attribute_mapping" {
+  type        = map(string)
+  description = "Claims copied from the GitHub token. google.subject is required. Map every claim the attribute condition reads."
+  default = {
+    "google.subject"       = "assertion.sub"
+    "attribute.repository" = "assertion.repository"
+    "attribute.ref"        = "assertion.ref"
+  }
 }
 
 variable "attribute_condition" {

@@ -2,7 +2,7 @@ resource "google_iam_workload_identity_pool" "github" {
   project                   = var.project_id
   workload_identity_pool_id = var.pool_id
   display_name              = var.pool_display_name
-  description               = "GitHub Actions identities for this repository."
+  description               = var.pool_description
 
   lifecycle {
     prevent_destroy = true
@@ -14,16 +14,9 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   workload_identity_pool_id          = google_iam_workload_identity_pool.github.workload_identity_pool_id
   workload_identity_pool_provider_id = var.provider_id
   display_name                       = var.provider_display_name
-  description                        = "GitHub OIDC tokens that pass the primary attribute condition."
+  description                        = var.provider_description
   attribute_condition                = var.attribute_condition
-
-  # google.subject is required. repository and ref are what service-account
-  # bindings select on. Map every claim the attribute condition reads.
-  attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.repository" = "assertion.repository"
-    "attribute.ref"        = "assertion.ref"
-  }
+  attribute_mapping                  = var.attribute_mapping
 
   oidc {
     # allowed_audiences stays unset. The default audience is this provider's
@@ -46,11 +39,7 @@ resource "google_iam_workload_identity_pool_provider" "additional" {
   description                        = each.value.description
   disabled                           = each.value.disabled
   attribute_condition                = each.value.attribute_condition
-  attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.repository" = "assertion.repository"
-    "attribute.ref"        = "assertion.ref"
-  }
+  attribute_mapping                  = var.attribute_mapping
 
   oidc {
     # Same default audience as the primary provider: its own resource name.

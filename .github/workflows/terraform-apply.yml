@@ -47,12 +47,12 @@ jobs:
 
       - name: Require Workload Identity settings
         env:
-          GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          GCP_TERRAFORM_APPLY_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_TERRAFORM_APPLY_WORKLOAD_IDENTITY_PROVIDER }}
           GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT: ${{ vars.GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT }}
         run: |
           set -euo pipefail
           missing=0
-          for name in GCP_WORKLOAD_IDENTITY_PROVIDER GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT; do
+          for name in GCP_TERRAFORM_APPLY_WORKLOAD_IDENTITY_PROVIDER GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT; do
             if [ -z "${!name}" ]; then
               echo "Missing repository variable ${name}."
               missing=1
@@ -75,7 +75,7 @@ jobs:
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           project_id: new-hanafuda
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          workload_identity_provider: ${{ vars.GCP_TERRAFORM_APPLY_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_TERRAFORM_APPLY_SERVICE_ACCOUNT }}
 
       - name: Terraform init
