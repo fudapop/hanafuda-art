@@ -69,15 +69,17 @@ locals {
 
   # projectIamAdmin can grant any project role, including owner. The managed
   # stack needs it to attach the Firestore deploy roles and roles/aiplatform.user.
-  # serviceUsageAdmin lets that stack enable APIs, including aiplatform,
-  # run, and artifactregistry. It can also disable APIs; the managed service
-  # sets disable_on_destroy to false.
-  # run.admin creates the imgproxy service. serviceAccountAdmin already
-  # includes iam.serviceAccounts.actAs, which Cloud Run requires on the
-  # runtime service account. repoAdmin creates the Docker Hub remote
-  # repository and its IAM. Neither role is roles/editor or roles/owner.
-  # Bucket create and bucket IAM are a custom role below so this identity
-  # cannot read object bytes on the public bucket.
+  # serviceUsageAdmin lets that stack enable aiplatform.googleapis.com. It can
+  # also disable APIs; the managed service sets disable_on_destroy to false.
+  # run.admin creates the imgproxy service. serviceAccountAdmin does not
+  # include iam.serviceAccounts.actAs. The managed stack grants
+  # roles/iam.serviceAccountUser on the imgproxy account itself.
+  # Repository create and repository IAM are a custom role in iam.tf.
+  # roles/artifactregistry.repoAdmin does not include repositories.create or
+  # repositories.setIamPolicy. roles/artifactregistry.admin does, and it can
+  # also read and write every artifact. Neither role here is roles/editor
+  # or roles/owner. Bucket create and bucket IAM are a custom role in iam.tf
+  # so this identity cannot read object bytes on the public bucket.
   terraform_apply_roles = toset([
     "roles/browser",
     "roles/iam.securityReviewer",
@@ -86,7 +88,6 @@ locals {
     "roles/serviceusage.serviceUsageAdmin",
     "roles/serviceusage.serviceUsageConsumer",
     "roles/run.admin",
-    "roles/artifactregistry.repoAdmin",
   ])
 }
 

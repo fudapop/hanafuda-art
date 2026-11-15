@@ -28,6 +28,16 @@ variable "bucket_name" {
   description = "GCS bucket imgproxy may read. The only allowed source."
 }
 
+variable "terraform_apply_member" {
+  type        = string
+  description = "Member that deploys this service. It receives roles/iam.serviceAccountUser on the runtime account. roles/iam.serviceAccountAdmin does not include iam.serviceAccounts.actAs."
+
+  validation {
+    condition     = can(regex("^serviceAccount:[^@]+@[^@]+\\.iam\\.gserviceaccount\\.com$", var.terraform_apply_member))
+    error_message = "terraform_apply_member must look like serviceAccount:name@project.iam.gserviceaccount.com."
+  }
+}
+
 variable "repository_id" {
   type        = string
   description = "Artifact Registry repository id for the Docker Hub pull-through cache."

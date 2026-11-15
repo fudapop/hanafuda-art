@@ -132,9 +132,9 @@ This creates:
 - Provider `github-pull-request`, limited to this repository and `refs/pull/*`, created disabled. It also rejects tokens whose subject is a GitHub environment. That rejection stays as a second safeguard after the provider is enabled. A disabled provider rejects tokens. Leave it disabled until step 9. Bindings on this pool are visible to every provider in it, so enabling `github-pull-request` while a repository-wide `firestore-deploy` binding exists would let a pull request deploy rules.
 - Workload Identity pool `github-terraform-apply` and provider `github`. Its condition requires this repository, `refs/heads/main`, subject `repo:fudapop/hanafuda-art:environment:terraform`, and `environment` claim `terraform`. Only `terraform-apply` is bound to this pool.
 - Service accounts `terraform-plan` and `terraform-apply`, with no keys.
-- Custom roles `terraformPlanStorage` and `terraformApplyStorage`. They read and update bucket metadata. They do not grant object read. Project roles for Cloud Run and Artifact Registry are on the same two service accounts. `run.googleapis.com` and `artifactregistry.googleapis.com` are enabled here. Re-apply bootstrap after pulling this, or the static-asset plan fails with 403 or with the API disabled.
+- Custom roles `terraformPlanStorage`, `terraformApplyStorage`, and `terraformApplyArtifactRegistry`. The storage roles read and update bucket metadata and do not grant object read. The Artifact Registry role creates repositories and sets their IAM. It does not grant artifact read or write. `roles/run.admin` is on `terraform-apply`. `run.googleapis.com` and `artifactregistry.googleapis.com` are enabled here. Re-apply bootstrap after pulling this, or the static-asset plan fails with 403 or with the API disabled.
 
-`terraform-plan` can read IAM, enabled APIs, project metadata, and the state object. It can also create and delete objects whose names end in `.tflock`, because `terraform init` locks state and `-lock=false` only skips the lock during a backend migration. It cannot replace the state file. It does not get `roles/viewer`, because that role can read Firestore and Cloud Storage data. It can read Cloud Run services and Artifact Registry repositories. The custom role `terraformPlanStorage` lets it read bucket metadata, not object bytes. Re-apply bootstrap after pulling this change or plan init fails with 403 on the lock object, and the static-asset plan fails with 403 on the bucket. `terraform-apply` can manage service accounts and project IAM, and it can enable APIs. `roles/resourcemanager.projectIamAdmin` can grant any project role; that is what lets it attach the Firestore and Vertex roles. `roles/serviceusage.serviceUsageAdmin` is what lets it enable `aiplatform.googleapis.com`. `run.googleapis.com` and `artifactregistry.googleapis.com` are enabled in this bootstrap apply, next to `storage.googleapis.com`, so the plan can read Cloud Run and Artifact Registry. `roles/run.admin` creates the imgproxy service. `roles/iam.serviceAccountAdmin` already includes `iam.serviceAccounts.actAs`, which that create requires. `roles/artifactregistry.repoAdmin` creates the Docker Hub remote repository. The custom role `terraformApplyStorage` creates buckets and sets bucket IAM. It does not grant object read. None of these roles is `roles/editor` or `roles/owner`. The managed API resource sets `disable_on_destroy` to false.
+`terraform-plan` can read IAM, enabled APIs, project metadata, and the state object. It can also create and delete objects whose names end in `.tflock`, because `terraform init` locks state and `-lock=false` only skips the lock during a backend migration. It cannot replace the state file. It does not get `roles/viewer`, because that role can read Firestore and Cloud Storage data. It can read Cloud Run services and Artifact Registry repositories. The custom role `terraformPlanStorage` lets it read bucket metadata, not object bytes. Re-apply bootstrap after pulling this change or plan init fails with 403 on the lock object, and the static-asset plan fails with 403 on the bucket. `terraform-apply` can manage service accounts and project IAM, and it can enable APIs. `roles/resourcemanager.projectIamAdmin` can grant any project role; that is what lets it attach the Firestore and Vertex roles. `roles/serviceusage.serviceUsageAdmin` is what lets it enable `aiplatform.googleapis.com`. `run.googleapis.com` and `artifactregistry.googleapis.com` are enabled in this bootstrap apply, next to `storage.googleapis.com`, so the plan can read Cloud Run and Artifact Registry. `roles/run.admin` creates the imgproxy service. `roles/iam.serviceAccountAdmin` does not include `iam.serviceAccounts.actAs`. The managed stack grants `roles/iam.serviceAccountUser` on the imgproxy service account to `terraform-apply`. The custom role `terraformApplyArtifactRegistry` creates the Docker Hub remote repository and sets its IAM. `roles/artifactregistry.repoAdmin` does not include `repositories.create` or `repositories.setIamPolicy`. `roles/artifactregistry.admin` does, and it can read and write every artifact. The custom role `terraformApplyStorage` creates buckets and sets bucket IAM. It does not grant object read. None of these roles is `roles/editor` or `roles/owner`. The managed API resource sets `disable_on_destroy` to false.
 
 If you already applied an older bootstrap, apply this one again before the managed stack. The apply identity needs the service-usage admin role before it can enable Vertex AI.
 
@@ -359,13 +359,13 @@ terraform plan
 terraform apply
 ```
 
-The plan enables `run.googleapis.com` and `artifactregistry.googleapis.com`, and it adds the Cloud Run and Artifact Registry roles plus the two custom storage roles. It must not recreate the Workload Identity pools or providers. An in-place change that is not one of those roles or API enables is a reason to stop.
+The plan enables `run.googleapis.com` and `artifactregistry.googleapis.com`, and it adds the Cloud Run role plus the custom storage and Artifact Registry roles. It must not recreate the Workload Identity pools or providers. An in-place change that is not one of those roles or API enables is a reason to stop.
 
 2. Set `TF_VAR_region` in GitHub if the static resources should not land in `us-central1`. Changing the region after the first apply replaces Cloud Run and the repository. The bucket location changes only by replacing the bucket, and `prevent_destroy` blocks that.
 
 3. Merge, then approve the `terraform` environment. CI applies `infra/new-hanafuda`. The plan before step 1 fails with 403, because the plan identity cannot read the new resources yet. `terraform fmt` and `terraform validate` still pass.
 
-4. If the apply fails while pulling `darthsim/imgproxy`, run it again. The Cloud Run service agent binding can take a minute to propagate, and an anonymous Docker Hub pull can be rate-limited. This stack does not store Docker Hub credentials.
+4. If the apply fails while attaching the imgproxy service account or pulling `darthsim/imgproxy`, run it again. The `roles/iam.serviceAccountUser` binding and the Cloud Run service agent binding can each take a minute to propagate, and an anonymous Docker Hub pull can be rate-limited. This stack does not store Docker Hub credentials.
 
 5. If the `allUsers` binding on the bucket fails, the organization is blocking public objects. `constraints/iam.allowedPolicyMemberDomains` has to allow `allUsers` for this project, and `constraints/storage.publicAccessPrevention` has to stay unset or unenforced. imgproxy can still read the bucket with its own service account. `assets.fudapop.com` cannot serve objects until the public binding exists.
 
@@ -419,7 +419,7 @@ Confirm both remotes, then copy and compare:
 
 ```bash
 rclone lsd supabase:
-rclone lsd gcs:
+rclone lsd gcs:fudapop-static
 
 rclone copy supabase:static gcs:fudapop-static \
   --checksum \
@@ -430,7 +430,7 @@ rclone copy supabase:static gcs:fudapop-static \
 rclone check supabase:static gcs:fudapop-static --checksum
 ```
 
-`lsd` on `supabase:` lists buckets. You want a bucket named `static`. A signature error means the endpoint, region, or key does not match the dashboard. The endpoint in the example is `https://ymoriyakbittfgocvxbw.storage.supabase.co/storage/v1/s3`, which is the direct storage host. `force_path_style = true` is required.
+`lsd` on `supabase:` lists buckets. You want a bucket named `static`. `lsd` on `gcs:fudapop-static` lists key prefixes in that bucket. `static-uploader` cannot list every bucket in the project, so `rclone lsd gcs:` fails even when the copy credentials work. A signature error means the endpoint, region, or key does not match the dashboard. The endpoint in the example is `https://ymoriyakbittfgocvxbw.storage.supabase.co/storage/v1/s3`, which is the direct storage host. `force_path_style = true` is required. The GCS remote sets `env_auth = true` so rclone uses Application Default Credentials.
 
 The live game still reads Supabase. A new file has to land in both places until the URL switch. Use `scripts/upload-to-static.ts` for Supabase and the command below for GCS, or upload to Supabase and run `rclone copy` again. `rclone copy` skips objects that are already the same.
 
@@ -469,13 +469,32 @@ When the plan cannot override Host, use a Worker on the route `img.fudapop.com/*
 ```js
 const ORIGIN = 'https://CLOUD_RUN_HOST'
 
+// A path that starts with "//" is a scheme-relative URL. Passing it to
+// `new URL(path, ORIGIN)` selects that host and sends the browser's headers
+// there. Build the URL from ORIGIN, then set the path.
+function targetUrl(requestUrl) {
+  const incoming = new URL(requestUrl)
+  const target = new URL(ORIGIN)
+  target.pathname = `/${incoming.pathname.replace(/^\/+/, '')}`
+  target.search = incoming.search
+  return target
+}
+
+function originHeaders(request, host) {
+  const headers = new Headers()
+  const accept = request.headers.get('Accept')
+  if (accept) headers.set('Accept', accept)
+  headers.set('Host', host)
+  return headers
+}
+
 export default {
   async fetch(request) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method not allowed', { status: 405 })
     }
-    const incoming = new URL(request.url)
-    const cacheUrl = new URL(incoming.pathname + incoming.search, ORIGIN)
+    const target = targetUrl(request.url)
+    const cacheUrl = new URL(target.href)
     cacheUrl.searchParams.set('__accept', request.headers.get('Accept') || '')
     const cacheKey = new Request(cacheUrl.toString(), { method: 'GET' })
     const cache = caches.default
@@ -483,11 +502,9 @@ export default {
     if (cached) {
       return cached
     }
-    const headers = new Headers(request.headers)
-    headers.set('Host', cacheUrl.host)
-    const response = await fetch(new URL(incoming.pathname + incoming.search, ORIGIN), {
+    const response = await fetch(target, {
       method: request.method,
-      headers,
+      headers: originHeaders(request, target.host),
     })
     if (response.ok && request.method === 'GET') {
       const stored = new Response(response.body, response)
@@ -511,16 +528,36 @@ Origin Rule path:
 Worker path, route `assets.fudapop.com/*`, if Host override is unavailable:
 
 ```js
+const ORIGIN = 'https://storage.googleapis.com/fudapop-static'
+
+function targetUrl(requestUrl) {
+  const incoming = new URL(requestUrl)
+  const target = new URL(ORIGIN)
+  target.pathname = `${target.pathname}/${incoming.pathname.replace(/^\/+/, '')}`
+  target.search = incoming.search
+  return target
+}
+
+function originHeaders(request, host) {
+  const headers = new Headers()
+  const accept = request.headers.get('Accept')
+  if (accept) headers.set('Accept', accept)
+  const range = request.headers.get('Range')
+  if (range) headers.set('Range', range)
+  headers.set('Host', host)
+  return headers
+}
+
 export default {
   async fetch(request) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method not allowed', { status: 405 })
     }
-    const incoming = new URL(request.url)
-    const origin = new URL(`https://storage.googleapis.com/fudapop-static${incoming.pathname}${incoming.search}`)
-    const headers = new Headers(request.headers)
-    headers.set('Host', 'storage.googleapis.com')
-    return fetch(origin, { method: request.method, headers })
+    const target = targetUrl(request.url)
+    return fetch(target, {
+      method: request.method,
+      headers: originHeaders(request, target.host),
+    })
   },
 }
 ```

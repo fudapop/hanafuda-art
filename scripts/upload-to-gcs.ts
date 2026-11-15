@@ -21,7 +21,7 @@
 import { parseArgs } from '@std/cli/parse-args'
 import { exists } from '@std/fs/exists'
 import { join } from '@std/path/join'
-import { contentTypeFor, isImage, multipartUploadBody, objectKey } from './upload-to-gcs-lib.ts'
+import { contentTypeFor, isImage, multipartUploadBody, objectKey, uploadUrl } from './upload-to-gcs-lib.ts'
 
 const CACHE_CONTROL = 'public, max-age=31536000'
 const BUCKET = Deno.env.get('GCS_STATIC_BUCKET')?.trim() || 'fudapop-static'
@@ -174,17 +174,21 @@ const upload = async (item: UploadItem): Promise<void> => {
     { name: item.key, contentType: item.contentType, cacheControl: CACHE_CONTROL },
     boundary,
   )
-  const response = await fetch(
-    `https://storage.googleapis.com/upload/storage/v1/b/${bucket}/o?uploadType=multipart`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': `multipart/related; boundary=${boundary}`,
-      },
-      body,
+  const response = await fetch(uploadUrl(bucket, upsert), {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': `multipart/related; boundary=${boundary}`,
     },
-  )
+    body,
+  })
+  // 412 is the generation precondition. Another upload created the object
+  // after the existence check. Leave that object in place.
+  if (!upsert && response.status === 412) {
+    await response.body?.cancel()
+    console.info('↪', item.key, 'already exists. Skipping... (pass --upsert to overwrite)')
+    return
+  }
   if (!response.ok) {
     const detail = await response.text()
     throw new Error(`'${item.key}' upload failed (${response.status}): ${detail}`)

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { contentTypeFor, isImage, multipartUploadBody, objectKey } from './upload-to-gcs-lib.ts'
+import { contentTypeFor, isImage, multipartUploadBody, objectKey, uploadUrl } from './upload-to-gcs-lib.ts'
 
 describe('contentTypeFor', () => {
   it('maps jpeg extensions to image/jpeg', () => {
@@ -32,6 +32,17 @@ describe('objectKey', () => {
 
   it('rejects a path instead of a file name', () => {
     assert.throws(() => objectKey('cards', 'nested/matsu-1.webp'), /file name/)
+  })
+})
+
+describe('uploadUrl', () => {
+  it('requires a new object unless upsert is set', () => {
+    const created = new URL(uploadUrl('fudapop-static', false))
+    assert.equal(created.searchParams.get('uploadType'), 'multipart')
+    assert.equal(created.searchParams.get('ifGenerationMatch'), '0')
+
+    const replaced = new URL(uploadUrl('fudapop-static', true))
+    assert.equal(replaced.searchParams.get('ifGenerationMatch'), null)
   })
 })
 

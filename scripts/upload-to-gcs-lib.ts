@@ -49,6 +49,25 @@ export const objectKey = (uploadPath: string, filename: string): string => {
 }
 
 /**
+ * Builds the GCS JSON API multipart upload URL.
+ *
+ * Without upsert, `ifGenerationMatch=0` makes the write fail when the object
+ * already exists, including when two uploads pass the existence check together.
+ *
+ * @param bucket Bucket name.
+ * @param upsert When true, an existing object is replaced.
+ * @returns The upload URL.
+ */
+export const uploadUrl = (bucket: string, upsert: boolean): string => {
+  const url = new URL(`https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucket)}/o`)
+  url.searchParams.set('uploadType', 'multipart')
+  if (!upsert) {
+    url.searchParams.set('ifGenerationMatch', '0')
+  }
+  return url.toString()
+}
+
+/**
  * @param bytes Object bytes.
  * @param metadata GCS object resource fields.
  * @param boundary Multipart boundary. Must not occur inside the image bytes.

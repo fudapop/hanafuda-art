@@ -76,6 +76,37 @@ resource "google_project_iam_custom_role" "terraform_apply_storage" {
   depends_on = [google_project_service.required]
 }
 
+# repoAdmin manages artifacts in a repository. It does not include
+# repositories.create or repositories.setIamPolicy. admin includes both, and
+# also every artifact read and write permission. This role is only repository
+# create, update, delete, and IAM.
+resource "google_project_iam_custom_role" "terraform_apply_artifact_registry" {
+  project     = var.project_id
+  role_id     = "terraformApplyArtifactRegistry"
+  title       = "Terraform apply Artifact Registry repositories"
+  description = "Create repositories and set their IAM. Does not grant artifact read or write."
+  permissions = [
+    "artifactregistry.locations.get",
+    "artifactregistry.locations.list",
+    "artifactregistry.repositories.create",
+    "artifactregistry.repositories.delete",
+    "artifactregistry.repositories.get",
+    "artifactregistry.repositories.getIamPolicy",
+    "artifactregistry.repositories.list",
+    "artifactregistry.repositories.setIamPolicy",
+    "artifactregistry.repositories.update",
+  ]
+  stage = "GA"
+
+  depends_on = [google_project_service.required]
+}
+
+resource "google_project_iam_member" "terraform_apply_artifact_registry" {
+  project = var.project_id
+  role    = google_project_iam_custom_role.terraform_apply_artifact_registry.id
+  member  = "serviceAccount:${google_service_account.terraform_apply.email}"
+}
+
 resource "google_project_iam_member" "terraform_plan_storage" {
   project = var.project_id
   role    = google_project_iam_custom_role.terraform_plan_storage.id

@@ -21,6 +21,9 @@ force_path_style = true
 
 [gcs]
 type = google cloud storage
+# Required. The GCS backend does not use Application Default Credentials
+# unless env_auth is true, even when service_account_file is unset.
+env_auth = true
 # rclone names this field project_number. The project id is accepted.
 project_number = new-hanafuda
 bucket_policy_only = true

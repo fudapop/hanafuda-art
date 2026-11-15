@@ -37,6 +37,15 @@ resource "google_service_account" "imgproxy" {
   }
 }
 
+# Cloud Run refuses to attach a runtime account unless the deployer has
+# iam.serviceAccounts.actAs on it. serviceAccountAdmin can set this policy.
+# It cannot act as the account by itself.
+resource "google_service_account_iam_member" "terraform_apply" {
+  service_account_id = google_service_account.imgproxy.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = var.terraform_apply_member
+}
+
 resource "google_storage_bucket_iam_member" "runtime" {
   bucket = var.bucket_name
   role   = "roles/storage.legacyObjectReader"
@@ -147,6 +156,7 @@ resource "google_cloud_run_v2_service" "imgproxy" {
 
   depends_on = [
     google_artifact_registry_repository_iam_member.cloud_run_agent,
+    google_service_account_iam_member.terraform_apply,
     google_storage_bucket_iam_member.runtime,
   ]
 }
