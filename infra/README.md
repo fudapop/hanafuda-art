@@ -111,7 +111,7 @@ The pull-request provider (`github-pull-request`) and the apply pool are new. Do
 
 ### 6. Apply bootstrap
 
-From `infra/bootstrap`:
+From `infra/bootstrap`. There is no `backend.tf` in git yet, so this init uses local state. Do not copy `backend.tf.example` over first: `terraform init` would look for `new-hanafuda-tfstate` before this apply creates it.
 
 ```bash
 terraform init -input=false
@@ -146,13 +146,15 @@ terraform output -raw gcp_terraform_apply_service_account
 
 ### 7. Move bootstrap state into the bucket
 
+Do this only after step 6 has created the bucket. `backend.tf` stays out of git until then.
+
 ```bash
 cp backend.tf.example backend.tf
 terraform init -migrate-state
 terraform state list
 ```
 
-After `state list` shows the resources, delete the local `terraform.tfstate.backup`. Do not commit either state file. Commit `infra/bootstrap/backend.tf` in a follow-up so the remote backend is recorded. CI does not apply bootstrap.
+After `state list` shows the resources, delete the local `terraform.tfstate.backup`. Do not commit either state file. Commit `infra/bootstrap/backend.tf` only after `gcloud storage buckets describe gs://new-hanafuda-tfstate` succeeds, so a fresh clone is not asked to initialize a backend that does not exist yet. CI does not apply bootstrap, and its validate step uses `terraform init -backend=false`.
 
 ### 8. Import the Firestore deploy identity if it already exists
 
