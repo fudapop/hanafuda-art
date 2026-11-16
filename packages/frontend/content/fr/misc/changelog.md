@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## [2026.11.0] - 2026-11-14
+
+### Corrections de bugs
+- **Fin de la manche** : Une manche qui utilise toutes les cartes des deux mains se termine par une égalité au lieu de planter lorsque la pioche est épuisée.
+- **Plateau de jeu sur téléphone** : Les mains, le plateau et les cartes capturées s'adaptent désormais à l'écran d'un téléphone sans défilement horizontal.
+- **Piles de collecte sur téléphone** : Les piles de cartes capturées restent sur une seule rangée superposée au lieu de déborder sur le plateau.
+- **Connexion sur Safari** : Le formulaire de connexion reste entièrement visible dans Safari.
+- **Connexion sur iPhone** : Le formulaire de connexion reste empilé sur l'écran d'un iPhone.
+- **Réinitialisation du mot de passe** : Les liens de réinitialisation se terminent désormais dans l'application au lieu d'échouer sur la page de réinitialisation hébergée.
+- **Connexion via Google et GitHub** : Le formulaire de connexion indique que ces comptes n'ont pas de mot de passe, et un échec de connexion par e-mail suggère d'utiliser ces boutons ou l'option Mot de passe oublié.
+- **Mots de passe des nouveaux comptes** : La création d'un compte requiert désormais de respecter la liste de critères de mot de passe affichée sur le formulaire.
+- **Mises à jour de l'application installée** : Une nouvelle version s'applique lorsque vous n'êtes pas dans une partie active, afin qu'un match en cours ne soit pas rechargé.
+- **Longueur des commentaires** : Les commentaires de plus de 2000 caractères restent dans le formulaire, et le message de remerciement n'apparaît qu'après l'enregistrement du commentaire.
+- **Mentions J'aime sur les annonces** : Une mention J'aime ou son retrait effectué sur un appareil s'affiche sur vos autres appareils.
+
+### Améliorations de l'interface et de l'expérience
+- **Classements ex æquo** : Les joueurs ex æquo dans un classement partagent le même rang.
+
+### Confidentialité
+- **E-mails des joueurs** : Les classements et autres lectures partagées ne contiennent plus les adresses e-mail des joueurs. Les profils publics du classement affichent le nom, l'avatar et les statistiques.
+- **Classements publics** : Les visiteurs non connectés peuvent ouvrir les classements.
+- **Réactions aux annonces** : Le nombre total de vues et de mentions J'aime publiques est masqué. Une mention J'aime est enregistrée sur votre compte plutôt que sur un compteur partagé.
+
 ## [2026.4.0] - 2026-04-05
 
 ### Nouvelles fonctionnalités

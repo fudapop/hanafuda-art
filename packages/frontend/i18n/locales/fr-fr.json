@@ -27,7 +27,8 @@
       "showTable": "Afficher la table",
       "saveGame": "Sauvegarder la partie",
       "loadGame": "Charger la partie",
-      "retry": "Réessayer"
+      "retry": "Réessayer",
+      "processing": "Traitement en cours..."
     },
     "labels": {
       "appName": "FudaPop",
@@ -106,16 +107,16 @@
     },
     "passwordReset": {
       "title": "Réinitialiser votre mot de passe ?",
-      "description": "Un lien pour changer votre mot de passe sera envoyé si un compte associé existe. Seul le lien le plus récent fonctionne."
+      "description": "Un lien pour modifier votre mot de passe vous sera envoyé si un compte associé existe. Seul le lien le plus récent fonctionne."
     },
     "action": {
       "newPassword": "Nouveau mot de passe",
       "confirmPassword": "Confirmer le mot de passe",
       "submit": "Enregistrer le mot de passe",
       "saving": "Enregistrement…",
-      "verifying": "Vérification du lien…",
-      "verifyingBody": "Cette vérification n'utilise pas le lien. Vous choisirez un mot de passe à l'étape suivante.",
-      "resetTitle": "Choisissez un nouveau mot de passe",
+      "verifying": "Vérification de votre lien…",
+      "verifyingBody": "Cela ne consomme pas le lien. Vous choisirez un mot de passe à l'étape suivante.",
+      "resetTitle": "Choisir un nouveau mot de passe",
       "resetDescription": "Définissez un nouveau mot de passe pour {email}.",
       "thisAddress": "cette adresse",
       "successTitle": "Mot de passe mis à jour",
@@ -123,20 +124,20 @@
       "continue": "Continuer vers la connexion",
       "mismatch": "Ces mots de passe ne correspondent pas.",
       "weakPassword": "Choisissez un mot de passe plus fort. Il doit respecter toutes les exigences ci-dessous.",
-      "expiredTitle": "Ce lien n'est plus valable",
+      "expiredTitle": "Ce lien n'est plus valide",
       "expiredBody": "Il a expiré ou a déjà été utilisé. Demandez un nouvel e-mail de réinitialisation depuis la page de connexion. Seul le lien le plus récent fonctionne.",
-      "missingTitle": "Ouvrez le lien reçu par e-mail",
-      "missingBody": "Cette page termine une réinitialisation de mot de passe. Ouvrez le lien de l'e-mail, ou demandez-en un nouveau depuis la page de connexion.",
-      "unsupportedTitle": "Ce lien ne peut pas être terminé ici",
+      "missingTitle": "Ouvrez le lien depuis votre e-mail",
+      "missingBody": "Cette page finalise la réinitialisation du mot de passe. Ouvrez le lien dans l'e-mail de réinitialisation, ou demandez-en un nouveau depuis la page de connexion.",
+      "unsupportedTitle": "Ce lien ne peut pas être finalisé ici",
       "unsupportedBody": "Le lien ne contient pas d'action reconnue. Demandez un nouvel e-mail depuis la page de connexion.",
       "disabledTitle": "Ce compte ne peut pas être mis à jour",
-      "disabledBody": "Le compte de ce lien est désactivé ou n'existe plus.",
+      "disabledBody": "Le compte associé à ce lien est désactivé ou n'existe plus.",
       "networkTitle": "Impossible de vérifier le lien",
       "network": "La requête réseau a échoué. Vérifiez votre connexion et réessayez.",
       "genericTitle": "Impossible d'utiliser ce lien",
-      "generic": "Une erreur s'est produite. Demandez un nouveau lien et réessayez.",
+      "generic": "Une erreur est survenue. Demandez un nouveau lien et réessayez.",
       "verifyTitle": "Vérifiez votre e-mail",
-      "verifyBody": "Confirmez {email} pour terminer la vérification. Le lien n'est utilisé que lorsque vous appuyez sur le bouton.",
+      "verifyBody": "Confirmez {email} pour terminer la vérification de cette adresse. Le lien n'est utilisé que lorsque vous appuyez sur le bouton.",
       "verifyButton": "Vérifier l'e-mail",
       "verifySuccessTitle": "E-mail vérifié",
       "verifySuccessBody": "Cette adresse est vérifiée. Vous pouvez continuer vers la connexion.",
@@ -159,9 +160,9 @@
     },
     "messages": {
       "unableToCreateAccount": "Impossible de créer un compte.",
-      "invalidEmailOrPassword": "E-mail ou mot de passe invalide. Si ce compte a été créé avec Google ou GitHub, utilisez ce bouton : il n'a pas de mot de passe tant que vous n'en définissez pas un via Mot de passe oublié.",
-      "providerAccountHint": "Les comptes Google et GitHub n'ont pas de mot de passe. Utilisez ces boutons, ou définissez-en un via Mot de passe oublié.",
-      "tooManyAttempts": "Trop de tentatives. Patientez un moment et réessayez.",
+      "invalidEmailOrPassword": "E-mail ou mot de passe invalide. Si vous avez créé ce compte avec Google ou GitHub, utilisez ce bouton — il n'a pas de mot de passe tant que vous n'en avez pas défini un avec Mot de passe oublié.",
+      "providerAccountHint": "Les comptes Google et GitHub n'ont pas de mot de passe. Utilisez ces boutons, ou définissez-en un avec Mot de passe oublié.",
+      "tooManyAttempts": "Trop de tentatives. Veuillez patienter un instant et réessayer.",
       "accountDisabled": "Ce compte a été désactivé.",
       "unableToLinkAccount": "Impossible de lier votre compte.",
       "unableToSignIn": "Impossible de se connecter. Veuillez réessayer plus tard.",
@@ -628,7 +629,20 @@
     "preview_rules_message": "Consultez les règles de l'hôte avant de rejoindre.",
     "sync_error": "Impossible de synchroniser l'état du jeu. Les deux joueurs doivent utiliser la même version de l'application.",
     "sync_error_retry": "Impossible de synchroniser l'état du jeu après plusieurs tentatives. Veuillez réessayer de rejoindre.",
-    "sync_error_update": "Impossible d'appliquer la mise à jour du jeu. Essayez de rafraîchir la page."
+    "sync_error_update": "Impossible d'appliquer la mise à jour du jeu. Essayez de rafraîchir la page.",
+    "opponent_thinking": "Réflexion...",
+    "disconnect": {
+      "title": "Adversaire déconnecté",
+      "description": "Votre adversaire s'est déconnecté de la partie. Vous pouvez attendre son retour ou revendiquer la victoire.",
+      "cancelDescription": "Votre adversaire s'est déconnecté de la partie. Vous pouvez attendre son retour ou mettre fin à la partie. Aucun résultat ne sera enregistré.",
+      "opponentMessage": "Message de l'adversaire :",
+      "offlineFor": "Déconnecté depuis :",
+      "continueWaiting": "Continuer d'attendre",
+      "claimVictory": "Revendiquer la victoire",
+      "endGame": "Terminer la partie",
+      "matchEnded": "Votre match est terminé.",
+      "reconnecting": "Reconnexion..."
+    }
   },
   "pages": {
     "changelog": "Journal des modifications",
@@ -655,6 +669,6 @@
     "deferred": "Une nouvelle version est prête. Elle se chargera lorsque vous reviendrez au menu.",
     "available": "Une nouvelle version est prête.",
     "updating": "Mise à jour vers la dernière version…",
-    "updateNow": "Mettre à jour"
+    "updateNow": "Mettre à jour maintenant"
   }
 }

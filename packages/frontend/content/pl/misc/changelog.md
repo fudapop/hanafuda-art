@@ -1,5 +1,28 @@
 # Dziennik zmian
 
+## [2026.11.0] - 2026-11-14
+
+### Poprawki błędów
+- **Koniec rundy**: Runda, w której zostaną zużyte wszystkie karty z obu rąk, kończy się remisem, zamiast powodować błąd aplikacji po wyczerpaniu talii.
+- **Plansza gry na telefonie**: Karty w ręku, pole gry i zdobyte karty mieszczą się teraz na ekranie telefonu bez konieczności przewijania w bok.
+- **Stosy zdobytych kart na telefonach**: Stosy zdobytych kart pozostają w jednym nakładającym się rzędzie, zamiast zawijać się na pole gry.
+- **Logowanie w Safari**: Formularz logowania pozostaje w pełni widoczny w Safari.
+- **Logowanie na iPhone**: Formularz logowania zachowuje układ pionowy na ekranie iPhone.
+- **Resetowanie hasła**: Linki do resetowania hasła kończą teraz działanie wewnątrz aplikacji, zamiast zgłaszać błąd na zewnętrznej stronie resetowania.
+- **Logowanie przez Google i GitHub**: Formularz logowania informuje, że te konta nie mają hasła, a nieudane logowanie przez e-mail sugeruje użycie tych przycisków lub opcji „Nie pamiętam hasła”.
+- **Hasła do nowych kont**: Tworzenie konta wymaga teraz spełnienia wymagań dotyczących hasła przedstawionych na formularzu.
+- **Aktualizacje zainstalowanej aplikacji**: Nowa wersja jest wdrażana, gdy nie uczestniczysz w aktywnej grze, dzięki czemu trwający mecz nie zostanie przeładowany.
+- **Długość opinii**: Komentarze dłuższe niż 2000 znaków pozostają w formularzu, a podziękowanie pojawia się dopiero po zapisaniu komentarza.
+- **Polubienia ogłoszeń**: Polubienie lub cofnięcie polubienia wykonane na jednym urządzeniu jest widoczne na innych Twoich urządzeniach.
+
+### Ulepszenia interfejsu i komfortu gry
+- **Miejsca remisowe**: Gracze z takim samym wynikiem w tabeli liderów zajmują to samo miejsce.
+
+### Prywatność
+- **Adresy e-mail graczy**: Tabele wyników i inne publicznie dostępne dane nie zawierają już adresów e-mail graczy. Publiczne profile w tabeli liderów pokazują nazwę, awatar i bilans gier.
+- **Publiczne rankingi**: Niezalogowani użytkownicy mogą przeglądać rankingi.
+- **Reakcje na ogłoszenia**: Publiczne statystyki wyświetleń i polubień zostały ukryte. Polubienie jest zapisywane na Twoim koncie zamiast we wspólnym liczniku.
+
 ## [2026.4.0] - 2026-04-05
 
 ### Nowe funkcje
