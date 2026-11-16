@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, it } from 'node:test'
+import { pathToFileURL } from 'node:url'
 import { loadGlossary } from './i18n/glossary.ts'
 import { applyJsonEdits, planJsonEdits, type JsonObject } from './i18n/json-locale.ts'
 import { parseLocalization, targetLocales } from './i18n/locales.ts'
@@ -53,6 +54,102 @@ const echoClient = (): { client: ModelClient; calls: number } => {
   }
   return { client, get calls() { return state.calls } }
 }
+
+describe('translation workflow range', () => {
+  const workflow = readFileSync(join(repoRoot, '.github/workflows/translate-content.yml'), 'utf8')
+
+  const resolveRange = (overrides: Record<string, string> = {}) => {
+    const block = workflow.match(/      - name: Resolve translation range\n[\s\S]*?        run: \|\n((?:          .*\n|\n)+)/)
+    assert.ok(block, 'workflow must resolve one shared range before planning and translating')
+    const script = block[1].replace(/^          /gm, '')
+    const dir = mkdtempSync(join(tmpdir(), 'i18n-range-'))
+    const git = (args: string[]) =>
+      execFileSync('git', args, { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+    try {
+      git(['init', '-b', 'main'])
+      git(['config', 'user.email', 'test@example.com'])
+      git(['config', 'user.name', 'Test'])
+      git(['commit', '--allow-empty', '-m', 'base'])
+      const base = git(['rev-parse', 'HEAD'])
+      git(['tag', 'translated-base'])
+      git(['checkout', '-b', 'other'])
+      git(['commit', '--allow-empty', '-m', 'other'])
+      git(['checkout', 'main'])
+      git(['commit', '--allow-empty', '-m', 'head'])
+      const head = git(['rev-parse', 'HEAD'])
+      const output = join(dir, 'output')
+      writeFileSync(output, '')
+      const result = spawnSync('bash', ['-c', script], {
+        cwd: dir,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          EVENT_NAME: 'workflow_dispatch',
+          REQUESTED_MODE: 'changed',
+          BASE_REF: 'translated-base',
+          PUSH_BASE_SHA: base,
+          HEAD_SHA: head,
+          ...overrides,
+          GITHUB_OUTPUT: output,
+        },
+      })
+      return { ...result, output: readFileSync(output, 'utf8'), base, head }
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  }
+
+  it('defaults manual runs to incremental and shares the resolved range', () => {
+    assert.match(workflow, /mode:\n[\s\S]*?type: choice\n[\s\S]*?default: changed/)
+    for (const name of ['Plan translations', 'Translate']) {
+      const step = workflow.slice(workflow.indexOf(`      - name: ${name}\n`)).split('\n      - name: ')[0]
+      assert.match(step, /MODE: \$\{\{ steps\.range\.outputs\.mode \}\}/)
+      assert.match(step, /BASE_SHA: \$\{\{ steps\.range\.outputs\.base \}\}/)
+      assert.match(step, /HEAD_SHA: \$\{\{ steps\.range\.outputs\.head \}\}/)
+      assert.match(step, /--pending-ref origin\/i18n\/update-translations/)
+      assert.doesNotMatch(step, /MODE=full/)
+    }
+  })
+
+  it('resolves a manual base tag to a full SHA', () => {
+    const result = resolveRange()
+    assert.equal(result.status, 0, result.stdout + result.stderr)
+    assert.equal(result.output, `mode=changed\nbase=${result.base}\nhead=${result.head}\n`)
+  })
+
+  it('requires a base for a manual incremental run', () => {
+    const result = resolveRange({ BASE_REF: '' })
+    assert.notEqual(result.status, 0)
+    assert.match(result.stdout + result.stderr, /base_ref is required/)
+    assert.equal(result.output, '')
+  })
+
+  it('rejects unknown or non-ancestor bases instead of falling back to full', () => {
+    for (const base of ['missing-ref', 'other', '--help']) {
+      const result = resolveRange({ BASE_REF: base })
+      assert.notEqual(result.status, 0, base)
+      assert.equal(result.output, '', base)
+    }
+  })
+
+  it('allows explicit full mode without a base', () => {
+    const result = resolveRange({ REQUESTED_MODE: 'full', BASE_REF: '' })
+    assert.equal(result.status, 0, result.stdout + result.stderr)
+    assert.equal(result.output, `mode=full\nbase=\nhead=${result.head}\n`)
+  })
+
+  it('keeps push events incremental and uses the push base', () => {
+    const result = resolveRange({ EVENT_NAME: 'push', REQUESTED_MODE: 'full', BASE_REF: 'missing-ref' })
+    assert.equal(result.status, 0, result.stdout + result.stderr)
+    assert.equal(result.output, `mode=changed\nbase=${result.base}\nhead=${result.head}\n`)
+  })
+
+  it('rejects an unsupported manual mode', () => {
+    const result = resolveRange({ REQUESTED_MODE: 'typo' })
+    assert.notEqual(result.status, 0)
+    assert.equal(result.output, '')
+  })
+})
 
 describe('maskText', () => {
   it('restores urls, attribute blocks, placeholders, and card ids', () => {
@@ -438,6 +535,113 @@ describe('prose batches', () => {
 })
 
 describe('pending translations', () => {
+  for (const olderRequest of [true, false]) {
+    it(olderRequest
+      ? 'preserves an older manual catch-up range and pending locale edits through the CLI'
+      : 'extends a newer requested range to include the older pending baseline', () => {
+      const dir = mkdtempSync(join(tmpdir(), 'i18n-catch-up-'))
+      const git = (args: string[]) =>
+        execFileSync('git', args, { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+      const write = (path: string, contents: string) => {
+        mkdirSync(join(dir, path, '..'), { recursive: true })
+        writeFileSync(join(dir, path), contents)
+      }
+      const commit = (message: string) => {
+        git(['add', '.'])
+        git(['commit', '-m', message])
+        return git(['rev-parse', 'HEAD'])
+      }
+      const sourcePage = 'packages/frontend/content/en/misc/note.md'
+      const targetPage = 'packages/frontend/content/ja/misc/note.md'
+      const sourceJson = 'packages/frontend/i18n/locales/en-us.json'
+      const targetJson = 'packages/frontend/i18n/locales/ja-jp.json'
+      const english = { common: { missed: 'Old UI', later: 'Old later UI', keep: 'Unchanged' } }
+      const localized = { common: { missed: 'Old localized UI', later: 'Old localized later', keep: 'Old reviewed UI' } }
+      try {
+        git(['init', '-b', 'main'])
+        git(['config', 'user.email', 'test@example.com'])
+        git(['config', 'user.name', 'Test'])
+        write(LOCALIZATION_PATH, JSON.stringify({
+          defaultLocale: 'en',
+          locales: [
+            { name: 'English', code: 'en', language: 'en-US', file: 'en-us.json', dir: 'ltr' },
+            { name: '日本語', code: 'ja', language: 'ja-JP', file: 'ja-jp.json', dir: 'ltr' },
+          ],
+        }))
+        write(sourcePage, 'Old English page\n')
+        write(targetPage, 'Old localized page\n')
+        write(sourceJson, JSON.stringify(english))
+        write(targetJson, JSON.stringify(localized))
+        const requestedBase = commit('last complete translation')
+
+        write(sourcePage, 'Missed English page\n')
+        english.common.missed = 'Missed English UI'
+        write(sourceJson, JSON.stringify(english))
+        commit('English changes whose translation was skipped')
+        english.common.later = 'Later English UI'
+        write(sourceJson, JSON.stringify(english))
+        commit('later English push that opens a translation PR')
+
+        git(['checkout', '-b', 'i18n/update-translations'])
+        write(targetJson, JSON.stringify({ common: {
+          ...localized.common,
+          later: 'Pending later UI',
+          keep: 'Reviewed pending UI',
+        } }))
+        commit('pending translations and reviewed wording')
+        git(['checkout', 'main'])
+        if (!olderRequest) {
+          write(sourcePage, 'Newest English page\n')
+          commit('newer English push')
+        }
+        const head = git(['rev-parse', 'HEAD'])
+        const args = [
+          '--experimental-strip-types', join(repoRoot, 'scripts/i18n-translate.ts'),
+          '--mode', 'changed', '--base', olderRequest ? requestedBase : head, '--head', head,
+        ]
+        const cli = (extra: string[]) => execFileSync(process.execPath, [...args, ...extra], {
+          cwd: dir,
+          encoding: 'utf8',
+          env: { ...process.env, GCP_ACCESS_TOKEN: 'test-token', GCP_PROJECT_ID: 'test-project' },
+        })
+        const noPending = cli(['--plan'])
+        if (olderRequest) assert.match(noPending, /Files: 2/)
+        else assert.match(noPending, /No files need translation/)
+
+        const pendingArgs = ['--pending-ref', 'i18n/update-translations']
+        const preview = cli([...pendingArgs, '--plan'])
+        assert.match(preview, new RegExp(`Files: ${olderRequest ? 2 : 1}`))
+        assert.ok(preview.includes(targetPage), preview)
+        if (olderRequest) assert.ok(preview.includes(targetJson), preview)
+        assert.equal(git(['status', '--porcelain']), '', 'preview must not materialize pending edits')
+
+        const mockVertex = join(dir, 'mock-vertex.mjs')
+        writeFileSync(mockVertex, `globalThis.fetch = async () => new Response(JSON.stringify({
+          candidates: [{ content: { parts: [{ text: JSON.stringify({
+            text: 'Recovered localized page',
+            strings: { 'common.missed': 'Recovered localized UI', 'common.later': 'Pending later UI' }
+          }) }] } }]
+        }))\n`)
+        execFileSync(process.execPath, [
+          '--import', pathToFileURL(mockVertex).href, ...args, ...pendingArgs,
+        ], {
+          cwd: dir,
+          encoding: 'utf8',
+          env: { ...process.env, GCP_ACCESS_TOKEN: 'test-token', GCP_PROJECT_ID: 'test-project' },
+        })
+        const translated = JSON.parse(readFileSync(join(dir, targetJson), 'utf8'))
+        assert.equal(translated.common.keep, 'Reviewed pending UI')
+        assert.equal(translated.common.later, 'Pending later UI')
+        assert.equal(translated.common.missed, olderRequest ? 'Recovered localized UI' : 'Old localized UI')
+        assert.equal(readFileSync(join(dir, targetPage), 'utf8'), 'Recovered localized page\n')
+        assert.equal(readFileSync(join(dir, sourceJson), 'utf8'), JSON.stringify(english))
+        assert.equal(readFileSync(join(dir, sourcePage), 'utf8'), olderRequest ? 'Missed English page\n' : 'Newest English page\n')
+      } finally {
+        rmSync(dir, { recursive: true, force: true })
+      }
+    })
+  }
+
   it('keeps locale edits from an open branch and ignores English paths', () => {
     const selected = selectPendingFiles(
       [

@@ -27,7 +27,8 @@
       "delete": "Usuń",
       "saveGame": "Zapisz grę",
       "loadGame": "Wczytaj grę",
-      "retry": "Ponów"
+      "retry": "Ponów",
+      "processing": "Przetwarzanie..."
     },
     "labels": {
       "appName": "FudaPop",
@@ -106,7 +107,7 @@
     },
     "passwordReset": {
       "title": "Zresetować hasło?",
-      "description": "Link do zmiany hasła zostanie wysłany, jeśli istnieje powiązane konto. Działa tylko najnowszy link."
+      "description": "Link do zmiany hasła zostanie wysłany, jeśli powiązane konto istnieje. Działa tylko najnowszy link."
     },
     "action": {
       "newPassword": "Nowe hasło",
@@ -114,36 +115,36 @@
       "submit": "Zapisz hasło",
       "saving": "Zapisywanie…",
       "verifying": "Sprawdzanie linku…",
-      "verifyingBody": "To sprawdzenie nie zużywa linku. Hasło wybierzesz w następnym kroku.",
+      "verifyingBody": "To nie powoduje zużycia linku. Wybierzesz hasło w następnym kroku.",
       "resetTitle": "Wybierz nowe hasło",
       "resetDescription": "Ustaw nowe hasło dla {email}.",
       "thisAddress": "tego adresu",
-      "successTitle": "Hasło zaktualizowane",
-      "successBody": "Możesz zalogować się nowym hasłem.",
+      "successTitle": "Hasło zostało zaktualizowane",
+      "successBody": "Możesz teraz zalogować się za pomocą nowego hasła.",
       "continue": "Przejdź do logowania",
-      "mismatch": "Hasła nie są takie same.",
-      "weakPassword": "Wybierz silniejsze hasło. Musi spełniać wszystkie wymagania poniżej.",
-      "expiredTitle": "Ten link już nie działa",
-      "expiredBody": "Wygasł albo został już użyty. Poproś o nowy e-mail resetujący na stronie logowania. Działa tylko najnowszy link.",
-      "missingTitle": "Otwórz link z e-maila",
-      "missingBody": "Ta strona kończy reset hasła. Otwórz link z e-maila albo poproś o nowy na stronie logowania.",
-      "unsupportedTitle": "Tego linku nie można tu dokończyć",
-      "unsupportedBody": "W linku brakuje rozpoznanej akcji. Poproś o nowy e-mail na stronie logowania.",
+      "mismatch": "Hasła nie są identyczne.",
+      "weakPassword": "Wybierz silniejsze hasło. Musi ono spełniać wszystkie poniższe wymagania.",
+      "expiredTitle": "Ten link nie jest już ważny",
+      "expiredBody": "Wygasł lub został już użyty. Poproś o nową wiadomość e-mail z resetowaniem hasła na stronie logowania. Działa tylko najnowszy link.",
+      "missingTitle": "Otwórz link ze swojej wiadomości e-mail",
+      "missingBody": "Ta strona kończy resetowanie hasła. Otwórz link w wiadomości e-mail o resetowaniu hasła lub poproś o nowy na stronie logowania.",
+      "unsupportedTitle": "Tego linku nie można zrealizować w tym miejscu",
+      "unsupportedBody": "W linku brakuje rozpoznanej akcji. Poproś o nową wiadomość e-mail na stronie logowania.",
       "disabledTitle": "Tego konta nie można zaktualizować",
-      "disabledBody": "Konto dla tego linku jest wyłączone albo już nie istnieje.",
+      "disabledBody": "Konto powiązane z tym linkiem jest wyłączone lub już nie istnieje.",
       "networkTitle": "Nie udało się sprawdzić linku",
       "network": "Żądanie sieciowe nie powiodło się. Sprawdź połączenie i spróbuj ponownie.",
-      "genericTitle": "Nie można użyć tego linku",
+      "genericTitle": "Nie udało się użyć tego linku",
       "generic": "Coś poszło nie tak. Poproś o nowy link i spróbuj ponownie.",
-      "verifyTitle": "Potwierdź e-mail",
-      "verifyBody": "Potwierdź {email}, aby dokończyć weryfikację. Link zostanie użyty dopiero po naciśnięciu przycisku.",
-      "verifyButton": "Potwierdź e-mail",
-      "verifySuccessTitle": "E-mail potwierdzony",
-      "verifySuccessBody": "Ten adres jest potwierdzony. Możesz przejść do logowania.",
-      "recoverTitle": "Przywróć e-mail",
+      "verifyTitle": "Zweryfikuj swój adres e-mail",
+      "verifyBody": "Potwierdź {email}, aby dokończyć weryfikację tego adresu. Link zostanie użyty dopiero po naciśnięciu przycisku.",
+      "verifyButton": "Zweryfikuj e-mail",
+      "verifySuccessTitle": "Adres e-mail zweryfikowany",
+      "verifySuccessBody": "Ten adres został zweryfikowany. Możesz przejść do logowania.",
+      "recoverTitle": "Przywróć swój adres e-mail",
       "recoverBody": "Przywróć {email} jako adres tego konta. Link zostanie użyty dopiero po naciśnięciu przycisku.",
       "recoverButton": "Przywróć e-mail",
-      "recoverSuccessTitle": "E-mail przywrócony",
+      "recoverSuccessTitle": "Adres e-mail przywrócony",
       "recoverSuccessBody": "Poprzedni adres e-mail został przywrócony."
     },
     "passwordRequirements": {
@@ -159,8 +160,8 @@
     },
     "messages": {
       "unableToCreateAccount": "Nie można utworzyć konta.",
-      "invalidEmailOrPassword": "Nieprawidłowy e-mail lub hasło. Jeśli konto utworzono przez Google lub GitHub, użyj tego przycisku — nie ma ono hasła, dopóki nie ustawisz go przez Zapomniałem hasła.",
-      "providerAccountHint": "Konta Google i GitHub nie mają hasła. Użyj tych przycisków albo ustaw hasło przez Zapomniałem hasła.",
+      "invalidEmailOrPassword": "Nieprawidłowy e-mail lub hasło. Jeśli utworzyłeś to konto za pomocą Google lub GitHub, użyj odpowiedniego przycisku — konto nie ma hasła, dopóki nie ustawisz go za pomocą opcji Nie pamiętam hasła.",
+      "providerAccountHint": "Konta Google i GitHub nie mają hasła. Użyj tych przycisków lub ustaw hasło za pomocą opcji Nie pamiętam hasła.",
       "tooManyAttempts": "Zbyt wiele prób. Odczekaj chwilę i spróbuj ponownie.",
       "accountDisabled": "To konto zostało wyłączone.",
       "unableToLinkAccount": "Nie można powiązać konta.",
@@ -354,7 +355,20 @@
     "preview_rules_message": "Przejrzyj zasady gospodarza przed dołączeniem.",
     "sync_error": "Nie udało się zsynchronizować stanu gry. Obaj gracze muszą korzystać z tej samej wersji aplikacji.",
     "sync_error_retry": "Nie udało się zsynchronizować stanu gry po kilku próbach. Spróbuj dołączyć ponownie.",
-    "sync_error_update": "Nie udało się zastosować aktualizacji gry. Spróbuj odświeżyć stronę."
+    "sync_error_update": "Nie udało się zastosować aktualizacji gry. Spróbuj odświeżyć stronę.",
+    "opponent_thinking": "Myśli...",
+    "disconnect": {
+      "title": "Przeciwnik rozłączył się",
+      "description": "Twój przeciwnik rozłączył się z gry. Możesz poczekać na jego powrót lub ogłosić swoje zwycięstwo.",
+      "cancelDescription": "Twój przeciwnik rozłączył się z gry. Możesz poczekać na jego powrót lub zakończyć grę. Wyniki nie zostaną zapisane.",
+      "opponentMessage": "Wiadomość od przeciwnika:",
+      "offlineFor": "Rozłączony od:",
+      "continueWaiting": "Czekaj dalej",
+      "claimVictory": "Ogłoś zwycięstwo",
+      "endGame": "Zakończ grę",
+      "matchEnded": "Twój mecz się zakończył.",
+      "reconnecting": "Ponowne łączenie..."
+    }
   },
   "settings": {
     "actions": {
@@ -636,7 +650,7 @@
     "privacy": "Polityka Prywatności",
     "rankings": "Rankingi",
     "signIn": "Zaloguj się",
-    "resetPassword": "Reset hasła",
+    "resetPassword": "Zresetuj hasło",
     "terms": "Warunki Użytkowania",
     "announcements": "Ogłoszenia",
     "home": "Strona Główna"
@@ -652,9 +666,9 @@
     "home": "Zagraj w japońską grę karcianą Hanafuda Koi-Koi przeciwko przeciwnikowi AI."
   },
   "pwa": {
-    "deferred": "Nowa wersja jest gotowa. Wczyta się po powrocie do menu.",
+    "deferred": "Nowa wersja jest gotowa. Zostanie załadowana po powrocie do menu.",
     "available": "Nowa wersja jest gotowa.",
     "updating": "Aktualizowanie do najnowszej wersji…",
-    "updateNow": "Aktualizuj"
+    "updateNow": "Aktualizuj teraz"
   }
 }

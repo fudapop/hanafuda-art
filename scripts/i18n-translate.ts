@@ -43,7 +43,7 @@ const HELP = `Usage: node --experimental-strip-types scripts/i18n-translate.ts [
 --mode changed|full   changed reads --base and --head. full retranslates every source.
 --base <sha>          Parent commit for changed mode.
 --head <sha>          Checked-out commit for changed mode. Must be HEAD.
---pending-ref <ref>   Open translation branch. When it exists, plan from its merge-base and restore its locale files first.
+--pending-ref <ref>   Open translation branch. Include its merge-base without narrowing --base, and merge its locale edits.
 --plan                Print the plan and do not call Vertex or write files.
 --github-output <path>  Append count= and api= for Actions.
 --help
@@ -185,19 +185,23 @@ const createPlan = (options: Options): { plan: Plan; pending: PendingTranslation
     }
   }
   if (!options.base || !options.head) throw new Error('changed mode requires --base and --head')
+  if ((!isZeroSha(options.base) && !isCommitSha(options.base)) || !isCommitSha(options.head)) {
+    throw new Error('--base and --head must be full commit SHAs')
+  }
   const pending = options.pendingRef ? loadPendingTranslations(options.pendingRef) : null
-  const base = pending?.base ?? options.base
+  // Pending work may extend the range, but must not hide older skipped translations.
+  const base = pending && !isZeroSha(options.base)
+    ? git(['merge-base', options.base, pending.base]).trim()
+    : pending?.base ?? options.base
   if (pending) {
     console.log(`Pending translations merged from ${options.pendingRef} through ${pending.base}`)
+    console.log(`Incremental baseline: ${base} (requested ${options.base})`)
   }
   if (isZeroSha(base)) {
     console.log(
       '::notice::Previous commit is unavailable, so incremental translation was skipped. Run the workflow manually for a full backfill.',
     )
     return { plan: emptyPlan('changed'), pending: null }
-  }
-  if (!isCommitSha(base) || !isCommitSha(options.head)) {
-    throw new Error('--base and --head must be full commit SHAs')
   }
   const head = git(['rev-parse', 'HEAD']).trim()
   if (options.head !== head) {
