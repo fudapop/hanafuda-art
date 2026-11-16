@@ -3,13 +3,15 @@
 # The job never pushes to main. It writes locale files on `i18n/update-translations`
 # and opens a pull request for review. Squash-merge that pull request.
 #
-# Incremental pushes retranslate only changed markdown sections and UI strings
+# Incremental runs retranslate only changed markdown sections and UI strings
 # whose English text changed, plus UI keys that are still missing in a locale
-# file this push edited. workflow_dispatch retranslates every English source.
+# file this range edited. Manual runs default to changed mode and require a
+# base_ref (commit or tag before the English changes). Full backfills are opt-in.
+# For a safe preview, enable dry_run with either mode.
 #
-# If i18n/update-translations is already open, the next run plans from that
-# branch's merge-base with HEAD and merges its locale edits into the current
-# files. A reviewed fix on main stays. A newer English push cannot drop
+# If i18n/update-translations is already open, the next run includes both the
+# requested range and that branch's merge-base with HEAD, and merges its locale
+# edits into the current files. A reviewed fix on main stays. A newer push cannot drop
 # translations that are still waiting for review. --plan does not write files.
 #
 # The pull request is opened with the TRANSLATE_PR_TOKEN secret: a fine-grained
@@ -72,8 +74,19 @@ on:
       - 'packages/frontend/localization.json'
   workflow_dispatch:
     inputs:
+      mode:
+        description: Incremental changes or a full retranslation of every English source
+        type: choice
+        default: changed
+        options:
+          - changed
+          - full
+      base_ref:
+        description: Commit or tag before the English changes (required for changed mode; pending PRs may extend this range)
+        type: string
+        required: false
       dry_run:
-        description: Print the full backfill plan and skip Vertex AI and the pull request
+        description: Print the selected translation plan and skip Vertex AI and the pull request
         type: boolean
         default: false
 
@@ -106,18 +119,55 @@ jobs:
       - name: Fetch pending translation branch
         run: git fetch --no-tags origin i18n/update-translations:refs/remotes/origin/i18n/update-translations || true
 
-      - name: Plan translations
-        id: plan
+      - name: Resolve translation range
+        id: range
         env:
           EVENT_NAME: ${{ github.event_name }}
-          BASE_SHA: ${{ github.event.before }}
+          REQUESTED_MODE: ${{ inputs.mode }}
+          BASE_REF: ${{ inputs.base_ref }}
+          PUSH_BASE_SHA: ${{ github.event.before }}
           HEAD_SHA: ${{ github.sha }}
         run: |
           set -eu
           MODE=changed
+          BASE_SHA="$PUSH_BASE_SHA"
           if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            MODE=full
+            MODE="$REQUESTED_MODE"
+            BASE_SHA=
+            case "$MODE" in
+              changed)
+                if [ -z "$BASE_REF" ]; then
+                  echo "::error::base_ref is required for a manual incremental run. Choose a commit or tag before the English changes."
+                  exit 1
+                fi
+                if ! BASE_SHA=$(git rev-parse --verify --end-of-options "${BASE_REF}^{commit}"); then
+                  echo "::error::base_ref must resolve to an existing commit or tag."
+                  exit 1
+                fi
+                if ! git merge-base --is-ancestor "$BASE_SHA" "$HEAD_SHA"; then
+                  echo "::error::base_ref must be an ancestor of the selected workflow commit."
+                  exit 1
+                fi
+                ;;
+              full) ;;
+              *)
+                echo "::error::mode must be changed or full."
+                exit 1
+                ;;
+            esac
           fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "base=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Plan translations
+        id: plan
+        env:
+          MODE: ${{ steps.range.outputs.mode }}
+          BASE_SHA: ${{ steps.range.outputs.base }}
+          HEAD_SHA: ${{ steps.range.outputs.head }}
+        run: |
+          set -eu
           ARGS=(--mode "$MODE" --plan --github-output "$GITHUB_OUTPUT")
           if [ "$MODE" = "changed" ]; then
             ARGS+=(--base "$BASE_SHA" --head "$HEAD_SHA" --pending-ref origin/i18n/update-translations)
@@ -170,15 +220,11 @@ jobs:
           GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
           GCP_LOCATION: ${{ vars.GCP_LOCATION || 'us-central1' }}
           GCP_MODEL: ${{ vars.GCP_MODEL || 'gemini-2.5-flash' }}
-          EVENT_NAME: ${{ github.event_name }}
-          BASE_SHA: ${{ github.event.before }}
-          HEAD_SHA: ${{ github.sha }}
+          MODE: ${{ steps.range.outputs.mode }}
+          BASE_SHA: ${{ steps.range.outputs.base }}
+          HEAD_SHA: ${{ steps.range.outputs.head }}
         run: |
           set -eu
-          MODE=changed
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            MODE=full
-          fi
           ARGS=(--mode "$MODE")
           if [ "$MODE" = "changed" ]; then
             ARGS+=(--base "$BASE_SHA" --head "$HEAD_SHA" --pending-ref origin/i18n/update-translations)

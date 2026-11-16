@@ -108,13 +108,11 @@ Do this only when asked to ship a batch, on its own branch from latest `main`, a
 
 1. `pnpm release` (preview with `pnpm release:dry-run`). Optional `--date YYYY-MM-DD` pins the UTC calendar day. The command bumps `packages/frontend/package.json` and moves `## Unreleased` to `## [YYYY.M.MICRO] - YYYY-MM-DD`. It does not commit, tag, or push. It fails when `Unreleased` is missing, empty, or only category headings with no bullets.
 2. Commit those two files. Title: `chore(release): vYYYY.M.MICRO`.
-3. Localized changelogs are not part of that command. When `GEMINI_API_KEY` is available, refresh `ja` / `fr` / `pl` / `ru` from `packages/frontend/content/en` (the translator reads `packages/frontend/localization.json`):
+3. Localized changelogs are not part of that command. Leave `ja` / `fr` / `pl` / `ru` unchanged in the release PR. After it merges to `main`, `.github/workflows/translate-content.yml` runs `scripts/i18n-translate.ts` on Vertex AI and opens a separate translation PR. It translates changed release sections while preserving unchanged historical translations.
 
-   ```
-   deno run --allow-read --allow-write --allow-env --allow-net scripts/translate-content.ts --include packages/frontend/content/en/misc
-   ```
+   For a manual catch-up, run **Translate content** on `main` with `mode=changed` and `base_ref` set to a commit or tag before the English changes. Enable `dry_run` first to review the plan without API calls or file writes. An open translation PR may extend the range back to its merge-base, but never narrows the requested range; its locale edits are merged into the plan. Choose `mode=full` only when a complete retranslation is intended.
 
-   Do not invent those translations by hand. Do not block the release when the key is missing. Say in the PR that the other locales are unchanged.
+   Do not invent translations by hand or block a release when translation credentials are unavailable. Say in the release PR that localized changelogs will follow separately.
 4. Open the PR. Do not create a tag or a GitHub Release on the PR branch.
 
 After that PR squash-merges to `main`, check out the new `main` commit and tag it:
