@@ -14,10 +14,11 @@
 # edits into the current files. A reviewed fix on main stays. A newer push cannot drop
 # translations that are still waiting for review. --plan does not write files.
 #
-# The pull request is opened with the TRANSLATE_PR_TOKEN secret: a fine-grained
-# PAT or GitHub App token with contents and pull-requests write on this
-# repository. The default GITHUB_TOKEN does not start the required pull_request
-# workflows, so the job skips Vertex and the pull request when the secret is unset.
+# The pull request uses an installation token for the GitHub App identified by
+# the APP_CLIENT_ID variable and APP_PRIVATE_KEY secret. Install the app on this
+# repository with contents and pull-requests write permissions. The default
+# GITHUB_TOKEN does not start the required pull_request workflows, so the job
+# skips Vertex and the pull request when the app credentials are unset.
 #
 # Removing a locale from localization.json does not delete its files.
 # Adding a locale plans a full translation for that locale only.
@@ -55,8 +56,7 @@
 #
 # The google-github-actions/auth action requests an OIDC token whose audience
 # is the provider resource name. The provider's audience must allow that.
-# Repository Actions permissions must let this workflow create a branch and a
-# pull request (contents: write and pull-requests: write on the job).
+# The GitHub App installation must be allowed to create a branch and pull request.
 #
 # Translation pull requests should not add a changelog bullet. They translate
 # English that already describes the player-facing change. The English
@@ -103,9 +103,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      contents: write
+      contents: read
       id-token: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -190,23 +189,32 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check pull request token
-        id: pr-token
+      - name: Check GitHub App credentials
+        id: app-credentials
         if: steps.identity.outputs.ready == 'true'
         env:
-          TOKEN: ${{ secrets.TRANSLATE_PR_TOKEN }}
+          APP_CLIENT_ID: ${{ vars.APP_CLIENT_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
         run: |
           set -eu
-          if [ -z "$TOKEN" ]; then
+          if [ -z "$APP_CLIENT_ID" ] || [ -z "$APP_PRIVATE_KEY" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=Translation pull request skipped::Set the TRANSLATE_PR_TOKEN secret to a fine-grained PAT or GitHub App token with contents and pull-requests write. The default GITHUB_TOKEN does not start required CI on the translation pull request, so Vertex AI was not called."
+            echo "::notice title=Translation pull request skipped::Set the APP_CLIENT_ID variable and APP_PRIVATE_KEY secret for a GitHub App installed on this repository with contents and pull-requests write permissions. Vertex AI was not called."
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Create GitHub App token
+        id: app-token
+        if: steps.identity.outputs.ready == 'true' && steps.app-credentials.outputs.ready == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Authenticate to Google Cloud
         id: auth
-        if: steps.identity.outputs.ready == 'true' && steps.pr-token.outputs.ready == 'true'
+        if: steps.identity.outputs.ready == 'true' && steps.app-credentials.outputs.ready == 'true'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -214,7 +222,7 @@ jobs:
           token_format: access_token
 
       - name: Translate
-        if: steps.identity.outputs.ready == 'true' && steps.pr-token.outputs.ready == 'true'
+        if: steps.identity.outputs.ready == 'true' && steps.app-credentials.outputs.ready == 'true'
         env:
           GCP_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
           GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
@@ -232,10 +240,10 @@ jobs:
           node --experimental-strip-types scripts/i18n-translate.ts "${ARGS[@]}"
 
       - name: Open translation pull request
-        if: steps.identity.outputs.ready == 'true' && steps.pr-token.outputs.ready == 'true'
+        if: steps.identity.outputs.ready == 'true' && steps.app-credentials.outputs.ready == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.TRANSLATE_PR_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           branch: i18n/update-translations
           base: main
           commit-message: 'chore(i18n): update translations'
