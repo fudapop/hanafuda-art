@@ -27,3 +27,15 @@ variable "budget_amount" {
   description = "Monthly budget in whole USD. Leave empty, together with billing_account_id, to skip the budget. There is no default amount."
   default     = ""
 }
+
+variable "cloudflare_account_id" {
+  type        = string
+  description = "Cloudflare account ID for managing R2 buckets and custom domains."
+  default     = ""
+}
+
+variable "cloudflare_zone_id" {
+  type        = string
+  description = "Cloudflare zone ID for fudapop.com to attach R2 custom domains."
+  default     = ""
+}

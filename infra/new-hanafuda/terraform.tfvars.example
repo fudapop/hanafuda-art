@@ -13,3 +13,7 @@ region = ""
 # for example 012345-6789AB-CDEF01.
 billing_account_id = ""
 budget_amount      = ""
+
+# Cloudflare settings for R2 assets
+cloudflare_account_id = ""
+cloudflare_zone_id    = ""
