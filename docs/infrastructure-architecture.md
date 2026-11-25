@@ -10,8 +10,8 @@ The infrastructure is split into two distinct tiers with separate lifecycles, st
 
 | Tier | Directory | State Location | Applied By | Primary Responsibility |
 | :--- | :--- | :--- | :--- | :--- |
-| **Foundation (Tier 0)** | [`infra/bootstrap`](file:///Users/andrehammons/Projects/new-hanafuda/infra/bootstrap) | `gs://new-hanafuda-tfstate/bootstrap/` | Human operator (Andre) locally with personal credentials (`gcloud auth`) | State storage, Workload Identity Federation (WIF) pools/providers, root IAM, and CI/CD service accounts. |
-| **Application (Tier 1)** | [`infra/new-hanafuda`](file:///Users/andrehammons/Projects/new-hanafuda/infra/new-hanafuda) | `gs://new-hanafuda-tfstate/new-hanafuda/` | Automated GitHub Actions CI/CD via keyless WIF | Application identities (`firestore-deploy`, `hanafuda-github-translate`), billing budget, Firestore/Firebase resources, and asset infrastructure. |
+| **Foundation (Tier 0)** | [`infra/bootstrap`](../infra/bootstrap) | `gs://new-hanafuda-tfstate/bootstrap/` | Human operator (Andre) locally with personal credentials (`gcloud auth`) | State storage, Workload Identity Federation (WIF) pools/providers, root IAM, and CI/CD service accounts. |
+| **Application (Tier 1)** | [`infra/new-hanafuda`](../infra/new-hanafuda) | `gs://new-hanafuda-tfstate/new-hanafuda/` | Automated GitHub Actions CI/CD via keyless WIF | Application identities (`firestore-deploy`, `hanafuda-github-translate`), billing budget, Firestore/Firebase resources, and asset infrastructure. |
 
 ---
 
@@ -61,10 +61,10 @@ The repository enforces a strict **no service-account JSON keys** policy, authen
 - Therefore, an authenticated human administrator with Project Owner/Admin permissions must provision the foundation out-of-band.
 
 ### Barrier 3: Privilege Escalation & Security Blast Radius
-Separating foundation management from application management enforces the Principle of Least Privilege:
-- **`terraform-plan`**: Runs on unmerged pull requests (potentially from forks or untrusted branches). It has strictly read-only metadata permissions and cannot view sensitive data or acquire admin roles.
-- **`terraform-apply`**: Runs only on merges to `main` within an approved GitHub Environment (`terraform`). It has scoped permissions to manage application service accounts and services.
-- **The Self-Modification Risk**: If `infra/bootstrap` were inside the managed pipeline, an automated pull request could modify the WIF trust conditions, grant broad `roles/owner` privileges to its own runner, or alter the root IAM bindings. Keeping `bootstrap` strictly manual ensures that CI/CD can never escalate its own permissions.
+Separating foundation management from application management limits what the automated workflow manages, but does not eliminate privilege-escalation risk:
+- **`terraform-plan`**: Runs on eligible same-repository pull requests, not forks. It can read metadata and Terraform state and manage state locks. Do not put secrets in state.
+- **`terraform-apply`**: Runs on changes pushed to `main` after approval of the `terraform` GitHub environment. Its `roles/resourcemanager.projectIamAdmin` role can grant any project role, including `roles/owner`, even though that role is not directly assigned to it.
+- **The Self-Modification Risk**: CI does not apply `infra/bootstrap`, so changes to foundation configuration require a separate manual apply. This operational boundary does not prevent the apply identity from escalating project permissions through IAM. Protect `main`, review application Terraform changes, and require environment approval accordingly.
 
 ### Barrier 4: State File & Lifecycle Isolation
 - Foundation infrastructure changes rarely (usually once at project inception).
