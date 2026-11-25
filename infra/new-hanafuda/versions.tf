@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/google"
       version = "8.11.0"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "5.29.0"
+    }
   }
 }
 
@@ -21,3 +25,5 @@ provider "google" {
   billing_project       = var.project_id
   user_project_override = true
 }
+
+provider "cloudflare" {}

@@ -32,6 +32,7 @@ archive/
 
 # Local env files
 .env
+.envrc
 .env.*
 !.env.example
 
