@@ -291,6 +291,10 @@ In `fudapop/hanafuda-art` → Settings → Secrets and variables → Actions →
 | `TF_VAR_region` | Optional. The region you chose in step 2, once you want it recorded for later regional resources |
 | `TF_VAR_billing_account_id` | Optional. The billing account id. Set together with the amount |
 | `TF_VAR_budget_amount` | Optional. Whole US dollars, such as `25` |
+| `TF_VAR_cloudflare_account_id` | Cloudflare account ID for the R2 bucket |
+| `TF_VAR_cloudflare_zone_id` | Cloudflare zone ID for `fudapop.com` |
+
+Set `CLOUDFLARE_PLAN_API_TOKEN` as a repository Actions secret with read-only access to the Cloudflare account and zone resources needed by the plan. Set `CLOUDFLARE_APPLY_API_TOKEN` as a secret in the protected `terraform` environment, with the permissions needed to manage the R2 bucket and its custom domain. Restrict both tokens to the relevant account and zone. The plan workflow runs code from same-repository pull requests and can access its repository secret, so only trusted contributors should have permission to push branches. Fork pull requests do not run the plan job. Never put either token in an Actions variable or Terraform variable.
 
 `GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_FIRESTORE_DEPLOY_SERVICE_ACCOUNT` are the names the Firestore deploy workflow reads. Plan uses the pull-request provider. Apply uses `GCP_TERRAFORM_APPLY_WORKLOAD_IDENTITY_PROVIDER`, the provider in pool `github-terraform-apply`. The shared `github` provider rejects `pull_request_target` as well as every ref other than `refs/heads/main`.
 
