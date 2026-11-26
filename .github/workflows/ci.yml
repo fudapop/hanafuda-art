@@ -89,6 +89,8 @@ jobs:
               - 'packages/frontend/firestore.indexes.json'
               - 'packages/frontend/firebase.json'
               - 'packages/frontend/vitest.rules.config.mjs'
+              - 'packages/frontend/app/utils/leaderboardQuery.ts'
+              - 'packages/frontend/app/utils/leaderboard.ts'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
