@@ -25,11 +25,13 @@ on:
 # tip. paths-filter fetches the previous commit itself.
 #
 # The first push of a ref (`before` is all zeros) and a force-push have no
-# trustworthy previous commit, so every job runs. Pull requests cancel a
-# superseded run of the same ref. Pushes to main do not, so every merge
-# finishes its own filtered run.
+# trustworthy previous commit, so every job runs. Pull requests share one
+# group per ref and cancel a superseded run. Each push has its own group.
+# A shared group still cancels the pending run when a newer push arrives,
+# even when cancel-in-progress is false, which can drop a rules test and
+# leave those rules unpublished.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.event_name == 'pull_request' && format('ci-{0}-{1}', github.workflow, github.ref) || format('ci-{0}-{1}', github.workflow, github.sha) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -75,13 +77,15 @@ jobs:
           filters: |
             # `.github/workflows/ci.yml` is in every filter so a change to
             # this workflow runs every job. Root deps are package.json,
-            # pnpm-lock.yaml, and pnpm-workspace.yaml.
+            # pnpm-lock.yaml, and pnpm-workspace.yaml. `.npmrc` is on the
+            # jobs that run `pnpm install`.
             frontend:
               - 'packages/frontend/**'
               - 'scripts/color-mode-init.js'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
+              - '.npmrc'
               - '.github/workflows/ci.yml'
             firestore:
               - 'packages/frontend/firestore.rules'
@@ -94,6 +98,7 @@ jobs:
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
+              - '.npmrc'
               - '.github/workflows/ci.yml'
             backend:
               - 'packages/backend/**'
@@ -101,6 +106,7 @@ jobs:
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
+              - '.npmrc'
               - '.github/workflows/ci.yml'
             i18n:
               - 'scripts/i18n/**'
