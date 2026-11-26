@@ -9,13 +9,147 @@ on:
       - main
       - development
 
-# Required checks must report on every PR. Path filters would skip them.
+# Required checks must report on every pull request. A workflow-level
+# `paths:` filter would skip this workflow and leave those checks pending.
+# The `changes` job sets one boolean output per area. Each heavy job
+# depends on it and skips itself with `if:` when that area did not change.
+# A job skipped that way still reports a passing check.
+#
+# Pushes to main are filtered too. For a push, paths-filter compares
+# against the previous commit (`github.event.before`) when `base` is the
+# branch that was pushed. That is also the default when `base` is omitted
+# and the push target is the repository default branch; `base` is set to
+# `github.ref` so the comparison does not depend on which branch is the
+# default. Pull requests ignore `base` and use the pull request file list.
+# A push of several commits is one diff from that previous tip to the new
+# tip. paths-filter fetches the previous commit itself.
+#
+# The first push of a ref (`before` is all zeros) and a force-push have no
+# trustworthy previous commit, so every job runs. Pull requests cancel a
+# superseded run of the same ref. Pushes to main do not, so every merge
+# finishes its own filtered run.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      frontend: ${{ steps.decide.outputs.frontend }}
+      firestore: ${{ steps.decide.outputs.firestore }}
+      backend: ${{ steps.decide.outputs.backend }}
+      i18n: ${{ steps.decide.outputs.i18n }}
+      release: ${{ steps.decide.outputs.release }}
+    steps:
+      # Checkout is for push diffs. paths-filter fetches `github.event.before`
+      # itself, including when one push contains more than one commit.
+      # Pull requests list files through the GitHub API and ignore this checkout.
+      - uses: actions/checkout@v4
+
+      - name: Check whether this push has a previous commit
+        id: push
+        run: |
+          set -euo pipefail
+          run_all=false
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            before="$(jq -r '.before // empty' "$GITHUB_EVENT_PATH")"
+            forced="$(jq -r '.forced // false' "$GITHUB_EVENT_PATH")"
+            null_sha=0000000000000000000000000000000000000000
+            if [ "$before" = "$null_sha" ] || [ "$forced" = "true" ]; then
+              echo "First push or force-push; running every job."
+              run_all=true
+            fi
+          fi
+          echo "run_all=$run_all" >> "$GITHUB_OUTPUT"
+
+      - name: Detect changed paths
+        id: filter
+        if: steps.push.conclusion == 'success' && steps.push.outputs.run_all != 'true'
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            # `.github/workflows/ci.yml` is in every filter so a change to
+            # this workflow runs every job. Root deps are package.json,
+            # pnpm-lock.yaml, and pnpm-workspace.yaml.
+            frontend:
+              - 'packages/frontend/**'
+              - 'scripts/color-mode-init.js'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/ci.yml'
+            firestore:
+              - 'packages/frontend/firestore.rules'
+              - 'packages/frontend/firestore.rules.test.ts'
+              - 'packages/frontend/firestore.indexes.json'
+              - 'packages/frontend/firebase.json'
+              - 'packages/frontend/vitest.rules.config.mjs'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/ci.yml'
+            backend:
+              - 'packages/backend/**'
+              - 'packages/shared/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/ci.yml'
+            i18n:
+              - 'scripts/i18n/**'
+              - 'scripts/i18n-*.ts'
+              - 'packages/frontend/localization.json'
+              - '.github/workflows/ci.yml'
+            release:
+              - 'scripts/release-calver*'
+              - '.github/workflows/ci.yml'
+
+      - name: Publish change flags
+        id: decide
+        if: >-
+          steps.push.conclusion == 'success' &&
+          (steps.push.outputs.run_all == 'true' || steps.filter.conclusion == 'success')
+        env:
+          RUN_ALL: ${{ steps.push.outputs.run_all }}
+          FRONTEND: ${{ steps.filter.outputs.frontend }}
+          FIRESTORE: ${{ steps.filter.outputs.firestore }}
+          BACKEND: ${{ steps.filter.outputs.backend }}
+          I18N: ${{ steps.filter.outputs.i18n }}
+          RELEASE: ${{ steps.filter.outputs.release }}
+        run: |
+          set -euo pipefail
+          if [ "$RUN_ALL" = "true" ]; then
+            FRONTEND=true
+            FIRESTORE=true
+            BACKEND=true
+            I18N=true
+            RELEASE=true
+          fi
+          for pair in \
+            "frontend:$FRONTEND" \
+            "firestore:$FIRESTORE" \
+            "backend:$BACKEND" \
+            "i18n:$I18N" \
+            "release:$RELEASE"
+          do
+            name="${pair%%:*}"
+            value="${pair#*:}"
+            if [ "$value" != "true" ] && [ "$value" != "false" ]; then
+              echo "Filter '${name}' is '${value}', expected true or false."
+              exit 1
+            fi
+            echo "${name}=${value}" >> "$GITHUB_OUTPUT"
+          done
+          echo "frontend=$FRONTEND firestore=$FIRESTORE backend=$BACKEND i18n=$I18N release=$RELEASE"
+
   unit-test:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +172,10 @@ jobs:
       - name: Run tests
         run: pnpm -F @hanafuda/frontend test
 
+  # `pnpm typecheck` checks the frontend and the backend.
   typecheck:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +196,8 @@ jobs:
         run: pnpm typecheck
 
   lint:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -79,6 +218,8 @@ jobs:
         run: pnpm lint
 
   build-frontend:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -99,6 +240,8 @@ jobs:
         run: pnpm -F @hanafuda/frontend build
 
   firestore-rules:
+    needs: changes
+    if: ${{ needs.changes.outputs.firestore == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -125,6 +268,8 @@ jobs:
         run: pnpm -F @hanafuda/frontend test:rules
 
   build-backend:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -145,6 +290,8 @@ jobs:
         run: pnpm build:backend
 
   i18n-script:
+    needs: changes
+    if: ${{ needs.changes.outputs.i18n == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -156,3 +303,23 @@ jobs:
 
       - name: Translation planner tests
         run: node --experimental-strip-types --test scripts/i18n-lib.test.ts
+
+  # Release tests import only Node builtins and local TypeScript.
+  # pnpm runs the package script; workspace dependencies are not installed.
+  release-script:
+    needs: changes
+    if: ${{ needs.changes.outputs.release == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Release script tests
+        run: pnpm test:release
