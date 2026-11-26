@@ -11,7 +11,7 @@ Terraform 1.17.2 and the Google provider 8.11.0 are pinned in each root module. 
 | Path | What it manages | Who applies it |
 | --- | --- | --- |
 | `infra/bootstrap` | State bucket, APIs, Workload Identity pool and providers, Terraform plan and apply service accounts | Andre, once, from a machine with user credentials |
-| `infra/new-hanafuda` | `firestore-deploy`, `hanafuda-github-translate`, and the monthly billing budget | GitHub Actions, from `main`, after approval |
+| `infra/new-hanafuda` | Application identities, monthly billing budget, public R2 assets/domain, and private card-original archive | GitHub Actions, from `main`, after approval |
 | `infra/modules/github-wif` | Workload Identity pool and GitHub OIDC providers | Called by bootstrap |
 | `infra/modules/budget` | A billing budget with alerts at 50%, 90%, and 100% of actual spend | Called by `new-hanafuda` |
 
@@ -22,7 +22,7 @@ Terraform 1.17.2 and the Google provider 8.11.0 are pinned in each root module. 
 - This Terraform does not create the Google Cloud project and does not attach a billing account.
 - Firestore rules and indexes stay in `packages/frontend` and deploy with `firebase deploy`, the workflow from the Firestore rules pull request. Terraform only creates the identity that workflow assumes.
 - Firebase Auth email templates are not managed here. Do not import or edit Identity Platform config to make Terraform quiet.
-- There is no module yet for the card-art bucket or for Cloud Run.
+- R2 card storage and its operator approval gates are documented in [r2-card-assets.md](./r2-card-assets.md). Cloud Run is not managed here.
 
 ## One-time setup
 
