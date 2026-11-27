@@ -115,6 +115,7 @@ jobs:
               - '.github/workflows/ci.yml'
             release:
               - 'scripts/release-calver*'
+              - 'package.json'
               - '.github/workflows/ci.yml'
 
       - name: Publish change flags
@@ -314,6 +315,7 @@ jobs:
 
   # Release tests import only Node builtins and local TypeScript.
   # pnpm runs the package script; workspace dependencies are not installed.
+  # package.json is included because the test script is defined there.
   release-script:
     needs: changes
     if: ${{ needs.changes.outputs.release == 'true' }}
