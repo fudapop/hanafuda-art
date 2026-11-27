@@ -4,6 +4,7 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import type { NuxtConfig } from 'nuxt/schema'
 import { appCheckDebugToken } from './app/utils/appCheckDebug'
+import { ASSET_ORIGIN } from './app/utils/assetUrls'
 
 // Nuxt schema inlines Vite's UserConfig, so it does not see Vite's Rollup
 // module augmentation (`viteVersion` on PluginContextMeta). @tailwindcss/vite
@@ -18,7 +19,8 @@ const siteDomain = new URL(siteUrl).hostname
 const seoMeta = JSON.parse(
   readFileSync(resolve('./seo-meta.json'), 'utf-8')
     .replaceAll('__SITE_URL__', siteUrl)
-    .replaceAll('__SITE_DOMAIN__', siteDomain),
+    .replaceAll('__SITE_DOMAIN__', siteDomain)
+    .replaceAll('__ASSET_ORIGIN__', ASSET_ORIGIN),
 )
 const localization = JSON.parse(readFileSync(resolve('./localization.json'), 'utf-8'))
 
@@ -74,11 +76,11 @@ export default defineNuxtConfig({
         },
         {
           rel: 'dns-prefetch',
-          href: process.env.NUXT_PUBLIC_SUPABASE_URL,
+          href: ASSET_ORIGIN,
         },
         {
           rel: 'preconnect',
-          href: process.env.NUXT_PUBLIC_SUPABASE_URL,
+          href: ASSET_ORIGIN,
         },
         {
           rel: 'preload',
