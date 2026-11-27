@@ -285,12 +285,7 @@ export default defineNuxtConfig({
       nodeEnv: process.env.NODE_ENV,
       version: pkg.version,
       siteUrl,
-      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
-      supabasePublishableKey: process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
       saveIntegritySalt: process.env.NUXT_PUBLIC_SAVE_INTEGRITY_SALT,
-    },
-    private: {
-      supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
     },
   },
   shadcn: {

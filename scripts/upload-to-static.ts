@@ -1,9 +1,9 @@
 /**
- * @fileoverview Static Asset Upload Script for Supabase Storage
+ * @fileoverview RETIRED Supabase uploader, retained as historical operational context.
  *
- * This Deno script uploads image files to Supabase Storage bucket for static asset hosting.
- * It supports uploading individual files or entire directories of images with automatic
- * content type detection and cache control headers.
+ * Do not run this script or use the historical examples below for setup.
+ * The frontend now reads public R2 assets directly; this is not an R2 publisher.
+ * Its SDK import is resolved by scripts/deno.json, not the frontend dependency.
  *
  */
 
@@ -12,6 +12,8 @@ import { load } from '@std/dotenv'
 import { exists } from '@std/fs/exists'
 import { join } from '@std/path/join'
 import { createClient } from '@supabase/supabase-js'
+
+throw new Error('Retired Supabase uploader. Historical reference only; uploads are disabled.')
 
 /**
  * Configuration and environment setup
