@@ -9,13 +9,13 @@
         <div class="hidden sm:inline">
           <img
             v-if="recordedWinner === selfKey"
-            :src="p1Avatar"
+            :src="resolveAssetUrl(p1Avatar).url"
             alt="p1 avatar"
             class="inline w-16 h-16 mr-4 border rounded-full shadow-xs lg:w-24 lg:h-24 border-border"
           />
           <img
             v-else
-            :src="p2Avatar"
+            :src="resolveAssetUrl(p2Avatar).url"
             alt="p2 avatar"
             class="inline w-16 h-16 mr-4 border rounded-full shadow-xs lg:w-24 lg:h-24 border-border"
           />
@@ -126,6 +126,7 @@
 </template>
 
 <script setup lang="ts">
+import { resolveAssetUrl } from '~/utils/assetUrls'
 import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import { storeToRefs } from 'pinia'
 import type { CompletedYaku } from '~/utils/yaku'

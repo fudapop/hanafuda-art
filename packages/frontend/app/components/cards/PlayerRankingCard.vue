@@ -14,7 +14,7 @@
           {{ rank ? `#${rank}` : '—' }}
         </span>
         <img
-          :src="player.avatar"
+          :src="resolveAssetUrl(player.avatar).url"
           :alt="player.username"
           class="size-12 mr-2 rounded-full"
           @error="handleImageError"
@@ -146,6 +146,7 @@
 </template>
 
 <script setup lang="ts">
+import { resolveAssetUrl } from '~/utils/assetUrls'
 type LeaderboardPlayer = {
   uid: string
   username: string

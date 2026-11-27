@@ -1,10 +1,25 @@
 import { nanoid } from 'nanoid'
+import { resolveAssetUrl } from './assetUrls'
 import type { GameSettings } from '~~/stores/configStore'
 import type { PlayerProfile } from '~~/types/profile'
 import { getRandom } from './myUtils'
 import { createTamperProofStats, getDefaultStats, verifyStatsIntegrity } from './stats'
 
 const DEFAULT_DESIGNS = ['cherry-version', 'otwarte-karty', 'ramen-red', 'flash-black'] as const
+
+/**
+ * Resolve saved avatars without mutating reactive state or scheduling persistence.
+ * Use at profile boundaries so normalization alone never advances lastUpdated.
+ *
+ * @param profile - Saved or merged profile
+ * @returns The profile, or a copy with only its avatar URL changed
+ * @throws Never; URL resolution is local and tolerates unrecognized values.
+ * @example const loaded = normalizeProfileAvatar(savedProfile)
+ */
+export function normalizeProfileAvatar(profile: PlayerProfile): PlayerProfile {
+  const avatar = resolveAssetUrl(profile.avatar).url
+  return avatar === profile.avatar ? profile : { ...profile, avatar }
+}
 
 /**
  * Sanitize profile data for storage.
@@ -20,7 +35,7 @@ export function sanitizeProfile(profile: PlayerProfile): PlayerProfile {
   const jsonStr = JSON.stringify({
     uid: profile.uid,
     email: profile.email,
-    avatar: profile.avatar,
+    avatar: resolveAssetUrl(profile.avatar).url,
     username: profile.username,
     record: profile.record,
     lastUpdated: profile.lastUpdated,
@@ -104,7 +119,7 @@ export async function createDefaultProfile(
 
   return {
     uid: overrides.uid || 'unknown',
-    avatar: overrides.avatar || defaultAvatar,
+    avatar: resolveAssetUrl(overrides.avatar || defaultAvatar).url,
     username: overrides.username || generateRandomUsername(),
     email: overrides.email ?? '',
     lastUpdated: overrides.lastUpdated || new Date(),
@@ -212,7 +227,7 @@ export async function sanitizeFirestoreData(
   return {
     uid: firestoreData.uid || uid,
     email: firestoreData.email || '',
-    avatar: firestoreData.avatar || defaultAvatar,
+    avatar: resolveAssetUrl(firestoreData.avatar || defaultAvatar).url,
     username: firestoreData.username || generateRandomUsername(),
     record: firestoreData.record || { coins: 500, win: 0, draw: 0, loss: 0 },
     // Handle Firestore Timestamp -> Date conversion

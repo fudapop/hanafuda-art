@@ -6,12 +6,12 @@
           <img
             v-if="user"
             class="size-12 mx-auto transition-all border-2 rounded-full lg:size-24 border-border"
-            :src="user.avatar"
+            :src="resolveAssetUrl(user.avatar).url"
             :alt="user.username"
           />
           <img
             v-else
-            :src="p1Avatar"
+            :src="resolveAssetUrl(p1Avatar).url"
             class="size-12 mx-auto transition-all border-2 rounded-full lg:size-24 border-border"
             alt=""
           />
@@ -56,6 +56,7 @@
 </template>
 
 <script setup lang="ts">
+import { resolveAssetUrl } from '~/utils/assetUrls'
 import { useScreenOrientation } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import NumberAnimation from 'vue-number-animation'
@@ -101,17 +102,17 @@ onMounted(() => {
     () => {
       ps.setPlayerName(selfKey.value, user?.username || `${t('common.labels.player')} 1`)
       if (user?.avatar) {
-        p1Avatar.value = user.avatar
+        p1Avatar.value = resolveAssetUrl(user.avatar).url
       }
       if (isMultiplayerGame.value && opponent.value) {
-        p2Avatar.value = opponent.value.avatar
+        p2Avatar.value = resolveAssetUrl(opponent.value.avatar).url
       }
     },
     { immediate: true },
   )
   watch(opponent, (newOpponent) => {
     if (newOpponent?.avatar) {
-      p2Avatar.value = newOpponent.avatar
+      p2Avatar.value = resolveAssetUrl(newOpponent.avatar).url
     }
   })
   watch(gameOver, async () => {

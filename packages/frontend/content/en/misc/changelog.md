@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- **Game assets**: Cards, avatars, and music now load directly from our dedicated asset host.
+- **Game assets**: Cards, music, and avatars (including previously saved avatars) now load directly from our dedicated asset host.
 
 ## [2026.11.0] - 2026-11-14
 

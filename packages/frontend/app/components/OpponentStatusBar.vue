@@ -52,6 +52,7 @@
 </template>
 
 <script setup lang="ts">
+import { resolveAssetUrl } from '~/utils/assetUrls'
 import { useScreenOrientation } from '@vueuse/core'
 import NumberAnimation from 'vue-number-animation'
 import { useGameDataStore } from '~~/stores/gameDataStore'
@@ -85,13 +86,13 @@ const opponentName = computed(() => {
 })
 
 const opponentAvatar = computed(() => {
-  return opponent.value?.avatar || p2Avatar.value
+  return resolveAssetUrl(opponent.value?.avatar || p2Avatar.value).url
 })
 
 onMounted(() => {
   watch(opponent, (newOpponent) => {
     if (newOpponent?.avatar) {
-      p2Avatar.value = newOpponent.avatar
+      p2Avatar.value = resolveAssetUrl(newOpponent.avatar).url
     }
   })
 })

@@ -40,9 +40,9 @@
               class="relative w-16 overflow-hidden [@media(min-height:500px)]:sm:w-24 aspect-square drop-shadow-xs cursor-pointer rounded-full"
             >
               <img
-                :src="a.url"
+                :src="resolveAssetUrl(a.url).url"
                 alt="user avatar"
-                :class="['grayscale', a.url === modelValue && 'ring-2 ring-offset-2 ring-primary']"
+                :class="['grayscale', a.url === resolveAssetUrl(modelValue).url && 'ring-2 ring-offset-2 ring-primary']"
               />
               <div class="absolute inset-0 z-10 place-content-center bg-black/50">
                 <LockClosedIcon
@@ -57,10 +57,10 @@
             <img
               v-for="url in avatars"
               :key="url"
-              :src="url"
+              :src="resolveAssetUrl(url).url"
               alt="user avatar"
               :class="`w-16 h-auto [@media(min-height:500px)]:sm:w-24 rounded-full drop-shadow-xs cursor-pointer ${
-                url === modelValue ? 'ring-2 ring-offset-2 ring-primary' : ''
+                resolveAssetUrl(url).url === resolveAssetUrl(modelValue).url ? 'ring-2 ring-offset-2 ring-primary' : ''
               }`"
               @click="() => handleClick(url, close)"
             />
@@ -72,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+import { resolveAssetUrl } from '~/utils/assetUrls'
 import { LockClosedIcon } from '@heroicons/vue/20/solid'
 
 const { t } = useI18n()
