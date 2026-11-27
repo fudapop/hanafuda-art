@@ -45,6 +45,7 @@ jobs:
         run: |
           terraform init -backend=false -input=false
           terraform validate
+          terraform test -no-color
 
   plan:
     name: plan
