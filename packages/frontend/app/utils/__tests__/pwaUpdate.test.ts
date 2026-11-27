@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { workboxOptions } from '../../../build/pwa'
 import {
   PWA_UPDATE_APPLY_DELAY_MS,
   PWA_UPDATE_CHECK_INTERVAL_MS,
@@ -407,8 +408,9 @@ describe('pwa config stays on prompt mode', () => {
   it('does not auto-reload and does not let a waiting worker claim open tabs', () => {
     expect(config).toMatch(/registerType:\s*'prompt'/)
     expect(config).toMatch(/registerPlugin:\s*false/)
-    expect(config).toMatch(/skipWaiting:\s*false/)
-    expect(config).toMatch(/clientsClaim:\s*false/)
+    // Step 4: assert the shared generateSW input, not its old inline spelling.
+    expect(workboxOptions.skipWaiting).toBe(false)
+    expect(workboxOptions.clientsClaim).toBe(false)
     expect(config).not.toMatch(/registerType:\s*'autoUpdate'/)
   })
 })

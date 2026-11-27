@@ -159,6 +159,8 @@ test('the updater reloads a safe screen and waits through an active game', async
       }
       open.onerror = () => reject(open.error)
     })
+    const old = await caches.open('supabase-cache')
+    await old.put('/legacy-avatar', new Response('old runtime entry'))
   })
 
   expect(canApplyPwaUpdate(inGame)).toBe(false)
@@ -172,7 +174,18 @@ test('the updater reloads a safe screen and waits through an active game', async
   await expect(page.locator('#version')).toHaveText('v1')
   await expect(page.locator('#notice')).toHaveAttribute('data-pwa-update-state', 'deferred')
 
-  await setGameInProgress(page, false)
+  // Step 4: the same waiting update must also defer in lobby/results screens.
+  for (const scene of [
+    { gameInProgress: false, lobbyOpen: true, viewingResults: false },
+    { gameInProgress: false, lobbyOpen: false, viewingResults: true },
+    { gameInProgress: false, viewingResults: false, playAgainPending: true },
+  ]) {
+    await page.evaluate((scene) => window.__setPwaScene?.(scene), scene)
+    await page.waitForTimeout(PWA_UPDATE_APPLY_DELAY_MS + 500)
+    await expect(page.locator('#version')).toHaveText('v1')
+    await expect(page.locator('#notice')).toHaveAttribute('data-pwa-update-state', 'deferred')
+  }
+  await page.evaluate(() => window.__setPwaScene?.({ playAgainPending: false }))
   await expect(page.locator('#version')).toHaveText('v2', { timeout: 15_000 })
 
   const stored = await page.evaluate(async () => {
@@ -196,11 +209,15 @@ test('the updater reloads a safe screen and waits through an active game', async
       coins: localStorage.getItem('hanafuda-test-coins'),
       design: localStorage.getItem('hanafuda-test-design'),
       record,
+      oldCache: await (await caches.open('supabase-cache'))
+        .match('/legacy-avatar')
+        .then((r) => r?.text()),
     }
   })
   expect(stored).toEqual({
     coins: '40',
     design: 'moon',
     record: { coins: 40, design: 'moon' },
+    oldCache: 'old runtime entry',
   })
 })

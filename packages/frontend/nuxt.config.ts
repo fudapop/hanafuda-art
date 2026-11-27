@@ -1,10 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
 import { readFileSync } from 'fs'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { resolve } from 'path'
 import type { NuxtConfig } from 'nuxt/schema'
 import { appCheckDebugToken } from './app/utils/appCheckDebug'
 import { ASSET_ORIGIN } from './app/utils/assetUrls'
+import { assetWorker, workboxOptions } from './build/pwa'
 
 // Nuxt schema inlines Vite's UserConfig, so it does not see Vite's Rollup
 // module augmentation (`viteVersion` on PluginContextMeta). @tailwindcss/vite
@@ -45,6 +47,17 @@ if (isProduction) {
 }
 
 export default defineNuxtConfig({
+  hooks: {
+    async 'nitro:config'(config) {
+      // Nitro publishes root assets; Vite's client output only publishes _nuxt.
+      // Keep this generated companion content-addressed and available to sw.js.
+      const directory = resolve(config.rootDir ?? '.', '.cache/r2-worker', assetWorker.fileName)
+      await mkdir(directory, { recursive: true })
+      await writeFile(resolve(directory, assetWorker.fileName), assetWorker.source)
+      config.publicAssets ??= []
+      config.publicAssets.push({ dir: directory, baseURL: '/', maxAge: 0 })
+    },
+  },
   app: {
     head: {
       htmlAttrs: {
@@ -260,46 +273,7 @@ export default defineNuxtConfig({
         },
       ],
     },
-    workbox: {
-      // A waiting worker must not take control of a tab that is in a game.
-      // cleanupOutdatedCaches removes previous Workbox precaches only.
-      skipWaiting: false,
-      clientsClaim: false,
-      cleanupOutdatedCaches: true,
-      disableDevLogs: true,
-      globPatterns: ['**/*.{js,css,html,webp,png}'],
-      navigateFallback: '/',
-      runtimeCaching: [
-        {
-          urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'google-fonts-cache',
-            expiration: {
-              maxEntries: 4,
-              maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
-            },
-            cacheableResponse: {
-              statuses: [0, 200],
-            },
-          },
-        },
-        {
-          urlPattern: /^https:\/\/.*\.supabase\.(?:co|io)\/.*/i,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'supabase-cache', // images and audio
-            expiration: {
-              maxEntries: 1000,
-              maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
-            },
-            cacheableResponse: {
-              statuses: [0, 200],
-            },
-          },
-        },
-      ],
-    },
+    workbox: workboxOptions,
   },
   router: {
     options: {
