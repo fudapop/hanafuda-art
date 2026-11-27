@@ -171,6 +171,9 @@ importers:
       better-sqlite3:
         specifier: ^12.0.0
         version: 12.6.2
+      esbuild:
+        specifier: 0.27.3
+        version: 0.27.3
       eslint:
         specifier: 10.14.0
         version: 10.14.0(jiti@2.6.1)
@@ -228,6 +231,18 @@ importers:
       vue-tsc:
         specifier: 3.3.14
         version: 3.3.14(typescript@5.9.3)
+      workbox-build:
+        specifier: 7.4.0
+        version: 7.4.0
+      workbox-cacheable-response:
+        specifier: 7.4.0
+        version: 7.4.0
+      workbox-expiration:
+        specifier: 7.4.0
+        version: 7.4.0
+      workbox-strategies:
+        specifier: 7.4.0
+        version: 7.4.0
 
   packages/landing:
     dependencies:
