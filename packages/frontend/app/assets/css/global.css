@@ -646,18 +646,36 @@ body > svg[style*="z-index: -99999999"] {
 }
 
 /*
+  The board fills this shell. dvh tracks the visible viewport when a phone
+  browser shows or hides its toolbar. vh covers browsers that do not know dvh.
+  --topbar-h is the unmeasured bar (safe area plus the old 3.5rem). The status
+  bar replaces it with its real height once that height is known.
+*/
+.game-viewport {
+  height: 100vh;
+  height: 100dvh;
+  --topbar-h: calc(env(safe-area-inset-top, 0px) + 3.5rem);
+}
+
+/*
   Phone board stack
   -----------------
-  Percentage anchors (top-1/4, bottom-1/4) let a wrapping collection grow over
-  the field. The five play rows share one grid: opponent hand, opponent
-  collection, field, player collection, player hand. The field row takes the
-  leftover space and centers its cards. Padding keeps both hands clear of the
-  fixed status bars and the safe area.
+  Opponent hand, opponent collection, field, player collection, and player
+  hand. On a short screen the field row takes the leftover height. Taller
+  phones split that spare height between the opponent rows and the player
+  rows instead, so the field stays centered. Padding keeps both hands clear
+  of the fixed status bars. The top padding is the measured bar (--topbar-h)
+  plus a small gap. Before that measurement it reserves the old bar height
+  plus the same gap.
 */
+.board-band {
+  display: contents;
+}
+
 .board-stack {
   position: absolute;
   inset: 0;
-  padding-top: calc(env(safe-area-inset-top, 0px) + 3.5rem);
+  padding-top: calc(var(--topbar-h) + 0.5rem);
   padding-bottom: max(4rem, env(safe-area-inset-bottom, 0px));
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto auto;
@@ -751,6 +769,38 @@ body > svg[style*="z-index: -99999999"] {
     84px,
     calc((100cqb - var(--field-block, 1.25rem)) / 3)
   );
+}
+
+/*
+  Tall phones (about 19.5:9, 800px and up) have spare height after the hands.
+  Cap the field and give the spare space to the opponent band and the player
+  band in equal shares. iPhone SE (667px) and short landscape stay on the
+  compact grid above. size containment would collapse an auto-height field,
+  so the field is an inline container and its cards use the cap directly.
+*/
+@media (max-width: 1023px) and (min-height: 800px) {
+  .board-stack {
+    grid-template-rows: 1fr auto 1fr;
+  }
+
+  .board-band {
+    display: grid;
+    align-content: space-evenly;
+    min-width: 0;
+    row-gap: 0.25rem;
+  }
+
+  .board-field-center {
+    container-type: inline-size;
+  }
+
+  .board-field-center .board-field {
+    --card-height: min(var(--card-height-pref, 140px), var(--card-height-cap, 9999px), 7.5rem);
+  }
+
+  .board-field-center .board-field:has(.field-dense) {
+    --card-height: min(var(--card-height-pref, 140px), var(--card-height-cap, 9999px), 84px);
+  }
 }
 
 /*

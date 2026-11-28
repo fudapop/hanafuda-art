@@ -11,22 +11,24 @@
       class="board-stack"
       data-board
     >
-      <div
-        class="board-opponent-slot min-w-0"
-        data-board-opponent-hand
-      >
-        <OpponentArea />
-      </div>
+      <div class="board-band">
+        <div
+          class="board-opponent-slot min-w-0"
+          data-board-opponent-hand
+        >
+          <OpponentArea />
+        </div>
 
-      <div
-        class="min-w-0"
-        data-board-opponent-collection
-      >
-        <div class="board-collection fit-cards">
-          <CollectionArea
-            :player="opponentKey"
-            @completed="emit('completed', $event)"
-          />
+        <div
+          class="min-w-0"
+          data-board-opponent-collection
+        >
+          <div class="board-collection fit-cards">
+            <CollectionArea
+              :player="opponentKey"
+              @completed="emit('completed', $event)"
+            />
+          </div>
         </div>
       </div>
 
@@ -45,27 +47,29 @@
         </div>
       </div>
 
-      <div
-        class="min-w-0"
-        data-board-player-collection
-      >
-        <div class="board-collection fit-cards">
-          <CollectionArea
-            :player="selfKey"
-            @completed="emit('completed', $event)"
-          />
+      <div class="board-band">
+        <div
+          class="min-w-0"
+          data-board-player-collection
+        >
+          <div class="board-collection fit-cards">
+            <CollectionArea
+              :player="selfKey"
+              @completed="emit('completed', $event)"
+            />
+          </div>
         </div>
-      </div>
 
-      <div
-        :class="['min-w-0 transition-opacity duration-200', handDimmed && 'opacity-80']"
-        data-board-player-hand
-      >
-        <div class="board-hand fit-cards py-2 sm:py-3">
-          <HandDisplay
-            :id="selfKey"
-            :can-interact="handEnabled"
-          />
+        <div
+          :class="['min-w-0 transition-opacity duration-200', handDimmed && 'opacity-80']"
+          data-board-player-hand
+        >
+          <div class="board-hand fit-cards py-2 sm:py-3">
+            <HandDisplay
+              :id="selfKey"
+              :can-interact="handEnabled"
+            />
+          </div>
         </div>
       </div>
     </div>
