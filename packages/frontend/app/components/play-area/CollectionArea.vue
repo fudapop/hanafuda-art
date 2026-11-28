@@ -23,12 +23,12 @@
         @dblclick="modalOpen = true"
         @dbltap="modalOpen = true"
       >
-        <template v-if="coll[type] && coll[type].size > 0">
+        <template v-if="collection[type].length > 0">
           <span
             class="coll-label uppercase absolute top-1 left-0 z-10 inline-block bg-gray-800 text-white text-[8px] tracking-wide p-[0.2em_1em] rounded-md"
           >
             <span class="text-xs align-middle">
-              {{ coll[type].size }}
+              {{ collection[type].length }}
             </span>
             <span class="coll-label-name ml-1">
               {{ t(`game.cardTypes.${type}`) }}
@@ -36,7 +36,7 @@
           </span>
           <template v-if="!isMobileLandscape">
             <CardList
-              :cards="coll[type]"
+              :cards="collection[type]"
               :stack="true"
             />
           </template>
@@ -89,34 +89,11 @@ const { getDesignInfo } = useCardDesign()
 const { selfKey, isMultiplayerGame } = useLocalPlayerPerspective()
 
 const cardTypes = ['brights', 'animals', 'ribbons', 'plains'] as const
-const coll: Record<string, Set<CardName>> = reactive({
-  brights: new Set([]),
-  animals: new Set([]),
-  ribbons: new Set([]),
-  plains: new Set([]),
-})
 
+// Piles follow the store. A local copy that only added cards survived a
+// round-1 lucky hand: the board mounts after those cards are collected and
+// roundOver is already true, so nothing ever cleared them.
 const collection = computed(() => sortByType([...cs.collection[player]]))
-const cBrights = computed(() => collection.value.brights)
-const cAnimals = computed(() => collection.value.animals)
-const cRibbons = computed(() => collection.value.ribbons)
-const cPlains = computed(() => collection.value.plains)
-
-const updateCollection = () => {
-  cBrights.value?.forEach((card) => coll.brights?.add(card))
-  cAnimals.value?.forEach((card) => coll.animals?.add(card))
-  cRibbons.value?.forEach((card) => coll.ribbons?.add(card))
-  cPlains.value?.forEach((card) => coll.plains?.add(card))
-}
-
-const resetCollection = () => {
-  // Stats tracking is now centralized in useStatsTracking composable
-  // Just clear the visual collection display
-  coll.brights?.clear()
-  coll.animals?.clear()
-  coll.ribbons?.clear()
-  coll.plains?.clear()
-}
 
 /**
  * Appends '+{n}' to denote the number of extra cards
@@ -138,8 +115,6 @@ const applyExtraTags = (yakuList: YakuName[]) => {
 let lastCompleted: Set<YakuName> = new Set([])
 
 onMounted(() => {
-  updateCollection()
-
   watch(
     [month, () => config.maxRounds],
     () => {
@@ -172,17 +147,13 @@ onMounted(() => {
   )
 
   watch(roundOver, () => {
-    if (roundOver.value) {
-      lastCompleted.clear()
-      resetCollection()
-    }
+    if (roundOver.value) lastCompleted.clear()
   })
 
   watch(
     collection,
     () => {
       if (roundOver.value) return
-      updateCollection()
 
       config.applyWildCardOption()
       const { score, completed: completedYaku } = checkAll(
