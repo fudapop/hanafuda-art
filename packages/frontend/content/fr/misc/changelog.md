@@ -1,5 +1,9 @@
 # Journal des modifications
 
+## Unreleased
+
+- **Ressources du jeu** : Les cartes, la musique et les avatars (y compris les avatars précédemment sauvegardés) se chargent désormais directement depuis notre serveur de ressources dédié.
+
 ## [2026.11.0] - 2026-11-14
 
 ### Corrections de bugs

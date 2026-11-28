@@ -1,5 +1,9 @@
 # Dziennik zmian
 
+## Unreleased
+
+- **Zasoby gry**: Karty, muzyka i awatary (w tym wcześniej zapisane awatary) ładują się teraz bezpośrednio z naszego dedykowanego hosta zasobów.
+
 ## [2026.11.0] - 2026-11-14
 
 ### Poprawki błędów
