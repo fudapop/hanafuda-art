@@ -5,6 +5,7 @@
 - **Game assets**: Cards, music, and avatars (including previously saved avatars) now load directly from our dedicated asset host.
 - **Collection piles**: Cards taken by a lucky hand in the first round no longer stay in the collection piles after the next round starts.
 - **Your turn hint**: The prompt above your hand no longer shifts the cards when it is your turn to choose one.
+- **Phone game board**: The opponent's hand sits clear of the top bar, and extra space on a tall phone is shared down the board.
 
 ## [2026.11.0] - 2026-11-14
 

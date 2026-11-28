@@ -1,6 +1,7 @@
 <template>
   <div
-    class="sm:[@media_(max-height:500px)]:[--card-height:80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] h-dvh overflow-hidden relative"
+    ref="shell"
+    class="game-viewport sm:[@media_(max-height:500px)]:[--card-height:80px] sm:[@media_(max-height:500px)]:grid-rows-[50px_1fr_50px] overflow-hidden relative"
   >
     <!-- BACKGROUND ELEMENTS -->
     <div
@@ -90,6 +91,8 @@
 
     <!-- OPPONENT STATUS BAR -->
     <div
+      ref="topBar"
+      data-top-bar
       :class="{
         'z-[-1] fixed top-0 inset-x-0 duration-300 transition-all sm:[@media_(max-height:500px)]:w-1/2 sm:[@media_(max-height:500px)]:rounded-br-full': true,
         'opacity-40': players[selfKey].isActive,
@@ -204,6 +207,10 @@ import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { GAME_OPTIONS_TABS } from '~/composables/useOptionsPanel'
 import { usePlayerStore } from '~~/stores/playerStore'
+
+const shell = useTemplateRef<HTMLElement>('shell')
+const topBar = useTemplateRef<HTMLElement>('topBar')
+useTopBarHeight(topBar, shell)
 
 const { currentDesign } = useCardDesign()
 const { t } = useI18n()
