@@ -7,21 +7,7 @@
     "jsr:@std/internal@^1.0.9": "1.0.9",
     "jsr:@std/path@*": "1.1.1",
     "jsr:@std/path@1.1.1": "1.1.1",
-    "jsr:@std/path@^1.1.1": "1.1.1",
-    "jsr:@supabase/supabase-js@*": "2.49.8",
-    "jsr:@supabase/supabase-js@2": "2.49.8",
-    "npm:@supabase/auth-js@2.69.1": "2.69.1",
-    "npm:@supabase/auth-js@2.71.1": "2.71.1",
-    "npm:@supabase/functions-js@2.4.4": "2.4.4",
-    "npm:@supabase/functions-js@2.4.6": "2.4.6",
-    "npm:@supabase/node-fetch@2.6.15": "2.6.15",
-    "npm:@supabase/postgrest-js@1.19.4": "1.19.4",
-    "npm:@supabase/postgrest-js@1.21.4": "1.21.4",
-    "npm:@supabase/realtime-js@2.11.2": "2.11.2",
-    "npm:@supabase/realtime-js@2.15.5": "2.15.5",
-    "npm:@supabase/storage-js@2.12.1": "2.12.1",
-    "npm:@supabase/storage-js@2.7.1": "2.7.1",
-    "npm:@types/node@*": "22.5.4"
+    "jsr:@std/path@^1.1.1": "1.1.1"
   },
   "jsr": {
     "@std/cli@1.0.20": {
@@ -45,135 +31,7 @@
       "dependencies": [
         "jsr:@std/internal"
       ]
-    },
-    "@supabase/supabase-js@2.49.8": {
-      "integrity": "fe1057c623e3297d627d8d795f8c8e7195b2973da8cec813f99e1484b6943b99",
-      "dependencies": [
-        "npm:@supabase/auth-js@2.69.1",
-        "npm:@supabase/functions-js@2.4.4",
-        "npm:@supabase/node-fetch",
-        "npm:@supabase/postgrest-js@1.19.4",
-        "npm:@supabase/realtime-js@2.11.2",
-        "npm:@supabase/storage-js@2.7.1"
-      ]
     }
-  },
-  "npm": {
-    "@supabase/auth-js@2.69.1": {
-      "integrity": "sha512-FILtt5WjCNzmReeRLq5wRs3iShwmnWgBvxHfqapC/VoljJl+W8hDAyFmf1NVw3zH+ZjZ05AKxiKxVeb0HNWRMQ==",
-      "dependencies": [
-        "@supabase/node-fetch"
-      ]
-    },
-    "@supabase/auth-js@2.71.1": {
-      "integrity": "sha512-mMIQHBRc+SKpZFRB2qtupuzulaUhFYupNyxqDj5Jp/LyPvcWvjaJzZzObv6URtL/O6lPxkanASnotGtNpS3H2Q==",
-      "dependencies": [
-        "@supabase/node-fetch"
-      ]
-    },
-    "@supabase/functions-js@2.4.4": {
-      "integrity": "sha512-WL2p6r4AXNGwop7iwvul2BvOtuJ1YQy8EbOd0dhG1oN1q8el/BIRSFCFnWAMM/vJJlHWLi4ad22sKbKr9mvjoA==",
-      "dependencies": [
-        "@supabase/node-fetch"
-      ]
-    },
-    "@supabase/functions-js@2.4.6": {
-      "integrity": "sha512-bhjZ7rmxAibjgmzTmQBxJU6ZIBCCJTc3Uwgvdi4FewueUTAGO5hxZT1Sj6tiD+0dSXf9XI87BDdJrg12z8Uaew==",
-      "dependencies": [
-        "@supabase/node-fetch"
-      ]
-    },
-    "@supabase/node-fetch@2.6.15": {
-      "integrity": "sha512-1ibVeYUacxWYi9i0cf5efil6adJ9WRyZBLivgjs+AUpewx1F3xPi7gLgaASI2SmIQxPoCEjAsLAzKPgMJVgOUQ==",
-      "dependencies": [
-        "whatwg-url"
-      ]
-    },
-    "@supabase/postgrest-js@1.19.4": {
-      "integrity": "sha512-O4soKqKtZIW3olqmbXXbKugUtByD2jPa8kL2m2c1oozAO11uCcGrRhkZL0kVxjBLrXHE0mdSkFsMj7jDSfyNpw==",
-      "dependencies": [
-        "@supabase/node-fetch"
-      ]
-    },
-    "@supabase/postgrest-js@1.21.4": {
-      "integrity": "sha512-TxZCIjxk6/dP9abAi89VQbWWMBbybpGWyvmIzTd79OeravM13OjR/YEYeyUOPcM1C3QyvXkvPZhUfItvmhY1IQ==",
-      "dependencies": [
-        "@supabase/node-fetch"
-      ]
-    },
-    "@supabase/realtime-js@2.11.2": {
-      "integrity": "sha512-u/XeuL2Y0QEhXSoIPZZwR6wMXgB+RQbJzG9VErA3VghVt7uRfSVsjeqd7m5GhX3JR6dM/WRmLbVR8URpDWG4+w==",
-      "dependencies": [
-        "@supabase/node-fetch",
-        "@types/phoenix",
-        "@types/ws",
-        "ws"
-      ]
-    },
-    "@supabase/realtime-js@2.15.5": {
-      "integrity": "sha512-/Rs5Vqu9jejRD8ZeuaWXebdkH+J7V6VySbCZ/zQM93Ta5y3mAmocjioa/nzlB6qvFmyylUgKVS1KpE212t30OA==",
-      "dependencies": [
-        "@supabase/node-fetch",
-        "@types/phoenix",
-        "@types/ws",
-        "ws"
-      ]
-    },
-    "@supabase/storage-js@2.12.1": {
-      "integrity": "sha512-QWg3HV6Db2J81VQx0PqLq0JDBn4Q8B1FYn1kYcbla8+d5WDmTdwwMr+EJAxNOSs9W4mhKMv+EYCpCrTFlTj4VQ==",
-      "dependencies": [
-        "@supabase/node-fetch"
-      ]
-    },
-    "@supabase/storage-js@2.7.1": {
-      "integrity": "sha512-asYHcyDR1fKqrMpytAS1zjyEfvxuOIp1CIXX7ji4lHHcJKqyk+sLl/Vxgm4sN6u8zvuUtae9e4kDxQP2qrwWBA==",
-      "dependencies": [
-        "@supabase/node-fetch"
-      ]
-    },
-    "@types/node@22.5.4": {
-      "integrity": "sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==",
-      "dependencies": [
-        "undici-types"
-      ]
-    },
-    "@types/phoenix@1.6.6": {
-      "integrity": "sha512-PIzZZlEppgrpoT2QgbnDU+MMzuR6BbCjllj0bM70lWoejMeNJAxCchxnv7J3XFkI8MpygtRpzXrIlmWUBclP5A=="
-    },
-    "@types/ws@8.18.1": {
-      "integrity": "sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==",
-      "dependencies": [
-        "@types/node"
-      ]
-    },
-    "tr46@0.0.3": {
-      "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw=="
-    },
-    "undici-types@6.19.8": {
-      "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
-    },
-    "webidl-conversions@3.0.1": {
-      "integrity": "sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ=="
-    },
-    "whatwg-url@5.0.0": {
-      "integrity": "sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==",
-      "dependencies": [
-        "tr46",
-        "webidl-conversions"
-      ]
-    },
-    "ws@8.18.3": {
-      "integrity": "sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg=="
-    }
-  },
-  "redirects": {
-    "https://esm.sh/@supabase/node-fetch@^2.6.13?target=denonext": "https://esm.sh/@supabase/node-fetch@2.6.15?target=denonext",
-    "https://esm.sh/@supabase/node-fetch@^2.6.14?target=denonext": "https://esm.sh/@supabase/node-fetch@2.6.15?target=denonext",
-    "https://esm.sh/@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.52.0",
-    "https://esm.sh/isows@^1.0.7?target=denonext": "https://esm.sh/isows@1.0.7?target=denonext",
-    "https://esm.sh/tr46@~0.0.3?target=denonext": "https://esm.sh/tr46@0.0.3?target=denonext",
-    "https://esm.sh/webidl-conversions@^3.0.0?target=denonext": "https://esm.sh/webidl-conversions@3.0.1?target=denonext",
-    "https://esm.sh/whatwg-url@^5.0.0?target=denonext": "https://esm.sh/whatwg-url@5.0.0?target=denonext"
   },
   "remote": {
     "https://deno.land/std@0.220.1/assert/assert.ts": "bec068b2fccdd434c138a555b19a2c2393b71dfaada02b7d568a01541e67cdc5",
@@ -336,32 +194,14 @@
     "https://deno.land/std@0.224.0/path/windows/relative.ts": "3e1abc7977ee6cc0db2730d1f9cb38be87b0ce4806759d271a70e4997fc638d7",
     "https://deno.land/std@0.224.0/path/windows/resolve.ts": "8dae1dadfed9d46ff46cc337c9525c0c7d959fb400a6308f34595c45bdca1972",
     "https://deno.land/std@0.224.0/path/windows/to_file_url.ts": "40e560ee4854fe5a3d4d12976cef2f4e8914125c81b11f1108e127934ced502e",
-    "https://deno.land/std@0.224.0/path/windows/to_namespaced_path.ts": "4ffa4fb6fae321448d5fe810b3ca741d84df4d7897e61ee29be961a6aac89a4c",
-    "https://esm.sh/@supabase/auth-js@2.71.1/denonext/auth-js.mjs": "d55f67342e652b8bdce35b0ff13ad5cc294b7e96dbd68f859b464b07c6864967",
-    "https://esm.sh/@supabase/functions-js@2.4.5/denonext/functions-js.mjs": "acfcb4db90c292c335a9dbb5664485f5e0b680533d68e6942abb9387ec7e0d0b",
-    "https://esm.sh/@supabase/node-fetch@2.6.15/denonext/node-fetch.mjs": "0bae9052231f4f6dbccc7234d05ea96923dbf967be12f402764580b6bf9f713d",
-    "https://esm.sh/@supabase/node-fetch@2.6.15?target=denonext": "4d28c4ad97328403184353f68434f2b6973971507919e9150297413664919cf3",
-    "https://esm.sh/@supabase/postgrest-js@1.19.4/denonext/postgrest-js.mjs": "2073b5552ba10c7a8302bffffae771e3aede1daf833382355dae239fb0ab2576",
-    "https://esm.sh/@supabase/realtime-js@2.11.15/denonext/realtime-js.mjs": "3b7511415165a1b503eae1dfbc10814ef3d0c1c866c97fdec4f6714bfa34a847",
-    "https://esm.sh/@supabase/storage-js@2.7.1/denonext/storage-js.mjs": "73ac8cdc95cfcd794fe603dbd7ce06d539ab51538ae6467eabe0f9cc26c993aa",
-    "https://esm.sh/@supabase/supabase-js@2.52.0": "7af6a5d4fe4cabcd0c8acdeda3b4ee473938d0c9a76b91ce79035f9f87f9e1e6",
-    "https://esm.sh/@supabase/supabase-js@2.52.0/denonext/supabase-js.mjs": "aec3a8d303e5f545eac8498e37dc78048164cefd01c0814b423cb1bc1ecdad9a",
-    "https://esm.sh/isows@1.0.7/denonext/isows.mjs": "be1812ebbf28737b43588bbcbd89bf43345e3d58d32be13def331d12361045b4",
-    "https://esm.sh/isows@1.0.7?target=denonext": "31b7306eada995ba18e29841d688a42bcc0166caf302e1b183b6d2a7c649f262",
-    "https://esm.sh/tr46@0.0.3/denonext/tr46.mjs": "5753ec0a99414f4055f0c1f97691100f13d88e48a8443b00aebb90a512785fa2",
-    "https://esm.sh/tr46@0.0.3?target=denonext": "19cb9be0f0d418a0c3abb81f2df31f080e9540a04e43b0f699bce1149cba0cbb",
-    "https://esm.sh/webidl-conversions@3.0.1/denonext/webidl-conversions.mjs": "54b5c2d50a294853c4ccebf9d5ed8988c94f4e24e463d84ec859a866ea5fafec",
-    "https://esm.sh/webidl-conversions@3.0.1?target=denonext": "4e20318d50528084616c79d7b3f6e7f0fe7b6d09013bd01b3974d7448d767e29",
-    "https://esm.sh/whatwg-url@5.0.0/denonext/whatwg-url.mjs": "29b16d74ee72624c915745bbd25b617cfd2248c6af0f5120d131e232a9a9af79",
-    "https://esm.sh/whatwg-url@5.0.0?target=denonext": "f001a2cadf81312d214ca330033f474e74d81a003e21e8c5d70a1f46dc97b02d"
+    "https://deno.land/std@0.224.0/path/windows/to_namespaced_path.ts": "4ffa4fb6fae321448d5fe810b3ca741d84df4d7897e61ee29be961a6aac89a4c"
   },
   "workspace": {
     "dependencies": [
       "jsr:@std/cli@*",
       "jsr:@std/dotenv@*",
       "jsr:@std/fs@*",
-      "jsr:@std/path@1.1.1",
-      "jsr:@supabase/supabase-js@2"
+      "jsr:@std/path@1.1.1"
     ]
   }
 }

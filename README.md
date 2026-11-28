@@ -52,14 +52,9 @@ If you would like to run a local copy for development or testing purposes, follo
 3. Configure Firebase for your development environment, then run `pnpm dev`.
 4. Navigate to http://localhost:8888 in your web browser.
 
-Public game assets come from `https://assets.fudapop.com`. The frontend needs no
-Supabase credentials or environment variables. Known saved Supabase asset URLs
-are mapped to R2 locally, without contacting Supabase.
-
-`scripts/upload-to-static.ts` is retired historical context, not a setup step or
-an R2 publishing tool. The root `supabase/` directory retains migration history;
-it is not required to run the frontend. Deployment, R2 CORS verification, and
-Supabase shutdown remain separate operator actions.
+Public game assets come from `https://assets.fudapop.com`. Supabase is fully
+removed from this repository. Known saved Supabase asset URLs are mapped to R2
+locally, without contacting Supabase.
 
 ### Technologies
 This project was built using the Nuxt.js, Vue.js, and TypeScript.

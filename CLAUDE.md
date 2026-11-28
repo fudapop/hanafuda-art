@@ -4,7 +4,7 @@
 
 NewHanafuda.art is a client-side web app for playing Koi-Koi, a traditional Japanese hanafuda card game. Players compete against an AI opponent or in real-time multiplayer matches. A secondary goal is showcasing artwork from various hanafuda artists — players earn in-game coins to unlock card designs.
 
-**Tech stack**: Nuxt 4 (SSR disabled, pure SPA), Vue 3, TypeScript, Tailwind CSS v4, Pinia, Supabase, Firebase (Auth/Firestore/RTDB), VueFire.
+**Tech stack**: Nuxt 4 (SSR disabled, pure SPA), Vue 3, TypeScript, Tailwind CSS v4, Pinia, Firebase (Auth/Firestore/RTDB), VueFire.
 
 **Package manager**: pnpm (always use `pnpm`, never `npm` or `yarn`).
 
@@ -37,7 +37,6 @@ packages/
   landing/                    # Static marketing page for fudapop.com
 docs/                         # Architecture documentation (markdown)
 scripts/                      # Build and release tooling
-supabase/                     # Migrations, generated types, config (pending removal)
 ```
 
 ## Code Conventions
