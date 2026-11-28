@@ -27,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import { resolveAssetUrl } from '~/utils/assetUrls'
 const props = defineProps<{
   calledBy: 'p1' | 'p2'
   msg: string
@@ -34,7 +35,9 @@ const props = defineProps<{
 
 const { p1Avatar, p2Avatar } = useAvatar()
 
-const avatar = props.calledBy === 'p1' ? p1Avatar.value : p2Avatar.value
+const avatar = computed(() =>
+  resolveAssetUrl(props.calledBy === 'p1' ? p1Avatar.value : p2Avatar.value).url,
+)
 </script>
 
 <style scoped>

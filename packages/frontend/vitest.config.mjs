@@ -9,6 +9,8 @@ export default defineVitestConfig({
     environment: 'nuxt',
     environmentOptions: {
       nuxt: {
+        // Tests must not inherit developer credentials from dotenv files.
+        dotenv: { fileName: '/dev/null' },
         mock: {
           intersectionObserver: true,
           indexedDb: true,

@@ -1,5 +1,6 @@
 import type { PlayerProfile, SyncResult, SyncOptions } from '~~/types/profile'
 import { mergePlayerStats } from '~/utils/stats'
+import { normalizeProfileAvatar } from '~/utils/profile'
 
 /**
  * Conflict resolution result with source tracking
@@ -37,6 +38,8 @@ export async function resolveConflict(
   remote: PlayerProfile,
   strategy: SyncOptions['conflictStrategy'] = 'last-write-wins',
 ): Promise<ConflictResolution> {
+  local = normalizeProfileAvatar(local)
+  remote = normalizeProfileAvatar(remote)
     switch (strategy) {
     case 'merge-fields': {
       // Merge fields individually, adding stats together to prevent loss

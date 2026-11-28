@@ -12,6 +12,7 @@
  * }
  * ```
  */
+import { resolveAssetUrl } from './assetUrls'
 
 /** How many rows the Rankings page loads for each filter. */
 export const LEADERBOARD_LIMIT = 50
@@ -115,7 +116,7 @@ export function buildLeaderboardEntry(source: LeaderboardSource): LeaderboardEnt
   return {
     uid,
     username: clip(source.username?.trim() || DEFAULT_USERNAME, LEADERBOARD_USERNAME_MAX),
-    avatar: clip(source.avatar?.trim() || DEFAULT_AVATAR, LEADERBOARD_AVATAR_MAX),
+    avatar: clip(resolveAssetUrl(source.avatar?.trim() || DEFAULT_AVATAR).url, LEADERBOARD_AVATAR_MAX),
     isGuest: source.isGuest === true,
     record: { win, loss, draw, coins },
     totalGames,
@@ -158,7 +159,7 @@ export function readLeaderboardEntry(
   return {
     uid: data.uid?.trim() || id,
     username: data.username?.trim() || DEFAULT_USERNAME,
-    avatar: data.avatar?.trim() || DEFAULT_AVATAR,
+    avatar: resolveAssetUrl(data.avatar?.trim() || DEFAULT_AVATAR).url,
     isGuest: data.isGuest === true,
     record,
     totalGames,

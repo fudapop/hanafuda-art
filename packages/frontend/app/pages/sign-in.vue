@@ -23,7 +23,7 @@
         ]"
       >
         <img
-          src="https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/logo-title.webp"
+          :src="buildAssetUrl('assets', 'logo-title.webp')"
           class="wide-landscape:max-h-[20vw] max-h-[120px] h-[40vh]"
           :alt="t('game.title')"
         />
@@ -93,6 +93,7 @@
 </template>
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
+import { buildAssetUrl } from '~/utils/assetUrls'
 
 const { t, locale } = useI18n()
 const pageTitle = computed(() => `${t('game.title')} | ${t('pages.signIn')}`)

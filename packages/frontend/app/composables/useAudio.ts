@@ -1,4 +1,10 @@
+/**
+ * @fileoverview Play public BGM and effects with format fallbacks, crossfades,
+ * saved volume preferences, and Media Session artwork.
+ * @example const { initAudio, playAudio } = useAudio(); initAudio('main')
+ */
 import { useStorage } from '@vueuse/core'
+import { buildAssetUrl, resolveAssetUrl } from '~/utils/assetUrls'
 
 interface LegacySystemPreferences {
   volume: number
@@ -16,37 +22,33 @@ interface SystemPreferences extends LegacySystemPreferences {
 }
 
 export const useAudio = () => {
-  const config = useRuntimeConfig()
-
-  const bucketUrl = `${config.public.supabaseUrl}/storage/v1/object/public/static/audio`
-
   // BGM tracks with fallback formats (browser will try in order)
   const BGM_TRACKS = {
     main: {
       name: 'Awayuki',
-      artwork: `${bucketUrl}/art/gambler-september-logo-512.png`,
+      artwork: buildAssetUrl('audio', 'art/gambler-september-logo-512.png'),
       sources: [
-        `${bucketUrl}/bgm/PerituneMaterial_Awayuki.ogg`,
-        `${bucketUrl}/bgm/PerituneMaterial_Awayuki.m4a`,
-        `${bucketUrl}/bgm/PerituneMaterial_Awayuki.mp3`,
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_Awayuki.ogg'),
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_Awayuki.m4a'),
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_Awayuki.mp3'),
       ],
     },
     koikoi1: {
       name: 'Epic Battle J',
-      artwork: `${bucketUrl}/art/gambler-june-logo-512.png`,
+      artwork: buildAssetUrl('audio', 'art/gambler-june-logo-512.png'),
       sources: [
-        `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.ogg`,
-        `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.m4a`,
-        `${bucketUrl}/bgm/PerituneMaterial_EpicBattle_J_loop.mp3`,
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_EpicBattle_J_loop.ogg'),
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_EpicBattle_J_loop.m4a'),
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_EpicBattle_J_loop.mp3'),
       ],
     },
     koikoi2: {
       name: 'Kengeki',
-      artwork: `${bucketUrl}/art/gambler-october-logo-512.png`,
+      artwork: buildAssetUrl('audio', 'art/gambler-october-logo-512.png'),
       sources: [
-        `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.ogg`,
-        `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.m4a`,
-        `${bucketUrl}/bgm/PerituneMaterial_Kengeki_loop.mp3`,
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_Kengeki_loop.ogg'),
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_Kengeki_loop.m4a'),
+        buildAssetUrl('audio', 'bgm/PerituneMaterial_Kengeki_loop.mp3'),
       ],
     },
   } as const
@@ -111,11 +113,11 @@ export const useAudio = () => {
   }
 
   const SFX = {
-    card1: `${bucketUrl}/sfx/card1.m4a`,
-    card2: `${bucketUrl}/sfx/card2.m4a`,
-    card3: `${bucketUrl}/sfx/card3.m4a`,
-    coin: `${bucketUrl}/sfx/coins-counting.m4a`,
-    slash: `${bucketUrl}/sfx/sword-slash-and-swing-185432.mp3`,
+    card1: buildAssetUrl('audio', 'sfx/card1.m4a'),
+    card2: buildAssetUrl('audio', 'sfx/card2.m4a'),
+    card3: buildAssetUrl('audio', 'sfx/card3.m4a'),
+    coin: buildAssetUrl('audio', 'sfx/coins-counting.m4a'),
+    slash: buildAssetUrl('audio', 'sfx/sword-slash-and-swing-185432.mp3'),
   } as const
 
   const getAudioSourceUrls = (): { bgm: string[]; sfx: string[]; art: string[] } => {
@@ -231,7 +233,7 @@ export const useAudio = () => {
           type: 'image/webp',
         },
         {
-          src: 'https://ymoriyakbittfgocvxbw.supabase.co/storage/v1/object/public/static/assets/logo-title.webp', // Fallback
+          src: buildAssetUrl('assets', 'logo-title.webp'), // Fallback
           sizes: '512x512',
           type: 'image/webp',
         },
@@ -270,6 +272,7 @@ export const useAudio = () => {
   const initAudio = (trackKeyOrSrc: keyof typeof BGM_TRACKS | string) => {
     if (!import.meta.client) return
 
+    trackKeyOrSrc = resolveAssetUrl(trackKeyOrSrc).url
     const ref = currentAudioRef.value
 
     if (typeof trackKeyOrSrc === 'string' && trackKeyOrSrc.startsWith('http')) {
@@ -471,6 +474,7 @@ export const useAudio = () => {
   ) => {
     if (!import.meta.client) return
 
+    trackKeyOrSrc = resolveAssetUrl(trackKeyOrSrc).url
     let targetSrc: string
     let newAudio: HTMLAudioElement
 

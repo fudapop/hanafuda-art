@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Local-first profiles with queued updates and optional remote sync.
+ * Avatar normalization happens on copies at existing boundaries, not as a migration save.
+ * @example const { current, updateProfile } = usePlayerProfile()
+ */
 import type { User } from 'firebase/auth'
 import { useAvatar } from '~/composables/useAvatar'
 import { getDexBeeDb } from '~/composables/useDexBee'
@@ -6,6 +11,7 @@ import {
   createDefaultProfile,
   generateRandomUsername,
   mergeSettings,
+  normalizeProfileAvatar,
   sanitizeFirestoreData,
   sanitizeProfile,
 } from '~/utils/profile'
@@ -168,7 +174,7 @@ export async function createLocalGuestProfile(username?: string): Promise<Player
 
   if (existingGuest) {
     console.info('Loading existing guest profile')
-    return existingGuest
+    return normalizeProfileAvatar(existingGuest)
   }
 
   // Create new guest profile with constant UID
@@ -254,7 +260,8 @@ export const usePlayerProfile = () => {
 
   const getLocalData = async (uid: string): Promise<PlayerProfile | null> => {
     const store = await getStore()
-    return await store.get(uid)
+    const saved = await store.get(uid)
+    return saved ? normalizeProfileAvatar(saved) : null
   }
 
   const hasLocalProfile = async (uid: string): Promise<boolean> => {
@@ -333,6 +340,7 @@ export const usePlayerProfile = () => {
     user: User,
     remoteProfile?: PlayerProfile,
   ): Promise<PlayerProfile> => {
+    if (remoteProfile) remoteProfile = normalizeProfileAvatar(remoteProfile)
     // Disable watcher during transfer to prevent race conditions
     isTransferring = true
 
@@ -384,6 +392,7 @@ export const usePlayerProfile = () => {
 
         const mergedProfile: PlayerProfile = {
           ...existingAuthProfile,
+          avatar: normalizeProfileAvatar(existingAuthProfile).avatar,
           email: existingAuthProfile.email || (user as any).email || '',
           // Merge game records by adding them together
           record: {
@@ -435,7 +444,7 @@ export const usePlayerProfile = () => {
           ...guestProfile,
           uid: user.uid, // New UID
           email: (user as any).email || '',
-          avatar: (user as any).photoURL || guestProfile.avatar,
+          avatar: (user as any).photoURL || normalizeProfileAvatar(guestProfile).avatar,
           username,
           isGuest: undefined, // No longer a guest
           record: {
@@ -624,9 +633,8 @@ export const usePlayerProfile = () => {
       // Adapter's resolve returns PlayerProfile, wrap it in ConflictResolution
       // We assume it's merged since we don't know the source.
       // Preserve email here as well: a newer remote doc has no email field.
-      const resolved = preserveLocalEmail(
-        local.email,
-        await syncAdapter.value.resolve(local, remote),
+      const resolved = normalizeProfileAvatar(
+        preserveLocalEmail(local.email, await syncAdapter.value.resolve(local, remote)),
       )
       return { resolved, source: 'merged' }
     }

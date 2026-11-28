@@ -21,6 +21,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore'
 import type { GameRules, InviteCode, MultiplayerGame } from '~~/types/profile'
+import { resolveAssetUrl } from '~/utils/assetUrls'
 import { useCardStore } from '~~/stores/cardStore'
 import { useConfigStore } from '~~/stores/configStore'
 import { usePlayerStore } from '~~/stores/playerStore'
@@ -150,7 +151,7 @@ export const useMultiplayerMatch = (): MultiplayerMatchComposable => {
       opponent.value = {
         uid: opponentData.uid,
         username: opponentData.username,
-        avatar: opponentData.avatar,
+        avatar: resolveAssetUrl(opponentData.avatar).url,
       }
 
       // Also update the playerStore so the name persists through store resets

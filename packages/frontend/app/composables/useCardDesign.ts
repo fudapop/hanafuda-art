@@ -1,4 +1,9 @@
+/**
+ * @fileoverview Select localized card designs and preload their public WebP faces.
+ * @example const { getCardUrl } = useCardDesign()
+ */
 import CARD_DESIGNS from '~/assets/designInfo.json'
+import { buildCardFaceUrl } from '~/utils/assetUrls'
 import { type CardName, DECK } from '~/utils/cards'
 import { getLocalizedDesignInfoSync } from '~/utils/designInfo'
 import { type CardSizeOptions, useConfigStore } from '~~/stores/configStore'
@@ -36,9 +41,7 @@ export const DESIGN_STORAGE_KEY = 'hanafuda-selected-design'
 type CardMap = Map<CardName, string>
 
 export const useCardDesign = () => {
-  const { supabaseUrl } = useRuntimeConfig().public
   const { locale } = useI18n()
-  const bucketUrl = `${supabaseUrl}/storage/v1/render/image/public/static`
   const currentDesign: Ref<CardDesign> = useState('design', () => 'cherry-version')
 
   // Cache for localized design info
@@ -92,13 +95,7 @@ export const useCardDesign = () => {
 
   const getCardUrl = (cardName: CardName, design?: CardDesign): string => {
     const designName = design ?? currentDesign.value
-    const designInfo = getDesignInfo(designName)
-    const path = `${bucketUrl}/cards/${designName}/${cardName}.${designInfo.formatExt || 'webp'}`
-    const query = new URLSearchParams({
-      width: '120',
-      resize: 'contain',
-    })
-    return `${path}?${query.toString()}`
+    return buildCardFaceUrl(designName, cardName)
   }
 
   /**

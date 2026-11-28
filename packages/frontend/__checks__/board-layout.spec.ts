@@ -6,8 +6,7 @@ import { devices, expect, test, type Page } from '@playwright/test'
  * store locally and does not sign in or write to Firebase.
  *
  * Run against a local dev server:
- *   NUXT_TELEMETRY_DISABLED=1 API_KEY=test-api-key RECAPTCHA_KEY=test-recaptcha-key \
- *     NUXT_PUBLIC_SUPABASE_URL=https://ymoriyakbittfgocvxbw.supabase.co pnpm dev
+ *   NUXT_TELEMETRY_DISABLED=1 API_KEY=test-api-key RECAPTCHA_KEY=test-recaptcha-key pnpm dev
  *   pnpm exec playwright test __checks__/board-layout.spec.ts --project=chromium --project=webkit
  */
 

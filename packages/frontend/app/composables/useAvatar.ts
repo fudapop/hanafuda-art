@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Generate avatar choices and session defaults from public assets.
+ * @example const { listAvatars } = useAvatar()
+ */
+import { buildAssetUrl } from '~/utils/assetUrls'
+
 const AVATARS = [
   // Flat
   'flat-crane',
@@ -41,11 +47,8 @@ type Avatar = {
 }
 
 export const useAvatar = () => {
-  const config = useRuntimeConfig()
-  const bucketUrl = `${config.public.supabaseUrl}/storage/v1/object/public/static/avatars`
-
   const getAvatarUrl = (name: AvatarName): string => {
-    return `${bucketUrl}/${name}.webp`
+    return buildAssetUrl('avatars', `${name}.webp`)
   }
 
   const listAvatarUrls = (): string[] => {

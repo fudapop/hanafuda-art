@@ -16,7 +16,7 @@
             />
             <img
               class="w-32 h-auto mx-auto my-2 border rounded-full sm:my-4 sm:w-36 border-border drop-shadow-xs"
-              :src="user.avatar"
+              :src="resolveAssetUrl(user.avatar).url"
               :alt="user.username"
             />
           </AvatarSelect>
@@ -262,6 +262,7 @@
 </template>
 
 <script setup lang="ts">
+import { resolveAssetUrl } from '~/utils/assetUrls'
 import { ExclamationCircleIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { onClickOutside, useDateFormat } from '@vueuse/core'
 
@@ -269,7 +270,7 @@ const { t } = useI18n()
 
 const user = useProfile().current
 const avatar = computed({
-  get: () => user.value?.avatar ?? '',
+  get: () => resolveAssetUrl(user.value?.avatar ?? '').url,
   set: (url: string) => {
     if (user.value) user.value.avatar = url.replace(window.location.origin, '')
   },

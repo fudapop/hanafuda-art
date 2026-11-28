@@ -48,9 +48,18 @@ Whether you're an artist, developer, or fellow hanafuda enthusiast, contribution
 If you would like to run a local copy for development or testing purposes, follow these steps:
 
 1. Clone the repository to your local machine.
-2. Install the necessary dependencies by running npm install in the root directory of the project.
-3. Run the development server by running npm run dev.
-4. Navigate to http://localhost:3000 in your web browser.
+2. Install the necessary dependencies by running `pnpm install` in the root directory.
+3. Configure Firebase for your development environment, then run `pnpm dev`.
+4. Navigate to http://localhost:8888 in your web browser.
+
+Public game assets come from `https://assets.fudapop.com`. The frontend needs no
+Supabase credentials or environment variables. Known saved Supabase asset URLs
+are mapped to R2 locally, without contacting Supabase.
+
+`scripts/upload-to-static.ts` is retired historical context, not a setup step or
+an R2 publishing tool. The root `supabase/` directory retains migration history;
+it is not required to run the frontend. Deployment, R2 CORS verification, and
+Supabase shutdown remain separate operator actions.
 
 ### Technologies
 This project was built using the Nuxt.js, Vue.js, and TypeScript.
@@ -58,4 +67,3 @@ This project was built using the Nuxt.js, Vue.js, and TypeScript.
 
 ## Credits
 This project was created by our contributors and is licensed under the MIT License. All artworks used in the game are attributed to and are property of the respective artists.
-

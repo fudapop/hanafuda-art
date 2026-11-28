@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore'
 import type { SyncAdapter, PlayerProfile } from '~~/types/profile'
 import { buildLeaderboardEntry } from '~/utils/leaderboard'
-import { sanitizeFirestoreData } from '~/utils/profile'
+import { normalizeProfileAvatar, sanitizeFirestoreData } from '~/utils/profile'
 import { preserveLocalEmail } from '~/utils/sync'
 
 /**
@@ -45,6 +45,7 @@ export function useFirestoreSyncAdapter(): SyncAdapter {
     },
 
     async push(profile: PlayerProfile): Promise<boolean> {
+      profile = normalizeProfileAvatar(profile)
       try {
         const updatedAt =
           profile.lastUpdated instanceof Date ? profile.lastUpdated : new Date(profile.lastUpdated)
@@ -121,6 +122,8 @@ export function useFirestoreSyncAdapter(): SyncAdapter {
 
     // Custom conflict resolution for Firestore
     async resolve(local: PlayerProfile, remote: PlayerProfile): Promise<PlayerProfile> {
+      local = normalizeProfileAvatar(local)
+      remote = normalizeProfileAvatar(remote)
       // Firestore-specific resolution logic
       // For now, use LWW but this can be customized
       if (local.lastUpdated > remote.lastUpdated) {
