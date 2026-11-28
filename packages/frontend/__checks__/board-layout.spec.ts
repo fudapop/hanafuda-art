@@ -137,6 +137,78 @@ function expectFieldClear(layout: Metrics) {
   }
 }
 
+type HintLayout = {
+  present: boolean
+  position: string
+  opacity: string
+  ariaHidden: string | null
+  fieldY: number
+  fieldHeight: number
+  handY: number
+  handHeight: number
+  fieldCardY: number
+  fieldCardHeight: number
+}
+
+async function hintLayout(page: Page): Promise<HintLayout> {
+  return page.evaluate(() => {
+    const rect = (el: Element | null) => el?.getBoundingClientRect()
+    const field = rect(document.querySelector('[data-board-field]'))
+    const hand = rect(document.querySelector('[data-board-player-hand]'))
+    const fieldCard = rect(document.querySelector('[data-board-field] .field-cards .card'))
+    const hint = document.querySelector('[data-board-player-hand] p')
+    const style = hint ? getComputedStyle(hint) : null
+    return {
+      present: !!hint,
+      position: style?.position ?? '',
+      opacity: style?.opacity ?? '',
+      ariaHidden: hint?.getAttribute('aria-hidden') ?? null,
+      fieldY: field?.y ?? -1,
+      fieldHeight: field?.height ?? -1,
+      handY: hand?.y ?? -1,
+      handHeight: hand?.height ?? -1,
+      fieldCardY: fieldCard?.y ?? -1,
+      fieldCardHeight: fieldCard?.height ?? -1,
+    }
+  })
+}
+
+function expectHintFrame(actual: HintLayout, expected: HintLayout) {
+  expect(actual.present).toBe(true)
+  expect(actual.fieldY).toBeCloseTo(expected.fieldY, 0)
+  expect(actual.fieldHeight).toBeCloseTo(expected.fieldHeight, 0)
+  expect(actual.handY).toBeCloseTo(expected.handY, 0)
+  expect(actual.handHeight).toBeCloseTo(expected.handHeight, 0)
+  expect(actual.fieldCardY).toBeCloseTo(expected.fieldCardY, 0)
+  expect(actual.fieldCardHeight).toBeCloseTo(expected.fieldCardHeight, 0)
+}
+
+async function setTurnPhase(page: Page, phase: 'select' | 'draw') {
+  await page.evaluate((nextPhase) => {
+    const root = document.querySelector('#__nuxt') as
+      | (HTMLElement & {
+          __vue_app__?: {
+            config: { globalProperties: { $pinia?: { _s: Map<string, { turnPhase: string }> } } }
+          }
+        })
+      | null
+    const store = root?.__vue_app__?.config.globalProperties.$pinia?._s.get('gameData')
+    if (!store) throw new Error('gameData store is not available')
+    store.turnPhase = nextPhase
+  }, phase)
+}
+
+async function waitForHintOpacity(page: Page, opacity: '0' | '1') {
+  await page.waitForFunction(
+    (expected) => {
+      const hint = document.querySelector('[data-board-player-hand] p')
+      return !!hint && getComputedStyle(hint).opacity === expected
+    },
+    opacity,
+    { timeout: 4000 },
+  )
+}
+
 function expectLabelsClear(layout: Metrics) {
   const targets = [...layout.fieldCards, ...layout.handCards]
   const labels = layout.piles.filter((pile) => pile.label)
@@ -179,6 +251,53 @@ test.describe('phone board', () => {
       })
     }
   }
+
+  test('390x844 showing and hiding the turn hint leaves the field put', async ({ page }) => {
+    await openBoard(page, { width: 390, height: 844 }, 'empty')
+    const shown = await hintLayout(page)
+    expect(shown.present).toBe(true)
+    expect(shown.position).toBe('relative')
+    expect(shown.opacity).toBe('1')
+    expect(shown.ariaHidden).toBeNull()
+
+    await setTurnPhase(page, 'draw')
+    await waitForHintOpacity(page, '0')
+    const hidden = await hintLayout(page)
+    expectHintFrame(hidden, shown)
+    expect(hidden.position).toBe('relative')
+    expect(hidden.ariaHidden).toBe('true')
+
+    await setTurnPhase(page, 'select')
+    await waitForHintOpacity(page, '1')
+    const shownAgain = await hintLayout(page)
+    expectHintFrame(shownAgain, shown)
+    expect(shownAgain.position).toBe('relative')
+    expect(shownAgain.ariaHidden).toBeNull()
+  })
+
+  test('568x320 turn hint stays out of flow while the field stays put', async ({ page }) => {
+    await openBoard(page, { width: 568, height: 320 }, 'empty')
+    const shown = await hintLayout(page)
+    expect(shown.present).toBe(true)
+    expect(shown.position).toBe('absolute')
+    expect(shown.opacity).toBe('1')
+    expect(shown.fieldCardHeight).toBeGreaterThanOrEqual(24)
+
+    await setTurnPhase(page, 'draw')
+    await waitForHintOpacity(page, '0')
+    const hidden = await hintLayout(page)
+    expectHintFrame(hidden, shown)
+    expect(hidden.position).toBe('absolute')
+    expect(hidden.ariaHidden).toBe('true')
+    expect(hidden.fieldCardHeight).toBeGreaterThanOrEqual(24)
+
+    await setTurnPhase(page, 'select')
+    await waitForHintOpacity(page, '1')
+    const shownAgain = await hintLayout(page)
+    expectHintFrame(shownAgain, shown)
+    expect(shownAgain.position).toBe('absolute')
+    expect(shownAgain.ariaHidden).toBeNull()
+  })
 
   test('568x320 landscape keeps a visible field between the hands', async ({ page }) => {
     await openBoard(page, { width: 568, height: 320 }, 'mid')
