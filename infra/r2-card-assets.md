@@ -2,10 +2,10 @@
 
 ## Status
 
-The asset migration is complete and Supabase is retired. Public assets are
-served from R2 at `https://assets.fudapop.com`. The frontend does not call
-Supabase. Saved legacy Supabase asset URLs are still rewritten to R2 in the
-client.
+Public assets are served from R2 at `https://assets.fudapop.com`. The frontend
+does not call Supabase. Saved legacy Supabase asset URLs are still rewritten
+to R2 in the client. Shutting down the Supabase project is a separate operator
+check. This record does not prove the old public objects are gone.
 
 ## Scope
 
@@ -43,11 +43,12 @@ configuration, not deployed state.
 | Public bucket | `cloudflare_r2_bucket.static`: `fudapop-static`, `enam` | Planned replacement of `fudapop-static-assets`; apply and actual settings unverified |
 | Public hostname | `cloudflare_r2_custom_domain.static_domain`: `assets.fudapop.com`, enabled, TLS 1.2 | Planned reconnection to the new bucket; handover ordering and live status unverified |
 | Private archive | Proposed `cloudflare_r2_bucket.private`: `fudapop-private`, Standard, `enam`, jurisdiction `default` | Name availability, pre-existing resource, actual placement and privacy unknown |
-| Source | Former Supabase project `ymoriyakbittfgocvxbw`, origin `https://ymoriyakbittfgocvxbw.supabase.co`, bucket `static`, prefix `cards/` | Retired. Public assets are on R2 at `assets.fudapop.com` |
+| Source | Former Supabase project `ymoriyakbittfgocvxbw`, origin `https://ymoriyakbittfgocvxbw.supabase.co`, bucket `static`, prefix `cards/` | Public delivery is R2 at `assets.fudapop.com`. Project shutdown is a separate check |
 
 The old bucket's empty state is operator-reported, not independently verified.
 Do not repeat deletion or infer that CDN copies are gone.
-Supabase is retired, so it is no longer a public copy of the originals.
+Public delivery now uses R2. Shutting down the Supabase project is a separate
+operator check, so R2 privacy alone does not prove the old public objects are gone.
 
 ## Storage boundary and provider capabilities
 
@@ -119,7 +120,7 @@ resources, outputs or state.
 | --- | --- | --- |
 | Terraform plan | `Workers R2 Storage Read` for the intended account, plus only read permissions needed by existing zone/domain resources; no storage write | Existing repository Actions secret `CLOUDFLARE_PLAN_API_TOKEN`; verify actual policy, do not replace unrelated access |
 | Terraform apply | `Workers R2 Storage Write` for the intended account, plus only permissions needed by existing zone/domain resources | Existing protected `terraform` environment secret `CLOUDFLARE_APPLY_API_TOKEN`; owner reviews any required expansion |
-| Source inventory/copy | Retired with Supabase. The migration source was a read of `static/cards/`; no source writes | No Supabase credential is issued |
+| Source inventory/copy | Historical read of `static/cards/`; no source writes | No Supabase credential is issued. Project shutdown is a separate check |
 | Private archive copy | Separate R2 **Object Read & Write** token scoped only to `fudapop-private` | Separate restricted secret manager entry, not CI/frontend |
 | Public derivative publication | Separate R2 **Object Read & Write** token scoped only to `fudapop-static`, once deployed and verified | Separate restricted secret manager entry, never reused for source/original operations |
 | Independent validation | R2 **Object Read only**, limited to the two intended buckets | Separate restricted entry; no write credential required |
@@ -147,7 +148,8 @@ Before issuing any temporary credential, the owner must approve and record:
 Use short-lived local process injection from the approved secret store, no
 shell tracing, CLI secret arguments, committed `.env`, shared logs or permanent
 upload service. Store temporary local configs with restrictive permissions
-outside the checkout. Supabase source credentials are retired with that project.
+outside the checkout. Do not issue a Supabase source credential from this
+record. Project shutdown is a separate operator check.
 
 ## Approval, deployment and evidence gates
 
@@ -180,8 +182,8 @@ remains in force, and local apply is not an alternative.
    objects; do not report it as passed. Restoring any non-card assets is separate
    work, not an implicit action in this infrastructure PR.
 3. Historical source: Supabase project `ymoriyakbittfgocvxbw`, bucket `static`,
-   prefix `cards/`. That migration is complete and Supabase is retired. Do not
-   stand the project back up or copy objects from it.
+   prefix `cards/`. Public delivery is R2. Shutting down that project is a
+   separate operator check. Do not copy objects from it as part of this record.
 4. Review a fresh Terraform plan through the existing plan workflow. The supplied
    plan shows four additions and two destructions for the revised scope above.
    Confirm the old bucket is empty, resolve custom-domain handover ordering,
@@ -202,9 +204,9 @@ remains in force, and local apply is not an alternative.
    exact upload/removal approval. Record bytes/hash and endpoint settings. An
    empty bucket's missing-object 404 is not privacy proof. Never use original
    artwork as a public test fixture.
-7. The public domain `assets.fudapop.com` serves assets from R2. Supabase is
-   retired. No further object deletion or cache purge is authorized by this
-   record.
+7. The public domain `assets.fudapop.com` serves assets from R2. Supabase
+   project shutdown is a separate operator check. No further object deletion
+   or cache purge is authorized by this record.
 
 For Phase 2 handoff record the infrastructure commit once one exists, reviewed
 plan and apply run IDs, timestamp/operator, exact account, bucket names and
@@ -212,9 +214,9 @@ actual region/jurisdiction, Terraform resource ownership, authenticated/private
 access checks, public endpoint/settings inventory, old-bucket removal/cache
 references, credential roles/store references/expiry, the initial approved
 source-snapshot identity/private-inventory reference and approval, evidence that
-the execution-time plan blocker is resolved, and approvals. The Supabase asset
-migration is complete. Public delivery is R2 at `assets.fudapop.com`. Record
-the operator's prior asset deletion separately.
+the execution-time plan blocker is resolved, and approvals. Frontend delivery
+is R2 at `assets.fudapop.com`. Shutting down the Supabase project is a separate
+operator check. Record the operator's prior asset deletion separately.
 
 If a public-bucket deployment fails, reconcile the bucket and domain through
 reviewed Terraform. The frontend reads R2, not Supabase. Do not assume the
