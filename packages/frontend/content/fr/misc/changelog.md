@@ -1,6 +1,6 @@
 # Journal des modifications
 
-## Unreleased
+## Recent changes
 
 - **Ressources du jeu** : Les cartes, la musique et les avatars (y compris les avatars précédemment enregistrés) se chargent désormais directement depuis notre serveur de ressources dédié.
 - **Piles de collecte** : Les cartes remportées par une main chanceuse lors de la première manche ne restent plus dans les piles de collecte après le début de la manche suivante.

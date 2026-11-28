@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## Recent changes
 
 - **Game assets**: Cards, music, and avatars (including previously saved avatars) now load directly from our dedicated asset host.
 - **Collection piles**: Cards taken by a lucky hand in the first round no longer stay in the collection piles after the next round starts.

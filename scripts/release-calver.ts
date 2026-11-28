@@ -4,9 +4,10 @@
  * Prepare a calendar-version release.
  *
  * Updates the player-facing version in `packages/frontend/package.json` and
- * moves `## Unreleased` in the English changelog to `## [YYYY.M.MICRO] - YYYY-MM-DD`.
- * Does not commit, tag, or push. Tag `vYYYY.M.MICRO` only after the release PR
- * squash-merges to main. See CLAUDE.md, Releases.
+ * moves the notes under `## Recent changes` in the English changelog to
+ * `## [YYYY.M.MICRO] - YYYY-MM-DD` and leaves an empty `## Recent changes`
+ * heading in place. Does not commit, tag, or push. The Release workflow tags
+ * `vYYYY.M.MICRO` after that pull request squash-merges to main. See CLAUDE.md, Releases.
  *
  * Usage:
  *   pnpm release
@@ -80,7 +81,10 @@ const main = () => {
 
   if (dryRun) {
     console.log(`Would update ${PACKAGE_JSON}`)
-    console.log(`Would move ## Unreleased to ## [${prepared.version}] - ${prepared.date}`)
+    console.log(
+      `Would move notes under ## Recent changes to ## [${prepared.version}] - ${prepared.date}`,
+    )
+    console.log('Would leave an empty ## Recent changes heading in place')
     console.log(`  in ${CHANGELOG}`)
     console.log('\nNo files written.')
   } else {
@@ -90,13 +94,19 @@ const main = () => {
     console.log(`Updated ${CHANGELOG}`)
   }
 
-  console.log(`
-Open a pull request. Suggested title: chore(release): v${prepared.version}
-Other locale changelogs stay as they are until translate-content is run.
-After the PR squash-merges to main, tag that commit (do not tag the PR branch):
+  if (!dryRun) {
+    console.log(`
+Prepared ${PACKAGE_JSON} and ${CHANGELOG}.
+## Recent changes is empty again, ready for the next notes.
+Other locale changelogs stay as they are until translate-content runs.
+`)
+  }
 
-  git tag v${prepared.version}
-  git push origin v${prepared.version}
+  console.log(`
+The Sunday Release workflow, and a manual run of that workflow, commits these
+files on release/v${prepared.version}, opens a pull request titled
+chore(release): v${prepared.version}, squash-merges it, and tags that version
+on main. A local run does not commit, tag, or push. Do not tag the pull request branch.
 `)
 }
 

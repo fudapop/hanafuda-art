@@ -9,7 +9,7 @@ const SYSTEM_RULES = [
   'You translate English copy for a Hanafuda Koi-Koi card game.',
   'Preserve markdown structure: headings, lists, tables, emphasis, line breaks, and emoji.',
   'Copy every token of the form @@PH_0@@ exactly once. Do not translate the text those tokens stand for, and do not add tokens.',
-  'Do not translate front-matter keys, version headings such as "## [2026.11.0]", or the heading "## Unreleased". Those are not in the fragment.',
+  'Do not translate front-matter keys, version headings such as "## [2026.11.0]", or the headings "## Recent changes" and "## Unreleased". Those are not in the fragment.',
   'Keep personal names and studio names as written unless the glossary gives a form.',
   'Return JSON only. Do not wrap it in a code fence.',
 ].join('\n')
