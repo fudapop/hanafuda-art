@@ -55,6 +55,9 @@ const parseArgs = (argv: string[]): CliOptions => {
       date = parseReleaseDate(argv[++i])
     } else if (arg.startsWith('--date=')) {
       date = parseReleaseDate(arg.slice('--date='.length))
+    } else if (arg === '--') {
+      // pnpm 10 keeps a separator in the script arguments: `pnpm run release -- --date`
+      // arrives here as `--`. Skip it so that form still works.
     } else {
       throw new ReleaseError(`Unknown argument "${arg}". Try --help.`)
     }

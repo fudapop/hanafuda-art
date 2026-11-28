@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { describe, it } from 'node:test'
 import {
   bumpPackageVersion,
@@ -26,6 +27,23 @@ const changelog = `# Changelog
 
 ---
 `
+
+describe('release CLI', () => {
+  it('ignores a lone -- that pnpm forwards to the script', () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        new URL('./release-calver.ts', import.meta.url).pathname,
+        '--',
+        '--help',
+      ],
+      { encoding: 'utf8' },
+    )
+    assert.equal(result.status, 0, result.stderr)
+    assert.match(result.stdout, /--date YYYY-MM-DD/)
+  })
+})
 
 describe('parseCalVer', () => {
   it('parses an unpadded month', () => {

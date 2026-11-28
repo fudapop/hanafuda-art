@@ -152,7 +152,9 @@ jobs:
           fi
 
           TODAY=$(date -u +%F)
-          pnpm run release -- --date "${TODAY}"
+          # pnpm 10 forwards a `--` separator to the script, and parseArgs rejects it.
+          # Pass the date without that separator. `pnpm release --date YYYY-MM-DD` works.
+          pnpm run release --date "${TODAY}"
 
           node --experimental-strip-types --input-type=module <<'EOF'
           import { readFileSync } from 'node:fs'
@@ -206,9 +208,67 @@ jobs:
           fi
 
           TITLE="chore(release): v${VERSION}"
-          PR=$(gh pr list --base main --state open --limit 50 --json number,headRefName \
-            --jq ".[] | select(.headRefName == \"${BRANCH}\") | .number" | head -n 1)
-          if [ -z "${PR}" ]; then
+          if [ "${NEED_PUSH}" = true ]; then
+            EXPECTED_SHA=$(git rev-parse HEAD)
+          else
+            EXPECTED_SHA="${REMOTE_SHA}"
+          fi
+          export EXPECTED_SHA
+
+          # Same-repository release pull requests only. A fork can open
+          # release/vX; that pull request is not this cut and is not merged.
+          list_release_prs() {
+            gh pr list --base main --state open --limit 50 \
+              --json number,headRefName,headRefOid,isCrossRepository,headRepository
+          }
+
+          PRS=$(list_release_prs)
+          SUPERSEDED=$(printf '%s' "${PRS}" | jq -r \
+            --arg branch "${BRANCH}" \
+            --arg repo "${GITHUB_REPOSITORY}" \
+            '.[]
+              | select(.isCrossRepository == false)
+              | select((.headRepository.nameWithOwner // "") == $repo)
+              | select(.headRefName | test("^release/v[0-9]{4}\\.(1[0-2]|[1-9])\\.[0-9]+$"))
+              | select(.headRefName != $branch)
+              | .number')
+          if [ -n "${SUPERSEDED}" ]; then
+            while IFS= read -r OLD; do
+              [ -z "${OLD}" ] && continue
+              echo "Closing #${OLD}; ${BRANCH} replaces that release pull request."
+              gh pr merge "${OLD}" --disable-auto || true
+              gh pr close "${OLD}" --comment "Superseded by ${BRANCH}. A newer calendar version is being cut, so this pull request will not merge."
+            done <<< "${SUPERSEDED}"
+          fi
+
+          # Prints the pull request number, "missing", or "ambiguous".
+          select_pr() {
+            printf '%s' "$(list_release_prs)" | jq -r \
+              --arg branch "${BRANCH}" \
+              --arg repo "${GITHUB_REPOSITORY}" \
+              --arg sha "${EXPECTED_SHA}" \
+              '
+              [
+                .[]
+                | select(.isCrossRepository == false)
+                | select((.headRepository.nameWithOwner // "") == $repo)
+                | select(.headRefName == $branch)
+                | select(.headRefOid == $sha)
+                | .number
+              ]
+              | if length > 1 then "ambiguous"
+                elif length == 1 then .[0] | tostring
+                else "missing"
+                end
+              '
+          }
+
+          PR=$(select_pr)
+          if [ "${PR}" = "ambiguous" ]; then
+            echo "::error::More than one pull request for ${BRANCH} at ${EXPECTED_SHA}."
+            exit 1
+          fi
+          if [ "${PR}" = "missing" ]; then
             BODY_FILE=$(mktemp)
             cat > "${BODY_FILE}" <<EOF
           Automated calendar-version release of ${VERSION} (${TODAY}).
@@ -221,13 +281,25 @@ jobs:
           EOF
             gh pr create --base main --head "${BRANCH}" --title "${TITLE}" --body-file "${BODY_FILE}"
             rm -f "${BODY_FILE}"
-            PR=$(gh pr list --base main --state open --limit 50 --json number,headRefName \
-              --jq ".[] | select(.headRefName == \"${BRANCH}\") | .number" | head -n 1)
+            PR=$(select_pr)
+          fi
+          if [ "${PR}" = "ambiguous" ]; then
+            echo "::error::More than one pull request for ${BRANCH} at ${EXPECTED_SHA}."
+            exit 1
+          fi
+          if [ -z "${PR}" ] || [ "${PR}" = "missing" ] || [ "${PR}" = "null" ]; then
+            echo "::error::No same-repository pull request for ${BRANCH} at ${EXPECTED_SHA}."
+            exit 1
           fi
 
-          METHOD=$(gh pr view "${PR}" --json autoMergeRequest --jq '.autoMergeRequest.mergeMethod // empty')
+          METHOD=$(gh pr view "${PR}" --json autoMergeRequest,headRefOid,isCrossRepository,headRepository \
+            --jq 'if .isCrossRepository or .headRepository.nameWithOwner != env.GITHUB_REPOSITORY or .headRefOid != env.EXPECTED_SHA then "reject" else (.autoMergeRequest.mergeMethod // "none") end')
+          if [ "${METHOD}" = "reject" ]; then
+            echo "::error::Pull request #${PR} is not ${BRANCH} at ${EXPECTED_SHA} in ${GITHUB_REPOSITORY}."
+            exit 1
+          fi
           if [ "${METHOD}" != "SQUASH" ]; then
-            gh pr merge "${PR}" --auto --squash --subject "${TITLE}"
+            gh pr merge "${PR}" --auto --squash --match-head-commit "${EXPECTED_SHA}" --subject "${TITLE}"
           fi
           echo "Release pull request #${PR} for v${VERSION} is set to squash auto-merge."
 
