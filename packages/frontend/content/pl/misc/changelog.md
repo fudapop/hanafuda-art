@@ -3,6 +3,9 @@
 ## Unreleased
 
 - **Zasoby gry**: Karty, muzyka i awatary (w tym wcześniej zapisane awatary) ładują się teraz bezpośrednio z naszego dedykowanego hosta zasobów.
+- **Stosy zebranych kart**: Karty zebrane przez szczęśliwą rękę w pierwszej rundzie nie pozostają już na stosach zebranych kart po rozpoczęciu kolejnej rundy.
+- **Wskazówka o Twojej turze**: Komunikat nad Twoją ręką nie przesuwa już kart, gdy nadchodzi Twoja kolej na wybór jednej z nich.
+- **Plansza gry na telefonie**: Ręka przeciwnika nie nachodzi na górny pasek, a dodatkowa przestrzeń na wysokich telefonach jest rozdzielana w dół planszy.
 
 ## [2026.11.0] - 2026-11-14
 
