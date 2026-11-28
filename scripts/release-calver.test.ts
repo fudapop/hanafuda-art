@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { describe, it } from 'node:test'
 import {
   bumpPackageVersion,
@@ -7,13 +8,14 @@ import {
   parseCalVer,
   parseReleaseDate,
   prepareRelease,
-  promoteUnreleased,
+  promoteRecentChanges,
+  recentChangesStatus,
   ReleaseError,
 } from './release-calver-lib.ts'
 
 const changelog = `# Changelog
 
-## Unreleased
+## Recent changes
 
 ### Bug Fixes
 - **Phone game board**: Cards fit on a phone.
@@ -25,6 +27,23 @@ const changelog = `# Changelog
 
 ---
 `
+
+describe('release CLI', () => {
+  it('ignores a lone -- that pnpm forwards to the script', () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        new URL('./release-calver.ts', import.meta.url).pathname,
+        '--',
+        '--help',
+      ],
+      { encoding: 'utf8' },
+    )
+    assert.equal(result.status, 0, result.stderr)
+    assert.match(result.stdout, /--date YYYY-MM-DD/)
+  })
+})
 
 describe('parseCalVer', () => {
   it('parses an unpadded month', () => {
@@ -83,12 +102,44 @@ describe('parseReleaseDate', () => {
   })
 })
 
-describe('promoteUnreleased', () => {
-  it('moves Unreleased into a dated heading and keeps later sections', () => {
-    const next = promoteUnreleased(changelog, '2026.11.0', '2026-11-13')
+describe('recentChangesStatus', () => {
+  it('releases when the section has a bullet', () => {
+    assert.equal(recentChangesStatus(changelog), 'release')
+    assert.equal(recentChangesStatus('## Recent changes\n\n* **Fix**: Done.\n'), 'release')
+  })
+
+  it('is empty when the section has no bullets', () => {
+    assert.equal(
+      recentChangesStatus('# Changelog\n\n## Recent changes\n\n## [2026.4.0]\n'),
+      'empty',
+    )
+    assert.equal(
+      recentChangesStatus('# Changelog\n\n## Recent changes\n\n### Bug Fixes\n\n## [2026.4.0]\n'),
+      'empty',
+    )
+    assert.equal(
+      recentChangesStatus('# Changelog\n\n## Recent changes\n\nA note without a bullet.\n'),
+      'empty',
+    )
+  })
+
+  it('reports a missing or duplicated heading', () => {
+    assert.equal(recentChangesStatus('# Changelog\n\n## [2026.4.0]\n'), 'missing')
+    assert.equal(
+      recentChangesStatus('## Recent changes\n\n- a\n\n## Recent changes\n\n- b\n'),
+      'duplicate',
+    )
+  })
+})
+
+describe('promoteRecentChanges', () => {
+  it('moves Recent changes into a dated heading and leaves the heading in place', () => {
+    const next = promoteRecentChanges(changelog, '2026.11.0', '2026-11-13')
     assert.equal(
       next,
       `# Changelog
+
+## Recent changes
 
 ## [2026.11.0] - 2026-11-13
 
@@ -103,17 +154,18 @@ describe('promoteUnreleased', () => {
 ---
 `,
     )
+    assert.equal(recentChangesStatus(next), 'empty')
   })
 
-  it('fails when Unreleased is missing, empty, only a heading, or duplicated', () => {
+  it('fails when Recent changes is missing, empty, only a heading, or duplicated', () => {
     assert.throws(
-      () => promoteUnreleased('# Changelog\n\n## [2026.4.0]\n', '2026.11.0', '2026-11-13'),
-      /no "## Unreleased"/,
+      () => promoteRecentChanges('# Changelog\n\n## [2026.4.0]\n', '2026.11.0', '2026-11-13'),
+      /no "## Recent changes"/,
     )
     assert.throws(
       () =>
-        promoteUnreleased(
-          '# Changelog\n\n## Unreleased\n\n## [2026.4.0]\n',
+        promoteRecentChanges(
+          '# Changelog\n\n## Recent changes\n\n## [2026.4.0]\n',
           '2026.11.0',
           '2026-11-13',
         ),
@@ -121,17 +173,17 @@ describe('promoteUnreleased', () => {
     )
     assert.throws(
       () =>
-        promoteUnreleased(
-          '# Changelog\n\n## Unreleased\n\n### Bug Fixes\n\n## [2026.4.0]\n',
+        promoteRecentChanges(
+          '# Changelog\n\n## Recent changes\n\n### Bug Fixes\n\n## [2026.4.0]\n',
           '2026.11.0',
           '2026-11-13',
         ),
-      /no notes/,
+      /no bullets/,
     )
     assert.throws(
       () =>
-        promoteUnreleased(
-          '## Unreleased\n\n- a\n\n## Unreleased\n\n- b\n',
+        promoteRecentChanges(
+          '## Recent changes\n\n- a\n\n## Recent changes\n\n- b\n',
           '2026.11.0',
           '2026-11-13',
         ),
@@ -141,7 +193,7 @@ describe('promoteUnreleased', () => {
 
   it('fails when that version heading already exists', () => {
     assert.throws(
-      () => promoteUnreleased(changelog, '2026.4.0', '2026-11-13'),
+      () => promoteRecentChanges(changelog, '2026.4.0', '2026-11-13'),
       /already has a 2026.4.0/,
     )
   })
@@ -179,7 +231,11 @@ describe('prepareRelease', () => {
     assert.equal(prepared.version, '2026.11.0')
     assert.equal(prepared.date, '2026-11-13')
     assert.equal(JSON.parse(prepared.packageJson).version, '2026.11.0')
-    assert.match(prepared.changelog, /^# Changelog\n\n## \[2026\.11\.0\] - 2026-11-13\n/)
+    assert.match(
+      prepared.changelog,
+      /^# Changelog\n\n## Recent changes\n\n## \[2026\.11\.0\] - 2026-11-13\n/,
+    )
+    assert.equal(recentChangesStatus(prepared.changelog), 'empty')
     assert.doesNotMatch(prepared.changelog, /^## Unreleased/m)
     assert.match(prepared.changelog, /## \[2026\.4\.0\] - 2026-04-05/)
   })

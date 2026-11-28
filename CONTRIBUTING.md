@@ -22,5 +22,7 @@ If you would like to contribute code to the project, please follow these steps:
 7. Push your changes to your forked repository with git push -u origin my-branch-name.
 8. Open a pull request on the Pull Requests page of the repository.
 
+Player-facing changes (gameplay, UI, auth, privacy, or the installed app) add one bullet under `## Recent changes` in `packages/frontend/content/en/misc/changelog.md`. Docs, CI, tests, and refactors do not. Do not bump the version. A release is cut every Sunday at 00:00 UTC.
+
 Please note that all contributions must
 adhere to our Code of Conduct, and should be submitted under the terms of the MIT License.

@@ -169,15 +169,24 @@ const splitDoc = (markdown: string): SplitDoc => {
   return { block: match[0], inner: match[1], body: markdown.slice(match[0].length) }
 }
 
+/**
+ * `## Recent changes` is the open section. `## Unreleased` is the previous
+ * heading, still recognized so a diff that only renames it keeps this id and
+ * does not retranslate older version sections.
+ */
+const OPEN_SECTION = /^## (?:Recent changes|Unreleased)\b/
+
 const sectionId = (heading: string): string => {
-  if (/^## Unreleased\b/.test(heading)) return 'unreleased'
+  if (OPEN_SECTION.test(heading)) return 'recent-changes'
   const version = heading.match(/^## \[([^\]]+)\]/)
   if (!version) throw new Error(`Heading is not a stable version id: ${heading}`)
   return version[1]
 }
 
 /**
- * Split changelog-style markdown on `## Unreleased` and `## [version]` headings.
+ * Split changelog-style markdown on `## Recent changes` and `## [version]` headings.
+ *
+ * `## Unreleased` is accepted as an alias of `## Recent changes`.
  *
  * @param markdown - Body after front matter.
  * @returns Null when there is no such heading, or any `##` heading is ordinary prose.
@@ -187,7 +196,7 @@ export const splitStableSections = (
 ): { preamble: string; sections: Section[] } | null => {
   const matches = [...markdown.matchAll(/^## [^\n]+/gm)]
   if (matches.length === 0) return null
-  if (!matches.every((match) => /^## (?:Unreleased|\[[^\]]+\])/.test(match[0]))) return null
+  if (!matches.every((match) => /^## (?:Recent changes|Unreleased|\[[^\]]+\])/.test(match[0]))) return null
   const preamble = markdown.slice(0, matches[0].index ?? 0)
   const sections = matches.map((match, index) => {
     const start = match.index ?? 0
@@ -327,6 +336,13 @@ export const planMarkdownFile = (args: {
           pieces.push({ type: 'literal', text: section.headingLine + rest })
           dirty = true
         }
+        continue
+      }
+      // An emptied Recent changes section is a heading with no notes. Copy it.
+      // Sending an empty fragment to the model can fail the whole changelog.
+      if (norm(section.body).length === 0) {
+        pieces.push({ type: 'literal', text: `${section.headingLine}\n\n` })
+        dirty = true
         continue
       }
       prose.push({ id: section.id, source: norm(section.body) })

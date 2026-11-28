@@ -302,6 +302,8 @@ Set `CLOUDFLARE_PLAN_API_TOKEN` as a repository Actions secret with read-only ac
 
 Pushes translate changed English content and UI strings. Manual runs default to `mode=changed` and require `base_ref`, a commit or tag before the English changes. An open translation PR may extend the range back to its merge-base, but never narrows the requested range; its locale edits are merged into the plan. Enable `dry_run` to inspect the plan without calling Vertex or opening a PR. Choose `mode=full` only for an intentional full retranslation. Actual translation runs also require the `APP_CLIENT_ID` variable and `APP_PRIVATE_KEY` secret for a GitHub App so the resulting PR runs the required checks; see the workflow for app permissions.
 
+[Release](../.github/workflows/release.yml) reuses that same `APP_CLIENT_ID` variable and `APP_PRIVATE_KEY` secret (the fuda-bot GitHub App). It does not add new secrets. The app needs contents and pull-requests write on this repository. The repository must allow auto-merge and squash merges. See the workflow header for branch protection and tag rules.
+
 `terraform-apply` is bound only in pool `github-terraform-apply`, to the subject `repo:fudapop/hanafuda-art:environment:terraform`. The provider in that pool also requires `refs/heads/main` and the `environment` claim `terraform`. The apply job declares `environment: terraform`, which is what waits for approval and what puts that subject on the token. Another workflow on `main` does not get this subject, and a token from the shared `github` pool cannot match this binding. The environment name in GitHub, the provider condition, and the binding have to stay `terraform`.
 
 `infra/new-hanafuda` prints the same identifiers after that stack has been applied:

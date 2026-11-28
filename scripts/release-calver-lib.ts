@@ -4,13 +4,13 @@
  * The player-facing version is `packages/frontend/package.json`. It uses
  * `YYYY.M.MICRO` (month is not zero-padded): the first release in a month is
  * `.0`, and later releases that month increment MICRO. These helpers compute
- * the next version and move an `## Unreleased` changelog section into a dated
- * heading. They do not touch git.
+ * the next version and move the notes under `## Recent changes` into a dated
+ * heading, leaving that heading in place for the next notes. They do not touch git.
  *
  * @example
  * const prepared = prepareRelease({
  *   packageJson: '{"version":"2026.4.0"}',
- *   changelog: '# Changelog\n\n## Unreleased\n\n- **Fix**: A fix.\n',
+ *   changelog: '# Changelog\n\n## Recent changes\n\n- **Fix**: A fix.\n',
  *   now: new Date(Date.UTC(2026, 10, 13)),
  * })
  * prepared.version // "2026.11.0"
@@ -29,8 +29,67 @@ export type CalVer = {
   micro: number
 }
 
+/** Heading that collects notes until the next calendar release. */
+export const RECENT_CHANGES_HEADING = '## Recent changes'
+
 const CALVER = /^(\d{4})\.(\d{1,2})\.(\d+)$/
 const RELEASE_DATE = /^(\d{4})-(\d{2})-(\d{2})$/
+const BULLET = /^\s*[-*]\s+\S/
+
+export type RecentChangesStatus = 'release' | 'empty' | 'missing' | 'duplicate'
+
+type RecentSection = {
+  headingCount: number
+  start: number
+  body: string
+  rest: string
+  normalized: string
+}
+
+/**
+ * Locate the single `## Recent changes` section.
+ *
+ * @param markdown - Changelog markdown. CRLF line endings are normalized.
+ * @returns Heading count plus the section body. `body` and `rest` are empty
+ * when the heading is missing or duplicated.
+ */
+const findRecentChanges = (markdown: string): RecentSection => {
+  const normalized = markdown.replace(/\r\n/g, '\n')
+  // Fresh regex each call. A shared global regex keeps lastIndex between runs.
+  const headings = [...normalized.matchAll(/^## Recent changes[ \t]*$/gm)]
+  if (headings.length !== 1) {
+    return { headingCount: headings.length, start: 0, body: '', rest: '', normalized }
+  }
+  const heading = headings[0]
+  const start = heading.index ?? 0
+  const bodyStart = start + heading[0].length
+  const relativeNext = normalized.slice(bodyStart).search(/\n## /)
+  const body =
+    relativeNext === -1
+      ? normalized.slice(bodyStart)
+      : normalized.slice(bodyStart, bodyStart + relativeNext)
+  const rest = relativeNext === -1 ? '' : normalized.slice(bodyStart + relativeNext + 1)
+  return { headingCount: 1, start, body, rest, normalized }
+}
+
+const sectionHasBullets = (body: string): boolean => body.split('\n').some((line) => BULLET.test(line))
+
+/**
+ * Whether `## Recent changes` has player-facing bullets.
+ *
+ * A Sunday release is a no-op when this is `empty`. `missing` and `duplicate`
+ * are a broken changelog and should fail the run.
+ *
+ * @param markdown - Changelog markdown.
+ * @returns `release` when the section contains a `-` or `*` list item.
+ */
+export const recentChangesStatus = (markdown: string): RecentChangesStatus => {
+  const found = findRecentChanges(markdown)
+  if (found.headingCount === 0) return 'missing'
+  if (found.headingCount > 1) return 'duplicate'
+  if (!sectionHasBullets(found.body)) return 'empty'
+  return 'release'
+}
 
 /**
  * Parse a `YYYY.M.MICRO` version.
@@ -127,16 +186,19 @@ export const getNextVersion = (currentVersion: string, now: Date): string => {
 }
 
 /**
- * Replace `## Unreleased` with a dated version heading.
+ * Move notes under `## Recent changes` into a dated version heading.
+ *
+ * The `## Recent changes` heading stays, with an empty body, so the next
+ * pull request can add bullets without recreating it.
  *
  * @param markdown - English changelog markdown.
  * @param version - CalVer string already validated by the caller, or validated here.
  * @param date - `YYYY-MM-DD` release date.
- * @returns Changelog with one new version section and no Unreleased heading.
- * @throws {ReleaseError} When Unreleased is missing, empty, only a category
- * heading, duplicated, or the version heading already exists.
+ * @returns Changelog with an empty Recent changes section and one new version section.
+ * @throws {ReleaseError} When Recent changes is missing, empty, only a category
+ * heading, duplicated, has no bullets, or the version heading already exists.
  */
-export const promoteUnreleased = (markdown: string, version: string, date: string): string => {
+export const promoteRecentChanges = (markdown: string, version: string, date: string): string => {
   if (!parseCalVer(version)) {
     throw new ReleaseError(`Version must be CalVer YYYY.M.MICRO, got "${version}".`)
   }
@@ -144,47 +206,32 @@ export const promoteUnreleased = (markdown: string, version: string, date: strin
     throw new ReleaseError(`Release date must be YYYY-MM-DD, got "${date}".`)
   }
 
-  const normalized = markdown.replace(/\r\n/g, '\n')
-  // Fresh regex each call. A shared global regex keeps lastIndex between runs.
-  const headings = [...normalized.matchAll(/^## Unreleased[ \t]*$/gm)]
-  if (headings.length === 0) {
+  const found = findRecentChanges(markdown)
+  if (found.headingCount === 0) {
     throw new ReleaseError(
-      'Changelog has no "## Unreleased" section. Add player-facing notes before cutting a release.',
+      'Changelog has no "## Recent changes" section. Add player-facing notes before cutting a release.',
     )
   }
-  if (headings.length > 1) {
-    throw new ReleaseError('Changelog has more than one "## Unreleased" section.')
+  if (found.headingCount > 1) {
+    throw new ReleaseError('Changelog has more than one "## Recent changes" section.')
   }
-  if (normalized.includes(`## [${version}]`)) {
+  if (found.normalized.includes(`## [${version}]`)) {
     throw new ReleaseError(`Changelog already has a ${version} section.`)
   }
 
-  const heading = headings[0]
-  const start = heading.index ?? 0
-  const bodyStart = start + heading[0].length
-  const relativeNext = normalized.slice(bodyStart).search(/\n## /)
-  const body =
-    relativeNext === -1
-      ? normalized.slice(bodyStart)
-      : normalized.slice(bodyStart, bodyStart + relativeNext)
-  const rest = relativeNext === -1 ? '' : normalized.slice(bodyStart + relativeNext + 1)
-  const notes = body.trim()
+  const notes = found.body.trim()
   if (!notes) {
-    throw new ReleaseError('The Unreleased section is empty.')
+    throw new ReleaseError('The Recent changes section is empty.')
   }
-  const hasNote = notes.split('\n').some((line) => {
-    const trimmed = line.trim()
-    return trimmed.length > 0 && !trimmed.startsWith('#')
-  })
-  if (!hasNote) {
+  if (!sectionHasBullets(notes)) {
     throw new ReleaseError(
-      'The Unreleased section has no notes. Add a bullet under the category heading.',
+      'The Recent changes section has no bullets. Add a bullet under the category heading.',
     )
   }
 
-  const prefix = start === 0 ? '' : normalized.slice(0, start).replace(/\s*$/, '\n\n')
-  const section = `## [${version}] - ${date}\n\n${notes}\n\n`
-  return `${prefix}${section}${rest}`.replace(/\n{3,}/g, '\n\n').replace(/\s*$/, '\n')
+  const prefix = found.start === 0 ? '' : found.normalized.slice(0, found.start).replace(/\s*$/, '\n\n')
+  const section = `${RECENT_CHANGES_HEADING}\n\n## [${version}] - ${date}\n\n${notes}\n\n`
+  return `${prefix}${section}${found.rest}`.replace(/\n{3,}/g, '\n\n').replace(/\s*$/, '\n')
 }
 
 /**
@@ -248,6 +295,6 @@ export const prepareRelease = (input: {
     version,
     date,
     packageJson: bumpPackageVersion(input.packageJson, version),
-    changelog: promoteUnreleased(input.changelog, version, date),
+    changelog: promoteRecentChanges(input.changelog, version, date),
   }
 }

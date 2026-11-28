@@ -94,32 +94,29 @@ Version format is calendar versioning, `YYYY.M.MICRO`, month not zero-padded. Th
 
 The English changelog is `packages/frontend/content/en/misc/changelog.md` (root `CHANGELOG.md` is a symlink to it). `/changelog` renders the locale file through Nuxt Content. `ja`, `fr`, `pl`, and `ru` copies are translations of that English file. Heading style is `## [2026.4.0] - 2026-04-05`, then `### Bug Fixes` / `### New Features` / `### UI & Experience Improvements` / `### Performance & Technical Improvements`, then bullets: `- **Short title**: One player-facing sentence.`
 
-Pull requests are stacked and squash-merged, so a version bump in every PR conflicts and a tag on the PR branch points at a commit squash-merge throws away. `pnpm release` used to commit, tag, and push from a clean tree. It now only prepares files.
+Pull requests are stacked and squash-merged, so a version bump in every PR conflicts and a tag on the PR branch points at a commit squash-merge throws away. `pnpm release` only prepares files. It does not commit, tag, or push.
 
 ### Normal pull request
 
-- Player-visible change (gameplay, UI, auth, privacy, installed-app behavior): add a bullet under `## Unreleased` at the top of the English changelog. Create that heading when it is missing. Leave the version number alone. Leave the other locales alone.
+- Player-visible change (gameplay, UI, auth, privacy, installed-app behavior): add a bullet under `## Recent changes` at the top of the English changelog. Create that heading when it is missing. Leave the version number alone. Leave the other locales alone.
 - No player-visible change (docs, CI, tests, refactors, internal tooling): do not touch the changelog or the version.
 
-### Cutting a release
+### Scheduled release
 
-Do this only when asked to ship a batch, on its own branch from latest `main`, after the work that belongs in the batch is already merged. Do not fold an open stack in unless asked.
+`.github/workflows/release.yml` cuts a release every Sunday at 00:00 UTC. Run the **Release** workflow with `workflow_dispatch` to cut one sooner. The workflow and a second run share a concurrency group so two cuts do not run at once.
 
-1. `pnpm release` (preview with `pnpm release:dry-run`). Optional `--date YYYY-MM-DD` pins the UTC calendar day. The command bumps `packages/frontend/package.json` and moves `## Unreleased` to `## [YYYY.M.MICRO] - YYYY-MM-DD`. It does not commit, tag, or push. It fails when `Unreleased` is missing, empty, or only category headings with no bullets.
-2. Commit those two files. Title: `chore(release): vYYYY.M.MICRO`.
-3. Localized changelogs are not part of that command. Leave `ja` / `fr` / `pl` / `ru` unchanged in the release PR. After it merges to `main`, `.github/workflows/translate-content.yml` runs `scripts/i18n-translate.ts` on Vertex AI and opens a separate translation PR. It translates changed release sections while preserving unchanged historical translations.
+1. If `## Recent changes` in the English changelog has no bullets, the run succeeds and does nothing.
+2. Otherwise it checks out `main` and runs `pnpm release`. That bumps `packages/frontend/package.json` to the next `YYYY.M.MICRO` and moves the notes under `## Recent changes` to `## [YYYY.M.MICRO] - YYYY-MM-DD`, leaving an empty `## Recent changes` heading for the next notes. The command fails when that heading is missing, duplicated, empty, or only category headings with no bullets.
+3. It commits those two files on `release/vYYYY.M.MICRO` and opens a pull request titled `chore(release): vYYYY.M.MICRO`. The pull request is authenticated as the fuda-bot GitHub App (`APP_CLIENT_ID` variable and `APP_PRIVATE_KEY` secret, the same app Translate content uses) so CI starts. Auto-merge is enabled with squash only for that same-repository pull request, and only when its head is the release commit. An open pull request for this version is updated when `main` has new notes, and left as-is when it already matches. An open pull request for an older `release/v*` version from this repository is closed.
+4. After that squash merge reaches `main`, the tag job in the same workflow creates lightweight tag `vYYYY.M.MICRO` on that commit when `packages/frontend/package.json` `version` changed and the tag does not already exist. Do not tag the pull request branch, and do not tag by hand.
 
-   For a manual catch-up, run **Translate content** on `main` with `mode=changed` and `base_ref` set to a commit or tag before the English changes. Enable `dry_run` first to review the plan without API calls or file writes. An open translation PR may extend the range back to its merge-base, but never narrows the requested range; its locale edits are merged into the plan. Choose `mode=full` only when a complete retranslation is intended.
+Localized changelogs are not part of `pnpm release`. Leave `ja` / `fr` / `pl` / `ru` unchanged in the release pull request. After it merges to `main`, `.github/workflows/translate-content.yml` runs `scripts/i18n-translate.ts` on Vertex AI and opens a separate translation pull request. It translates changed release sections while preserving unchanged historical translations. The heading `## Recent changes` stays in English in every locale.
 
-   Do not invent translations by hand or block a release when translation credentials are unavailable. Say in the release PR that localized changelogs will follow separately.
-4. Open the PR. Do not create a tag or a GitHub Release on the PR branch.
+For a manual catch-up, run **Translate content** on `main` with `mode=changed` and `base_ref` set to a commit or tag before the English changes. Enable `dry_run` first to review the plan without API calls or file writes. An open translation PR may extend the range back to its merge-base, but never narrows the requested range; its locale edits are merged into the plan. Choose `mode=full` only when a complete retranslation is intended.
 
-After that PR squash-merges to `main`, check out the new `main` commit and tag it:
+Do not invent translations by hand or block a release when translation credentials are unavailable. The release pull request says localized changelogs follow separately.
 
-```
-git tag vYYYY.M.MICRO
-git push origin vYYYY.M.MICRO
-```
+`pnpm release` still works locally (preview with `pnpm release:dry-run`). Optional `--date YYYY-MM-DD` pins the UTC calendar day. A local run prepares the same two files and does not commit, tag, or push. The Sunday workflow is the usual way to open the pull request. A release commit that reaches `main` is tagged by the workflow.
 
 ## Documentation
 

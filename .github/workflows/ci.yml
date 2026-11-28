@@ -79,8 +79,18 @@ jobs:
             # this workflow runs every job. Root deps are package.json,
             # pnpm-lock.yaml, and pnpm-workspace.yaml. `.npmrc` is on the
             # jobs that run `pnpm install`.
+            #
+            # A release pull request changes only
+            # packages/frontend/package.json and the English changelog.
+            # Both match packages/frontend/**, so unit-test, typecheck,
+            # lint, and build-frontend still run. Jobs whose filters do
+            # not match are skipped with `if:` and still report success,
+            # which lets required checks pass. Do not add a workflow-level
+            # `paths:` filter; that would leave required checks pending.
             frontend:
               - 'packages/frontend/**'
+              - 'packages/frontend/package.json'
+              - 'packages/frontend/content/en/misc/changelog.md'
               - 'scripts/color-mode-init.js'
               - 'package.json'
               - 'pnpm-lock.yaml'

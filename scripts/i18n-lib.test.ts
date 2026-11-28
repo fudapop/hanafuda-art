@@ -214,7 +214,7 @@ describe('front matter', () => {
 describe('changelog sections', () => {
   const before = '# Changelog\n\n## [2026.4.0] - 2026-04-05\n\n### Features\n- Old\n'
   const after =
-    '# Changelog\n\n## Unreleased\n\n### Bug Fixes\n- New [docs](https://example.com/a)\n\n## [2026.4.0] - 2026-04-05\n\n### Features\n- Old\n'
+    '# Changelog\n\n## Recent changes\n\n### Bug Fixes\n- New [docs](https://example.com/a)\n\n## [2026.4.0] - 2026-04-05\n\n### Features\n- Old\n'
   const existing = '# 更新履歴\n\n## [2026.4.0] - 2026-04-05\n\n### 新機能\n- 古い\n'
   const sourcePath = 'packages/frontend/content/en/misc/changelog.md'
 
@@ -244,7 +244,7 @@ describe('changelog sections', () => {
       glossary,
     })
     assert.ok(planned && planned.kind === 'markdown')
-    assert.deepEqual(planned.prose.map((part) => part.id), ['unreleased'])
+    assert.deepEqual(planned.prose.map((part) => part.id), ['recent-changes'])
     const echo = echoClient()
     const files = new Map<string, string>([[planned.targetPath, existing]])
     const result = await runPlan({
@@ -263,12 +263,64 @@ describe('changelog sections', () => {
     assert.deepEqual(result.written, [planned.targetPath])
     assert.equal(echo.calls, 1)
     assert.match(written, /# 更新履歴/)
-    assert.match(written, /## Unreleased/)
+    assert.match(written, /## Recent changes/)
     assert.match(written, /https:\/\/example.com\/a/)
     assert.match(written, /### 新機能/)
     assert.match(written, /- 古い/)
     assert.doesNotMatch(written, /- Old/)
     assert.doesNotMatch(written, /packages\/frontend\/content\/en\//)
+  })
+
+  it('keeps reviewed sections when the open heading is renamed from Unreleased', () => {
+    const bullets = '### Bug Fixes\n- Same\n'
+    const renamedBefore = `# Changelog\n\n## Unreleased\n\n${bullets}\n## [2026.4.0] - 2026-04-05\n\n- Old\n`
+    const renamedAfter = `# Changelog\n\n## Recent changes\n\n${bullets}\n## [2026.4.0] - 2026-04-05\n\n- Old\n`
+    const renamedExisting =
+      '# 更新履歴\n\n## Recent changes\n\n### 不具合修正\n- 同じ\n\n## [2026.4.0] - 2026-04-05\n\n- 古い\n'
+    const plan = planMarkdownFile({
+      mode: 'changed',
+      locale: 'ja',
+      sourcePath,
+      targetPath: 'packages/frontend/content/ja/misc/changelog.md',
+      before: renamedBefore,
+      after: renamedAfter,
+      existing: renamedExisting,
+      glossary,
+    })
+    assert.equal(plan, null)
+  })
+
+  it('copies an emptied Recent changes heading and translates only the new version', () => {
+    const shippedBefore =
+      '# Changelog\n\n## Recent changes\n\n- New\n\n## [2026.4.0] - 2026-04-05\n\n- Old\n'
+    const shippedAfter =
+      '# Changelog\n\n## Recent changes\n\n## [2026.11.0] - 2026-11-28\n\n- Shipped\n\n## [2026.4.0] - 2026-04-05\n\n- Old\n'
+    const shippedExisting =
+      '# 更新履歴\n\n## Recent changes\n\n- 新しい\n\n## [2026.4.0] - 2026-04-05\n\n- 古い\n'
+    const planned = planMarkdownFile({
+      mode: 'changed',
+      locale: 'ja',
+      sourcePath,
+      targetPath: 'packages/frontend/content/ja/misc/changelog.md',
+      before: shippedBefore,
+      after: shippedAfter,
+      existing: shippedExisting,
+      glossary,
+    })
+    assert.ok(planned && planned.kind === 'markdown')
+    assert.deepEqual(
+      planned.prose.map((part) => part.id),
+      ['2026.11.0'],
+    )
+    const written = assembleMarkdown(planned, {
+      strings: {},
+      prose: { '2026.11.0': '- 出荷' },
+    })
+    assert.match(written, /# 更新履歴/)
+    assert.match(written, /## Recent changes\n\n## \[2026\.11\.0\] - 2026-11-28\n\n- 出荷/)
+    assert.match(written, /- 古い/)
+    assert.doesNotMatch(written, /- 新しい/)
+    assert.doesNotMatch(written, /- New/)
   })
 })
 
@@ -339,7 +391,7 @@ describe('buildPlan', () => {
     const afterFiles = {
       ...beforeFiles,
       'packages/frontend/content/en/misc/changelog.md':
-        '# Changelog\n\n## Unreleased\n\n- New\n\n## [2026.4.0] - 2026-04-05\n\n- Old\n',
+        '# Changelog\n\n## Recent changes\n\n- New\n\n## [2026.4.0] - 2026-04-05\n\n- Old\n',
     }
     const plan = buildPlan({
       mode: 'changed',

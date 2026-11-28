@@ -1,0 +1,371 @@
+# Cut a calendar-version release from the notes under "## Recent changes".
+#
+# Schedule: Sunday 00:00 UTC. GitHub may start a scheduled run late.
+# workflow_dispatch cuts a release immediately. A second cut waits for the
+# one already running (concurrency group calver-release). Tag jobs use a
+# separate group per commit so a tag push does not cancel a cut, and a cut
+# does not cancel a tag.
+#
+# The pull request and the tag are created with the fuda-bot GitHub App, the
+# same app Translate content uses. An app token starts the pull_request
+# workflows. The default GITHUB_TOKEN would not, so required CI would never
+# finish and auto-merge would wait forever.
+#
+# Required repository configuration (no new secret names):
+#
+#   APP_CLIENT_ID      Actions variable. GitHub App ID or client ID.
+#   APP_PRIVATE_KEY    Actions secret. PEM private key for that app.
+#
+# Install the app on this repository with:
+#
+#   Contents: Read and write        push release/v* and create v* tags
+#   Pull requests: Read and write   open the pull request and enable auto-merge
+#
+# Repository settings:
+#
+#   Settings → General → Pull Requests → Allow auto-merge
+#   Allow squash merging. Squash is the only merge this workflow requests.
+#   Settings → General → Pull Requests → Automatically delete head branches
+#     is optional. The next cut replaces release/v* when the notes changed.
+#
+# Branch protection on main:
+#
+#   Required status checks must be jobs from CI. A release pull request only
+#   changes packages/frontend/package.json and the English changelog. Those
+#   paths match the frontend filter in .github/workflows/ci.yml, so
+#   unit-test, typecheck, lint, and build-frontend run. Other CI jobs are
+#   skipped with `if:` and still report success. Do not use a workflow-level
+#   paths filter on CI; skipped workflows stay pending and block auto-merge.
+#   If main requires a approving review, auto-merge waits for that review.
+#   Unattended Sunday releases need the app allowed to merge without a
+#   review, or no required review on this pull request.
+#   If main requires branches to be up to date, a commit that lands on main
+#   while CI is running leaves the release pull request behind. The next
+#   Release run rebuilds the branch from main when the notes still differ.
+#
+# Tag rules: the app creates the lightweight tag. A ruleset that restricts
+# tag creation must allow this app to create refs/tags/v*.
+#
+# An empty "## Recent changes" section (no bullets) exits success. A missing
+# or duplicated heading fails the run. pnpm release also fails in those cases
+# when someone runs it locally.
+
+name: Release
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/frontend/package.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'push' && format('calver-release-tag-{0}', github.sha) || 'calver-release' }}
+  cancel-in-progress: false
+
+jobs:
+  cut:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Check for release notes
+        id: notes
+        run: |
+          set -euo pipefail
+          node --experimental-strip-types --input-type=module <<'EOF'
+          import { appendFileSync, readFileSync } from 'node:fs'
+          import { recentChangesStatus } from './scripts/release-calver-lib.ts'
+          const status = recentChangesStatus(
+            readFileSync('packages/frontend/content/en/misc/changelog.md', 'utf8'),
+          )
+          if (status === 'missing') {
+            console.error('Changelog has no "## Recent changes" section.')
+            process.exit(1)
+          }
+          if (status === 'duplicate') {
+            console.error('Changelog has more than one "## Recent changes" section.')
+            process.exit(1)
+          }
+          const release = status === 'release' ? 'true' : 'false'
+          if (release === 'false') {
+            console.log('No bullets under ## Recent changes. Nothing to release.')
+          } else {
+            console.log('## Recent changes has bullets. Cutting a release.')
+          }
+          appendFileSync(process.env.GITHUB_OUTPUT, `release=${release}\n`)
+          EOF
+
+      - name: Create GitHub App token
+        id: app-token
+        if: steps.notes.outputs.release == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Open the release pull request
+        if: steps.notes.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_SLUG}" ]; then
+            echo "::error::GitHub App token did not include an app slug."
+            exit 1
+          fi
+
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          export GIT_TERMINAL_PROMPT=0
+          export GH_PROMPT_DISABLED=1
+
+          if BOT_ID=$(gh api "users/${APP_SLUG}[bot]" --jq .id); then
+            git config user.name "${APP_SLUG}[bot]"
+            git config user.email "${BOT_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+          else
+            echo "::warning::Could not resolve ${APP_SLUG}[bot]. Commits use a noreply email."
+            git config user.name "${APP_SLUG}[bot]"
+            git config user.email "${APP_SLUG}[bot]@users.noreply.github.com"
+          fi
+
+          TODAY=$(date -u +%F)
+          # pnpm 10 forwards a `--` separator to the script, and parseArgs rejects it.
+          # Pass the date without that separator. `pnpm release --date YYYY-MM-DD` works.
+          pnpm run release --date "${TODAY}"
+
+          node --experimental-strip-types --input-type=module <<'EOF'
+          import { readFileSync } from 'node:fs'
+          import { recentChangesStatus } from './scripts/release-calver-lib.ts'
+          const status = recentChangesStatus(
+            readFileSync('packages/frontend/content/en/misc/changelog.md', 'utf8'),
+          )
+          if (status !== 'empty') {
+            console.error(`Expected an empty "## Recent changes" section after release, got ${status}.`)
+            process.exit(1)
+          }
+          EOF
+
+          VERSION=$(jq -r '.version' packages/frontend/package.json)
+          if ! [[ "${VERSION}" =~ ^[0-9]{4}\.(1[0-2]|[1-9])\.[0-9]+$ ]]; then
+            echo "::error::pnpm release produced a version that is not CalVer: ${VERSION}"
+            exit 1
+          fi
+          BRANCH="release/v${VERSION}"
+
+          git checkout -B "${BRANCH}"
+          git add -- packages/frontend/package.json packages/frontend/content/en/misc/changelog.md
+          EXTRA=$(git status --porcelain | grep -v -E '^[AM]  (packages/frontend/package\.json|packages/frontend/content/en/misc/changelog\.md)$' || true)
+          if [ -n "${EXTRA}" ]; then
+            echo "::error::pnpm release changed files other than the version and the English changelog."
+            printf '%s\n' "${EXTRA}"
+            exit 1
+          fi
+          if git diff --cached --quiet; then
+            echo "::error::pnpm release made no changes."
+            exit 1
+          fi
+          git commit -m "chore(release): v${VERSION}" -m "Move the notes under Recent changes into ${VERSION} and leave that heading empty."
+
+          REMOTE_SHA=$(git ls-remote --heads origin "refs/heads/${BRANCH}" | awk 'NR==1 { print $1 }')
+          NEED_PUSH=true
+          if [ -n "${REMOTE_SHA}" ]; then
+            git fetch --no-tags origin "refs/heads/${BRANCH}"
+            REMOTE_SHA=$(git rev-parse FETCH_HEAD)
+            if git diff --quiet FETCH_HEAD HEAD -- packages/frontend/package.json packages/frontend/content/en/misc/changelog.md; then
+              NEED_PUSH=false
+              echo "${BRANCH} already matches this version and changelog."
+            fi
+          fi
+          if [ "${NEED_PUSH}" = true ]; then
+            if [ -n "${REMOTE_SHA}" ]; then
+              git push --force-with-lease="refs/heads/${BRANCH}:${REMOTE_SHA}" origin "HEAD:${BRANCH}"
+            else
+              git push origin "HEAD:${BRANCH}"
+            fi
+          fi
+
+          TITLE="chore(release): v${VERSION}"
+          if [ "${NEED_PUSH}" = true ]; then
+            EXPECTED_SHA=$(git rev-parse HEAD)
+          else
+            EXPECTED_SHA="${REMOTE_SHA}"
+          fi
+          export EXPECTED_SHA
+
+          # Same-repository release pull requests only. A fork can open
+          # release/vX; that pull request is not this cut and is not merged.
+          list_release_prs() {
+            gh pr list --base main --state open --limit 50 \
+              --json number,headRefName,headRefOid,isCrossRepository,headRepository
+          }
+
+          PRS=$(list_release_prs)
+          SUPERSEDED=$(printf '%s' "${PRS}" | jq -r \
+            --arg branch "${BRANCH}" \
+            --arg repo "${GITHUB_REPOSITORY}" \
+            '.[]
+              | select(.isCrossRepository == false)
+              | select((.headRepository.nameWithOwner // "") == $repo)
+              | select(.headRefName | test("^release/v[0-9]{4}\\.(1[0-2]|[1-9])\\.[0-9]+$"))
+              | select(.headRefName != $branch)
+              | .number')
+          if [ -n "${SUPERSEDED}" ]; then
+            while IFS= read -r OLD; do
+              [ -z "${OLD}" ] && continue
+              echo "Closing #${OLD}; ${BRANCH} replaces that release pull request."
+              gh pr merge "${OLD}" --disable-auto || true
+              gh pr close "${OLD}" --comment "Superseded by ${BRANCH}. A newer calendar version is being cut, so this pull request will not merge."
+            done <<< "${SUPERSEDED}"
+          fi
+
+          # Prints the pull request number, "missing", or "ambiguous".
+          select_pr() {
+            printf '%s' "$(list_release_prs)" | jq -r \
+              --arg branch "${BRANCH}" \
+              --arg repo "${GITHUB_REPOSITORY}" \
+              --arg sha "${EXPECTED_SHA}" \
+              '
+              [
+                .[]
+                | select(.isCrossRepository == false)
+                | select((.headRepository.nameWithOwner // "") == $repo)
+                | select(.headRefName == $branch)
+                | select(.headRefOid == $sha)
+                | .number
+              ]
+              | if length > 1 then "ambiguous"
+                elif length == 1 then .[0] | tostring
+                else "missing"
+                end
+              '
+          }
+
+          PR=$(select_pr)
+          if [ "${PR}" = "ambiguous" ]; then
+            echo "::error::More than one pull request for ${BRANCH} at ${EXPECTED_SHA}."
+            exit 1
+          fi
+          if [ "${PR}" = "missing" ]; then
+            BODY_FILE=$(mktemp)
+            cat > "${BODY_FILE}" <<EOF
+          Automated calendar-version release of ${VERSION} (${TODAY}).
+
+          pnpm release moved the notes under "## Recent changes" in the English changelog to "## [${VERSION}] - ${TODAY}" and bumped packages/frontend/package.json. An empty "## Recent changes" heading remains for the next notes.
+
+          Localized changelogs are unchanged in this pull request. After this squash-merges to main, Translate content updates ja, fr, pl, and ru. The tag job creates v${VERSION} on that commit.
+
+          Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+          EOF
+            gh pr create --base main --head "${BRANCH}" --title "${TITLE}" --body-file "${BODY_FILE}"
+            rm -f "${BODY_FILE}"
+            PR=$(select_pr)
+          fi
+          if [ "${PR}" = "ambiguous" ]; then
+            echo "::error::More than one pull request for ${BRANCH} at ${EXPECTED_SHA}."
+            exit 1
+          fi
+          if [ -z "${PR}" ] || [ "${PR}" = "missing" ] || [ "${PR}" = "null" ]; then
+            echo "::error::No same-repository pull request for ${BRANCH} at ${EXPECTED_SHA}."
+            exit 1
+          fi
+
+          METHOD=$(gh pr view "${PR}" --json autoMergeRequest,headRefOid,isCrossRepository,headRepository \
+            --jq 'if .isCrossRepository or .headRepository.nameWithOwner != env.GITHUB_REPOSITORY or .headRefOid != env.EXPECTED_SHA then "reject" else (.autoMergeRequest.mergeMethod // "none") end')
+          if [ "${METHOD}" = "reject" ]; then
+            echo "::error::Pull request #${PR} is not ${BRANCH} at ${EXPECTED_SHA} in ${GITHUB_REPOSITORY}."
+            exit 1
+          fi
+          if [ "${METHOD}" != "SQUASH" ]; then
+            gh pr merge "${PR}" --auto --squash --match-head-commit "${EXPECTED_SHA}" --subject "${TITLE}"
+          fi
+          echo "Release pull request #${PR} for v${VERSION} is set to squash auto-merge."
+
+  tag:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Read the player version
+        id: version
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          VERSION=$(jq -r '.version' packages/frontend/package.json)
+          NULL_SHA=0000000000000000000000000000000000000000
+          CHANGED=true
+          if [ -n "${BEFORE}" ] && [ "${BEFORE}" != "${NULL_SHA}" ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            if git cat-file -e "${BEFORE}:packages/frontend/package.json" 2>/dev/null; then
+              PREV=$(git show "${BEFORE}:packages/frontend/package.json" | jq -r '.version')
+              if [ "${PREV}" = "${VERSION}" ]; then
+                CHANGED=false
+                echo "packages/frontend/package.json changed and the version is still ${VERSION}."
+              fi
+            fi
+          fi
+          if [ "${CHANGED}" != true ]; then
+            echo "tag=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          if ! [[ "${VERSION}" =~ ^[0-9]{4}\.(1[0-2]|[1-9])\.[0-9]+$ ]]; then
+            echo "::error::packages/frontend/package.json version ${VERSION} is not CalVer YYYY.M.MICRO."
+            exit 1
+          fi
+          echo "tag=true" >> "${GITHUB_OUTPUT}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create GitHub App token
+        id: app-token
+        if: steps.version.outputs.tag == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Tag the release commit
+        if: steps.version.outputs.tag == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          export GH_PROMPT_DISABLED=1
+          TAG="v${VERSION}"
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq .ref >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists."
+            exit 0
+          fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+            -f ref="refs/tags/${TAG}" \
+            -f sha="${GITHUB_SHA}"
+          echo "Created lightweight tag ${TAG} on ${GITHUB_SHA}."

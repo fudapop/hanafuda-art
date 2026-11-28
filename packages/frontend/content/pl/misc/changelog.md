@@ -1,6 +1,6 @@
 # Dziennik zmian
 
-## Unreleased
+## Recent changes
 
 - **Zasoby gry**: Karty, muzyka i awatary (w tym wcześniej zapisane awatary) ładują się teraz bezpośrednio z naszego dedykowanego hosta zasobów.
 - **Stosy zebranych kart**: Karty zebrane przez szczęśliwą rękę w pierwszej rundzie nie pozostają już na stosach zebranych kart po rozpoczęciu kolejnej rundy.
