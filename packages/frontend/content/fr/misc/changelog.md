@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- **Ressources du jeu** : Les cartes, la musique et les avatars (y compris les avatars précédemment sauvegardés) se chargent désormais directement depuis notre serveur de ressources dédié.
+- **Ressources du jeu** : Les cartes, la musique et les avatars (y compris les avatars précédemment enregistrés) se chargent désormais directement depuis notre serveur de ressources dédié.
+- **Piles de collecte** : Les cartes remportées par une main chanceuse lors de la première manche ne restent plus dans les piles de collecte après le début de la manche suivante.
+- **Indice de votre tour** : L'invite au-dessus de votre main ne décale plus les cartes lorsqu'il s'agit de votre tour de choisir.
+- **Plateau de jeu sur téléphone** : La main de l'adversaire est bien dégagée de la barre supérieure, et l'espace supplémentaire sur les téléphones de grande taille est réparti sur l'ensemble du plateau.
 
 ## [2026.11.0] - 2026-11-14
 
