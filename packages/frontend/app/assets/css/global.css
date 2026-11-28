@@ -684,8 +684,9 @@ body > svg[style*="z-index: -99999999"] {
     padding-block: 0.25rem;
   }
 
-  /* The turn hint is a full line. On a 320px-tall screen that line is the
-     difference between a field and no field, so it overlays the hand. */
+  /* The turn hint stays mounted so taller boards do not reflow when it
+     fades in. On a 320px-tall screen that line is the difference between a
+     field and no field, so it overlays the hand instead of reserving a row. */
   .board-hand p {
     position: absolute;
     z-index: 10;

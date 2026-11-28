@@ -1,20 +1,17 @@
 <template>
   <div class="relative">
-    <Transition
-      enter-active-class="duration-300 delay-2000 ease-out"
-      enter-from-class="opacity-0 -translate-y-1"
-      enter-to-class="opacity-100"
-      leave-active-class="duration-200 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0 -translate-y-1"
+    <!--
+      Always mounted. Removing it with v-if grew the hand row of the fixed
+      board grid and the field above it shifted. Opacity hides the line
+      without changing that row. Short screens overlay it (global.css).
+    -->
+    <p
+      class="turn-hint relative z-10 mb-1 mx-auto max-w-3/4 text-center text-sm text-text/70 pointer-events-none select-none"
+      :class="{ 'is-shown': awaitingSelection }"
+      :aria-hidden="awaitingSelection ? undefined : true"
     >
-      <p
-        v-if="awaitingSelection"
-        class="relative z-10 mb-1 mx-auto max-w-3/4 text-center text-sm text-text/70 pointer-events-none"
-      >
-        {{ t('game.regions.yourTurn') }} &mdash; {{ t('game.hints.selectCard') }}
-      </p>
-    </Transition>
+      {{ t('game.regions.yourTurn') }} &mdash; {{ t('game.hints.selectCard') }}
+    </p>
     <ul
       :role="id === selfKey ? 'listbox' : 'list'"
       :aria-label="t(id === selfKey ? 'game.regions.yourHand' : 'game.regions.opponentHand')"
@@ -167,3 +164,28 @@ onUnmounted(() => {
   cleanupHand()
 })
 </script>
+
+<style scoped>
+.turn-hint {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms ease-in,
+    visibility 0s linear 200ms;
+}
+
+.turn-hint.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 300ms ease-out 2000ms,
+    visibility 0s linear 2000ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .turn-hint,
+  .turn-hint.is-shown {
+    transition: none;
+  }
+}
+</style>
